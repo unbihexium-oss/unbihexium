@@ -150,3 +150,11 @@ from unbihexium.analysis.urban import UrbanPlanner
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Vegetation Indices](03_indices_flood_water.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

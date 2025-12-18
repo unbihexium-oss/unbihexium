@@ -137,3 +137,11 @@ Classical algorithms and ML-based models available in all tiers.
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Geostatistics Tutorial](../tutorials/geostat.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

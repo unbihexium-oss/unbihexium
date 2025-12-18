@@ -126,3 +126,11 @@ All models available in tiny/base/large variants with SHA256 verification.
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Model Zoo Catalog](../model_zoo/catalog.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

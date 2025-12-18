@@ -143,3 +143,11 @@ Index calculators and water detection models in all tiers.
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Indices Tutorial](../tutorials/indices.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

@@ -131,3 +131,11 @@ from unbihexium.registry.pipelines import PipelineRegistry
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [STAC Integration](../reference/api.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

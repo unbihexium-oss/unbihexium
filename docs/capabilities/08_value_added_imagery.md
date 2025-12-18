@@ -119,3 +119,11 @@ from unbihexium.io.geotiff import orthorectify, mosaic
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Image Processing](04_environment_forestry_image_processing.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

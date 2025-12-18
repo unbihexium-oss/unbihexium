@@ -131,3 +131,11 @@ from unbihexium.io.digitization import Digitizer
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Value-Added Imagery](08_value_added_imagery.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

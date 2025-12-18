@@ -1,68 +1,64 @@
-# Capabilities
+# Capabilities Index
 
-Unbihexium provides capabilities across multiple domains.
+## Purpose
 
-## Domain Coverage
+Overview of all 12 capability domains in unbihexium.
 
-| Domain | Capabilities | Maturity |
-|--------|-------------|----------|
-| AI Products | Detection, Segmentation, Super-Resolution | Stable |
-| Indices | NDVI, NDWI, NBR, EVI, SAVI, MSI | Stable |
-| Geostatistics | Variogram, Kriging, Moran's I | Stable |
-| Analysis | Zonal, Suitability, Network | Stable |
-| Water | Flood detection, Water bodies | Stable |
-| Agriculture | Crop classification, Yield prediction | Stable |
-| Urban | Building detection, Change analysis | Stable |
-| SAR | Amplitude analysis, Phase processing | Research |
+## Quick Navigation
 
-## Capability Architecture
+| No. | Domain | Link | Key Features |
+|-----|--------|------|--------------|
+| 01 | AI Products | [01_ai_products.md](01_ai_products.md) | Detection, segmentation, super-resolution |
+| 02 | Tourism/Data | [02_tourism_data_processing.md](02_tourism_data_processing.md) | Route planning, analytics |
+| 03 | Indices/Water | [03_indices_flood_water.md](03_indices_flood_water.md) | NDVI, NDWI, flood risk |
+| 04 | Environment | [04_environment_forestry_image_processing.md](04_environment_forestry_image_processing.md) | Monitoring, deforestation |
+| 05 | Asset/Energy | [05_asset_management_energy.md](05_asset_management_energy.md) | Damage, utilities, solar |
+| 06 | Urban/Agri | [06_urban_agriculture.md](06_urban_agriculture.md) | Planning, crops, yield |
+| 07 | Risk/Defense | [07_risk_defense_neutral.md](07_risk_defense_neutral.md) | Hazard, security |
+| 08 | Value-Added | [08_value_added_imagery.md](08_value_added_imagery.md) | DSM, DEM, ortho |
+| 09 | Benefits | [09_benefits_narrative.md](09_benefits_narrative.md) | Delivery, coverage |
+| 10 | Satellite | [10_satellite_imagery_features.md](10_satellite_imagery_features.md) | Stereo, scales |
+| 11 | Resolution | [11_resolution_metadata_qa.md](11_resolution_metadata_qa.md) | 0.3m-1.5m QA |
+| 12 | SAR/Radar | [12_radar_sar.md](12_radar_sar.md) | Amplitude, InSAR |
+
+## Domain Overview
 
 ```mermaid
 graph TB
-    subgraph Core
-        R[Raster] --> P[Pipeline]
-        V[Vector] --> P
-        P --> M[Model]
+    subgraph Detection
+        AI[AI Products]
     end
-
-    subgraph Domains
-        P --> AI[AI Products]
-        P --> IDX[Indices]
-        P --> GEO[Geostatistics]
-        P --> ANA[Analysis]
+    
+    subgraph Analysis
+        TOUR[Tourism/Data]
+        RISK[Risk/Defense]
     end
-
+    
+    subgraph Remote Sensing
+        IND[Indices/Water]
+        ENV[Environment]
+        SAT[Satellite]
+        SAR[SAR/Radar]
+    end
+    
+    subgraph Applications
+        ASSET[Asset/Energy]
+        URBAN[Urban/Agri]
+    end
+    
     subgraph Output
-        AI --> OUT[Results]
-        IDX --> OUT
-        GEO --> OUT
-        ANA --> OUT
+        VAL[Value-Added]
+        RES[Resolution]
+        BEN[Benefits]
     end
 ```
 
-## Maturity Levels
+## Model Coverage
 
-We follow a clear maturity classification:
+Total models: 390 (130 per tier)
 
-| Level | Definition | Testing |
-|-------|------------|---------|
-| Stable | Production-ready | Full test suite |
-| Beta | Feature-complete, may change | Integration tests |
-| Research | Experimental, API may change | Smoke tests |
+$$coverage = \frac{implemented}{planned} = \frac{130}{130} = 100\%$$
 
-## Performance Formula
+---
 
-Pipeline throughput is calculated as:
-
-$$T = \frac{N \times S^2}{t_{total}}$$
-
-Where:
-- $N$ = number of tiles
-- $S$ = tile size (pixels)
-- $t_{total}$ = total processing time
-
-## Learn More
-
-- [AI Capabilities](ai.md)
-- [Water Domain](water.md)
-- [Agriculture Domain](agriculture.md)
+**Navigation:** [Home](../index.md) | [TOC](../toc.md) | [Glossary](../glossary.md)

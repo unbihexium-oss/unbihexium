@@ -154,3 +154,11 @@ from unbihexium.sar.interferometry import compute_coherence, compute_displacemen
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Glossary](../glossary.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

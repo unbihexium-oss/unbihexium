@@ -150,3 +150,11 @@ from unbihexium.ai.detection import MaritimeAwareness
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
 - [Responsible Use Policy](../security/responsible_use.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+

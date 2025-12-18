@@ -160,3 +160,11 @@ from unbihexium.analysis.forestry import DensityEstimator
 
 - [Documentation Index](../index.md)
 - [Table of Contents](../toc.md)
+
+---
+
+## Quick Navigation
+
+| Prev | Home | Next |
+|------|------|------|
+
