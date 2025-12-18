@@ -4,7 +4,7 @@ Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python l
 
 [![PyPI version](https://img.shields.io/pypi/v/unbihexium)](https://pypi.org/project/unbihexium/)
 [![Python versions](https://img.shields.io/pypi/pyversions/unbihexium)](https://pypi.org/project/unbihexium/)
-[![License](https://img.shields.io/github/license/unbihexium-oss/unbihexium)](https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI](https://github.com/unbihexium-oss/unbihexium/actions/workflows/ci.yml/badge.svg)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/ci.yml)
 [![Coverage](https://github.com/unbihexium-oss/unbihexium/actions/workflows/coverage.yml/badge.svg)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/coverage.yml)
 [![Docs](https://github.com/unbihexium-oss/unbihexium/actions/workflows/docs.yml/badge.svg)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/docs.yml)
