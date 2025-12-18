@@ -80,3 +80,13 @@ from unbihexium.geostat import Variogram, OrdinaryKriging
 # Analysis
 from unbihexium.analysis import zonal_statistics, AHP
 ```
+
+---
+
+## Navigation
+
+| Prev | Up | Next |
+|------|-----|------|
+| [Tutorials](../tutorials/index.md) | [Home](../index.md) | [CLI Reference](cli.md) |
+
+**Related:** [Architecture](../architecture/overview.md) | [Model Zoo](../model_zoo/catalog.md)

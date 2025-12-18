@@ -35,3 +35,13 @@ Common formulas used across tutorials:
 **NDVI**: $$NDVI = \frac{NIR - RED}{NIR + RED}$$
 
 **Semivariance**: $$\gamma(h) = \frac{1}{2N(h)} \sum_{i=1}^{N(h)} [z(x_i) - z(x_i + h)]^2$$
+
+---
+
+## Navigation
+
+| Prev | Up | Next |
+|------|-----|------|
+| [Quickstart](../getting_started/quickstart.md) | [Home](../index.md) | [Detection Tutorial](detection.md) |
+
+**Related:** [Capabilities](../capabilities/index.md) | [API Reference](../reference/api.md)

@@ -159,3 +159,13 @@ unbihexium zoo list --task detection
 # Download
 unbihexium zoo download ship_detector_tiny
 ```
+
+---
+
+## Navigation
+
+| Prev | Up | Next |
+|------|-----|------|
+| [Architecture](../architecture/overview.md) | [Home](../index.md) | [Distribution](distribution.md) |
+
+**Related:** [Capabilities](../capabilities/index.md) | [API Reference](../reference/api.md)

@@ -89,3 +89,13 @@ unbihexium pipeline run ship_detection -i input.tif -o output.geojson
 - Try different detection models
 - Adjust confidence threshold
 - Explore change detection
+
+---
+
+## Navigation
+
+| Prev | Up | Next |
+|------|-----|------|
+| [Tutorials Index](index.md) | [Home](../index.md) | [Indices Tutorial](indices.md) |
+
+**Related:** [AI Capabilities](../capabilities/01_ai_products.md) | [Model Zoo](../model_zoo/catalog.md)

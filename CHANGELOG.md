@@ -34,3 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OpenSSF Scorecard integration
 - CodeQL scanning
 - Signed releases with attestations
+
+---
+
+## Navigation
+
+[README](README.md) | [Contributing](CONTRIBUTING.md) | [Security](SECURITY.md) | [License](LICENSE)

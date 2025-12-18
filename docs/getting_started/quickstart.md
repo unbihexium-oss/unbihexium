@@ -90,3 +90,13 @@ sequenceDiagram
     Pipeline-->>CLI: Output file
     CLI-->>User: Success
 ```
+
+---
+
+## Navigation
+
+| Prev | Up | Next |
+|------|-----|------|
+| [Installation](installation.md) | [Home](../index.md) | [Tutorials](../tutorials/index.md) |
+
+**Related:** [API Reference](../reference/api.md) | [CLI Reference](../reference/cli.md) | [Model Zoo](../model_zoo/catalog.md)
