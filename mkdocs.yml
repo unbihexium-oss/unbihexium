@@ -1,0 +1,86 @@
+site_name: Unbihexium Documentation
+site_url: https://unbihexium.org/docs
+site_author: Unbihexium OSS Foundation
+site_description: Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR library
+
+repo_name: unbihexium-oss/unbihexium
+repo_url: https://github.com/unbihexium-oss/unbihexium
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting_started/installation.md
+    - Quick Start: getting_started/quickstart.md
+  - Tutorials:
+    - tutorials/index.md
+    - Object Detection: tutorials/detection.md
+    - Spectral Indices: tutorials/indices.md
+    - Geostatistics: tutorials/geostat.md
+  - Capabilities:
+    - capabilities/index.md
+    - AI Products: capabilities/ai.md
+    - Water and Flood: capabilities/water.md
+    - Agriculture: capabilities/agriculture.md
+  - Reference:
+    - API: reference/api.md
+    - CLI: reference/cli.md
+  - Architecture:
+    - Overview: architecture/overview.md
+  - Model Zoo:
+    - Catalog: model_zoo/catalog.md
+  - Security:
+    - Responsible Use: security/responsible_use.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            show_source: true
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

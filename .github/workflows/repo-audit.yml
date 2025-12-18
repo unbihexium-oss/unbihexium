@@ -1,0 +1,37 @@
+name: Repo Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 0 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run repo audit
+        run: python scripts/repo_audit.py --check
+
+      - name: Run manifest validation
+        run: python scripts/manifest_validate.py
+
+      - name: Run model artifact audit
+        run: python scripts/model_artifact_audit.py

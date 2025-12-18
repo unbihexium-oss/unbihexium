@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: Unbihexium
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - name: Unbihexium OSS Foundation
+    email: opensource@unbihexium.org
+repository-code: https://github.com/unbihexium-oss/unbihexium
+url: https://unbihexium.org
+abstract: >-
+  Production-grade Earth Observation, Geospatial,
+  Remote Sensing, and SAR Python library.
+keywords:
+  - earth-observation
+  - geospatial
+  - remote-sensing
+  - sar
+  - satellite-imagery
+  - machine-learning
+license: Apache-2.0
+version: 1.0.0
+date-released: 2025-12-18

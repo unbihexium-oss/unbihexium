@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Model Manifest Schema",
+  "type": "object",
+  "required": ["id", "name", "task", "framework", "version", "sha256", "license"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique model identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable model name"
+    },
+    "task": {
+      "type": "string",
+      "enum": [
+        "detection",
+        "segmentation",
+        "classification",
+        "super_resolution",
+        "change_detection",
+        "regression",
+        "embedding"
+      ]
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["pytorch", "tensorflow", "onnx", "sklearn"]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$|^placeholder|^to_be_computed"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source": {
+      "type": "string",
+      "enum": ["repo", "release", "lfs", "external"]
+    },
+    "path": {
+      "type": "string",
+      "description": "Path relative to model_zoo directory"
+    },
+    "release_tag": {
+      "type": "string",
+      "description": "GitHub release tag for release assets"
+    },
+    "asset_name": {
+      "type": "string",
+      "description": "Asset filename in release"
+    },
+    "license": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "input_shape": {
+      "type": "array",
+      "items": {"type": "integer"}
+    },
+    "classes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "scale_factor": {
+      "type": "integer"
+    }
+  }
+}
