@@ -71,7 +71,7 @@ def write_zarr(
     """
     try:
         import zarr
-        from numcodecs import Zlib, Blosc
+        from numcodecs import Blosc, Zlib
     except ImportError as e:
         raise ImportError("zarr is required for Zarr support") from e
 

@@ -36,6 +36,7 @@ def read_geotiff(
 
         if window is not None:
             from rasterio.windows import Window
+
             win = Window.from_slices(
                 (window[0], window[1]),
                 (window[2], window[3]),
@@ -142,6 +143,7 @@ def read_cog(
 
         if window is not None:
             from rasterio.windows import Window
+
             win = Window.from_slices(
                 (window[0], window[1]),
                 (window[2], window[3]),

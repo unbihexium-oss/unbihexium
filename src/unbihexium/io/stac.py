@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Iterator
+from typing import Any
 
 
 @dataclass
@@ -72,7 +73,9 @@ class STACClient:
             yield STACItem(
                 id=feature["id"],
                 bbox=tuple(feature.get("bbox", [0, 0, 0, 0])),
-                datetime=datetime.fromisoformat(feature["properties"].get("datetime", "").replace("Z", "+00:00"))
+                datetime=datetime.fromisoformat(
+                    feature["properties"].get("datetime", "").replace("Z", "+00:00")
+                )
                 if feature["properties"].get("datetime")
                 else None,
                 properties=feature.get("properties", {}),
@@ -102,7 +105,11 @@ def search_stac(
         List of STAC items.
     """
     client = STACClient(url=url)
-    return list(client.search(bbox=bbox, datetime_range=datetime_range, collections=collections, limit=limit))
+    return list(
+        client.search(
+            bbox=bbox, datetime_range=datetime_range, collections=collections, limit=limit
+        )
+    )
 
 
 def load_from_stac(item: STACItem, asset_key: str = "visual") -> Any:

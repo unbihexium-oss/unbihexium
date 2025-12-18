@@ -43,8 +43,9 @@ def compute_coherence(
 
     # Cross-correlation
     cross = master * np.conj(slave)
-    cross_mean = ndimage.uniform_filter(np.real(cross), size=window_size) + \
-                 1j * ndimage.uniform_filter(np.imag(cross), size=window_size)
+    cross_mean = ndimage.uniform_filter(
+        np.real(cross), size=window_size
+    ) + 1j * ndimage.uniform_filter(np.imag(cross), size=window_size)
 
     # Power terms
     power_master = ndimage.uniform_filter(np.abs(master) ** 2, size=window_size)
@@ -84,9 +85,8 @@ def compute_interferogram(
     # Multilooking
     if multilook != (1, 1):
         from scipy import ndimage
-        ifg = ndimage.uniform_filter(
-            np.real(ifg), size=multilook
-        ) + 1j * ndimage.uniform_filter(
+
+        ifg = ndimage.uniform_filter(np.real(ifg), size=multilook) + 1j * ndimage.uniform_filter(
             np.imag(ifg), size=multilook
         )
 

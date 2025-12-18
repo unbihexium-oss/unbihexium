@@ -69,8 +69,8 @@ def pauli_decomposition(
     """
     # Pauli decomposition
     surface = np.abs(hh + vv) ** 2 / 2  # Single bounce
-    double = np.abs(hh - vv) ** 2 / 2   # Double bounce
-    volume = 2 * np.abs(hv) ** 2         # Volume scattering
+    double = np.abs(hh - vv) ** 2 / 2  # Double bounce
+    volume = 2 * np.abs(hv) ** 2  # Volume scattering
 
     return PolarimetricResult(
         decomposition_type="pauli",

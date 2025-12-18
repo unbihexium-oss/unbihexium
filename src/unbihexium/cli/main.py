@@ -186,7 +186,7 @@ def pipeline_run(
 
     pipeline = PipelineRegistry.create(pipeline_id)
     if pipeline is None:
-        console.print(f"[red]Error:[/] Failed to create pipeline")
+        console.print("[red]Error:[/] Failed to create pipeline")
         raise SystemExit(1)
 
     try:
@@ -216,8 +216,6 @@ def index(
     blue: str,
 ) -> None:
     """Compute a spectral index."""
-    from pathlib import Path
-
     from unbihexium.core.index import IndexRegistry
     from unbihexium.core.raster import Raster
 

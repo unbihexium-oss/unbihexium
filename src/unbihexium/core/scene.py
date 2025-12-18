@@ -11,7 +11,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from unbihexium.core.raster import Raster, RasterMetadata
+from unbihexium.core.raster import Raster
 
 
 class AcquisitionMode(str, Enum):
@@ -81,10 +81,12 @@ class Scene:
         if raster.data is None:
             return cls()
         count = raster.count
-        band_names = band_names or [f"band_{i+1}" for i in range(count)]
+        band_names = band_names or [f"band_{i + 1}" for i in range(count)]
         rasters = {}
         for i, name in enumerate(band_names[:count]):
-            band_data = raster.data[i:i+1] if raster.data.ndim == 3 else raster.data[np.newaxis, ...]
+            band_data = (
+                raster.data[i : i + 1] if raster.data.ndim == 3 else raster.data[np.newaxis, ...]
+            )
             rasters[name] = Raster.from_array(
                 band_data,
                 crs=raster.metadata.crs if raster.metadata else "EPSG:4326",

@@ -6,16 +6,14 @@ with support for tiling, chunking, and streaming operations.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Literal
+from typing import Any, Literal
 
 import numpy as np
 from numpy.typing import NDArray
-
-if TYPE_CHECKING:
-    from affine import Affine
 
 
 class RasterDtype(str, Enum):
@@ -371,7 +369,9 @@ class Raster:
             for col_off in range(0, width, step):
                 tile_height = min(tile_size, height - row_off)
                 tile_width = min(tile_size, width - col_off)
-                tile_data = self.data[:, row_off : row_off + tile_height, col_off : col_off + tile_width]
+                tile_data = self.data[
+                    :, row_off : row_off + tile_height, col_off : col_off + tile_width
+                ]
                 yield row_off, col_off, tile_data
 
     def resample(
@@ -485,9 +485,9 @@ class Raster:
             A new reprojected Raster.
         """
         from rasterio.crs import CRS
+        from rasterio.enums import Resampling
         from rasterio.transform import Affine
         from rasterio.warp import calculate_default_transform, reproject
-        from rasterio.enums import Resampling
 
         self.load()
 
@@ -504,7 +504,9 @@ class Raster:
             dst_crs,
             self.metadata.width,
             self.metadata.height,
-            *self.metadata.bounds if self.metadata.bounds else (0, 0, self.metadata.width, self.metadata.height),
+            *self.metadata.bounds
+            if self.metadata.bounds
+            else (0, 0, self.metadata.width, self.metadata.height),
             resolution=resolution,
         )
 

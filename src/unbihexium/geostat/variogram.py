@@ -138,7 +138,11 @@ class Variogram:
         # Initial guesses
         nugget_init = semivariance[0]
         sill_init = np.max(semivariance)
-        range_init = lags[np.argmax(semivariance > 0.95 * sill_init)] if np.any(semivariance > 0.95 * sill_init) else lags[-1]
+        range_init = (
+            lags[np.argmax(semivariance > 0.95 * sill_init)]
+            if np.any(semivariance > 0.95 * sill_init)
+            else lags[-1]
+        )
 
         def objective(params: NDArray[np.floating[Any]]) -> float:
             nugget, sill, range_param = params
@@ -172,7 +176,7 @@ class Variogram:
 
         elif self.model == VariogramModel.GAUSSIAN:
             # Gaussian model
-            return nugget + sill * (1 - np.exp(-(h / range_param) ** 2))
+            return nugget + sill * (1 - np.exp(-((h / range_param) ** 2)))
 
         elif self.model == VariogramModel.LINEAR:
             # Linear model

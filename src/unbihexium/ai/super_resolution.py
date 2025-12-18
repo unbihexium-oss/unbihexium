@@ -8,8 +8,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from unbihexium.core.raster import Raster
 from unbihexium.core.pipeline import Pipeline, PipelineConfig
+from unbihexium.core.raster import Raster
 from unbihexium.registry.pipelines import PipelineRegistry
 
 

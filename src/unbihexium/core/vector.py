@@ -6,10 +6,11 @@ with support for GeoJSON, Parquet, and various geometry operations.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -66,7 +67,9 @@ class VectorMetadata:
         """Create metadata from dictionary."""
         return cls(
             crs=data["crs"],
-            geometry_type=GeometryType(data["geometry_type"]) if data.get("geometry_type") else None,
+            geometry_type=GeometryType(data["geometry_type"])
+            if data.get("geometry_type")
+            else None,
             feature_count=data.get("feature_count", 0),
             bounds=tuple(data["bounds"]) if data.get("bounds") else None,
             columns=data.get("columns", []),
@@ -182,8 +185,9 @@ class Vector:
         Returns:
             A new Vector instance.
         """
-        import geopandas as gpd
         import json
+
+        import geopandas as gpd
 
         if isinstance(geojson, str):
             geojson = json.loads(geojson)
@@ -315,6 +319,7 @@ class Vector:
 
         if bounds:
             from shapely.geometry import box
+
             bbox = box(*bounds)
             filtered = filtered[filtered.intersects(bbox)]
 
@@ -383,6 +388,7 @@ class Vector:
         """
         if self.data is None or self.data.empty:
             from shapely.geometry import Point
+
             return Point()
 
         return self.data.geometry.unary_union
@@ -504,9 +510,9 @@ class Vector:
 
     def __repr__(self) -> str:
         """Return string representation."""
-        geom_type = self.metadata.geometry_type.value if self.metadata and self.metadata.geometry_type else "Unknown"
-        return (
-            f"Vector(features={self.feature_count}, "
-            f"geometry_type={geom_type}, "
-            f"crs={self.crs})"
+        geom_type = (
+            self.metadata.geometry_type.value
+            if self.metadata and self.metadata.geometry_type
+            else "Unknown"
         )
+        return f"Vector(features={self.feature_count}, geometry_type={geom_type}, crs={self.crs})"

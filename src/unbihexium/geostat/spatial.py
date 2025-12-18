@@ -24,8 +24,10 @@ class SpatialAutocorrelationResult:
 class MoransI:
     """Moran's I spatial autocorrelation statistic.
 
-    Moran's I is calculated as:
-    $$I = \\frac{n}{\\sum_i \\sum_j w_{ij}} \\cdot \\frac{\\sum_i \\sum_j w_{ij}(x_i - \\bar{x})(x_j - \\bar{x})}{\\sum_i (x_i - \\bar{x})^2}$$
+    Moran's I measures spatial autocorrelation based on feature
+    locations and feature values. Formula:
+
+    I = (n / sum(w_ij)) * sum(w_ij * (x_i - mean) * (x_j - mean)) / sum((x_i - mean)^2)
 
     where w_ij is the spatial weight between locations i and j.
     """
@@ -80,23 +82,23 @@ class MoransI:
 
         # Expected value and variance under null hypothesis
         E_I = -1 / (n - 1)
-        
+
         # Simplified variance calculation
         S1 = 0.5 * np.sum((w + w.T) ** 2)
         S2 = np.sum((w.sum(axis=0) + w.sum(axis=1)) ** 2)
         S0 = w_sum
 
         var_I = (
-            (n * ((n**2 - 3*n + 3) * S1 - n*S2 + 3*S0**2) 
-             - (n**2 - n) * ((n**2 - 3*n + 3) * S1 - n*S2 + 3*S0**2))
-            / ((n - 1) * (n - 2) * (n - 3) * S0**2)
-        )
+            n * ((n**2 - 3 * n + 3) * S1 - n * S2 + 3 * S0**2)
+            - (n**2 - n) * ((n**2 - 3 * n + 3) * S1 - n * S2 + 3 * S0**2)
+        ) / ((n - 1) * (n - 2) * (n - 3) * S0**2)
         var_I = max(var_I, 1e-10)
 
         z_score = (I - E_I) / np.sqrt(var_I)
-        
+
         # Two-tailed p-value
         from scipy.stats import norm
+
         p_value = 2 * (1 - norm.cdf(abs(z_score)))
 
         return SpatialAutocorrelationResult(
@@ -108,9 +110,7 @@ class MoransI:
             statistic_name="Moran's I",
         )
 
-    def _build_weights(
-        self, coordinates: NDArray[np.floating[Any]]
-    ) -> NDArray[np.floating[Any]]:
+    def _build_weights(self, coordinates: NDArray[np.floating[Any]]) -> NDArray[np.floating[Any]]:
         """Build spatial weights matrix."""
         n = len(coordinates)
         weights = np.zeros((n, n))
@@ -156,7 +156,7 @@ class GearysC:
         """Calculate Geary's C statistic."""
         n = len(values)
         mean = np.mean(values)
-        
+
         if weights is None:
             weights = self._build_weights(coordinates)
 
@@ -183,6 +183,7 @@ class GearysC:
         z_score = (C - E_C) / np.sqrt(var_C)
 
         from scipy.stats import norm
+
         p_value = 2 * (1 - norm.cdf(abs(z_score)))
 
         return SpatialAutocorrelationResult(
@@ -194,9 +195,7 @@ class GearysC:
             statistic_name="Geary's C",
         )
 
-    def _build_weights(
-        self, coordinates: NDArray[np.floating[Any]]
-    ) -> NDArray[np.floating[Any]]:
+    def _build_weights(self, coordinates: NDArray[np.floating[Any]]) -> NDArray[np.floating[Any]]:
         """Build spatial weights matrix."""
         morans = MoransI(distance_threshold=self.distance_threshold)
         return morans._build_weights(coordinates)

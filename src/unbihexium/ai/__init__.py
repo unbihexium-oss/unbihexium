@@ -1,18 +1,18 @@
 """AI domain module for detection, segmentation, and super-resolution."""
 
 from unbihexium.ai.detection import (
-    ShipDetector,
-    BuildingDetector,
     AircraftDetector,
-    VehicleDetector,
+    BuildingDetector,
     ObjectDetector,
+    ShipDetector,
+    VehicleDetector,
 )
 from unbihexium.ai.segmentation import (
-    SemanticSegmenter,
     ChangeDetector,
-    WaterDetector,
     CropDetector,
     GreenhouseDetector,
+    SemanticSegmenter,
+    WaterDetector,
 )
 from unbihexium.ai.super_resolution import SuperResolution
 

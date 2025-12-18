@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Type
+from typing import Any
 
 from unbihexium.core.pipeline import Pipeline, PipelineConfig
 
@@ -15,7 +16,7 @@ class PipelineEntry:
     pipeline_id: str
     name: str
     description: str = ""
-    config_class: Type[PipelineConfig] | None = None
+    config_class: type[PipelineConfig] | None = None
     factory: Callable[..., Pipeline] | None = None
     domains: list[str] = field(default_factory=list)
     tags: dict[str, str] = field(default_factory=dict)

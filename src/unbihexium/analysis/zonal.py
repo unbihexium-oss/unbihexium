@@ -91,18 +91,20 @@ def _zonal_from_raster(
 
         pcts = {p: float(np.percentile(zone_values, p)) for p in percentiles}
 
-        results.append(ZonalResult(
-            zone_id=int(zone_id),
-            count=len(zone_values),
-            sum=float(np.sum(zone_values)),
-            mean=float(np.mean(zone_values)),
-            std=float(np.std(zone_values)),
-            min=float(np.min(zone_values)),
-            max=float(np.max(zone_values)),
-            median=float(np.median(zone_values)),
-            variety=len(np.unique(zone_values)),
-            percentiles=pcts,
-        ))
+        results.append(
+            ZonalResult(
+                zone_id=int(zone_id),
+                count=len(zone_values),
+                sum=float(np.sum(zone_values)),
+                mean=float(np.mean(zone_values)),
+                std=float(np.std(zone_values)),
+                min=float(np.min(zone_values)),
+                max=float(np.max(zone_values)),
+                median=float(np.median(zone_values)),
+                variety=len(np.unique(zone_values)),
+                percentiles=pcts,
+            )
+        )
 
     return results
 
@@ -114,7 +116,6 @@ def _zonal_from_vector(
     percentiles: list[int],
 ) -> list[ZonalResult]:
     """Calculate zonal stats from vector zones."""
-    import rasterio
     from rasterio.features import geometry_mask
     from rasterio.transform import Affine
 
@@ -144,17 +145,19 @@ def _zonal_from_vector(
 
         pcts = {p: float(np.percentile(zone_values, p)) for p in percentiles}
 
-        results.append(ZonalResult(
-            zone_id=zone_id,
-            count=len(zone_values),
-            sum=float(np.sum(zone_values)),
-            mean=float(np.mean(zone_values)),
-            std=float(np.std(zone_values)),
-            min=float(np.min(zone_values)),
-            max=float(np.max(zone_values)),
-            median=float(np.median(zone_values)),
-            variety=len(np.unique(zone_values)),
-            percentiles=pcts,
-        ))
+        results.append(
+            ZonalResult(
+                zone_id=zone_id,
+                count=len(zone_values),
+                sum=float(np.sum(zone_values)),
+                mean=float(np.mean(zone_values)),
+                std=float(np.std(zone_values)),
+                min=float(np.min(zone_values)),
+                max=float(np.max(zone_values)),
+                median=float(np.median(zone_values)),
+                variety=len(np.unique(zone_values)),
+                percentiles=pcts,
+            )
+        )
 
     return results

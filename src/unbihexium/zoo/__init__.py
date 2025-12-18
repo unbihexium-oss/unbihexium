@@ -1,12 +1,12 @@
 """Model Zoo package for unbihexium."""
 
+from unbihexium.zoo.downloader import download_model, verify_model
 from unbihexium.zoo.registry import (
     ModelZooEntry,
-    list_models,
     get_model,
+    list_models,
     register_model,
 )
-from unbihexium.zoo.downloader import download_model, verify_model
 
 __all__ = [
     "ModelZooEntry",

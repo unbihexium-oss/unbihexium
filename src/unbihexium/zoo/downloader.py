@@ -10,7 +10,7 @@ from typing import Any
 import requests
 from tqdm import tqdm
 
-from unbihexium.zoo.registry import get_model, ModelZooEntry
+from unbihexium.zoo.registry import ModelZooEntry, get_model
 
 # Default cache directory
 DEFAULT_CACHE_DIR = Path.home() / ".unbihexium_cache" / "models"
@@ -68,10 +68,17 @@ def download_model(
     # Handle different sources
     if entry.source == "repo":
         # For repo models, they should be in model_zoo/assets/tiny/
-        repo_path = Path(__file__).parent.parent.parent.parent / "model_zoo" / "assets" / "tiny" / f"{model_id}.pt"
+        repo_path = (
+            Path(__file__).parent.parent.parent.parent
+            / "model_zoo"
+            / "assets"
+            / "tiny"
+            / f"{model_id}.pt"
+        )
         if repo_path.exists():
             # Copy to cache
             import shutil
+
             model_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(repo_path, model_path)
             return model_path
@@ -100,11 +107,10 @@ def _download_file(url: str, dest: Path) -> None:
 
     total_size = int(response.headers.get("content-length", 0))
 
-    with open(dest, "wb") as f:
-        with tqdm(total=total_size, unit="B", unit_scale=True) as pbar:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
-                pbar.update(len(chunk))
+    with open(dest, "wb") as f, tqdm(total=total_size, unit="B", unit_scale=True) as pbar:
+        for chunk in response.iter_content(chunk_size=8192):
+            f.write(chunk)
+            pbar.update(len(chunk))
 
 
 def _create_placeholder_model(path: Path, entry: ModelZooEntry) -> None:

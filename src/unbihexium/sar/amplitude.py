@@ -52,7 +52,7 @@ def compute_sigma0(
     Returns:
         Sigma0 in linear scale.
     """
-    a_squared = amplitude ** 2
+    a_squared = amplitude**2
 
     if isinstance(incidence_angle, (int, float)):
         sin_theta = np.sin(incidence_angle)
@@ -129,12 +129,12 @@ def speckle_filter(
     elif filter_type == "lee":
         # Lee filter implementation
         mean = ndimage.uniform_filter(data, size=window_size)
-        mean_sq = ndimage.uniform_filter(data ** 2, size=window_size)
-        var = mean_sq - mean ** 2
+        mean_sq = ndimage.uniform_filter(data**2, size=window_size)
+        var = mean_sq - mean**2
 
         # Estimate noise variance (assuming Rayleigh distribution)
-        noise_var = var / (mean ** 2 + 1e-10)
-        k = var / (var + noise_var * mean ** 2 + 1e-10)
+        noise_var = var / (mean**2 + 1e-10)
+        k = var / (var + noise_var * mean**2 + 1e-10)
 
         filtered = mean + k * (data - mean)
         return filtered.astype(np.float32)
@@ -142,10 +142,10 @@ def speckle_filter(
     elif filter_type == "frost":
         # Simplified Frost filter
         mean = ndimage.uniform_filter(data, size=window_size)
-        var = ndimage.uniform_filter(data ** 2, size=window_size) - mean ** 2
+        var = ndimage.uniform_filter(data**2, size=window_size) - mean**2
 
         cv = np.sqrt(var) / (mean + 1e-10)
-        alpha = cv ** 2
+        alpha = cv**2
 
         # Weighted average based on distance
         filtered = ndimage.uniform_filter(data * np.exp(-alpha), size=window_size)

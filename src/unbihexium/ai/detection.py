@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from unbihexium.core.model import ModelConfig, ModelTask, ModelWrapper
+from unbihexium.core.model import ModelWrapper
 from unbihexium.core.pipeline import Pipeline, PipelineConfig
 from unbihexium.core.raster import Raster
 from unbihexium.registry.pipelines import PipelineRegistry
@@ -48,15 +48,17 @@ class DetectionResult:
             if det.geo_bbox:
                 x1, y1, x2, y2 = det.geo_bbox
                 coords = [[[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]]
-                features.append({
-                    "type": "Feature",
-                    "properties": {
-                        "class_id": det.class_id,
-                        "class_name": det.class_name,
-                        "confidence": det.confidence,
-                    },
-                    "geometry": {"type": "Polygon", "coordinates": coords},
-                })
+                features.append(
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "class_id": det.class_id,
+                            "class_name": det.class_name,
+                            "confidence": det.confidence,
+                        },
+                        "geometry": {"type": "Polygon", "coordinates": coords},
+                    }
+                )
         return {"type": "FeatureCollection", "features": features}
 
 
@@ -135,10 +137,7 @@ class ObjectDetector:
         while detections:
             best = detections.pop(0)
             keep.append(best)
-            detections = [
-                d for d in detections
-                if self._iou(best.bbox, d.bbox) < iou_threshold
-            ]
+            detections = [d for d in detections if self._iou(best.bbox, d.bbox) < iou_threshold]
 
         return keep
 
