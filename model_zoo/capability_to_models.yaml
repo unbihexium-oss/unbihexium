@@ -1,0 +1,123 @@
+# Capability to Model Mapping
+# Maps every capability_id to its primary model(s)
+
+version: "1.0.0"
+last_updated: "2025-12-19"
+
+mappings:
+  # Vision / EO AI
+  ship_detection:
+    primary_model_id: ubx-det-multiclass-1.0.0
+    description: Ship detection using multi-class detector with ship label
+
+  building_detection:
+    primary_model_id: ubx-det-multiclass-1.0.0
+    description: Building footprint detection
+
+  aircraft_detection:
+    primary_model_id: ubx-det-multiclass-1.0.0
+    description: Aircraft detection using multi-class detector
+
+  vehicle_detection:
+    primary_model_id: ubx-det-multiclass-1.0.0
+    description: Vehicle detection using multi-class detector
+
+  super_resolution:
+    primary_model_id: ubx-sr-srcnn-1.0.0
+    description: Image super-resolution using SRCNN
+
+  change_detection:
+    primary_model_id: ubx-change-siamese-1.0.0
+    description: Generic change detection using siamese network
+
+  water_segmentation:
+    primary_model_id: ubx-seg-multiclass-unet-1.0.0
+    description: Water body segmentation
+
+  crop_segmentation:
+    primary_model_id: ubx-seg-multiclass-unet-1.0.0
+    description: Crop type segmentation
+
+  greenhouse_detection:
+    primary_model_id: ubx-seg-multiclass-unet-1.0.0
+    description: Greenhouse detection via segmentation
+
+  landcover_classification:
+    primary_model_id: ubx-lulc-seg-1.0.0
+    description: Land use / land cover classification
+
+  # Boundary / Agriculture
+  crop_boundary:
+    primary_model_id: ubx-boundary-crop-1.0.0
+    description: Crop field boundary delineation
+
+  yield_prediction:
+    primary_model_id: ubx-yield-reg-1.0.0
+    description: Crop yield prediction
+
+  # Network / Tourism
+  routing_analysis:
+    primary_model_id: ubx-routing-heuristics-pack-1.0.0
+    description: Routing heuristics for network analysis
+
+  suitability_analysis:
+    primary_model_id: ubx-suitability-mlp-1.0.0
+    description: Multi-criteria suitability scoring
+
+  # Flood / Water
+  flood_risk:
+    primary_model_id: ubx-flood-risk-mlp-1.0.0
+    description: Flood risk scoring
+
+  water_quality:
+    primary_model_id: ubx-water-quality-reg-1.0.0
+    description: Water quality parameter estimation
+
+  # Environment / Forestry
+  deforestation_detection:
+    primary_model_id: ubx-deforestation-change-1.0.0
+    description: Deforestation change detection
+
+  forest_monitoring:
+    primary_model_id: ubx-deforestation-change-1.0.0
+    description: Forest monitoring via change detection
+
+  # Asset / Energy
+  corridor_monitoring:
+    primary_model_id: ubx-corridor-change-1.0.0
+    description: Pipeline corridor change monitoring
+
+  site_selection:
+    primary_model_id: ubx-site-selection-mlp-1.0.0
+    description: Wind/solar site suitability
+
+  leakage_detection:
+    primary_model_id: ubx-leakage-anomaly-1.0.0
+    description: Leakage anomaly detection
+
+  # Urban
+  builtup_detection:
+    primary_model_id: ubx-builtup-seg-1.0.0
+    description: Built-up area segmentation
+
+  urban_expansion:
+    primary_model_id: ubx-builtup-seg-1.0.0
+    description: Urban expansion monitoring
+
+  # Risk / Preparedness
+  wildfire_risk:
+    primary_model_id: ubx-wildfire-risk-1.0.0
+    description: Wildfire risk scoring
+
+  fire_detection:
+    primary_model_id: ubx-fire-detect-1.0.0
+    description: Active fire detection
+
+  # SAR
+  sar_amplitude_analysis:
+    primary_model_id: ubx-sar-amp-clf-1.0.0
+    description: SAR amplitude classification
+
+  insar_displacement:
+    primary_model_id: ubx-sar-phase-demo-1.0.0
+    description: InSAR displacement estimation (research-grade)

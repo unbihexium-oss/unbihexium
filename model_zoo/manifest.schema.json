@@ -1,77 +1,241 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Model Manifest Schema",
+  "description": "Schema for model manifest files in the Unbihexium Model Zoo",
   "type": "object",
-  "required": ["id", "name", "task", "framework", "version", "sha256", "license"],
+  "required": [
+    "model_id",
+    "name",
+    "version",
+    "task",
+    "architecture",
+    "license",
+    "artifacts"
+  ],
   "properties": {
-    "id": {
+    "model_id": {
       "type": "string",
+      "pattern": "^ubx-[a-z0-9-]+-[0-9]+\\.[0-9]+\\.[0-9]+$",
       "description": "Unique model identifier"
     },
     "name": {
       "type": "string",
       "description": "Human-readable model name"
     },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version"
+    },
     "task": {
       "type": "string",
       "enum": [
+        "super_resolution",
         "detection",
         "segmentation",
-        "classification",
-        "super_resolution",
         "change_detection",
+        "boundary_detection",
+        "classification",
         "regression",
-        "embedding"
-      ]
+        "risk_scoring",
+        "anomaly_detection",
+        "suitability",
+        "routing",
+        "insar"
+      ],
+      "description": "Primary task type"
     },
-    "framework": {
+    "architecture": {
       "type": "string",
-      "enum": ["pytorch", "tensorflow", "onnx", "sklearn"]
-    },
-    "version": {
-      "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
-    },
-    "sha256": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{64}$|^placeholder|^to_be_computed"
-    },
-    "size_bytes": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "source": {
-      "type": "string",
-      "enum": ["repo", "release", "lfs", "external"]
-    },
-    "path": {
-      "type": "string",
-      "description": "Path relative to model_zoo directory"
-    },
-    "release_tag": {
-      "type": "string",
-      "description": "GitHub release tag for release assets"
-    },
-    "asset_name": {
-      "type": "string",
-      "description": "Asset filename in release"
+      "description": "Model architecture identifier"
     },
     "license": {
-      "type": "string"
+      "type": "string",
+      "description": "License identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "production",
+        "research",
+        "experimental"
+      ],
+      "default": "production"
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "description": "Detailed model description"
     },
-    "input_shape": {
+    "input": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "image",
+            "tensor",
+            "tabular",
+            "config"
+          ]
+        },
+        "channels": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "normalization": {
+          "type": "object",
+          "properties": {
+            "mean": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "std": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "image",
+            "tensor",
+            "boxes",
+            "mask",
+            "scalar",
+            "vector"
+          ]
+        },
+        "channels": {
+          "type": "integer"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "required": [
+        "tiny"
+      ],
+      "properties": {
+        "tiny": {
+          "type": "object",
+          "required": [
+            "files"
+          ],
+          "properties": {
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "sha256"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "size_bytes": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "full": {
+          "type": "object",
+          "properties": {
+            "release_tag": {
+              "type": "string"
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "sha256"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string"
+                  },
+                  "size_bytes": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "training": {
+      "type": "object",
+      "properties": {
+        "dataset": {
+          "type": "string"
+        },
+        "epochs": {
+          "type": "integer"
+        },
+        "batch_size": {
+          "type": "integer"
+        },
+        "optimizer": {
+          "type": "string"
+        },
+        "learning_rate": {
+          "type": "number"
+        }
+      }
+    },
+    "capabilities": {
       "type": "array",
-      "items": {"type": "integer"}
-    },
-    "classes": {
-      "type": "array",
-      "items": {"type": "string"}
-    },
-    "scale_factor": {
-      "type": "integer"
+      "items": {
+        "type": "string"
+      },
+      "description": "List of capability_ids this model supports"
     }
   }
 }

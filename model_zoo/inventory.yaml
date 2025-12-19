@@ -1,952 +1,194 @@
 # Model Zoo Inventory
-# Complete catalog of ALL models covering 12 major capability domains
-# Total: 390 models (130 per tier)
+# Single source of truth for all models in the Unbihexium Model Zoo
 
-schema_version: "1.0"
-total_models: 390
-
-domains:
-  ai: AI Products (detection, segmentation, super-resolution)
-  tourism: Tourism analytics and route planning
-  analysis: Spatial and statistical analysis
-  indices: Vegetation and environmental indices
-  water: Flood and water management
-  environment: Environmental monitoring
-  forestry: Forest and vegetation monitoring
-  processing: Image processing primitives
-  asset: Geospatial asset management
-  energy: Energy infrastructure and site selection
-  urban: Urban planning and monitoring
-  agriculture: Agricultural analysis
-  risk: Risk assessment and disaster management
-  defense: Security and surveillance analytics (neutral)
-  sar: SAR/Radar imaging and analysis
-  mapping: Thematic and topographic mapping
-  geostat: Geostatistical analysis
-  classification: Land cover and scene classification
-
-tiers:
-  tiny:
-    description: Smoke test models for CI/CD
-    source: repo
-    path: assets/tiny/
-  base:
-    description: Production-ready models
-    source: repo
-    path: assets/base/
-  large:
-    description: High-accuracy models
-    source: repo
-    path: assets/large/
+version: "1.0.0"
+last_updated: "2025-12-19"
 
 models:
-
-  - id: accessibility_analyzer
-    domain: analysis
-    task: accessibility
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: aircraft_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: asset_condition_change
-    domain: asset
-    task: change_detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: beekeeping_suitability
-    domain: agriculture
-    task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: border_monitor
-    domain: defense
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: building_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: builtup_detector
-    domain: urban
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: business_valuation
-    domain: analysis
-    task: valuation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: change_detector
-    domain: ai
-    task: change_detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: cloud_mask
-    domain: processing
-    task: masking
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: construction_monitor
-    domain: urban
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: coregistration
-    domain: processing
-    task: alignment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: corridor_monitor
-    domain: energy
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: crop_boundary_delineation
-    domain: ai
-    task: segmentation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: crop_classifier
-    domain: agriculture
-    task: classification
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: crop_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: crop_growth_monitor
-    domain: agriculture
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: crop_health_assessor
-    domain: agriculture
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: damage_assessor
-    domain: asset
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: deforestation_detector
-    domain: forestry
-    task: change_detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: dem_generator
-    domain: processing
-    task: terrain
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: desertification_monitor
-    domain: environment
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: digitization_2d
-    domain: processing
-    task: digitization
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: digitization_3d
-    domain: processing
-    task: digitization
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: disaster_management
-    domain: risk
-    task: planning
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: drought_monitor
-    domain: environment
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: dsm_generator
-    domain: processing
-    task: surface
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: dtm_generator
-    domain: processing
-    task: terrain
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: economic_spatial_assessor
-    domain: asset
-    task: valuation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: emergency_disaster_manager
-    domain: risk
-    task: disaster
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: encroachment_detector
-    domain: energy
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: energy_potential
-    domain: energy
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: environmental_monitor
-    domain: environment
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: environmental_risk
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: erosion_detector
-    domain: environment
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: evi_calculator
-    domain: indices
-    task: vegetation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: field_surveyor
-    domain: agriculture
-    task: survey
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: fire_monitor
-    domain: risk
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: flood_risk
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: flood_risk_assessor
-    domain: water
-    task: flood
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: forest_density_estimator
-    domain: forestry
-    task: regression
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: forest_monitor
-    domain: forestry
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: geostatistical_analyzer
-    domain: geostat
-    task: analysis
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: grazing_potential
-    domain: agriculture
-    task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: greenhouse_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: ground_displacement
-    domain: sar
-    task: displacement
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: hazard_vulnerability
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: hydroelectric_monitor
-    domain: energy
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: infrastructure_monitor
-    domain: urban
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: insurance_underwriting
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: land_degradation_detector
-    domain: environment
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: land_surface_temperature
-    domain: energy
-    task: thermal
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: landslide_risk
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: leakage_detector
-    domain: energy
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: livestock_estimator
-    domain: agriculture
-    task: regression
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: lulc_classifier
-    domain: classification
-    task: landcover
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: marine_pollution_detector
-    domain: environment
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: maritime_awareness
-    domain: defense
-    task: awareness
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: military_objects_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: mobility_analyzer
-    domain: defense
-    task: analysis
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: model_3d
-    domain: urban
-    task: modeling
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: mosaic_processor
-    domain: processing
-    task: mosaic
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: mosaicking
-    domain: processing
-    task: mosaic
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: msi_calculator
-    domain: indices
-    task: moisture
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: multi_solution_segmentation
-    domain: ai
-    task: segmentation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: multispectral_processor
-    domain: processing
-    task: spectral
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: natural_resources_monitor
-    domain: environment
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: nbr_calculator
-    domain: indices
-    task: burn
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: ndvi_calculator
-    domain: indices
-    task: vegetation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: ndwi_calculator
-    domain: indices
-    task: water
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: network_analyzer
-    domain: analysis
-    task: network
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: object_detector
-    domain: asset
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: offshore_survey
-    domain: energy
-    task: survey
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: onshore_monitor
-    domain: energy
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: ortho_processor
-    domain: processing
-    task: geometric
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: orthorectification
-    domain: processing
-    task: geometric
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: panchromatic_processor
-    domain: processing
-    task: spectral
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: pansharpening
-    domain: processing
-    task: enhancement
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: perennial_garden_suitability
-    domain: agriculture
-    task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: pipeline_route_planner
-    domain: energy
-    task: planning
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: pivot_inventory
-    domain: agriculture
-    task: inventory
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: plowed_land_detector
-    domain: agriculture
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: preparedness_manager
-    domain: defense
-    task: planning
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: protected_area_change_detector
-    domain: environment
-    task: change_detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: raster_tiler
-    domain: processing
-    task: tiling
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: reservoir_monitor
-    domain: water
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: resource_allocation
-    domain: urban
-    task: optimization
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: road_network_analyzer
-    domain: urban
-    task: network
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: route_planner
-    domain: tourism
-    task: planning
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: salinity_detector
-    domain: environment
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_amplitude
-    domain: sar
-    task: amplitude
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_flood_detector
-    domain: sar
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_mapping_workflow
-    domain: sar
-    task: mapping
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_oil_spill_detector
-    domain: sar
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_phase_displacement
-    domain: sar
-    task: interferometry
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_ship_detector
-    domain: sar
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: sar_subsidence_monitor
-    domain: sar
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: savi_calculator
-    domain: indices
-    task: vegetation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: security_monitor
-    domain: defense
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: seismic_risk
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: ship_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: site_suitability
-    domain: analysis
-    task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: solar_site_selector
-    domain: energy
-    task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: spatial_analyzer
-    domain: analysis
-    task: spatial
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: spatial_relationship
-    domain: analysis
-    task: spatial
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: stereo_processor
-    domain: processing
-    task: stereo
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: super_resolution
-    domain: ai
+  # Vision (EO AI)
+  - model_id: ubx-sr-srcnn-1.0.0
+    name: SRCNN Super-Resolution
     task: super_resolution
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+    architecture: srcnn
+    source: repo
     version: "1.0.0"
-
-  - id: synthetic_imagery
-    domain: ai
-    task: image_generation
-    tiers: [tiny, base, large]
     license: Apache-2.0
-    version: "1.0.0"
+    status: production
 
-  - id: target_detector
-    domain: defense
+  - model_id: ubx-det-multiclass-1.0.0
+    name: Multi-class Object Detector
     task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+    architecture: resnet_fpn
+    source: repo
     version: "1.0.0"
-
-  - id: thematic_mapper
-    domain: mapping
-    task: thematic
-    tiers: [tiny, base, large]
     license: Apache-2.0
-    version: "1.0.0"
+    status: production
 
-  - id: timeseries_analyzer
-    domain: analysis
-    task: timeseries
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: topography_mapper
-    domain: mapping
-    task: topography
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: tourist_destination_monitor
-    domain: tourism
-    task: monitoring
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: transportation_mapper
-    domain: urban
-    task: mapping
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: tree_height_estimator
-    domain: forestry
-    task: regression
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: tri_stereo_processor
-    domain: processing
-    task: stereo
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: urban_growth_assessor
-    domain: urban
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: urban_planner
-    domain: urban
-    task: planning
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: utility_mapper
-    domain: asset
-    task: mapping
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: vegetation_condition
-    domain: agriculture
-    task: assessment
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: vehicle_detector
-    domain: ai
-    task: detection
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: viewshed_analyzer
-    domain: defense
-    task: analysis
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: water_quality_assessor
-    domain: water
-    task: quality
-    tiers: [tiny, base, large]
-    license: Apache-2.0
-    version: "1.0.0"
-
-  - id: water_surface_detector
-    domain: ai
+  - model_id: ubx-seg-multiclass-unet-1.0.0
+    name: Multi-class Segmentation UNet
     task: segmentation
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+    architecture: unet
+    source: repo
     version: "1.0.0"
-
-  - id: watershed_manager
-    domain: water
-    task: watershed
-    tiers: [tiny, base, large]
     license: Apache-2.0
-    version: "1.0.0"
+    status: production
 
-  - id: wildfire_risk
-    domain: risk
-    task: assessment
-    tiers: [tiny, base, large]
+  - model_id: ubx-change-siamese-1.0.0
+    name: Siamese Change Detector
+    task: change_detection
+    architecture: siamese
+    source: repo
+    version: "1.0.0"
     license: Apache-2.0
-    version: "1.0.0"
+    status: production
 
-  - id: wildlife_habitat_analyzer
-    domain: environment
-    task: habitat
-    tiers: [tiny, base, large]
+  - model_id: ubx-boundary-crop-1.0.0
+    name: Crop Boundary Delineation
+    task: boundary_detection
+    architecture: unet_contour
+    source: repo
+    version: "1.0.0"
     license: Apache-2.0
-    version: "1.0.0"
+    status: production
 
-  - id: wind_site_selector
-    domain: energy
+  # Tourism / Network / Suitability
+  - model_id: ubx-routing-heuristics-pack-1.0.0
+    name: Routing Heuristics Pack
+    task: routing
+    architecture: config_pack
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-suitability-mlp-1.0.0
+    name: Suitability Scoring MLP
     task: suitability
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+    architecture: mlp
+    source: repo
     version: "1.0.0"
+    license: Apache-2.0
+    status: production
 
-  - id: yield_predictor
-    domain: agriculture
+  # Flood / Water
+  - model_id: ubx-flood-risk-mlp-1.0.0
+    name: Flood Risk Scorer
+    task: risk_scoring
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-water-quality-reg-1.0.0
+    name: Water Quality Regressor
     task: regression
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+    architecture: mlp
+    source: repo
     version: "1.0.0"
+    license: Apache-2.0
+    status: production
 
-  - id: zonal_statistics
-    domain: analysis
-    task: zonal
-    tiers: [tiny, base, large]
-    license: Apache-2.0
+  # Environment / Forestry
+  - model_id: ubx-lulc-seg-1.0.0
+    name: Land Use Land Cover Segmentation
+    task: segmentation
+    architecture: unet
+    source: repo
     version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-deforestation-change-1.0.0
+    name: Deforestation Change Detector
+    task: change_detection
+    architecture: siamese
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  # Asset / Energy
+  - model_id: ubx-corridor-change-1.0.0
+    name: Pipeline Corridor Monitor
+    task: change_detection
+    architecture: siamese
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-site-selection-mlp-1.0.0
+    name: Site Selection Scorer
+    task: suitability
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-leakage-anomaly-1.0.0
+    name: Leakage Anomaly Detector
+    task: anomaly_detection
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  # Urban / Agriculture
+  - model_id: ubx-builtup-seg-1.0.0
+    name: Built-up Area Segmentation
+    task: segmentation
+    architecture: unet
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-yield-reg-1.0.0
+    name: Crop Yield Regressor
+    task: regression
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  # Risk / Preparedness
+  - model_id: ubx-wildfire-risk-1.0.0
+    name: Wildfire Risk Scorer
+    task: risk_scoring
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  - model_id: ubx-fire-detect-1.0.0
+    name: Active Fire Detector
+    task: detection
+    architecture: threshold_pack
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: production
+
+  # SAR
+  - model_id: ubx-sar-amp-clf-1.0.0
+    name: SAR Amplitude Classifier
+    task: classification
+    architecture: mlp
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: research
+
+  - model_id: ubx-sar-phase-demo-1.0.0
+    name: SAR Phase Demo Pack
+    task: insar
+    architecture: config_pack
+    source: repo
+    version: "1.0.0"
+    license: Apache-2.0
+    status: research
