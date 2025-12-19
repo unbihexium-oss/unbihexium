@@ -130,6 +130,87 @@ def zoo_verify(model_id: str) -> None:
         raise SystemExit(1) from e
 
 
+@zoo.command("where")
+@click.argument("model_id")
+def zoo_where(model_id: str) -> None:
+    """Show location of a cached model."""
+    from unbihexium.zoo import get_cached_model_path, is_model_cached
+
+    if is_model_cached(model_id):
+        path = get_cached_model_path(model_id)
+        console.print(f"[green]Cached:[/] {path}")
+    else:
+        console.print(f"[yellow]Not cached:[/] {model_id}")
+        console.print("Run: unbihexium zoo download {model_id}")
+
+
+@main.command()
+@click.argument("model_id")
+@click.option("--input", "-i", "input_path", required=True, help="Input file path.")
+@click.option("--output", "-o", "output_path", required=True, help="Output file path.")
+@click.option("--task", "-t", help="Task type override.")
+def infer(
+    model_id: str,
+    input_path: str,
+    output_path: str,
+    task: str | None,
+) -> None:
+    """Run inference with a model from the zoo.
+
+    Example:
+        unbihexium infer ubx-sr-srcnn-1.0.0 -i input.tif -o output.tif
+    """
+    from pathlib import Path
+
+    import numpy as np
+
+    console.print(f"[blue]Running inference:[/] {model_id}")
+    console.print(f"  Input: {input_path}")
+    console.print(f"  Output: {output_path}")
+
+    try:
+        import onnxruntime as ort
+
+        from unbihexium.zoo import get_cached_model_path, is_model_cached
+
+        if not is_model_cached(model_id):
+            console.print("[yellow]Model not cached. Downloading...[/]")
+            from unbihexium.zoo import download_model
+
+            download_model(model_id)
+
+        model_path = get_cached_model_path(model_id)
+        if model_path is None:
+            console.print(f"[red]Error:[/] Model not found: {model_id}")
+            raise SystemExit(1)
+
+        onnx_path = model_path / "model.onnx"
+        if not onnx_path.exists():
+            console.print(f"[red]Error:[/] ONNX file not found: {onnx_path}")
+            raise SystemExit(1)
+
+        session = ort.InferenceSession(str(onnx_path))
+        input_name = session.get_inputs()[0].name
+
+        input_data = np.load(input_path).astype(np.float32)
+        if input_data.ndim == 3:
+            input_data = input_data[np.newaxis, ...]
+
+        outputs = session.run(None, {input_name: input_data})
+        result = outputs[0]
+
+        np.save(output_path, result)
+        console.print(f"[green]Output saved:[/] {output_path}")
+        console.print(f"  Shape: {result.shape}")
+
+    except ImportError:
+        console.print("[red]Error:[/] onnxruntime required. Install with: pip install onnxruntime")
+        raise SystemExit(1)
+    except Exception as e:
+        console.print(f"[red]Error:[/] {e}")
+        raise SystemExit(1) from e
+
+
 @main.group()
 def pipeline() -> None:
     """Pipeline commands."""
