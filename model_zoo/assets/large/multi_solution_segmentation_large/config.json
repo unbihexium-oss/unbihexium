@@ -1,8 +1,0 @@
-{
-  "model_id": "multi_solution_segmentation_large",
-  "task": "segmentation",
-  "variant": "large",
-  "params": 1278052,
-  "resolution": 256,
-  "base_channels": 96
-}

@@ -1,8 +1,0 @@
-{
-  "model_id": "model_3d_tiny",
-  "task": "terrain",
-  "variant": "tiny",
-  "params": 186177,
-  "resolution": 64,
-  "base_channels": 32
-}

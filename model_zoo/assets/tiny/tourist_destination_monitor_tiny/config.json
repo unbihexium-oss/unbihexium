@@ -1,8 +1,0 @@
-{
-  "model_id": "tourist_destination_monitor_tiny",
-  "task": "segmentation",
-  "variant": "tiny",
-  "params": 258754,
-  "resolution": 64,
-  "base_channels": 32
-}

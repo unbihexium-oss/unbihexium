@@ -1,8 +1,0 @@
-{
-  "model_id": "natural_resources_monitor_tiny",
-  "task": "regression",
-  "variant": "tiny",
-  "params": 68481,
-  "resolution": 64,
-  "base_channels": 32
-}

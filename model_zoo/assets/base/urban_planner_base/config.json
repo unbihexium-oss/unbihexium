@@ -1,8 +1,0 @@
-{
-  "model_id": "urban_planner_base",
-  "task": "segmentation",
-  "variant": "base",
-  "params": 569412,
-  "resolution": 128,
-  "base_channels": 64
-}

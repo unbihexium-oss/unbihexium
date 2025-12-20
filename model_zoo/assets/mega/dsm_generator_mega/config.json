@@ -1,8 +1,0 @@
-{
-  "model_id": "dsm_generator_mega",
-  "task": "terrain",
-  "variant": "mega",
-  "params": 2956545,
-  "resolution": 512,
-  "base_channels": 128
-}

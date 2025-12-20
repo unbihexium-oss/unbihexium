@@ -1,8 +1,0 @@
-{
-  "model_id": "security_monitor_base",
-  "task": "detection",
-  "variant": "base",
-  "params": 569154,
-  "resolution": 128,
-  "base_channels": 64
-}

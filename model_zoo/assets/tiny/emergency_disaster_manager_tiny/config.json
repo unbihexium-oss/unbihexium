@@ -1,8 +1,0 @@
-{
-  "model_id": "emergency_disaster_manager_tiny",
-  "task": "regression",
-  "variant": "tiny",
-  "params": 69761,
-  "resolution": 64,
-  "base_channels": 32
-}

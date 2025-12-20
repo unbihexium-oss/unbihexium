@@ -1,8 +1,0 @@
-{
-  "model_id": "tree_height_estimator_base",
-  "task": "terrain",
-  "variant": "base",
-  "params": 740993,
-  "resolution": 128,
-  "base_channels": 64
-}

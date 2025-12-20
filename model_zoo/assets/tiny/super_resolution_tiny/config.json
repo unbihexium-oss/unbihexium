@@ -1,8 +1,0 @@
-{
-  "model_id": "super_resolution_tiny",
-  "task": "super_resolution",
-  "variant": "tiny",
-  "params": 49667,
-  "resolution": 64,
-  "base_channels": 32
-}

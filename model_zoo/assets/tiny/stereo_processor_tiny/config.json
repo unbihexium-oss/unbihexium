@@ -1,8 +1,0 @@
-{
-  "model_id": "stereo_processor_tiny",
-  "task": "terrain",
-  "variant": "tiny",
-  "params": 186177,
-  "resolution": 64,
-  "base_channels": 32
-}

@@ -1,8 +1,0 @@
-{
-  "model_id": "vegetation_condition_mega",
-  "task": "index",
-  "variant": "mega",
-  "params": 2956803,
-  "resolution": 512,
-  "base_channels": 128
-}

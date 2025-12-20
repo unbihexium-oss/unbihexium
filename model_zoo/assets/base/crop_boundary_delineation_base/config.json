@@ -1,8 +1,0 @@
-{
-  "model_id": "crop_boundary_delineation_base",
-  "task": "segmentation",
-  "variant": "base",
-  "params": 569154,
-  "resolution": 128,
-  "base_channels": 64
-}

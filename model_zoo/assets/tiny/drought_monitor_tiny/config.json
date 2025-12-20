@@ -1,8 +1,0 @@
-{
-  "model_id": "drought_monitor_tiny",
-  "task": "regression",
-  "variant": "tiny",
-  "params": 68225,
-  "resolution": 64,
-  "base_channels": 32
-}

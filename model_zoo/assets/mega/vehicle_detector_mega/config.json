@@ -1,8 +1,0 @@
-{
-  "model_id": "vehicle_detector_mega",
-  "task": "detection",
-  "variant": "mega",
-  "params": 2268545,
-  "resolution": 512,
-  "base_channels": 128
-}

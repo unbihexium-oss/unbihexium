@@ -1,8 +1,0 @@
-{
-  "model_id": "orthorectification_mega",
-  "task": "enhancement",
-  "variant": "mega",
-  "params": 2956803,
-  "resolution": 512,
-  "base_channels": 128
-}
