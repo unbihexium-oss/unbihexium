@@ -1,10 +1,8 @@
 {
   "model_id": "wildfire_risk_base",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "base",
-  "input": {
-    "type": "tabular",
-    "features": 12
-  }
+  "params": 268545,
+  "resolution": 128,
+  "base_channels": 64
 }

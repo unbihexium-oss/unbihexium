@@ -1,10 +1,8 @@
 {
   "model_id": "wind_site_selector_tiny",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 10
-  }
+  "params": 68481,
+  "resolution": 64,
+  "base_channels": 32
 }

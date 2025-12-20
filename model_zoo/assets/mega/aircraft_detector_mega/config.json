@@ -1,27 +1,8 @@
 {
   "model_id": "aircraft_detector_mega",
   "task": "detection",
-  "architecture": "resnet_fpn",
   "variant": "mega",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 256,
-    "width": 256
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "aircraft"
-  ]
+  "params": 2268545,
+  "resolution": 512,
+  "base_channels": 128
 }

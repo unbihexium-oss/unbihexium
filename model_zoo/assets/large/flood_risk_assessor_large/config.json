@@ -1,10 +1,8 @@
 {
   "model_id": "flood_risk_assessor_large",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "large",
-  "input": {
-    "type": "tabular",
-    "features": 15
-  }
+  "params": 600577,
+  "resolution": 256,
+  "base_channels": 96
 }

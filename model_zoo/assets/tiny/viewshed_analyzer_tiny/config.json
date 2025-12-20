@@ -1,10 +1,8 @@
 {
   "model_id": "viewshed_analyzer_tiny",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 6
-  }
+  "params": 67969,
+  "resolution": 64,
+  "base_channels": 32
 }

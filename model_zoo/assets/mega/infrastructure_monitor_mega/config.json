@@ -1,28 +1,8 @@
 {
   "model_id": "infrastructure_monitor_mega",
   "task": "segmentation",
-  "architecture": "siamese_unet",
   "variant": "mega",
-  "input": {
-    "type": "image",
-    "channels": 6,
-    "height": 256,
-    "width": 256
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "intact",
-    "damaged"
-  ]
+  "params": 4107010,
+  "resolution": 512,
+  "base_channels": 128
 }

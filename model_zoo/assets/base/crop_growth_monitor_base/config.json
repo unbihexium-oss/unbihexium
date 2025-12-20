@@ -1,10 +1,8 @@
 {
   "model_id": "crop_growth_monitor_base",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "base",
-  "input": {
-    "type": "tabular",
-    "features": 8
-  }
+  "params": 267521,
+  "resolution": 128,
+  "base_channels": 64
 }

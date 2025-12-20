@@ -1,10 +1,8 @@
 {
   "model_id": "disaster_management_tiny",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 15
-  }
+  "params": 69121,
+  "resolution": 64,
+  "base_channels": 32
 }

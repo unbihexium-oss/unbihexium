@@ -1,10 +1,8 @@
 {
   "model_id": "environmental_monitor_base",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "base",
-  "input": {
-    "type": "tabular",
-    "features": 15
-  }
+  "params": 269313,
+  "resolution": 128,
+  "base_channels": 64
 }

@@ -1,24 +1,8 @@
 {
   "model_id": "pansharpening_tiny",
   "task": "enhancement",
-  "architecture": "srcnn",
   "variant": "tiny",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 32,
-    "width": 32
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  }
+  "params": 186243,
+  "resolution": 64,
+  "base_channels": 32
 }

@@ -1,10 +1,8 @@
 {
   "model_id": "mobility_analyzer_tiny",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 8
-  }
+  "params": 68225,
+  "resolution": 64,
+  "base_channels": 32
 }

@@ -1,10 +1,8 @@
 {
   "model_id": "economic_spatial_assessor_large",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "large",
-  "input": {
-    "type": "tabular",
-    "features": 12
-  }
+  "params": 599425,
+  "resolution": 256,
+  "base_channels": 96
 }

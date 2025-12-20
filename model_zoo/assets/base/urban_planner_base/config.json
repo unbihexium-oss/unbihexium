@@ -1,30 +1,8 @@
 {
   "model_id": "urban_planner_base",
   "task": "segmentation",
-  "architecture": "unet",
   "variant": "base",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 64,
-    "width": 64
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "residential",
-    "commercial",
-    "industrial",
-    "green"
-  ]
+  "params": 569412,
+  "resolution": 128,
+  "base_channels": 64
 }

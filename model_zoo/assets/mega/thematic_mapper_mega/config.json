@@ -1,29 +1,8 @@
 {
   "model_id": "thematic_mapper_mega",
   "task": "segmentation",
-  "architecture": "unet",
   "variant": "mega",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 256,
-    "width": 256
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "theme1",
-    "theme2",
-    "theme3"
-  ]
+  "params": 2269059,
+  "resolution": 512,
+  "base_channels": 128
 }

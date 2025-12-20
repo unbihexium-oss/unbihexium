@@ -1,31 +1,8 @@
 {
   "model_id": "lulc_classifier_tiny",
   "task": "segmentation",
-  "architecture": "unet",
   "variant": "tiny",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 32,
-    "width": 32
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "water",
-    "forest",
-    "urban",
-    "agriculture",
-    "barren"
-  ]
+  "params": 143461,
+  "resolution": 64,
+  "base_channels": 32
 }

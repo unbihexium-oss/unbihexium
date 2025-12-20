@@ -1,10 +1,8 @@
 {
   "model_id": "ground_displacement_tiny",
-  "task": "regression",
-  "architecture": "cnn",
+  "task": "terrain",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 1
-  }
+  "params": 186177,
+  "resolution": 64,
+  "base_channels": 32
 }

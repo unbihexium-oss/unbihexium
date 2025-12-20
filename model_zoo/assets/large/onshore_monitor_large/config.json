@@ -1,10 +1,8 @@
 {
   "model_id": "onshore_monitor_large",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "large",
-  "input": {
-    "type": "tabular",
-    "features": 10
-  }
+  "params": 598657,
+  "resolution": 256,
+  "base_channels": 96
 }

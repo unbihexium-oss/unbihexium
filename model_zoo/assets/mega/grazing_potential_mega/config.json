@@ -1,10 +1,8 @@
 {
   "model_id": "grazing_potential_mega",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "mega",
-  "input": {
-    "type": "tabular",
-    "features": 6
-  }
+  "params": 1058305,
+  "resolution": 512,
+  "base_channels": 128
 }

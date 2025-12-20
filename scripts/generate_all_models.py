@@ -196,12 +196,13 @@ MODEL_CATALOG = [
 ]
 
 
-# Variant configurations
+# Variant configurations - production-grade parameter counts
+# Parameters scale with capacity^2 * base_channels^2
 VARIANTS = {
-    "tiny": {"capacity": 0.25, "resolution": 32},
-    "base": {"capacity": 1.0, "resolution": 64},
-    "large": {"capacity": 2.0, "resolution": 128},
-    "mega": {"capacity": 4.0, "resolution": 256},  # 10M+ parameters
+    "tiny": {"capacity": 1.0, "resolution": 64, "base_channels": 32},      # ~100K params
+    "base": {"capacity": 2.0, "resolution": 128, "base_channels": 64},     # ~1M params
+    "large": {"capacity": 3.0, "resolution": 256, "base_channels": 96},    # ~5M params
+    "mega": {"capacity": 4.0, "resolution": 512, "base_channels": 128},    # ~15M+ params
 }
 
 
@@ -215,75 +216,182 @@ def compute_sha256(filepath: Path) -> str:
 
 
 class SimpleCNN(nn.Module):
-    """Simple CNN for image-to-image tasks."""
+    """Production-grade CNN for image-to-image tasks."""
     
-    def __init__(self, in_channels: int = 3, out_channels: int = 1, base_features: int = 16):
+    def __init__(self, in_channels: int = 3, out_channels: int = 1, base_features: int = 64):
         super().__init__()
-        self.conv1 = nn.Conv2d(in_channels, base_features, 3, padding=1)
-        self.conv2 = nn.Conv2d(base_features, base_features * 2, 3, padding=1)
-        self.conv3 = nn.Conv2d(base_features * 2, out_channels, 3, padding=1)
-        self.relu = nn.ReLU(inplace=True)
+        # Encoder blocks
+        self.enc1 = self._block(in_channels, base_features)
+        self.enc2 = self._block(base_features, base_features * 2)
+        self.enc3 = self._block(base_features * 2, base_features * 4)
+        self.enc4 = self._block(base_features * 4, base_features * 8)
+        # Decoder blocks
+        self.dec4 = self._block(base_features * 8, base_features * 4)
+        self.dec3 = self._block(base_features * 4, base_features * 2)
+        self.dec2 = self._block(base_features * 2, base_features)
+        self.out = nn.Conv2d(base_features, out_channels, 1)
     
-    def forward(self, x):
-        x = self.relu(self.conv1(x))
-        x = self.relu(self.conv2(x))
-        return self.conv3(x)
-
-
-class SimpleUNet(nn.Module):
-    """Simple UNet for segmentation - ONNX compatible."""
-    
-    def __init__(self, in_channels: int = 3, num_classes: int = 2, base_features: int = 16):
-        super().__init__()
-        # Encoder - no pooling, use strided conv
-        self.enc1 = nn.Sequential(
-            nn.Conv2d(in_channels, base_features, 3, padding=1),
+    def _block(self, in_ch, out_ch):
+        return nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
             nn.ReLU(inplace=True),
         )
-        self.enc2 = nn.Sequential(
-            nn.Conv2d(base_features, base_features * 2, 3, stride=2, padding=1),
-            nn.ReLU(inplace=True),
-        )
-        # Decoder - use ConvTranspose2d for upsampling
-        self.dec1 = nn.Sequential(
-            nn.ConvTranspose2d(base_features * 2, base_features, 2, stride=2),
-            nn.ReLU(inplace=True),
-        )
-        self.out = nn.Conv2d(base_features * 2, num_classes, 1)
     
     def forward(self, x):
         e1 = self.enc1(x)
         e2 = self.enc2(e1)
-        d1 = self.dec1(e2)
-        return self.out(torch.cat([d1, e1], dim=1))
+        e3 = self.enc3(e2)
+        e4 = self.enc4(e3)
+        d4 = self.dec4(e4)
+        d3 = self.dec3(d4)
+        d2 = self.dec2(d3)
+        return self.out(d2)
+
+
+class SimpleUNet(nn.Module):
+    """Production-grade UNet for segmentation - ONNX compatible."""
+    
+    def __init__(self, in_channels: int = 3, num_classes: int = 2, base_features: int = 64):
+        super().__init__()
+        # Encoder path
+        self.enc1 = self._enc_block(in_channels, base_features)
+        self.enc2 = self._enc_block(base_features, base_features * 2)
+        self.enc3 = self._enc_block(base_features * 2, base_features * 4)
+        self.enc4 = self._enc_block(base_features * 4, base_features * 8)
+        
+        # Bottleneck
+        self.bottleneck = self._enc_block(base_features * 8, base_features * 16)
+        
+        # Decoder path with skip connections
+        self.up4 = nn.ConvTranspose2d(base_features * 16, base_features * 8, 2, stride=2)
+        self.dec4 = self._dec_block(base_features * 16, base_features * 8)
+        self.up3 = nn.ConvTranspose2d(base_features * 8, base_features * 4, 2, stride=2)
+        self.dec3 = self._dec_block(base_features * 8, base_features * 4)
+        self.up2 = nn.ConvTranspose2d(base_features * 4, base_features * 2, 2, stride=2)
+        self.dec2 = self._dec_block(base_features * 4, base_features * 2)
+        self.up1 = nn.ConvTranspose2d(base_features * 2, base_features, 2, stride=2)
+        self.dec1 = self._dec_block(base_features * 2, base_features)
+        
+        self.out = nn.Conv2d(base_features, num_classes, 1)
+        self.pool = nn.MaxPool2d(2)
+    
+    def _enc_block(self, in_ch, out_ch):
+        return nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+        )
+    
+    def _dec_block(self, in_ch, out_ch):
+        return nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+        )
+    
+    def forward(self, x):
+        # Encoder
+        e1 = self.enc1(x)
+        e2 = self.enc2(self.pool(e1))
+        e3 = self.enc3(self.pool(e2))
+        e4 = self.enc4(self.pool(e3))
+        
+        # Bottleneck
+        b = self.bottleneck(self.pool(e4))
+        
+        # Decoder with skip connections
+        d4 = self.dec4(torch.cat([self.up4(b), e4], dim=1))
+        d3 = self.dec3(torch.cat([self.up3(d4), e3], dim=1))
+        d2 = self.dec2(torch.cat([self.up2(d3), e2], dim=1))
+        d1 = self.dec1(torch.cat([self.up1(d2), e1], dim=1))
+        
+        return self.out(d1)
 
 
 class SimpleSiamese(nn.Module):
-    """Simple Siamese network for change detection."""
+    """Production-grade Siamese network for change detection."""
     
-    def __init__(self, in_channels: int = 6, num_classes: int = 2, base_features: int = 16):
+    def __init__(self, in_channels: int = 6, num_classes: int = 2, base_features: int = 64):
         super().__init__()
+        # Shared encoder for bi-temporal input
         self.encoder = nn.Sequential(
+            # Block 1
             nn.Conv2d(in_channels, base_features, 3, padding=1),
+            nn.BatchNorm2d(base_features),
             nn.ReLU(inplace=True),
-            nn.Conv2d(base_features, base_features * 2, 3, padding=1),
+            nn.Conv2d(base_features, base_features, 3, padding=1),
+            nn.BatchNorm2d(base_features),
+            nn.ReLU(inplace=True),
+            # Block 2
+            nn.Conv2d(base_features, base_features * 2, 3, stride=2, padding=1),
+            nn.BatchNorm2d(base_features * 2),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(base_features * 2, base_features * 2, 3, padding=1),
+            nn.BatchNorm2d(base_features * 2),
+            nn.ReLU(inplace=True),
+            # Block 3
+            nn.Conv2d(base_features * 2, base_features * 4, 3, stride=2, padding=1),
+            nn.BatchNorm2d(base_features * 4),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(base_features * 4, base_features * 4, 3, padding=1),
+            nn.BatchNorm2d(base_features * 4),
+            nn.ReLU(inplace=True),
+            # Block 4
+            nn.Conv2d(base_features * 4, base_features * 8, 3, stride=2, padding=1),
+            nn.BatchNorm2d(base_features * 8),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(base_features * 8, base_features * 8, 3, padding=1),
+            nn.BatchNorm2d(base_features * 8),
             nn.ReLU(inplace=True),
         )
-        self.decoder = nn.Conv2d(base_features * 2, num_classes, 1)
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(base_features * 8, base_features * 4, 4, stride=2, padding=1),
+            nn.BatchNorm2d(base_features * 4),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(base_features * 4, base_features * 2, 4, stride=2, padding=1),
+            nn.BatchNorm2d(base_features * 2),
+            nn.ReLU(inplace=True),
+            nn.ConvTranspose2d(base_features * 2, base_features, 4, stride=2, padding=1),
+            nn.BatchNorm2d(base_features),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(base_features, num_classes, 1),
+        )
     
     def forward(self, x):
         return self.decoder(self.encoder(x))
 
 
 class SimpleMLP(nn.Module):
-    """Simple MLP for tabular data."""
+    """Production-grade MLP for tabular/regression data."""
     
-    def __init__(self, in_features: int = 10, out_features: int = 1, hidden: int = 32):
+    def __init__(self, in_features: int = 10, out_features: int = 1, hidden: int = 256):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(in_features, hidden),
+            nn.BatchNorm1d(hidden),
             nn.ReLU(inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(hidden, hidden * 2),
+            nn.BatchNorm1d(hidden * 2),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.2),
+            nn.Linear(hidden * 2, hidden),
+            nn.BatchNorm1d(hidden),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.1),
             nn.Linear(hidden, hidden // 2),
+            nn.BatchNorm1d(hidden // 2),
             nn.ReLU(inplace=True),
             nn.Linear(hidden // 2, out_features),
         )
@@ -293,28 +401,53 @@ class SimpleMLP(nn.Module):
 
 
 class SimpleSRCNN(nn.Module):
-    """Simple SRCNN for super-resolution."""
+    """Production-grade ESPCN/SRCNN for super-resolution."""
     
-    def __init__(self, in_channels: int = 3, scale: int = 2, base_features: int = 32):
+    def __init__(self, in_channels: int = 3, scale: int = 2, base_features: int = 64):
         super().__init__()
         self.scale = scale
-        self.conv1 = nn.Conv2d(in_channels, base_features, 9, padding=4)
-        self.conv2 = nn.Conv2d(base_features, base_features // 2, 1)
-        self.conv3 = nn.Conv2d(base_features // 2, in_channels * (scale ** 2), 5, padding=2)
-        self.pixel_shuffle = nn.PixelShuffle(scale)
-        self.relu = nn.ReLU(inplace=True)
+        # Feature extraction
+        self.feature_extract = nn.Sequential(
+            nn.Conv2d(in_channels, base_features, 5, padding=2),
+            nn.BatchNorm2d(base_features),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(base_features, base_features, 3, padding=1),
+            nn.BatchNorm2d(base_features),
+            nn.ReLU(inplace=True),
+        )
+        # Residual blocks
+        self.res_blocks = nn.Sequential(
+            self._res_block(base_features),
+            self._res_block(base_features),
+            self._res_block(base_features),
+            self._res_block(base_features),
+        )
+        # Upscale
+        self.upscale = nn.Sequential(
+            nn.Conv2d(base_features, base_features * (scale ** 2), 3, padding=1),
+            nn.PixelShuffle(scale),
+            nn.Conv2d(base_features, in_channels, 3, padding=1),
+        )
+    
+    def _res_block(self, ch):
+        return nn.Sequential(
+            nn.Conv2d(ch, ch, 3, padding=1),
+            nn.BatchNorm2d(ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(ch, ch, 3, padding=1),
+            nn.BatchNorm2d(ch),
+        )
     
     def forward(self, x):
-        x = self.relu(self.conv1(x))
-        x = self.relu(self.conv2(x))
-        x = self.pixel_shuffle(self.conv3(x))
-        return x
+        feat = self.feature_extract(x)
+        res = self.res_blocks(feat) + feat
+        return self.upscale(res)
 
 
 def create_model(model_def: dict, variant: str) -> nn.Module:
-    """Create a model based on definition and variant."""
+    """Create a production-grade model based on definition and variant."""
     var_cfg = VARIANTS[variant]
-    base_features = int(16 * var_cfg["capacity"])
+    base_features = var_cfg["base_channels"]  # Use base_channels from variant config
     
     task = model_def["task"]
     arch = model_def.get("arch", "mlp")
@@ -335,7 +468,7 @@ def create_model(model_def: dict, variant: str) -> nn.Module:
     
     else:  # regression, risk, etc.
         in_features = model_def.get("features", 10)
-        hidden = int(32 * var_cfg["capacity"])
+        hidden = base_features * 4  # Scale hidden layer with base_features
         return SimpleMLP(in_features, 1, hidden)
 
 

@@ -1,10 +1,8 @@
 {
   "model_id": "emergency_disaster_manager_mega",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "mega",
-  "input": {
-    "type": "tabular",
-    "features": 20
-  }
+  "params": 1065473,
+  "resolution": 512,
+  "base_channels": 128
 }

@@ -1,10 +1,8 @@
 {
   "model_id": "emergency_disaster_manager_tiny",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 20
-  }
+  "params": 69761,
+  "resolution": 64,
+  "base_channels": 32
 }

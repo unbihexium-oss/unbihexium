@@ -1,30 +1,8 @@
 {
   "model_id": "urban_planner_mega",
   "task": "segmentation",
-  "architecture": "unet",
   "variant": "mega",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 256,
-    "width": 256
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "residential",
-    "commercial",
-    "industrial",
-    "green"
-  ]
+  "params": 2269316,
+  "resolution": 512,
+  "base_channels": 128
 }

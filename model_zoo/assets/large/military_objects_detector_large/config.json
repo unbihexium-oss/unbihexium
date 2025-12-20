@@ -1,29 +1,8 @@
 {
   "model_id": "military_objects_detector_large",
   "task": "detection",
-  "architecture": "resnet_fpn",
   "variant": "large",
-  "input": {
-    "type": "image",
-    "channels": 3,
-    "height": 128,
-    "width": 128
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "structure",
-    "vehicle",
-    "equipment"
-  ]
+  "params": 1277859,
+  "resolution": 256,
+  "base_channels": 96
 }

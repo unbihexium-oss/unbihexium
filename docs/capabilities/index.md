@@ -1,112 +1,74 @@
-# Capabilities Encyclopedia
+# Capability Domains
 
-## Purpose
+## Overview
 
-This index provides navigation to the 12 capability domains implemented in Unbihexium.
+The Unbihexium library provides 520 production-ready models organized into 12 capability domains spanning geospatial AI, remote sensing, and Earth observation applications.
 
-## Audience
+---
 
-- Solution architects evaluating coverage
-- Developers implementing pipelines
-- Analysts selecting appropriate models
-- Integration engineers mapping requirements
+## Domain Summary
 
-## Capability Architecture
+| ID | Domain | Models | Tasks | Status |
+|----|--------|--------|-------|--------|
+| [01](01_ai_products.md) | AI Products | 13 | Detection, Segmentation, Enhancement | Production |
+| [02](02_tourism_data_processing.md) | Tourism and Data Processing | 10 | Regression, Spatial Analysis | Production |
+| [03](03_indices_flood_water.md) | Vegetation Indices and Flood/Water | 12 | Index, Segmentation, Regression | Production |
+| [04](04_environment_forestry_image_processing.md) | Environment and Forestry | 14 | Segmentation, Regression, Terrain | Production |
+| [05](05_asset_management_energy.md) | Asset Management and Energy | 12 | Regression, Segmentation, Detection | Production |
+| [06](06_urban_agriculture.md) | Urban Planning and Agriculture | 18 | Segmentation, Detection, Regression | Production |
+| [07](07_risk_defense_neutral.md) | Risk Assessment and Defense | 15 | Regression, Detection | Production |
+| [08](08_value_added_imagery.md) | Value-Added Imagery | 4 | Terrain | Production |
+| [09](09_benefits_narrative.md) | Benefits Narrative | 0 | Documentation | N/A |
+| [10](10_satellite_imagery_features.md) | Satellite Imagery Features | 6 | Terrain, Enhancement | Production |
+| [11](11_resolution_metadata_qa.md) | Resolution and Metadata QA | 4 | Enhancement, Segmentation | Production |
+| [12](12_radar_sar.md) | Radar and SAR | 8 | Detection, Segmentation, Terrain | Production |
 
-```mermaid
-graph TB
-    subgraph "Sensing Layer"
-        A1[Optical Imagery]
-        A2[SAR Imagery]
-        A3[Aerial Data]
-    end
-    
-    subgraph "AI Capabilities"
-        B1[Detection]
-        B2[Segmentation]
-        B3[Change Analysis]
-        B4[Regression]
-        B5[Enhancement]
-    end
-    
-    subgraph "Domain Applications"
-        C1[Defense/Intelligence]
-        C2[Agriculture]
-        C3[Urban Planning]
-        C4[Environment]
-        C5[Energy/Assets]
-        C6[Risk/Insurance]
-    end
-    
-    A1 --> B1
-    A1 --> B2
-    A2 --> B3
-    A3 --> B4
-    A1 --> B5
-    
-    B1 --> C1
-    B2 --> C2
-    B3 --> C3
-    B4 --> C4
-    B5 --> C5
-    B1 --> C6
-```
+---
 
-## Coverage Formula
-
-Total capability coverage measured as:
-
-$$
-C_{\text{total}} = \frac{\sum_{d=1}^{12} \sum_{c \in D_d} \mathbb{1}[\text{implemented}(c)]}{N_{\text{required}}} \times 100\%
-$$
-
-## Capability Matrix
-
-| ID | Domain | Implementations | Models | Status |
-|----|--------|-----------------|--------|--------|
-| 01 | [AI Products](01_ai_products.md) | 13 | 39 | Production |
-| 02 | [Tourism and Data Processing](02_tourism_data_processing.md) | 18 | 30 | Production |
-| 03 | [Indices and Flood/Water](03_indices_flood_water.md) | 13 | 36 | Production |
-| 04 | [Environment and Forestry](04_environment_forestry_image_processing.md) | 24 | 42 | Production |
-| 05 | [Asset Management and Energy](05_asset_management_energy.md) | 16 | 36 | Production |
-| 06 | [Urban and Agriculture](06_urban_agriculture.md) | 26 | 54 | Production |
-| 07 | [Risk and Defense (Neutral)](07_risk_defense_neutral.md) | 17 | 45 | Production |
-| 08 | [Value-Added Imagery](08_value_added_imagery.md) | 3 | 9 | Production |
-| 09 | [Benefits Narrative](09_benefits_narrative.md) | N/A | N/A | Documentation |
-| 10 | [Satellite Imagery Features](10_satellite_imagery_features.md) | 7 | 21 | Production |
-| 11 | [Resolution and Metadata QA](11_resolution_metadata_qa.md) | 4 | 12 | Production |
-| 12 | [Radar and SAR](12_radar_sar.md) | 7 | 21 | Research |
-
-## Implementation Status
+## Model Statistics by Domain
 
 ```mermaid
-pie title Implementation Status
-    "Production" : 11
-    "Research" : 1
-    "Documentation" : 1
+xychart-beta
+    title "Models per Capability Domain"
+    x-axis [D01, D02, D03, D04, D05, D06, D07, D08, D09, D10, D11, D12]
+    y-axis "Model Count" 0 --> 20
+    bar [13, 10, 12, 14, 12, 18, 15, 4, 0, 6, 4, 8]
 ```
 
-## Cross-Domain Dependencies
+---
 
-```mermaid
-flowchart LR
-    A[Input Processing] --> B[Indices 03]
-    B --> C[Environment 04]
-    B --> D[Agriculture 06]
-    C --> E[Risk 07]
-    D --> E
-    
-    F[Detection 01] --> G[Urban 06]
-    F --> H[Defense 07]
-    F --> I[Assets 05]
-```
+## Task Distribution
 
-## Quick Reference
+| Task Type | Total Models | Domains |
+|-----------|--------------|---------|
+| Regression | 47 | D02, D03, D04, D05, D06, D07 |
+| Segmentation | 32 | D01, D03, D04, D05, D06, D11, D12 |
+| Detection | 19 | D01, D05, D06, D07, D12 |
+| Enhancement | 11 | D01, D10, D11 |
+| Terrain | 13 | D04, D08, D10, D12 |
+| Index | 7 | D03 |
+| Super Resolution | 1 | D01 |
 
-| Capability | Primary Use Case | Entry Point |
-|------------|------------------|-------------|
-| Super-resolution | Image enhancement | `pipeline.run("super_resolution")` |
-| Ship detection | Maritime awareness | `pipeline.run("ship_detection")` |
-| NDVI calculation | Vegetation health | `pipeline.run("ndvi")` |
-| Flood risk | Hazard assessment | `pipeline.run("flood_risk")` |
-| Change detection | Temporal analysis | `pipeline.run("change_detection")` |
+---
+
+## Variant Availability
+
+All 130 base models are available in 4 variant tiers:
+
+| Variant | Resolution | Parameters | Use Case |
+|---------|------------|------------|----------|
+| tiny | 64 x 64 | 50K - 259K | Edge devices, real-time |
+| base | 128 x 128 | 191K - 1M | Standard production |
+| large | 256 x 256 | 425K - 2.3M | High accuracy |
+| mega | 512 x 512 | 752K - 4.1M | Maximum quality |
+
+---
+
+## Quick Navigation
+
+- **Agricultural Applications**: [D03](03_indices_flood_water.md), [D06](06_urban_agriculture.md)
+- **Environmental Monitoring**: [D04](04_environment_forestry_image_processing.md)
+- **Infrastructure**: [D05](05_asset_management_energy.md)
+- **Urban Planning**: [D06](06_urban_agriculture.md)
+- **Risk Assessment**: [D07](07_risk_defense_neutral.md)
+- **SAR Processing**: [D12](12_radar_sar.md)

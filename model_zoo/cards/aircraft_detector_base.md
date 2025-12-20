@@ -8,7 +8,7 @@
 | Task | Detection |
 | Architecture | RESNET_FPN |
 | Variant | base |
-| Resolution | 64x64 |
+| Resolution | 128x128 |
 | License | Apache-2.0 |
 
 ## Description

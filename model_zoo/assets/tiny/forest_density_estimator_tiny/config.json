@@ -1,10 +1,8 @@
 {
   "model_id": "forest_density_estimator_tiny",
   "task": "regression",
-  "architecture": "cnn",
   "variant": "tiny",
-  "input": {
-    "type": "tabular",
-    "features": 1
-  }
+  "params": 67329,
+  "resolution": 64,
+  "base_channels": 32
 }

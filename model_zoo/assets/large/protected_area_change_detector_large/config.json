@@ -1,28 +1,8 @@
 {
   "model_id": "protected_area_change_detector_large",
   "task": "segmentation",
-  "architecture": "siamese_unet",
   "variant": "large",
-  "input": {
-    "type": "image",
-    "channels": 6,
-    "height": 128,
-    "width": 128
-  },
-  "normalization": {
-    "mean": [
-      0.5,
-      0.5,
-      0.5
-    ],
-    "std": [
-      0.5,
-      0.5,
-      0.5
-    ]
-  },
-  "classes": [
-    "no_change",
-    "change"
-  ]
+  "params": 2312258,
+  "resolution": 256,
+  "base_channels": 96
 }

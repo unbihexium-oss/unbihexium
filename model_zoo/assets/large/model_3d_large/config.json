@@ -1,10 +1,8 @@
 {
   "model_id": "model_3d_large",
-  "task": "regression",
-  "architecture": "cnn",
+  "task": "terrain",
   "variant": "large",
-  "input": {
-    "type": "tabular",
-    "features": 1
-  }
+  "params": 1664449,
+  "resolution": 256,
+  "base_channels": 96
 }

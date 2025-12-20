@@ -1,10 +1,8 @@
 {
   "model_id": "insurance_underwriting_base",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "base",
-  "input": {
-    "type": "tabular",
-    "features": 20
-  }
+  "params": 270593,
+  "resolution": 128,
+  "base_channels": 64
 }

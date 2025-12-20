@@ -1,10 +1,8 @@
 {
   "model_id": "offshore_survey_large",
   "task": "regression",
-  "architecture": "mlp",
   "variant": "large",
-  "input": {
-    "type": "tabular",
-    "features": 8
-  }
+  "params": 597889,
+  "resolution": 256,
+  "base_channels": 96
 }
