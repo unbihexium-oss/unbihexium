@@ -1,12 +1,37 @@
 # Unbihexium
 
-[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://pypi.org/project/unbihexium/)
+<!-- Core Info -->
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-3776ab.svg?logo=python&logoColor=white)](https://pypi.org/project/unbihexium/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE.txt)
-[![Models](https://img.shields.io/badge/models-520-orange.svg)](model_zoo/)
-[![Parameters](https://img.shields.io/badge/parameters-515M-purple.svg)](model_zoo/)
-[![Notebooks](https://img.shields.io/badge/notebooks-130-teal.svg)](examples/notebooks/)
-[![Code Style](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](CHANGELOG.md)
+
+<!-- Model Zoo -->
+[![Models](https://img.shields.io/badge/models-520-ff6b35.svg)](model_zoo/)
+[![Parameters](https://img.shields.io/badge/parameters-515M-9c27b0.svg)](model_zoo/)
+[![Architectures](https://img.shields.io/badge/architectures-130-e91e63.svg)](model_zoo/)
+[![Variants](https://img.shields.io/badge/variants-tiny%20%7C%20base%20%7C%20large%20%7C%20mega-00bcd4.svg)](model_zoo/)
+
+<!-- Capabilities -->
+[![Domains](https://img.shields.io/badge/domains-12-4caf50.svg)](docs/capabilities/)
+[![Notebooks](https://img.shields.io/badge/notebooks-130-009688.svg)](examples/notebooks/)
+[![Tasks](https://img.shields.io/badge/tasks-detection%20%7C%20segmentation%20%7C%20regression-673ab7.svg)](docs/)
+
+<!-- Technology -->
+[![ONNX](https://img.shields.io/badge/ONNX-supported-005cff.svg?logo=onnx)](https://onnx.ai/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-supported-ee4c2c.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Rasterio](https://img.shields.io/badge/Rasterio-GeoTIFF-228b22.svg)](https://rasterio.readthedocs.io/)
+[![NumPy](https://img.shields.io/badge/NumPy-array%20support-013243.svg?logo=numpy&logoColor=white)](https://numpy.org/)
+
+<!-- Quality -->
+[![Code Style](https://img.shields.io/badge/code%20style-ruff-261230.svg?logo=ruff&logoColor=d7ff64)](https://github.com/astral-sh/ruff)
+[![Type Checked](https://img.shields.io/badge/types-pyright-blue.svg)](https://github.com/microsoft/pyright)
+[![Security](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![Tested](https://img.shields.io/badge/tested-pytest-0a9edc.svg?logo=pytest&logoColor=white)](https://pytest.org/)
+
+<!-- Community -->
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red.svg)](https://github.com/unbihexium-oss/unbihexium)
 
 ---
 
