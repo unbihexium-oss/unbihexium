@@ -1,11 +1,25 @@
 # Unbihexium
 
-<!-- Row 1: Core Project Info -->
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-3776ab.svg?logo=python&logoColor=white)](https://pypi.org/project/unbihexium/)
-[![Version](https://img.shields.io/badge/version-1.0.0-success.svg)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE.txt)
-[![Status](https://img.shields.io/badge/status-production-brightgreen.svg)](README.md)
-[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey.svg)](README.md)
+<div align="center">
+
+**Production-Grade Geospatial AI Library for Earth Observation**
+
+<!-- GitHub Stats (Standard Format) -->
+[![GitHub Stars](https://img.shields.io/github/stars/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium/fork)
+[![GitHub Watchers](https://img.shields.io/github/watchers/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium/watchers)
+[![GitHub Issues](https://img.shields.io/github/issues/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium/issues)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium/commits/main)
+
+<!-- PyPI -->
+[![PyPI](https://img.shields.io/pypi/v/unbihexium?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/unbihexium/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/unbihexium?style=flat-square&logo=pypi&logoColor=white)](https://pypi.org/project/unbihexium/)
+[![Python](https://img.shields.io/pypi/pyversions/unbihexium?style=flat-square&logo=python&logoColor=white)](https://pypi.org/project/unbihexium/)
+[![License](https://img.shields.io/github/license/unbihexium-oss/unbihexium?style=flat-square)](LICENSE.txt)
+[![Repo Size](https://img.shields.io/github/repo-size/unbihexium-oss/unbihexium?style=flat-square&logo=github)](https://github.com/unbihexium-oss/unbihexium)
+
+</div>
+
 
 <!-- Row 2: Model Zoo Stats -->
 [![Models](https://img.shields.io/badge/models-520-ff6b35.svg)](model_zoo/)
@@ -56,15 +70,10 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-<!-- Row 8: Open Source Love -->
-[![Made with Love](https://img.shields.io/badge/made%20with-%E2%9D%A4-red.svg)](https://github.com/unbihexium-oss/unbihexium)
-[![Open Source](https://img.shields.io/badge/open%20source-100%25-success.svg)](https://github.com/unbihexium-oss/unbihexium)
-[![GitHub Stars](https://img.shields.io/badge/stars-⭐-yellow.svg)](https://github.com/unbihexium-oss/unbihexium)
-[![GitHub Forks](https://img.shields.io/badge/forks-🍴-blue.svg)](https://github.com/unbihexium-oss/unbihexium/fork)
-[![Maintained](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/unbihexium-oss/unbihexium)
-[![Active](https://img.shields.io/badge/development-active-brightgreen.svg)](https://github.com/unbihexium-oss/unbihexium)
-[![Issues](https://img.shields.io/badge/issues-welcome-blue.svg)](https://github.com/unbihexium-oss/unbihexium/issues)
-[![Discussions](https://img.shields.io/badge/discussions-open-purple.svg)](https://github.com/unbihexium-oss/unbihexium/discussions)
+<!-- Row 8: Community -->
+[![Maintained](https://img.shields.io/badge/maintained-yes-green.svg?style=flat-square)](https://github.com/unbihexium-oss/unbihexium)
+[![Made with Love](https://img.shields.io/badge/made%20with-%E2%9D%A4-red.svg?style=flat-square)](https://github.com/unbihexium-oss/unbihexium)
+[![Open Source](https://img.shields.io/badge/open%20source-100%25-success.svg?style=flat-square)](https://github.com/unbihexium-oss/unbihexium)
 
 ---
 
