@@ -102,4 +102,4 @@ Performance benchmarks for Unbihexium models and pipelines.
 
 ---
 
-*Benchmarks last updated: December 2024*
+*Benchmarks last updated: December 2025*
