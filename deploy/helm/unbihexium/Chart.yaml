@@ -1,0 +1,19 @@
+apiVersion: v2
+name: unbihexium
+description: Production-Grade Geospatial AI Library for Earth Observation
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - geospatial
+  - ai
+  - machine-learning
+  - earth-observation
+  - remote-sensing
+  - onnx
+home: https://github.com/unbihexium-oss/unbihexium
+sources:
+  - https://github.com/unbihexium-oss/unbihexium
+maintainers:
+  - name: Unbihexium OSS
+    email: oss@unbihexium.org

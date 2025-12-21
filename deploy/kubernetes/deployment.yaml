@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unbihexium-api
+  labels:
+    app: unbihexium
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: unbihexium
+      component: api
+  template:
+    metadata:
+      labels:
+        app: unbihexium
+        component: api
+    spec:
+      containers:
+        - name: unbihexium
+          image: ghcr.io/unbihexium-oss/unbihexium:latest
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: UNBIHEXIUM_CACHE_DIR
+              value: /data/cache
+            - name: UNBIHEXIUM_LOG_LEVEL
+              value: INFO
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: model-cache
+              mountPath: /data/cache
+      volumes:
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: unbihexium-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbihexium-api
+  labels:
+    app: unbihexium
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: unbihexium
+    component: api
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unbihexium-cache-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: unbihexium-api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: unbihexium-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: unbihexium-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+    - hosts:
+        - api.unbihexium.org
+      secretName: unbihexium-tls
+  rules:
+    - host: api.unbihexium.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: unbihexium-api
+                port:
+                  number: 80
