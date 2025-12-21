@@ -38,7 +38,7 @@ FROM python:3.12-slim AS runtime
 
 LABEL maintainer="Unbihexium OSS Foundation <opensource@unbihexium.org>"
 LABEL description="Production-grade Earth Observation and Geospatial AI"
-LABEL version="1.0.0"
+LABEL version="1.0.1"
 LABEL license="Apache-2.0"
 
 # Install runtime dependencies only

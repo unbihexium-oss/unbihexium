@@ -2,8 +2,8 @@ apiVersion: v2
 name: unbihexium
 description: Production-Grade Geospatial AI Library for Earth Observation
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 1.0.1
+appVersion: "1.0.1"
 keywords:
   - geospatial
   - ai
