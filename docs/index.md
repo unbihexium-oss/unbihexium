@@ -49,10 +49,12 @@ $$
 |---------|-------------|
 | [Installation](getting_started/installation.md) | Install the library |
 | [Quickstart](getting_started/quickstart.md) | First steps |
+| [Notebooks](tutorials/notebooks.md) | 130 comprehensive Jupyter notebooks |
 | [CLI Reference](reference/cli.md) | Command-line interface |
 | [API Reference](reference/api.md) | Python API |
-| [Model Zoo](model_zoo/model_catalog.md) | Available models |
-| [Capabilities](capabilities/index.md) | Domain capabilities |
+| [Model Zoo](model_zoo/model_catalog.md) | 520 available models |
+| [Capabilities](capabilities/index.md) | 12 domain capabilities |
+
 
 ## Prerequisites
 
