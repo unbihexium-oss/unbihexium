@@ -552,7 +552,7 @@ $$
 
 Each model directory contains:
 
-```
+```text
 model_zoo/assets/{variant}/{model_id}_{variant}/
 ├── model.onnx       # ONNX format for inference
 ├── model.pt         # PyTorch format for fine-tuning

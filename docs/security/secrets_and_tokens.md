@@ -34,7 +34,7 @@ $$
 
 | Property | Value |
 | ---------- | ------- |
-| Obtain from | https://pypi.org/manage/account/token/ |
+| Obtain from | <https://pypi.org/manage/account/token/> |
 | Scope | unbihexium package only |
 | Permissions | Upload |
 | CI Usage | `if: secrets.PYPI_API_TOKEN != ''` |
@@ -43,7 +43,7 @@ $$
 
 | Property | Value |
 | ---------- | ------- |
-| Obtain from | https://codecov.io/github/unbihexium-oss/unbihexium |
+| Obtain from | <https://codecov.io/github/unbihexium-oss/unbihexium> |
 | Scope | Repository |
 | Permissions | Upload |
 | CI Usage | Optional |

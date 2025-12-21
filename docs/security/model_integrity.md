@@ -56,7 +56,7 @@ print(result.verified)
 
 ## Model.sha256 Format
 
-```
+```text
 a3b2c1d4e5f6789... model.onnx
 ```
 
