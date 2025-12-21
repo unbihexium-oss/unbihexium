@@ -1,0 +1,8 @@
+{
+  "model_id": "environmental_monitor_base",
+  "task": "regression",
+  "variant": "base",
+  "params": 269313,
+  "resolution": 128,
+  "base_channels": 64
+}

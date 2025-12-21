@@ -1,0 +1,8 @@
+{
+  "model_id": "change_detector_base",
+  "task": "segmentation",
+  "variant": "base",
+  "params": 1029506,
+  "resolution": 128,
+  "base_channels": 64
+}

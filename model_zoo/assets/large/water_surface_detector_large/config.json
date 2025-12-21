@@ -1,0 +1,8 @@
+{
+  "model_id": "water_surface_detector_large",
+  "task": "segmentation",
+  "variant": "large",
+  "params": 1277666,
+  "resolution": 256,
+  "base_channels": 96
+}

@@ -1,0 +1,8 @@
+{
+  "model_id": "model_3d_base",
+  "task": "terrain",
+  "variant": "base",
+  "params": 740993,
+  "resolution": 128,
+  "base_channels": 64
+}

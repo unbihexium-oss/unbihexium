@@ -1,0 +1,8 @@
+{
+  "model_id": "forest_density_estimator_large",
+  "task": "regression",
+  "variant": "large",
+  "params": 595201,
+  "resolution": 256,
+  "base_channels": 96
+}

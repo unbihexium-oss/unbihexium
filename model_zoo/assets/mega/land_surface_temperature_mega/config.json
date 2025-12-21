@@ -1,0 +1,8 @@
+{
+  "model_id": "land_surface_temperature_mega",
+  "task": "terrain",
+  "variant": "mega",
+  "params": 2956545,
+  "resolution": 512,
+  "base_channels": 128
+}

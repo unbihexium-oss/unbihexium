@@ -1,0 +1,8 @@
+{
+  "model_id": "insurance_underwriting_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 69761,
+  "resolution": 64,
+  "base_channels": 32
+}

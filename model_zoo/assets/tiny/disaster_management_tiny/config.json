@@ -1,0 +1,8 @@
+{
+  "model_id": "disaster_management_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 69121,
+  "resolution": 64,
+  "base_channels": 32
+}

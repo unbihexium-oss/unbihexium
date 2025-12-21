@@ -1,0 +1,8 @@
+{
+  "model_id": "multispectral_processor_base",
+  "task": "enhancement",
+  "variant": "base",
+  "params": 741123,
+  "resolution": 128,
+  "base_channels": 64
+}

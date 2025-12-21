@@ -1,0 +1,8 @@
+{
+  "model_id": "perennial_garden_suitability_base",
+  "task": "regression",
+  "variant": "base",
+  "params": 268033,
+  "resolution": 128,
+  "base_channels": 64
+}

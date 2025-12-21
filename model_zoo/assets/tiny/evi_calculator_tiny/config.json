@@ -1,0 +1,8 @@
+{
+  "model_id": "evi_calculator_tiny",
+  "task": "index",
+  "variant": "tiny",
+  "params": 186243,
+  "resolution": 64,
+  "base_channels": 32
+}

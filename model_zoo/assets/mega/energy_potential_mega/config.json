@@ -1,0 +1,8 @@
+{
+  "model_id": "energy_potential_mega",
+  "task": "regression",
+  "variant": "mega",
+  "params": 1060353,
+  "resolution": 512,
+  "base_channels": 128
+}

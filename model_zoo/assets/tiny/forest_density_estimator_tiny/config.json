@@ -1,0 +1,8 @@
+{
+  "model_id": "forest_density_estimator_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 67329,
+  "resolution": 64,
+  "base_channels": 32
+}

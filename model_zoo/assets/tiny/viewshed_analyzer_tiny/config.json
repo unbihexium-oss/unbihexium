@@ -1,0 +1,8 @@
+{
+  "model_id": "viewshed_analyzer_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 67969,
+  "resolution": 64,
+  "base_channels": 32
+}

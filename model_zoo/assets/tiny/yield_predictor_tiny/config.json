@@ -1,0 +1,8 @@
+{
+  "model_id": "yield_predictor_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 68737,
+  "resolution": 64,
+  "base_channels": 32
+}

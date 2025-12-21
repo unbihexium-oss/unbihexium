@@ -1,0 +1,8 @@
+{
+  "model_id": "protected_area_change_detector_mega",
+  "task": "segmentation",
+  "variant": "mega",
+  "params": 4107010,
+  "resolution": 512,
+  "base_channels": 128
+}

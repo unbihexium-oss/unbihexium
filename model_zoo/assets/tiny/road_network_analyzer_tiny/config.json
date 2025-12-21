@@ -1,0 +1,8 @@
+{
+  "model_id": "road_network_analyzer_tiny",
+  "task": "segmentation",
+  "variant": "tiny",
+  "params": 143266,
+  "resolution": 64,
+  "base_channels": 32
+}

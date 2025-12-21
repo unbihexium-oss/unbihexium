@@ -1,0 +1,8 @@
+{
+  "model_id": "maritime_awareness_mega",
+  "task": "detection",
+  "variant": "mega",
+  "params": 2268802,
+  "resolution": 512,
+  "base_channels": 128
+}

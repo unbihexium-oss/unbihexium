@@ -1,0 +1,8 @@
+{
+  "model_id": "timeseries_analyzer_mega",
+  "task": "regression",
+  "variant": "mega",
+  "params": 1061377,
+  "resolution": 512,
+  "base_channels": 128
+}

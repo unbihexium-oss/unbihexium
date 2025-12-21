@@ -1,0 +1,8 @@
+{
+  "model_id": "super_resolution_base",
+  "task": "super_resolution",
+  "variant": "base",
+  "params": 191491,
+  "resolution": 128,
+  "base_channels": 64
+}

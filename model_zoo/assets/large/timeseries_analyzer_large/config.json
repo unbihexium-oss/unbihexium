@@ -1,0 +1,8 @@
+{
+  "model_id": "timeseries_analyzer_large",
+  "task": "regression",
+  "variant": "large",
+  "params": 599425,
+  "resolution": 256,
+  "base_channels": 96
+}

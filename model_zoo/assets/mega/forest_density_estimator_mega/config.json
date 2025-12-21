@@ -1,0 +1,8 @@
+{
+  "model_id": "forest_density_estimator_mega",
+  "task": "regression",
+  "variant": "mega",
+  "params": 1055745,
+  "resolution": 512,
+  "base_channels": 128
+}

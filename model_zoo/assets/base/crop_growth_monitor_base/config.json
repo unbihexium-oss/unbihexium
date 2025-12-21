@@ -1,0 +1,8 @@
+{
+  "model_id": "crop_growth_monitor_base",
+  "task": "regression",
+  "variant": "base",
+  "params": 267521,
+  "resolution": 128,
+  "base_channels": 64
+}

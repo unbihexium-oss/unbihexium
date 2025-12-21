@@ -1,0 +1,8 @@
+{
+  "model_id": "tree_height_estimator_tiny",
+  "task": "terrain",
+  "variant": "tiny",
+  "params": 186177,
+  "resolution": 64,
+  "base_channels": 32
+}

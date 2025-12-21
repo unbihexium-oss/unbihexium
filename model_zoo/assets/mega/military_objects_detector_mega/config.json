@@ -1,0 +1,8 @@
+{
+  "model_id": "military_objects_detector_mega",
+  "task": "detection",
+  "variant": "mega",
+  "params": 2269059,
+  "resolution": 512,
+  "base_channels": 128
+}

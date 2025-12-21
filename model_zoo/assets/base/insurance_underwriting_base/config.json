@@ -1,0 +1,8 @@
+{
+  "model_id": "insurance_underwriting_base",
+  "task": "regression",
+  "variant": "base",
+  "params": 270593,
+  "resolution": 128,
+  "base_channels": 64
+}

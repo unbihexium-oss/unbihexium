@@ -1,0 +1,8 @@
+{
+  "model_id": "offshore_survey_large",
+  "task": "regression",
+  "variant": "large",
+  "params": 597889,
+  "resolution": 256,
+  "base_channels": 96
+}

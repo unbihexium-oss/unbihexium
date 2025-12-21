@@ -1,0 +1,8 @@
+{
+  "model_id": "crop_classifier_mega",
+  "task": "segmentation",
+  "variant": "mega",
+  "params": 2269573,
+  "resolution": 512,
+  "base_channels": 128
+}

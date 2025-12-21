@@ -1,0 +1,8 @@
+{
+  "model_id": "insurance_underwriting_mega",
+  "task": "regression",
+  "variant": "mega",
+  "params": 1065473,
+  "resolution": 512,
+  "base_channels": 128
+}

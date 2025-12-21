@@ -1,0 +1,8 @@
+{
+  "model_id": "viewshed_analyzer_mega",
+  "task": "regression",
+  "variant": "mega",
+  "params": 1058305,
+  "resolution": 512,
+  "base_channels": 128
+}

@@ -1,0 +1,8 @@
+{
+  "model_id": "perennial_garden_suitability_tiny",
+  "task": "regression",
+  "variant": "tiny",
+  "params": 68481,
+  "resolution": 64,
+  "base_channels": 32
+}

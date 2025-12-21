@@ -1,0 +1,8 @@
+{
+  "model_id": "thematic_mapper_tiny",
+  "task": "segmentation",
+  "variant": "tiny",
+  "params": 143331,
+  "resolution": 64,
+  "base_channels": 32
+}

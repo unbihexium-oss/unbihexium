@@ -1,0 +1,8 @@
+{
+  "model_id": "multi_solution_segmentation_mega",
+  "task": "segmentation",
+  "variant": "mega",
+  "params": 2269316,
+  "resolution": 512,
+  "base_channels": 128
+}

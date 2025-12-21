@@ -1,0 +1,8 @@
+{
+  "model_id": "maritime_awareness_large",
+  "task": "detection",
+  "variant": "large",
+  "params": 1277666,
+  "resolution": 256,
+  "base_channels": 96
+}

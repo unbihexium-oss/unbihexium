@@ -1,0 +1,8 @@
+{
+  "model_id": "pansharpening_tiny",
+  "task": "enhancement",
+  "variant": "tiny",
+  "params": 186243,
+  "resolution": 64,
+  "base_channels": 32
+}

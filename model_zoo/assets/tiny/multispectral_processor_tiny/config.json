@@ -1,0 +1,8 @@
+{
+  "model_id": "multispectral_processor_tiny",
+  "task": "enhancement",
+  "variant": "tiny",
+  "params": 186243,
+  "resolution": 64,
+  "base_channels": 32
+}

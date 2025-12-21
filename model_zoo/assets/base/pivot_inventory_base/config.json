@@ -1,0 +1,8 @@
+{
+  "model_id": "pivot_inventory_base",
+  "task": "detection",
+  "variant": "base",
+  "params": 569025,
+  "resolution": 128,
+  "base_channels": 64
+}

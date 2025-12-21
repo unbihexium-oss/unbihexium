@@ -1,0 +1,8 @@
+{
+  "model_id": "dem_generator_base",
+  "task": "terrain",
+  "variant": "base",
+  "params": 740993,
+  "resolution": 128,
+  "base_channels": 64
+}

@@ -1,0 +1,8 @@
+{
+  "model_id": "livestock_estimator_base",
+  "task": "regression",
+  "variant": "base",
+  "params": 267009,
+  "resolution": 128,
+  "base_channels": 64
+}

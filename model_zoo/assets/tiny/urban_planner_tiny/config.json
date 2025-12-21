@@ -1,0 +1,8 @@
+{
+  "model_id": "urban_planner_tiny",
+  "task": "segmentation",
+  "variant": "tiny",
+  "params": 143396,
+  "resolution": 64,
+  "base_channels": 32
+}
