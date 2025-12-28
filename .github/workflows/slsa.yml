@@ -28,7 +28,7 @@ jobs:
           python -m build
 
       - name: Generate SLSA Provenance
-        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.9.0
+        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
         with:
           base64-subjects: |
             $(sha256sum dist/* | base64 -w0)
