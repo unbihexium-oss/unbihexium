@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
 
       - name: Generate attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: dist/*
         continue-on-error: true
