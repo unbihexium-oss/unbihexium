@@ -1,323 +1,668 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/cli/main.py
+# Title       : Command line interface
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires click and rich; model
+#               commands need PyTorch or ONNX Runtime
+# =============================================================================
+#
+# Abstract
+# --------
+# The `unbihexium` command:
+#
+#   info                         library version and registry sizes
+#   zoo list|info|build|export|verify|where|clear
+#                                browse the model catalogue and manage the
+#                                local model store
+#   train MODEL --data DIR       train or fine-tune a model (or --synthetic N
+#                                to check the setup on generated data)
+#   evaluate MODEL --data DIR    accuracy of a model on a dataset split
+#   predict MODEL INPUT OUTPUT   run a model on a raster and write GeoJSON,
+#                                GeoTIFF or JSON depending on the task
+#   pipeline list|run            registered processing pipelines
+#   index NAME -i IN -o OUT      spectral index of a raster
+#
+# Model arguments accept a catalogue family or model id (starter weights), a
+# checkpoint written by `train` (.pt) or an ONNX export (.onnx).
+#
+# Exit status
+# -----------
+#   0  success
+#   1  invalid input, missing files or a failed command
+# =============================================================================
 
-"""Main CLI entrypoint for unbihexium."""
-
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
 from __future__ import annotations
 
+# JSON output of listings and metrics.
+import json
+
+# Represent file paths.
+from pathlib import Path
+
+# Type of loosely structured values.
+from typing import Any
+
+# Command line framework.
 import click
+
+# Rich terminal output.
 from rich.console import Console
+
+# Tables in the terminal.
 from rich.table import Table
 
+# Version of the package.
 from unbihexium._version import __version__
 
+# Console used by every command.
 console = Console()
 
 
-@click.group()
+# Print an error and exit with status 1.
+def fail(message: str) -> None:
+    # Error message in red.
+    console.print(f"[red]Error:[/] {message}")
+    # Non-zero exit status.
+    raise SystemExit(1)
+
+
+# Print a dictionary as JSON; NaN becomes null.
+def print_json(data: Any) -> None:
+    # Convert non-finite floats for strict JSON.
+    text = json.dumps(data, indent=2, default=str)
+    # Strict JSON has no NaN or infinity.
+    text = text.replace("NaN", "null").replace("Infinity", "null")
+    # Plain output without rich markup.
+    click.echo(text)
+
+
+# Root command group.
+@click.group(help="Unbihexium: Earth observation, geospatial, remote sensing and SAR library.")
 @click.version_option(version=__version__, prog_name="unbihexium")
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
 @click.pass_context
 def main(ctx: click.Context, verbose: bool) -> None:
-    """Unbihexium: Earth Observation, Geospatial, Remote Sensing, and SAR library."""
+    # Shared state of the subcommands.
     ctx.ensure_object(dict)
+    # Verbose flag.
     ctx.obj["verbose"] = verbose
 
 
-@main.command()
+# Library information.
+@main.command(help="Display library information.")
 def info() -> None:
-    """Display library information."""
-    from unbihexium.registry.capabilities import CapabilityRegistry
-    from unbihexium.registry.models import ModelRegistry
-    from unbihexium.registry.pipelines import PipelineRegistry
+    # Registries are imported lazily to keep start-up fast.
+    import unbihexium.ai
+    from unbihexium.registry.capabilities import CapabilityRegistry  # Capabilities.
+    from unbihexium.registry.pipelines import PipelineRegistry  # Pipelines.
+    from unbihexium.zoo import catalog_version, list_models  # Model zoo.
 
+    # Version line.
     console.print(f"[bold blue]Unbihexium[/] v{__version__}")
-    console.print()
+    # Registered capabilities.
     console.print(f"Registered capabilities: {len(CapabilityRegistry.ids())}")
-    console.print(f"Registered models: {len(ModelRegistry.ids())}")
+    # Model zoo size.
+    console.print(f"Model zoo models: {len(list_models())} (catalogue {catalog_version()})")
+    # Registered pipelines.
     console.print(f"Registered pipelines: {len(PipelineRegistry.ids())}")
 
 
-@main.group()
+# Model zoo command group.
+@main.group(help="Browse the model catalogue and manage the local model store.")
 def zoo() -> None:
-    """Model zoo commands."""
+    # Group without its own behaviour.
     pass
 
 
-@zoo.command("list")
-@click.option("--task", "-t", help="Filter by task type.")
+# List models.
+@zoo.command("list", help="List model zoo models.")
+@click.option("--task", "-t", help="Filter by task, for example detection.")
+@click.option("--domain", "-d", help="Filter by capability domain.")
+@click.option("--variant", help="Filter by variant: tiny, base, large or mega.")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON.")
-def zoo_list(task: str | None, as_json: bool) -> None:
-    """List available models in the zoo."""
+def zoo_list(task: str | None, domain: str | None, variant: str | None, as_json: bool) -> None:
+    # Imported lazily.
     from unbihexium.zoo import list_models
 
-    models = list_models(task=task)
-
+    # Matching registry entries.
+    try:
+        # Filtered listing.
+        entries = list_models(task=task, domain=domain, variant=variant)
+    # Invalid filter values.
+    except ValueError as exc:
+        # Report and exit.
+        fail(str(exc))
+    # JSON output.
     if as_json:
-        import json
-
-        click.echo(json.dumps([m.to_dict() for m in models], indent=2))
+        # One dictionary per model.
+        print_json([e.to_dict() for e in entries])
+        # Done.
         return
-
-    table = Table(title="Model Zoo")
+    # Table output.
+    table = Table(title=f"Model zoo ({len(entries)} models)")
+    # Model id column.
     table.add_column("Model ID", style="cyan")
-    table.add_column("Name", style="green")
-    table.add_column("Task", style="yellow")
-    table.add_column("Source", style="blue")
-    table.add_column("Size", style="magenta")
-
-    for model in models:
-        size = f"{model.size_bytes / 1024 / 1024:.1f} MB" if model.size_bytes > 0 else "N/A"
-        table.add_row(
-            model.model_id,
-            model.config.name,
-            model.config.task.value,
-            model.source,
-            size,
-        )
-
+    # Task column.
+    table.add_column("Task", style="green")
+    # Domain column.
+    table.add_column("Domain", style="yellow")
+    # Parameter count column.
+    table.add_column("Parameters", justify="right")
+    # One row per model.
+    for e in entries:
+        # Row values.
+        table.add_row(e.model_id, e.task.value, e.domain, f"{e.num_parameters:,}")
+    # Print the table.
     console.print(table)
 
 
-@zoo.command("download")
+# Show one model.
+@zoo.command("info", help="Show the inputs, outputs and metadata of a model.")
 @click.argument("model_id")
-@click.option("--version", "-V", "model_version", help="Model version.")
-@click.option("--cache-dir", type=click.Path(), help="Cache directory.")
-@click.option(
-    "--source",
-    type=click.Choice(["auto", "repo", "release", "lfs", "external"]),
-    default="auto",
-    help="Download source.",
-)
-def zoo_download(
-    model_id: str,
-    model_version: str | None,
-    cache_dir: str | None,
-    source: str,
-) -> None:
-    """Download a model from the zoo."""
-    from pathlib import Path
+def zoo_info(model_id: str) -> None:
+    # Imported lazily.
+    from unbihexium.zoo import get_model
 
-    from unbihexium.zoo import download_model
+    # Registry entry.
+    entry = get_model(model_id)
+    # Unknown models.
+    if entry is None:
+        # Report and exit.
+        fail(f"unknown model {model_id}; see `unbihexium zoo list`")
+    # Mypy: fail() does not return.
+    assert entry is not None
+    # Entry as JSON.
+    print_json(entry.to_dict())
 
-    cache = Path(cache_dir) if cache_dir else None
 
+# Build or download a model into the store.
+@zoo.command("build", help="Build a model into the local store and verify it.")
+@click.argument("model_id")
+@click.option("--onnx", is_flag=True, help="Also export the model to ONNX.")
+@click.option("--force", is_flag=True, help="Rebuild even if the model is cached.")
+@click.option("--cache-dir", type=click.Path(), help="Cache root directory.")
+def zoo_build(model_id: str, onnx: bool, force: bool, cache_dir: str | None) -> None:
+    # Imported lazily.
+    from unbihexium.zoo import ensure_model
+
+    # Build, verify and cache the model.
     try:
-        path = download_model(
-            model_id,
-            version=model_version,
-            cache_dir=cache,
-            source=source,
-        )
-        console.print(f"[green]Downloaded:[/] {path}")
-    except Exception as e:
-        console.print(f"[red]Error:[/] {e}")
-        raise SystemExit(1) from e
+        # Directory of the cached model.
+        directory = ensure_model(model_id, cache_dir=cache_dir, onnx=onnx, force=force)
+    # Import errors mean PyTorch is missing.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; install PyTorch with pip install 'unbihexium[torch]'")
+    # Unknown models and verification errors.
+    except (KeyError, ValueError) as exc:
+        # Report and exit.
+        fail(str(exc))
+    # Report the location.
+    console.print(f"[green]Cached:[/] {directory}")
 
 
-@zoo.command("verify")
+# Compatibility alias of build.
+@zoo.command("download", help="Alias of `zoo build`, kept for compatibility.", hidden=True)
+@click.argument("model_id")
+@click.option("--force", "-f", is_flag=True, help="Rebuild even if the model is cached.")
+@click.option("--cache-dir", type=click.Path(), help="Cache root directory.")
+@click.pass_context
+def zoo_download(ctx: click.Context, model_id: str, force: bool, cache_dir: str | None) -> None:
+    # Forward to build.
+    ctx.invoke(zoo_build, model_id=model_id, onnx=False, force=force, cache_dir=cache_dir)
+
+
+# Export a checkpoint to ONNX.
+@zoo.command("export", help="Export a model or checkpoint to ONNX and verify it.")
+@click.argument("model")
+@click.argument("output", type=click.Path())
+@click.option("--no-verify", is_flag=True, help="Skip the ONNX Runtime comparison.")
+def zoo_export(model: str, output: str, no_verify: bool) -> None:
+    # Imported lazily; export needs PyTorch and onnx.
+    from unbihexium.zoo import load_model  # Model loading.
+    from unbihexium.zoo.export import export_onnx  # ONNX export.
+
+    # Load the model or checkpoint.
+    net = load_model(model)
+    # Export and verify.
+    path = export_onnx(net, output, verify=not no_verify)
+    # Report the file.
+    console.print(f"[green]Exported:[/] {path}")
+
+
+# Verify a cached model.
+@zoo.command("verify", help="Verify the files and weights digest of a cached model.")
 @click.argument("model_id")
 def zoo_verify(model_id: str) -> None:
-    """Verify model integrity via SHA256 checksum."""
+    # Imported lazily.
     from unbihexium.zoo import verify_model
 
-    try:
-        valid = verify_model(model_id)
-        if valid:
-            console.print(f"[green]Verified:[/] {model_id} - checksum OK")
-        else:
-            console.print(f"[red]Failed:[/] {model_id} - checksum mismatch")
-            raise SystemExit(1)
-    except Exception as e:
-        console.print(f"[red]Error:[/] {e}")
-        raise SystemExit(1) from e
+    # Check the checksums and the digest.
+    if verify_model(model_id):
+        # Success.
+        console.print(f"[green]Verified:[/] {model_id}")
+    # Missing or modified files.
+    else:
+        # Report and exit.
+        fail(f"{model_id} is not cached or does not verify")
 
 
-@zoo.command("where")
+# Location of a cached model.
+@zoo.command("where", help="Print the checkpoint path of a cached model.")
 @click.argument("model_id")
 def zoo_where(model_id: str) -> None:
-    """Show location of a cached model."""
-    from unbihexium.zoo import get_cached_model_path, is_model_cached
+    # Imported lazily.
+    from unbihexium.zoo import get_cached_model_path
 
-    if is_model_cached(model_id):
-        path = get_cached_model_path(model_id)
-        console.print(f"[green]Cached:[/] {path}")
-    else:
-        console.print(f"[yellow]Not cached:[/] {model_id}")
-        console.print("Run: unbihexium zoo download {model_id}")
+    # Checkpoint path, or None.
+    path = get_cached_model_path(model_id)
+    # Models that are not cached.
+    if path is None:
+        # Report and exit.
+        fail(f"{model_id} is not cached; run `unbihexium zoo build {model_id}`")
+    # Print the path.
+    click.echo(str(path))
 
 
-@main.command()
+# Remove cached models.
+@zoo.command("clear", help="Remove one or all models from the local store.")
+@click.argument("model_id", required=False)
+@click.option("--yes", is_flag=True, help="Do not ask for confirmation.")
+def zoo_clear(model_id: str | None, yes: bool) -> None:
+    # Imported lazily.
+    from unbihexium.zoo import clear_cache
+
+    # Ask before removing everything.
+    if model_id is None and not yes:
+        # Confirmation prompt; aborts on no.
+        click.confirm("Remove every cached model?", abort=True)
+    # Remove the files.
+    removed = clear_cache(model_id)
+    # Report the number of removed models.
+    console.print(f"Removed {removed} model(s)")
+
+
+# Train a model.
+@main.command(help="Train or fine-tune a model zoo model.")
+@click.argument("model")
+@click.option("--data", type=click.Path(exists=True, file_okay=False), help="Dataset root.")
+@click.option("--synthetic", type=int, help="Train on this many synthetic samples instead.")
+@click.option("--variant", help="Variant for family names: tiny, base, large or mega.")
+@click.option("--epochs", default=50, show_default=True, help="Number of epochs.")
+@click.option("--batch-size", default=8, show_default=True, help="Chips per step.")
+@click.option("--lr", "learning_rate", default=1e-3, show_default=True, help="Peak learning rate.")
+@click.option("--weight-decay", default=1e-4, show_default=True, help="AdamW weight decay.")
+@click.option("--chip-size", type=int, help="Chip size in pixels; default is the tile size.")
+@click.option("--samples-per-epoch", type=int, help="Random chips per epoch.")
+@click.option("--device", default="auto", show_default=True, help="auto, cpu, cuda or mps.")
+@click.option("--workers", default=0, show_default=True, help="Data loader processes.")
+@click.option("--seed", default=0, show_default=True, help="Random seed.")
+@click.option("--amp", is_flag=True, help="Mixed precision on CUDA.")
+@click.option("--patience", type=int, help="Stop after this many epochs without improvement.")
+@click.option(
+    "--regression-loss",  # Option name.
+    type=click.Choice(["l1", "mse", "huber"]),  # Allowed losses.
+    default="l1",  # Default loss.
+    show_default=True,  # Show the default in the help.
+    help="Loss of regression targets.",  # Help text.
+)  # End of the option.
+@click.option("--no-augment", is_flag=True, help="Disable data augmentation.")
+@click.option("--output", default="runs", show_default=True, help="Output directory.")
+def train(**options: Any) -> None:
+    # Imported lazily; training needs PyTorch.
+    try:
+        # Training entry point and configuration.
+        from unbihexium.ai.training import TrainConfig
+        from unbihexium.ai.training import train as run_training  # Training entry point.
+    # PyTorch is missing.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; install PyTorch with pip install 'unbihexium[torch]'")
+    # Hyperparameters from the options.
+    config = TrainConfig(
+        epochs=options["epochs"],  # Epochs.
+        batch_size=options["batch_size"],  # Batch size.
+        learning_rate=options["learning_rate"],  # Learning rate.
+        weight_decay=options["weight_decay"],  # Weight decay.
+        chip_size=options["chip_size"],  # Chip size.
+        samples_per_epoch=options["samples_per_epoch"],  # Chips per epoch.
+        device=options["device"],  # Device.
+        num_workers=options["workers"],  # Loader processes.
+        seed=options["seed"],  # Seed.
+        amp=options["amp"],  # Mixed precision.
+        patience=options["patience"],  # Early stopping.
+        regression_loss=options["regression_loss"],  # Regression loss.
+        augment=not options["no_augment"],  # Augmentation.
+        output_dir=options["output"],  # Output directory.
+    )  # End of the configuration.
+    # Data or synthetic samples are required.
+    if not options["data"] and not options["synthetic"]:
+        # Explain the options.
+        fail("pass --data DIR or --synthetic N")
+    # Run the training.
+    try:
+        # History and checkpoints.
+        result = run_training(
+            options["model"],  # Model.
+            options["data"],  # Dataset.
+            config,  # Hyperparameters.
+            variant=options["variant"],  # Variant.
+            synthetic=options["synthetic"],  # Synthetic samples.
+        )  # End of the training.
+    # Dataset and configuration problems.
+    except (ValueError, KeyError) as exc:
+        # Report and exit.
+        fail(str(exc))
+    # Summary.
+    console.print(f"[green]Best epoch:[/] {result.best_epoch}")
+    # Best checkpoint.
+    console.print(f"[green]Best checkpoint:[/] {result.best_checkpoint}")
+    # Metrics of the best checkpoint.
+    print_json(result.best_metrics)
+
+
+# Evaluate a model.
+@main.command(help="Evaluate a model on a dataset split.")
+@click.argument("model")
+@click.option(
+    "--data", required=True, type=click.Path(exists=True, file_okay=False), help="Dataset root."
+)
+@click.option("--split", default="val", show_default=True, help="Split: train, val or test.")
+@click.option("--chip-size", type=int, help="Chip size in pixels; default is the tile size.")
+@click.option("--batch-size", default=8, show_default=True, help="Chips per forward pass.")
+@click.option("--device", default="auto", show_default=True, help="auto, cpu, cuda or mps.")
+@click.option("--threshold", default=0.3, show_default=True, help="Detection score threshold.")
+def evaluate(
+    model: str,  # Model, model id or checkpoint.
+    data: str,  # Dataset root.
+    split: str,  # Split.
+    chip_size: int | None,  # Chip size.
+    batch_size: int,  # Batch size.
+    device: str,  # Device.
+    threshold: float,  # Detection threshold.
+) -> None:  # The command returns nothing.
+    # Imported lazily; evaluation needs PyTorch.
+    from unbihexium.ai.training import evaluate as run_evaluation
+
+    # Metrics of the model.
+    try:
+        # Evaluate on the split.
+        metrics = run_evaluation(model, data, split, chip_size, batch_size, device, threshold)
+    # Dataset problems.
+    except (ValueError, KeyError) as exc:
+        # Report and exit.
+        fail(str(exc))
+    # Print the metrics.
+    print_json(metrics)
+
+
+# Run a model on a raster.
+@main.command(help="Run a model on a raster and write the result.")
+@click.argument("model")
+@click.argument("input_path", type=click.Path(exists=True, dir_okay=False))
+@click.argument("output_path", type=click.Path(dir_okay=False))
+@click.option(
+    "--second",
+    type=click.Path(exists=True, dir_okay=False),  # Existing file.
+    help="Second date for change detection.",  # Help text.
+)
+@click.option("--variant", help="Variant for family names.")
+@click.option("--threshold", type=float, help="Detection or segmentation threshold.")
+@click.option("--tile-size", type=int, help="Tile size in pixels.")
+@click.option("--overlap", default=0.25, show_default=True, help="Tile overlap fraction.")
+@click.option(
+    "--backend",  # Option name.
+    type=click.Choice(["auto", "torch", "onnx"]),  # Allowed backends.
+    default="auto",  # Default backend.
+    show_default=True,  # Show the default in the help.
+    help="Inference backend.",  # Help text.
+)  # End of the option.
+@click.option("--device", default="cpu", show_default=True, help="Torch device.")
+def predict(
+    model: str,  # Model, model id, checkpoint or ONNX file.
+    input_path: str,  # Input raster.
+    output_path: str,  # Output file.
+    second: str | None,  # Second date.
+    variant: str | None,  # Variant.
+    threshold: float | None,  # Threshold.
+    tile_size: int | None,  # Tile size.
+    overlap: float,  # Overlap.
+    backend: str,  # Backend.
+    device: str,  # Device.
+) -> None:  # The command returns nothing.
+    # Imported lazily.
+    from unbihexium.ai.predict import task_api, write_result
+
+    # Inference options.
+    options: dict[str, Any] = {
+        "variant": variant,  # Variant.
+        "tile_size": tile_size,  # Tile size.
+        "overlap": overlap,  # Overlap.
+        "backend": backend,  # Backend.
+        "device": device,  # Device.
+    }  # End of the options.
+    # Thresholds only when given, so that task defaults apply otherwise.
+    if threshold is not None:
+        # Add the threshold.
+        options["threshold"] = threshold
+    # Run the model.
+    try:
+        # Task API of the model.
+        api = task_api(model, **options)
+        # Change detection with two files.
+        if second is not None:
+            # Pairwise prediction.
+            result = api.predict_pair(input_path, second)  # type: ignore[attr-defined]
+        # Single input.
+        else:
+            # Prediction.
+            result = api.predict(input_path)  # type: ignore[attr-defined]
+    # Invalid inputs and models.
+    except (ValueError, KeyError, AttributeError) as exc:
+        # Report and exit.
+        fail(str(exc))
+    # Write the result.
+    path = write_result(result, output_path)
+    # Report the output.
+    console.print(f"[green]Wrote:[/] {path} ({api.model_id})")
+
+
+# Compatibility alias of predict with the options of earlier releases.
+@main.command(help="Alias of `predict`, kept for compatibility.", hidden=True)
 @click.argument("model_id")
 @click.option("--input", "-i", "input_path", required=True, help="Input file path.")
 @click.option("--output", "-o", "output_path", required=True, help="Output file path.")
-@click.option("--task", "-t", help="Task type override.")
+@click.option("--task", "-t", help="Ignored; the task follows from the model.")
+@click.pass_context
 def infer(
-    model_id: str,
-    input_path: str,
-    output_path: str,
-    task: str | None,
-) -> None:
-    """Run inference with a model from the zoo.
-
-    Example:
-        unbihexium infer ubx-sr-srcnn-1.0.0 -i input.tif -o output.tif
-    """
-    from pathlib import Path
-
-    import numpy as np
-
-    console.print(f"[blue]Running inference:[/] {model_id}")
-    console.print(f"  Input: {input_path}")
-    console.print(f"  Output: {output_path}")
-
-    try:
-        import onnxruntime as ort
-
-        from unbihexium.zoo import get_cached_model_path, is_model_cached
-
-        if not is_model_cached(model_id):
-            console.print("[yellow]Model not cached. Downloading...[/]")
-            from unbihexium.zoo import download_model
-
-            download_model(model_id)
-
-        model_path = get_cached_model_path(model_id)
-        if model_path is None:
-            console.print(f"[red]Error:[/] Model not found: {model_id}")
-            raise SystemExit(1)
-
-        onnx_path = model_path / "model.onnx"
-        if not onnx_path.exists():
-            console.print(f"[red]Error:[/] ONNX file not found: {onnx_path}")
-            raise SystemExit(1)
-
-        session = ort.InferenceSession(str(onnx_path))
-        input_name = session.get_inputs()[0].name
-
-        input_data = np.load(input_path).astype(np.float32)
-        if input_data.ndim == 3:
-            input_data = input_data[np.newaxis, ...]
-
-        outputs = session.run(None, {input_name: input_data})
-        result = outputs[0]
-
-        np.save(output_path, result)
-        console.print(f"[green]Output saved:[/] {output_path}")
-        console.print(f"  Shape: {result.shape}")
-
-    except ImportError:
-        console.print("[red]Error:[/] onnxruntime required. Install with: pip install onnxruntime")
-        raise SystemExit(1)
-    except Exception as e:
-        console.print(f"[red]Error:[/] {e}")
-        raise SystemExit(1) from e
+    ctx: click.Context,  # Click context.
+    model_id: str,  # Model.
+    input_path: str,  # Input raster.
+    output_path: str,  # Output file.
+    task: str | None,  # Ignored task name.
+) -> None:  # The command returns nothing.
+    # Forward to predict with default options.
+    ctx.invoke(predict, model=model_id, input_path=input_path, output_path=output_path)
 
 
-@main.group()
+# Pipeline command group.
+@main.group(help="Registered processing pipelines.")
 def pipeline() -> None:
-    """Pipeline commands."""
+    # Group without its own behaviour.
     pass
 
 
-@pipeline.command("list")
+# List pipelines.
+@pipeline.command("list", help="List available pipelines.")
 @click.option("--domain", "-d", help="Filter by domain.")
 def pipeline_list(domain: str | None) -> None:
-    """List available pipelines."""
-    from unbihexium.registry.pipelines import PipelineRegistry
+    # Task APIs register their pipelines on import.
+    import unbihexium.ai
+    from unbihexium.registry.pipelines import PipelineRegistry  # Pipeline registry.
 
-    if domain:
-        pipelines = PipelineRegistry.by_domain(domain)
-    else:
-        pipelines = PipelineRegistry.list_all()
-
+    # Filtered or complete listing.
+    pipelines = PipelineRegistry.by_domain(domain) if domain else PipelineRegistry.list_all()
+    # Table output.
     table = Table(title="Pipelines")
+    # Id column.
     table.add_column("Pipeline ID", style="cyan")
+    # Name column.
     table.add_column("Name", style="green")
+    # Domains column.
     table.add_column("Domains", style="yellow")
-
+    # One row per pipeline.
     for p in pipelines:
+        # Row values.
         table.add_row(p.pipeline_id, p.name, ", ".join(p.domains))
-
+    # Print the table.
     console.print(table)
 
 
-@pipeline.command("run")
+# Run a pipeline.
+@pipeline.command("run", help="Run a pipeline on raster files and write its result.")
 @click.argument("pipeline_id")
 @click.option("--input", "-i", "input_path", required=True, help="Input file path.")
+@click.option("--input2", "input2_path", help="Second input for two-date pipelines.")
 @click.option("--output", "-o", "output_path", required=True, help="Output file path.")
-@click.option("--config", "-c", "config_path", help="Config file path.")
+@click.option("--param", "-p", multiple=True, help="Pipeline parameter as KEY=VALUE.")
 def pipeline_run(
-    pipeline_id: str,
-    input_path: str,
-    output_path: str,
-    config_path: str | None,
-) -> None:
-    """Run a pipeline."""
-    from pathlib import Path
+    pipeline_id: str,  # Registry id.
+    input_path: str,  # First input.
+    input2_path: str | None,  # Second input.
+    output_path: str,  # Output file.
+    param: tuple[str, ...],  # Parameters.
+) -> None:  # The command returns nothing.
+    # Task APIs register their pipelines on import.
+    import unbihexium.ai
+    from unbihexium.ai.predict import write_result  # Result output.
+    from unbihexium.registry.pipelines import PipelineRegistry  # Registry.
 
-    from unbihexium.registry.pipelines import PipelineRegistry
-
-    entry = PipelineRegistry.get(pipeline_id)
-    if entry is None:
-        console.print(f"[red]Error:[/] Pipeline not found: {pipeline_id}")
-        raise SystemExit(1)
-
-    # Basic pipeline execution
-    console.print(f"[blue]Running pipeline:[/] {pipeline_id}")
-    console.print(f"  Input: {input_path}")
-    console.print(f"  Output: {output_path}")
-
-    pipeline = PipelineRegistry.create(pipeline_id)
-    if pipeline is None:
-        console.print("[red]Error:[/] Failed to create pipeline")
-        raise SystemExit(1)
-
+    # Parameters as a dictionary; values are parsed as JSON when possible.
+    params: dict[str, Any] = {}
+    # Parse every parameter.
+    for item in param:
+        # Split at the first equals sign.
+        key, _, value = item.partition("=")
+        # JSON values (numbers, booleans) or plain strings.
+        try:
+            # Parsed value.
+            params[key] = json.loads(value)
+        # Plain strings.
+        except json.JSONDecodeError:
+            # Keep the text.
+            params[key] = value
+    # Create the pipeline.
+    created = PipelineRegistry.create(pipeline_id, **params)
+    # Unknown pipelines.
+    if created is None:
+        # Report and exit.
+        fail(f"pipeline not found: {pipeline_id}")
+    # Mypy: fail() does not return.
+    assert created is not None
+    # Input files.
+    inputs = {"input": input_path, "input1": input_path}
+    # Second input.
+    if input2_path:
+        # Add it.
+        inputs["input2"] = input2_path
+    # Run the pipeline.
     try:
-        run = pipeline.run({"input": Path(input_path)})
-        console.print(f"[green]Completed:[/] {run.run_id}")
-        console.print(f"  Duration: {run.duration_seconds:.2f}s" if run.duration_seconds else "")
-    except Exception as e:
-        console.print(f"[red]Error:[/] {e}")
-        raise SystemExit(1) from e
+        # Execute the steps.
+        run = created.run(inputs)
+    # Pipeline failures.
+    except Exception as exc:  # Every failure of a step ends the command.
+        # Report and exit.
+        fail(str(exc))
+    # Result object stored by the task pipelines.
+    result = getattr(created, "last_result", None)
+    # Write the result when the pipeline produced one.
+    if result is not None:
+        # Write the file.
+        write_result(result, output_path)
+    # Report the run.
+    console.print(f"[green]Completed:[/] {run.run_id} -> {output_path}")
 
 
-@main.command()
+# Compute a spectral index.
+@main.command(help="Compute a spectral index of a raster and write it as GeoTIFF.")
 @click.argument("index_name")
 @click.option("--input", "-i", "input_path", required=True, help="Input raster file.")
-@click.option("--output", "-o", "output_path", required=True, help="Output file path.")
-@click.option("--red", default="B04", help="Red band name.")
-@click.option("--nir", default="B08", help="NIR band name.")
-@click.option("--green", default="B03", help="Green band name.")
-@click.option("--blue", default="B02", help="Blue band name.")
-def index(
-    index_name: str,
-    input_path: str,
-    output_path: str,
-    red: str,
-    nir: str,
-    green: str,
-    blue: str,
-) -> None:
-    """Compute a spectral index."""
-    from unbihexium.core.index import IndexRegistry
-    from unbihexium.core.raster import Raster
+@click.option("--output", "-o", "output_path", required=True, help="Output GeoTIFF file.")
+@click.option("--blue", default=2, show_default=True, help="1-based band number of blue.")
+@click.option("--green", default=3, show_default=True, help="1-based band number of green.")
+@click.option("--red", default=4, show_default=True, help="1-based band number of red.")
+@click.option("--nir", default=8, show_default=True, help="1-based band number of near infrared.")
+@click.option("--swir1", default=12, show_default=True, help="1-based band number of SWIR 1.6 um.")
+@click.option("--swir2", default=13, show_default=True, help="1-based band number of SWIR 2.2 um.")
+def index(index_name: str, input_path: str, output_path: str, **bands: int) -> None:
+    # Imported lazily.
+    import numpy as np  # Arrays.
 
+    from unbihexium.core.index import IndexRegistry  # Index formulas.
+    from unbihexium.core.raster import Raster  # Raster input and output.
+
+    # Index definition.
     idx = IndexRegistry.get(index_name.upper())
+    # Unknown indices.
     if idx is None:
-        available = IndexRegistry.list_all()
-        console.print(f"[red]Error:[/] Unknown index: {index_name}")
-        console.print(f"Available: {', '.join(available)}")
-        raise SystemExit(1)
-
-    console.print(f"[blue]Computing index:[/] {index_name}")
-    console.print(f"  Input: {input_path}")
-
+        # Report the available indices and exit.
+        fail(f"unknown index {index_name}; available: {', '.join(IndexRegistry.list_all())}")
+    # Mypy: fail() does not return.
+    assert idx is not None
+    # Read the raster.
     raster = Raster.from_file(input_path)
-    # This is a simplified example - real implementation would handle band mapping
-    console.print(f"[green]Output:[/] {output_path}")
+    # Band data.
+    data = raster.data
+    # Mypy: from_file reads the data.
+    assert data is not None
+    # Bands required by the formula, by name.
+    arrays = {}
+    # Collect the required bands.
+    for name in idx.bands_required:
+        # 1-based band number of the name.
+        number = bands[name.lower()]
+        # The band must exist.
+        if not 1 <= number <= data.shape[0]:
+            # Explain the problem.
+            fail(f"{name} is band {number}, but the raster has {data.shape[0]} bands")
+        # Band array.
+        arrays[name] = data[number - 1]
+    # Compute the index.
+    values = idx.compute(arrays).astype(np.float32)
+    # Georeferenced output raster.
+    meta = raster.metadata
+    # Same grid as the input.
+    crs = meta.crs if meta else "EPSG:4326"
+    # Transform of the input.
+    transform = meta.transform if meta else None
+    # Output raster on that grid.
+    out = Raster.from_array(values, crs=crs, transform=transform)
+    # Write the GeoTIFF.
+    out.to_file(output_path)
+    # Report the output.
+    console.print(f"[green]Wrote:[/] {output_path} ({idx.name})")
 
 
+# Name used by earlier releases and the tests.
+cli = main
+
+# Run the command line when the module is executed.
 if __name__ == "__main__":
+    # Entry point.
     main()
+
+# =============================================================================
+# End of module src/unbihexium/cli/main.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

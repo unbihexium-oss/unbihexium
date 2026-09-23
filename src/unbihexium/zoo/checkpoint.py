@@ -48,10 +48,13 @@ from typing import Any
 import torch
 
 # Model configuration and construction.
-from unbihexium.ai.models.factory import BuildConfig, ZooModel, build_from_config
+from unbihexium.ai.models.factory import ZooModel, build_from_config
 
 # Digest of the weights.
 from unbihexium.ai.models.init import weights_digest
+
+# Configuration record of a model.
+from unbihexium.zoo.config import BuildConfig
 
 # Format marker of Unbihexium checkpoints.
 CHECKPOINT_FORMAT = "unbihexium-checkpoint"

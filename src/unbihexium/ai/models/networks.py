@@ -62,12 +62,12 @@ from unbihexium.ai.models.blocks import HeadConv, RangeActivation
 # Residual encoder and U-Net decoder.
 from unbihexium.ai.models.encoder import Decoder, Encoder
 
+# Output stride of the CenterNet detector, defined with the configuration.
+from unbihexium.zoo.config import DETECTION_STRIDE
+
 # Initial bias of CenterNet heatmap logits: sigmoid(-2.19) = 0.1, so that
 # training starts from a low background probability (Zhou et al., 2019).
 HEATMAP_PRIOR_BIAS = -2.19
-
-# Output stride of the CenterNet detector.
-DETECTION_STRIDE = 4
 
 
 # U-Net for dense per-pixel outputs.

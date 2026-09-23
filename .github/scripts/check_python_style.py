@@ -76,8 +76,14 @@ STYLE_ROOTS = (
     "examples/scripts/",  # Example scripts.
     "examples/serving/",  # Serving example.
     "src/unbihexium/zoo/",  # Model zoo.
-    "src/unbihexium/ai/models/",  # Network architectures.
+    "src/unbihexium/ai/",  # Task APIs, inference, training and architectures.
+    "src/unbihexium/cli/",  # Command line interface.
+    "tests/unit/test_ai.py",  # Tests of the task APIs.
+    "tests/unit/test_ai_data.py",  # Tests of the datasets.
+    "tests/unit/test_ai_utils.py",  # Tests of decoding, metrics and transforms.
+    "tests/unit/test_cli.py",  # Tests of the command line.
     "tests/unit/test_models.py",  # Tests of the architectures.
+    "tests/unit/test_training.py",  # Tests of training.
     "tests/unit/test_zoo_catalog.py",  # Tests of the catalogue.
     "tests/unit/test_zoo_store.py",  # Tests of the model store.
 )  # End of the directory list.
@@ -195,31 +201,34 @@ def uncommented_lines(source: str) -> list[int]:
         # Text of the line.
         text = lines[line - 1]
         # An inline comment covers the line.
-        if line in comments:
+        if line in comments or ((line - 1) in comments and (line - 1) not in code) or ((line - 1) in covered and lines[line - 2].lstrip().startswith("@")) or (_is_definition(text) and _after_decorator(lines, line, covered)) or CLOSING_LINE.match(text) or (depth_at.get(line, 0) > 0 and STRING_LINE.match(text)):
             # Mark the line as covered.
             covered.add(line)
-        # A comment-only line directly above covers the line.
-        elif (line - 1) in comments and (line - 1) not in code:
-            # Mark the line as covered.
-            covered.add(line)
-        # A covered decorator covers the next decorator or definition line.
-        elif (line - 1) in covered and lines[line - 2].lstrip().startswith("@"):
-            # Mark the line as covered.
-            covered.add(line)
-        # A definition after a covered multi-line decorator is covered too.
-        elif _is_definition(text) and _after_decorator(lines, line, covered):
-            # Mark the line as covered.
-            covered.add(line)
-        # Closing brackets are punctuation, not code.
-        elif CLOSING_LINE.match(text):
-            # Mark the line as covered.
-            covered.add(line)
-        # A string continuation inside brackets belongs to its expression.
-        elif depth_at.get(line, 0) > 0 and STRING_LINE.match(text):
-            # Mark the line as covered.
-            covered.add(line)
+    # A covered first decorator covers every decorator and the definition
+    # of its chain, even when multi-line decorators sit in between.
+    for group in _decorator_groups(source):
+        # The chain is documented by the comment above its first decorator.
+        if group[0] in covered:
+            # Cover the start of every decorator and the definition line.
+            covered.update(group)
     # Code lines that are not covered.
     return sorted(code - covered)
+
+
+# Start lines of the decorators and the definition of decorated functions and classes.
+def _decorator_groups(source: str) -> list[list[int]]:
+    # Chains found in the file.
+    groups = []
+    # Visit every node of the syntax tree.
+    for node in ast.walk(ast.parse(source)):
+        # Decorated functions and classes.
+        definition = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+        # Only nodes with decorators form a chain.
+        if isinstance(node, definition) and node.decorator_list:
+            # Decorator start lines followed by the definition line.
+            groups.append([d.lineno for d in node.decorator_list] + [node.lineno])
+    # Return the chains.
+    return groups
 
 
 # Check one file and return its problems.

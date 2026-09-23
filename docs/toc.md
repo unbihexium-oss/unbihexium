@@ -87,6 +87,8 @@ $$
 ## Model Zoo
 
 - [Model Catalog](model_zoo/model_catalog.md)
+- [Training](model_zoo/training.md)
+- [Inference](model_zoo/inference.md)
 - [Download and Verify](model_zoo/download_and_verify.md)
 - [Distribution](model_zoo/distribution.md)
 - [Licensing](model_zoo/licensing_and_provenance.md)
