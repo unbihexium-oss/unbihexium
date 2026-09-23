@@ -1,91 +1,91 @@
 {
-  "model_id": "salinity_detector",
-  "name": "Salinity Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "salinity_detector",
+  "name": "Soil Salinity Detector",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "agriculture",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Salinity Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Classifies soil salinity levels.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "non_saline",
+      "slight",
+      "moderate",
+      "strong"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Salinity class masks from soil sampling.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5584d1d2411add0cddfa9d4466d316693c8ecd8d1eb927d8a05a685e8f666d48",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d78bf1d194cc3ccaea2f8d7b0e945efc9e78a48b9415f8a85871e76638ab1b19",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "bb1afee29c23aa62cb9ed581c1c7b3c0052f934b5b5f6839759d02539cf6f5af",
-          "size_bytes": 411
-        }
-      ]
+      "model_id": "salinity_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733988,
+      "weights_digest": "6fe4f56f7ecab3ff87d9f9389b1aef5ef9588c0bc262ad5705dad1580e141f6c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ab2763a9a03419f4b88033d3071b79178da17b9ddfcc8c148809d5b01a5b1461",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "86d409646f03d17b1846aff8e33e255b1fb2722e9b6d41caed8c617b25051d1f",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "f780040f54c4ea6705a753d8f01e6a9c8be7d3443328cdd2fd7d4b4962003bed",
-          "size_bytes": 411
-        }
-      ]
+      "model_id": "salinity_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060548,
+      "weights_digest": "88122f03763b457a85089d5b5a3cef81e362cddde431d084f67de4033e2118ed"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "844a13cad8e517ecdf15747a1daf3042af5212e8154ccf496a57a33116da35a6",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "beef71d60f38766a2e2cd1451990e1d88e3faa385d7f8d000b8b17badc688a02",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "9cd0528018f772d73e4094bb1317caee8eb06efd94759f0e37ecf541b0157f20",
-          "size_bytes": 415
-        }
-      ]
+      "model_id": "salinity_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062244,
+      "weights_digest": "79976669f8efced4bf085bbd1a437b5aaf8a294cf8c1d4452b1f367d84c646a6"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "fc4c3c235be48d157c049ebffc359488113210b2ac718b452dc7e99b085540f3",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2526ec3e0f2cea2d048be1c7f41deb1b8df7414bcc1208d019863e87975f56f5",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "d34050df780b1c7bf5ca3cd890ffe037a8d89b1aeb552364f862d57f6e153b0f",
-          "size_bytes": 413
-        }
-      ]
+      "model_id": "salinity_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454788,
+      "weights_digest": "8355a678836055ef1034f7364cbee6e2d4e53dc5b695f9a498c896e0e4707c71"
     }
-  },
-  "capabilities": [
-    "salinity_detector"
-  ]
+  }
 }

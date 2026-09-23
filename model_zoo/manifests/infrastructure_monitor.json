@@ -1,91 +1,78 @@
 {
-  "model_id": "infrastructure_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "infrastructure_monitor",
   "name": "Infrastructure Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
-  "architecture": "siamese_unet",
+  "domain": "assets",
+  "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Infrastructure Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments roads, railways, buildings and bridges.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "road",
+      "railway",
+      "building",
+      "bridge"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Infrastructure masks.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9729829e3c7170fc96abc735a8e0673500cd0a4945d6f0e5ea4c9d7d0a7dcf4a",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c0b25bead56bf9e0a2846249d710f0487995ea91f6d60e328b359263ea2353b1",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "b9206096301dae27b88222f0da933c4bd89b5baa69da2d0a6fd0b4df1588d3be",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "infrastructure_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732997,
+      "weights_digest": "704c2313dd9b8c846d8324c0873f80c359451594a25981a144479eab9bac2a6b"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d8c2ebc0121c1dff53ed39ae6d700682a280f993fd4a79d3a37240a17998f4e1",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a2fba58729cf92173c9ff7a850fe1a5ec5efd576178e0bc7c6166a6c65e7f4a6",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "bf31b772eef8fa8d8675dd87fd717e718b9ecf72f4511f05cee6e8a80a8b119e",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "infrastructure_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058565,
+      "weights_digest": "5a60a7a931a5be9a1c82e76421b5d2d4571d2e7c5d3711a785ec5c2ba404653a"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "85c710116a3a2455f6fa8ff3051189656bef8f91ac088f0f3fc350227ab9815b",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "69b62aea32b3fb8a060b2f553c199ecdabbd8ede077b51904ba6bba4ad1abebe",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "dea71c218bdc462e9987522c8a6141d33f44c7c67835b8608a8b77dce7880664",
-          "size_bytes": 429
-        }
-      ]
+      "model_id": "infrastructure_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059269,
+      "weights_digest": "b60fcc002935ab9add529286feea3206e5778c556f90f4991f6ea1963b1dc587"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "271b85dd26ad6861cf7b920f7ad82227058cf67207047041c984a88626e3cc50",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ed097a5f32bc8a1217426dc6b97ee90f0caf64521e1fda0cfc786b8f54e70b94",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "37a668bc2d348546ab2e3eb243b827aaa0e6b728e63beac03ba9f8670ae71f51",
-          "size_bytes": 427
-        }
-      ]
+      "model_id": "infrastructure_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450821,
+      "weights_digest": "d55b313f21a3a3bfcabfac7ff3c7ca5145001bad972d8692193967dae8b985b6"
     }
-  },
-  "capabilities": [
-    "infrastructure_monitor"
-  ]
+  }
 }

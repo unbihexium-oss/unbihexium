@@ -1,1044 +1,242 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/zoo/registry.py
+# Title       : Registry of model zoo entries
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, standard library and PyYAML
+# =============================================================================
+#
+# Abstract
+# --------
+# A ModelZooEntry describes one model (a family in one size variant) of the
+# model zoo: its specification from the catalogue, the hyperparameters of
+# its variant, the expected digest of its starter weights and where its
+# files can be obtained. The registry contains the 520 catalogue models and
+# any models registered by the user, for example fine-tuned checkpoints
+# shared inside a project.
+#
+# Expected digests are read from digests.json, which
+# `python -m unbihexium.zoo.sync` generates next to catalog.yaml. An entry
+# without a digest can still be built, but it cannot be verified against a
+# published value.
+#
+# Usage
+# -----
+#   from unbihexium.zoo import get_model, list_models
+#   entry = get_model("ship_detector_base")
+#   detectors = list_models(task="detection", variant="tiny")
+# =============================================================================
 
-"""Model zoo registry for managing model entries."""
-
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
 from __future__ import annotations
 
-from dataclasses import dataclass
+# JSON parsing of the digest table.
+import json
+
+# Mutable records.
+from dataclasses import dataclass, field
+
+# Cache the digest table.
+from functools import lru_cache
+
+# Locate packaged data files.
+from importlib import resources
+
+# Type of loosely structured values.
 from typing import Any
 
-from unbihexium.core.model import ModelConfig, ModelFramework, ModelTask
+# Catalogue types and lookups.
+from unbihexium.zoo.catalog import (
+    MODEL_LICENSE,  # Licence of the models.
+    CatalogError,  # Raised for unknown families.
+    ModelSpec,  # Catalogue entry of a family.
+    Task,  # Task enumeration.
+    Variant,  # Size variant enumeration.
+    VariantSpec,  # Variant hyperparameters.
+    all_model_ids,  # Every model id of the zoo.
+    get_spec,  # Look up a family.
+    get_variant,  # Look up a variant.
+    parse_model_id,  # Split a model id.
+)  # End of the catalogue imports.
+
+# File with the expected weight digests of the catalogue models.
+DIGESTS_FILE = "digests.json"
 
 
+# Description of one model of the zoo.
 @dataclass
 class ModelZooEntry:
-    """Entry in the model zoo."""
-
+    # Model id, for example "ship_detector_base".
     model_id: str
-    config: ModelConfig
-    sha256: str = ""
+    # Catalogue specification of the family.
+    spec: ModelSpec
+    # Hyperparameters of the variant.
+    variant: VariantSpec
+    # Expected SHA-256 digest of the starter weights, if published.
+    weights_digest: str = ""
+    # Number of trainable parameters, if known.
+    num_parameters: int = 0
+    # Where the files come from: "build" (generated locally), "url" or "local".
+    source: str = "build"
+    # Download URL of a checkpoint, for source "url".
     download_url: str | None = None
-    size_bytes: int = 0
-    license: str = "MPL-2.0"
-    source: str = "release"  # repo, release, lfs, external
-    version: str = "1.0.0"
-    description: str = ""
-    domain: str = "general"
-    maturity: str = "stable"
+    # Path of a local checkpoint, for source "local".
+    local_path: str | None = None
+    # Version of the entry.
+    version: str = "2.0.0"
+    # Licence of the model.
+    license: str = MODEL_LICENSE
+    # Free-form metadata.
+    tags: dict[str, str] = field(default_factory=dict)
 
+    # Model family.
+    @property
+    def family(self) -> str:
+        # Read it from the specification.
+        return self.spec.family
+
+    # Task of the model.
+    @property
+    def task(self) -> Task:
+        # Read it from the specification.
+        return self.spec.task
+
+    # Capability domain of the model.
+    @property
+    def domain(self) -> str:
+        # Read it from the specification.
+        return self.spec.domain
+
+    # Human-readable name including the variant.
+    @property
+    def name(self) -> str:
+        # Family name and variant.
+        return f"{self.spec.name} ({self.variant.variant.value})"
+
+    # Whether the model needs training before its predictions are meaningful.
+    @property
+    def requires_training(self) -> bool:
+        # Everything except the spectral index formulas.
+        return self.spec.task.is_trainable
+
+    # Serialise to plain Python types.
     def to_dict(self) -> dict[str, Any]:
+        # Specification plus entry fields.
         return {
-            "model_id": self.model_id,
-            "name": self.config.name,
-            "task": self.config.task.value,
-            "framework": self.config.framework.value,
-            "sha256": self.sha256,
-            "download_url": self.download_url,
-            "size_bytes": self.size_bytes,
-            "license": self.license,
-            "source": self.source,
-            "version": self.version,
-            "domain": self.domain,
-            "maturity": self.maturity,
-        }
+            "model_id": self.model_id,  # Model id.
+            "variant": self.variant.variant.value,  # Size variant.
+            "tile_size": self.variant.tile_size,  # Recommended tile size.
+            "weights_digest": self.weights_digest,  # Expected digest.
+            "num_parameters": self.num_parameters,  # Parameter count.
+            "source": self.source,  # Origin of the files.
+            "download_url": self.download_url,  # Download URL.
+            "version": self.version,  # Entry version.
+            "requires_training": self.requires_training,  # Starter model flag.
+            **self.spec.to_dict(),  # Catalogue fields.
+        }  # End of the dictionary.
 
 
-# Global model registry
-_models: dict[str, ModelZooEntry] = {}
+# Read the published digests; an absent file yields an empty table.
+@lru_cache(maxsize=1)
+def _published() -> dict[str, dict[str, Any]]:
+    # The digest file is generated; it may be missing in a development tree.
+    path = resources.files("unbihexium.zoo").joinpath(DIGESTS_FILE)
+    # Return an empty table when the file does not exist.
+    if not path.is_file():
+        # No published digests.
+        return {}
+    # Parse the JSON table.
+    return json.loads(path.read_text(encoding="utf-8")).get("models", {})
 
 
+# Models registered at runtime by the user.
+_custom: dict[str, ModelZooEntry] = {}
+
+
+# Create the entry of a catalogue model.
+def _catalogue_entry(model_id: str) -> ModelZooEntry:
+    # Split the model id.
+    family, variant = parse_model_id(model_id)
+    # Published digest and parameter count, if any.
+    published = _published().get(model_id, {})
+    # Build the entry.
+    return ModelZooEntry(
+        model_id=model_id,  # Model id.
+        spec=get_spec(family),  # Catalogue specification.
+        variant=get_variant(variant),  # Variant hyperparameters.
+        weights_digest=str(published.get("weights_digest", "")),  # Expected digest.
+        num_parameters=int(published.get("num_parameters", 0)),  # Parameter count.
+    )  # End of the entry.
+
+
+# Register a user model, for example a fine-tuned checkpoint.
 def register_model(entry: ModelZooEntry) -> None:
-    """Register a model in the zoo."""
-    _models[entry.model_id] = entry
+    # Store the entry under its model id, replacing an earlier one.
+    _custom[entry.model_id] = entry
 
 
+# Remove a user model from the registry.
+def unregister_model(model_id: str) -> bool:
+    # Remove and report whether the model was registered.
+    return _custom.pop(model_id, None) is not None
+
+
+# Return the entry of a model id, or None when it is unknown.
 def get_model(model_id: str) -> ModelZooEntry | None:
-    """Get a model entry by ID."""
-    return _models.get(model_id)
+    # User registrations take precedence over the catalogue.
+    if model_id in _custom:
+        # Return the user entry.
+        return _custom[model_id]
+    # A bare family name refers to its base variant.
+    family, variant = parse_model_id(model_id)
+    # Look the family up in the catalogue.
+    try:
+        # Build the catalogue entry of the family and variant.
+        return _catalogue_entry(f"{family}_{variant.value}")
+    # Unknown names yield None.
+    except CatalogError:
+        # The model does not exist.
+        return None
 
 
-def list_models(task: str | None = None, domain: str | None = None) -> list[ModelZooEntry]:
-    """List all models, optionally filtered by task or domain."""
-    models = list(_models.values())
-    if task:
-        models = [m for m in models if m.config.task.value == task]
-    if domain:
-        models = [m for m in models if m.domain == domain]
-    return models
+# List entries, optionally filtered by task, domain and variant.
+def list_models(
+    task: Task | str | None = None,  # Keep only this task.
+    domain: str | None = None,  # Keep only this domain.
+    variant: Variant | str | None = None,  # Keep only this variant.
+) -> list[ModelZooEntry]:  # Matching entries, catalogue first.
+    # All catalogue entries followed by user entries.
+    entries = [_catalogue_entry(mid) for mid in all_model_ids()] + list(_custom.values())
+    # Filter by task.
+    if task is not None:
+        # Normalise the task.
+        wanted_task = Task(task)
+        # Keep matching entries.
+        entries = [e for e in entries if e.task is wanted_task]
+    # Filter by domain.
+    if domain is not None:
+        # Keep matching entries.
+        entries = [e for e in entries if e.domain == domain]
+    # Filter by variant.
+    if variant is not None:
+        # Normalise the variant.
+        wanted_variant = Variant(variant)
+        # Keep matching entries.
+        entries = [e for e in entries if e.variant.variant is wanted_variant]
+    # Return the filtered list.
+    return entries
 
 
 # =============================================================================
-# DETECTION MODELS
+# End of module src/unbihexium/zoo/registry.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
 # =============================================================================
-
-_detection_models = [
-    # Ship Detection
-    ModelZooEntry(
-        model_id="ship_detector_tiny",
-        config=ModelConfig(
-            model_id="ship_detector_tiny",
-            name="Ship Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="maritime",
-        description="Tiny ship detection model for smoke tests",
-    ),
-    ModelZooEntry(
-        model_id="ship_detector_base",
-        config=ModelConfig(
-            model_id="ship_detector_base",
-            name="Ship Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="maritime",
-        description="Base ship detection model",
-    ),
-    ModelZooEntry(
-        model_id="ship_detector_large",
-        config=ModelConfig(
-            model_id="ship_detector_large",
-            name="Ship Detector Large",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=5,
-        ),
-        size_bytes=209715200,
-        source="release",
-        domain="maritime",
-        description="Large ship detection model",
-    ),
-    # Building Detection
-    ModelZooEntry(
-        model_id="building_detector_tiny",
-        config=ModelConfig(
-            model_id="building_detector_tiny",
-            name="Building Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="urban",
-        description="Tiny building detection model",
-    ),
-    ModelZooEntry(
-        model_id="building_detector_base",
-        config=ModelConfig(
-            model_id="building_detector_base",
-            name="Building Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="urban",
-        description="Base building detection model",
-    ),
-    ModelZooEntry(
-        model_id="building_detector_large",
-        config=ModelConfig(
-            model_id="building_detector_large",
-            name="Building Detector Large",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=209715200,
-        source="release",
-        domain="urban",
-        description="Large building detection model",
-    ),
-    # Aircraft Detection
-    ModelZooEntry(
-        model_id="aircraft_detector_tiny",
-        config=ModelConfig(
-            model_id="aircraft_detector_tiny",
-            name="Aircraft Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="aviation",
-        description="Tiny aircraft detection model",
-    ),
-    ModelZooEntry(
-        model_id="aircraft_detector_base",
-        config=ModelConfig(
-            model_id="aircraft_detector_base",
-            name="Aircraft Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="aviation",
-        description="Base aircraft detection model",
-    ),
-    # Vehicle Detection
-    ModelZooEntry(
-        model_id="vehicle_detector_tiny",
-        config=ModelConfig(
-            model_id="vehicle_detector_tiny",
-            name="Vehicle Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="transport",
-        description="Tiny vehicle detection model",
-    ),
-    ModelZooEntry(
-        model_id="vehicle_detector_base",
-        config=ModelConfig(
-            model_id="vehicle_detector_base",
-            name="Vehicle Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=4,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="transport",
-        description="Base vehicle detection model",
-    ),
-    # Energy Detection
-    ModelZooEntry(
-        model_id="solar_panel_detector_tiny",
-        config=ModelConfig(
-            model_id="solar_panel_detector_tiny",
-            name="Solar Panel Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="energy",
-        description="Tiny solar panel detection model",
-    ),
-    ModelZooEntry(
-        model_id="solar_panel_detector_base",
-        config=ModelConfig(
-            model_id="solar_panel_detector_base",
-            name="Solar Panel Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="energy",
-        description="Base solar panel detection model",
-    ),
-    ModelZooEntry(
-        model_id="wind_turbine_detector_tiny",
-        config=ModelConfig(
-            model_id="wind_turbine_detector_tiny",
-            name="Wind Turbine Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="energy",
-        description="Tiny wind turbine detection model",
-    ),
-    ModelZooEntry(
-        model_id="wind_turbine_detector_base",
-        config=ModelConfig(
-            model_id="wind_turbine_detector_base",
-            name="Wind Turbine Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="energy",
-        description="Base wind turbine detection model",
-    ),
-    ModelZooEntry(
-        model_id="oil_tank_detector_tiny",
-        config=ModelConfig(
-            model_id="oil_tank_detector_tiny",
-            name="Oil Tank Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="energy",
-        description="Tiny oil tank detection model",
-    ),
-    ModelZooEntry(
-        model_id="oil_tank_detector_base",
-        config=ModelConfig(
-            model_id="oil_tank_detector_base",
-            name="Oil Tank Detector Base",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="energy",
-        description="Base oil tank detection model",
-    ),
-    ModelZooEntry(
-        model_id="pool_detector_tiny",
-        config=ModelConfig(
-            model_id="pool_detector_tiny",
-            name="Swimming Pool Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="urban",
-        description="Tiny swimming pool detection model",
-    ),
-]
-
-# =============================================================================
-# SEGMENTATION MODELS
-# =============================================================================
-
-_segmentation_models = [
-    ModelZooEntry(
-        model_id="segmentation_tiny",
-        config=ModelConfig(
-            model_id="segmentation_tiny",
-            name="Semantic Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="general",
-        description="Tiny semantic segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="segmentation_base",
-        config=ModelConfig(
-            model_id="segmentation_base",
-            name="Semantic Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=6,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="general",
-        description="Base semantic segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="land_cover_tiny",
-        config=ModelConfig(
-            model_id="land_cover_tiny",
-            name="Land Cover Classifier Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=5,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="environment",
-        description="Tiny land cover classification model",
-    ),
-    ModelZooEntry(
-        model_id="land_cover_base",
-        config=ModelConfig(
-            model_id="land_cover_base",
-            name="Land Cover Classifier Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=8,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="environment",
-        description="Base land cover classification model",
-    ),
-    ModelZooEntry(
-        model_id="water_segmentation_tiny",
-        config=ModelConfig(
-            model_id="water_segmentation_tiny",
-            name="Water Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="water",
-        description="Tiny water body segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="water_segmentation_base",
-        config=ModelConfig(
-            model_id="water_segmentation_base",
-            name="Water Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=5,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="water",
-        description="Base water body segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="flood_mapping_tiny",
-        config=ModelConfig(
-            model_id="flood_mapping_tiny",
-            name="Flood Mapping Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="water",
-        description="Tiny flood extent mapping model",
-    ),
-    ModelZooEntry(
-        model_id="flood_mapping_base",
-        config=ModelConfig(
-            model_id="flood_mapping_base",
-            name="Flood Mapping Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="water",
-        description="Base flood extent mapping model",
-    ),
-    ModelZooEntry(
-        model_id="crop_segmentation_tiny",
-        config=ModelConfig(
-            model_id="crop_segmentation_tiny",
-            name="Crop Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="agriculture",
-        description="Tiny crop type segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="crop_segmentation_base",
-        config=ModelConfig(
-            model_id="crop_segmentation_base",
-            name="Crop Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=7,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="agriculture",
-        description="Base crop type segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="forest_segmentation_tiny",
-        config=ModelConfig(
-            model_id="forest_segmentation_tiny",
-            name="Forest Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="forestry",
-        description="Tiny forest segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="forest_segmentation_base",
-        config=ModelConfig(
-            model_id="forest_segmentation_base",
-            name="Forest Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=4,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="forestry",
-        description="Base forest segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="road_segmentation_tiny",
-        config=ModelConfig(
-            model_id="road_segmentation_tiny",
-            name="Road Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="transport",
-        description="Tiny road segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="road_segmentation_base",
-        config=ModelConfig(
-            model_id="road_segmentation_base",
-            name="Road Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=5,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="transport",
-        description="Base road segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="building_footprint_tiny",
-        config=ModelConfig(
-            model_id="building_footprint_tiny",
-            name="Building Footprint Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="urban",
-        description="Tiny building footprint segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="building_footprint_base",
-        config=ModelConfig(
-            model_id="building_footprint_base",
-            name="Building Footprint Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=4,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="urban",
-        description="Base building footprint segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="greenhouse_detector_tiny",
-        config=ModelConfig(
-            model_id="greenhouse_detector_tiny",
-            name="Greenhouse Detector Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="agriculture",
-        description="Tiny greenhouse detection model",
-    ),
-    ModelZooEntry(
-        model_id="greenhouse_detector_base",
-        config=ModelConfig(
-            model_id="greenhouse_detector_base",
-            name="Greenhouse Detector Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="agriculture",
-        description="Base greenhouse detection model",
-    ),
-    ModelZooEntry(
-        model_id="cloud_segmentation_tiny",
-        config=ModelConfig(
-            model_id="cloud_segmentation_tiny",
-            name="Cloud Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="imaging",
-        description="Tiny cloud and shadow segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="cloud_segmentation_base",
-        config=ModelConfig(
-            model_id="cloud_segmentation_base",
-            name="Cloud Segmentation Base",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=4,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="imaging",
-        description="Base cloud and shadow segmentation model",
-    ),
-]
-
-# =============================================================================
-# CHANGE DETECTION MODELS
-# =============================================================================
-
-_change_detection_models = [
-    ModelZooEntry(
-        model_id="change_detector_tiny",
-        config=ModelConfig(
-            model_id="change_detector_tiny",
-            name="Change Detector Tiny",
-            task=ModelTask.CHANGE_DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="general",
-        description="Tiny change detection model",
-    ),
-    ModelZooEntry(
-        model_id="change_detector_base",
-        config=ModelConfig(
-            model_id="change_detector_base",
-            name="Change Detector Base",
-            task=ModelTask.CHANGE_DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=2,
-        ),
-        size_bytes=209715200,
-        source="release",
-        domain="general",
-        description="Base change detection model",
-    ),
-    ModelZooEntry(
-        model_id="urban_change_detector_tiny",
-        config=ModelConfig(
-            model_id="urban_change_detector_tiny",
-            name="Urban Change Detector Tiny",
-            task=ModelTask.CHANGE_DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=3,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="urban",
-        description="Tiny urban change detection model",
-    ),
-    ModelZooEntry(
-        model_id="deforestation_detector_tiny",
-        config=ModelConfig(
-            model_id="deforestation_detector_tiny",
-            name="Deforestation Detector Tiny",
-            task=ModelTask.CHANGE_DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=3,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="forestry",
-        description="Tiny deforestation detection model",
-    ),
-    ModelZooEntry(
-        model_id="deforestation_detector_base",
-        config=ModelConfig(
-            model_id="deforestation_detector_base",
-            name="Deforestation Detector Base",
-            task=ModelTask.CHANGE_DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=4,
-        ),
-        size_bytes=209715200,
-        source="release",
-        domain="forestry",
-        description="Base deforestation detection model",
-    ),
-]
-
-# =============================================================================
-# SUPER RESOLUTION MODELS
-# =============================================================================
-
-_super_resolution_models = [
-    ModelZooEntry(
-        model_id="super_resolution_tiny",
-        config=ModelConfig(
-            model_id="super_resolution_tiny",
-            name="Super Resolution Tiny",
-            task=ModelTask.SUPER_RESOLUTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="imaging",
-        description="Tiny super resolution model (2x)",
-    ),
-    ModelZooEntry(
-        model_id="super_resolution_2x",
-        config=ModelConfig(
-            model_id="super_resolution_2x",
-            name="Super Resolution 2x",
-            task=ModelTask.SUPER_RESOLUTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="imaging",
-        description="Production super resolution model (2x)",
-    ),
-    ModelZooEntry(
-        model_id="super_resolution_4x",
-        config=ModelConfig(
-            model_id="super_resolution_4x",
-            name="Super Resolution 4x",
-            task=ModelTask.SUPER_RESOLUTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=3,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="imaging",
-        description="Production super resolution model (4x)",
-    ),
-    ModelZooEntry(
-        model_id="pan_sharpening_tiny",
-        config=ModelConfig(
-            model_id="pan_sharpening_tiny",
-            name="Pan Sharpening Tiny",
-            task=ModelTask.SUPER_RESOLUTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=4,
-            num_classes=3,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="imaging",
-        description="Tiny pan-sharpening model",
-    ),
-    ModelZooEntry(
-        model_id="pan_sharpening_base",
-        config=ModelConfig(
-            model_id="pan_sharpening_base",
-            name="Pan Sharpening Base",
-            task=ModelTask.SUPER_RESOLUTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=4,
-            num_classes=3,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="imaging",
-        description="Base pan-sharpening model",
-    ),
-]
-
-# =============================================================================
-# SAR MODELS
-# =============================================================================
-
-_sar_models = [
-    ModelZooEntry(
-        model_id="sar_segmentation_tiny",
-        config=ModelConfig(
-            model_id="sar_segmentation_tiny",
-            name="SAR Segmentation Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=2,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="sar",
-        maturity="research",
-        description="Tiny SAR segmentation model",
-    ),
-    ModelZooEntry(
-        model_id="sar_ship_detector_tiny",
-        config=ModelConfig(
-            model_id="sar_ship_detector_tiny",
-            name="SAR Ship Detector Tiny",
-            task=ModelTask.DETECTION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=2,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="sar",
-        maturity="research",
-        description="Tiny SAR ship detection model",
-    ),
-    ModelZooEntry(
-        model_id="sar_oil_spill_detector_tiny",
-        config=ModelConfig(
-            model_id="sar_oil_spill_detector_tiny",
-            name="SAR Oil Spill Detector Tiny",
-            task=ModelTask.SEGMENTATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=2,
-            num_classes=2,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="sar",
-        maturity="research",
-        description="Tiny SAR oil spill detection model",
-    ),
-]
-
-# =============================================================================
-# CLASSIFICATION MODELS
-# =============================================================================
-
-_classification_models = [
-    ModelZooEntry(
-        model_id="scene_classifier_tiny",
-        config=ModelConfig(
-            model_id="scene_classifier_tiny",
-            name="Scene Classifier Tiny",
-            task=ModelTask.CLASSIFICATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=5,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="general",
-        description="Tiny scene classification model",
-    ),
-    ModelZooEntry(
-        model_id="scene_classifier_base",
-        config=ModelConfig(
-            model_id="scene_classifier_base",
-            name="Scene Classifier Base",
-            task=ModelTask.CLASSIFICATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=15,
-        ),
-        size_bytes=52428800,
-        source="release",
-        domain="general",
-        description="Base scene classification model",
-    ),
-    ModelZooEntry(
-        model_id="damage_classifier_tiny",
-        config=ModelConfig(
-            model_id="damage_classifier_tiny",
-            name="Damage Classifier Tiny",
-            task=ModelTask.CLASSIFICATION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=4,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="risk",
-        description="Tiny building damage classification model",
-    ),
-]
-
-# =============================================================================
-# EMBEDDING MODELS
-# =============================================================================
-
-_embedding_models = [
-    ModelZooEntry(
-        model_id="geo_embedding_tiny",
-        config=ModelConfig(
-            model_id="geo_embedding_tiny",
-            name="Geo Embedding Tiny",
-            task=ModelTask.EMBEDDING,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=256,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="general",
-        description="Tiny geospatial embedding model",
-    ),
-    ModelZooEntry(
-        model_id="geo_embedding_base",
-        config=ModelConfig(
-            model_id="geo_embedding_base",
-            name="Geo Embedding Base",
-            task=ModelTask.EMBEDDING,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=768,
-        ),
-        size_bytes=314572800,
-        source="release",
-        domain="general",
-        description="Base geospatial embedding model",
-    ),
-]
-
-# =============================================================================
-# REGRESSION MODELS
-# =============================================================================
-
-_regression_models = [
-    ModelZooEntry(
-        model_id="yield_predictor_tiny",
-        config=ModelConfig(
-            model_id="yield_predictor_tiny",
-            name="Yield Predictor Tiny",
-            task=ModelTask.REGRESSION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=12,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="agriculture",
-        description="Tiny crop yield prediction model",
-    ),
-    ModelZooEntry(
-        model_id="yield_predictor_base",
-        config=ModelConfig(
-            model_id="yield_predictor_base",
-            name="Yield Predictor Base",
-            task=ModelTask.REGRESSION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=12,
-            num_classes=1,
-        ),
-        size_bytes=104857600,
-        source="release",
-        domain="agriculture",
-        description="Base crop yield prediction model",
-    ),
-    ModelZooEntry(
-        model_id="biomass_estimator_tiny",
-        config=ModelConfig(
-            model_id="biomass_estimator_tiny",
-            name="Biomass Estimator Tiny",
-            task=ModelTask.REGRESSION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=6,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="forestry",
-        description="Tiny above-ground biomass estimation model",
-    ),
-    ModelZooEntry(
-        model_id="height_estimator_tiny",
-        config=ModelConfig(
-            model_id="height_estimator_tiny",
-            name="Height Estimator Tiny",
-            task=ModelTask.REGRESSION,
-            framework=ModelFramework.PYTORCH,
-            input_channels=3,
-            num_classes=1,
-        ),
-        size_bytes=102400,
-        source="repo",
-        domain="urban",
-        description="Tiny building height estimation model",
-    ),
-]
-
-# Register all models
-for model in _detection_models:
-    register_model(model)
-
-for model in _segmentation_models:
-    register_model(model)
-
-for model in _change_detection_models:
-    register_model(model)
-
-for model in _super_resolution_models:
-    register_model(model)
-
-for model in _sar_models:
-    register_model(model)
-
-for model in _classification_models:
-    register_model(model)
-
-for model in _embedding_models:
-    register_model(model)
-
-for model in _regression_models:
-    register_model(model)

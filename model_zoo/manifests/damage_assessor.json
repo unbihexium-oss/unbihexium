@@ -1,91 +1,75 @@
 {
-  "model_id": "damage_assessor",
-  "name": "Damage Assessor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "damage_assessor",
+  "name": "Building Damage Assessor",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "risk",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Damage Assessor model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects damaged and destroyed buildings in post-event imagery for rapid damage assessment.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "damaged_building",
+      "destroyed_building"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of buildings graded as damaged or destroyed.",
+  "data_sources": [
+    "Very high resolution post-event satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a86794d6a27eaa4587f948350d535bfc51ef28f08d03cb87c667262e619e7abf",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a7bc2d0cd6c929eacd5a9aeb4a23f1f0f646287bf946a95d351f77c869a678be",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "de80f3489d2601beb37b51e57aa3eb63ad654a3fc7ad954ce8e0679f5e92b54a",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "damage_assessor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730614,
+      "weights_digest": "0e02bc124b958f0ed3b829edfd5929234cd5d1a1814ca3fdd39651df528d580d"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "da5f2a561dff9cfc04d6e94792daf2598bd87dafd7fe40b8dae5274467e5e02c",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "af1fe005c067892fb4f53ae63483cca0804a7520f9c79320b0191ba30873c5b0",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "eeea8dfa728ce142c1238bea3608738b91e49d98c627586265868883746b9364",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "damage_assessor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049190,
+      "weights_digest": "2e90285660f2ff9b832ed319a840163f122f1d4f7e4582e69dc6fba23cf35486"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0917c009349a0ec1aa12fb066a57bd9516055e385b0cde15578d24f6c25a0d90",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d7d42ea7fc090a52cde00d03ac3e100e3a663e72c9e166a40297dbec39a3658b",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "25ebf16de9ec8cf9c46821785b67aadaea315391dc6d026ec991b4dde91d6b4e",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "damage_assessor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038294,
+      "weights_digest": "0cd8ac975169662a2de3c89ab2da19fa010df8744f81091e889b69e94bdf59c7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c8d9c05ae2d1ffa332e8ab425f073201bc9609884acb4fb830db032c451ad92f",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ab9bafa3283afd339759977a4431cc42b9342bdba7e8347b20c3aa42eb1b3691",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "ec8a865b5020eddb227014100c5e8f7dd25a73024d7b811359cefccf22c7d4e0",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "damage_assessor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413638,
+      "weights_digest": "033c3101a1d39ad15c6795798384555a6b2485d09c699243602e1a9816a4793b"
     }
-  },
-  "capabilities": [
-    "damage_assessor"
-  ]
+  }
 }

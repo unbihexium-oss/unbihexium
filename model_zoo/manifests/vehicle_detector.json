@@ -1,91 +1,77 @@
 {
-  "model_id": "vehicle_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "vehicle_detector",
   "name": "Vehicle Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "ai",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Vehicle Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects cars, trucks and buses.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "car",
+      "truck",
+      "bus"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of vehicles by type.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery",
+    "0.1 to 0.5 m"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "acc3f623f88277d6bec34e8bcb70a561ace52aed03ad09d9179c21451340e34d",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "418ccb83a664a4813106255d9c494a04790d566e2fa149de85988bf960b2047c",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "a92822f17568cb164445f3d2468e257b8a2cbbd4337213171e0c8b46961ac76c",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "vehicle_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730647,
+      "weights_digest": "ace45134bb6477c1cac2175a258c2ab67c769924b60388eabc1817a12d9aee4d"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f1c2a429a5e6807a129126e805a78bf3b7799459720169332f18e90242685227",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2bab6a89727fa6e0b7976d81058944ce7251f190d77b0e86f161ac17cd1b4a33",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "3d0d4097eccb850572d4e0bfb967fac47bef0a0e4eb351331fd6b7a41ebce705",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "vehicle_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049255,
+      "weights_digest": "302618924bf38f07aa26cd7f1195686170e54fe2d59e2cf221df692a799f4f34"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "342d6f2e3b9bb99d0e6bb3b6a19af353213a52d8188f63a8babad8dbafacc743",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "546dd21dfb496636ed861da5f5119fbbbaa801380349c9f5dcbeafc3cc2cac8d",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "f6586c829db2e6b08ef8b1afc0b5d971f17cde3c8e4d0fbad8f9645dc3038239",
-          "size_bytes": 403
-        }
-      ]
+      "model_id": "vehicle_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038391,
+      "weights_digest": "c97ae7f19ec468d3afde8166a4bb566c6acab3a14cfa7e01688c6d5018919cea"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "99dfd48c8a33052fbcc7f5d86ec358f0152932ada10c03a600b15e577e409716",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "72b113d0ee746fbb8fdb00ff46a1131c32eb767658129043a96554a68a9e6a85",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "36b39fb8a5564b86511e453d311fd1f895e6f31ccc52771d08ac8a3b6aa71baf",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "vehicle_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413767,
+      "weights_digest": "10fec40187f79831a210dbbc26fa3f333256517e55115e8e30b241f574eadd27"
     }
-  },
-  "capabilities": [
-    "vehicle_detector"
-  ]
+  }
 }

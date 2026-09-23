@@ -1,91 +1,81 @@
 {
-  "model_id": "pansharpening",
+  "$schema": "../manifest.schema.json",
+  "family": "pansharpening",
   "name": "Pansharpening",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "srcnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Pansharpening model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Fuses upsampled multispectral bands with the panchromatic band into a sharpened multispectral image.",
+  "inputs": {
+    "bands": [
+      "ms_blue",
+      "ms_green",
+      "ms_red",
+      "ms_nir",
+      "pan"
+    ],
+    "dates": 1,
+    "channels": [
+      "ms_blue",
+      "ms_green",
+      "ms_red",
+      "ms_nir",
+      "pan"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Sharpened references, for example by Wald's protocol.",
+  "data_sources": [
+    "Multispectral and panchromatic bands of the same sensor"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bcddbeb281879ee3542bde8225fc8d6011e127e6cbf2c378113274490a673a5a",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7676b37e61b1bebd780fc6fdf616d8feb72249cda924570c86e419be00204bee",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "57be6a7468899323c64e03405c0175dd074f691898f28754407ad79be8f4de9f",
-          "size_bytes": 356
-        }
-      ]
+      "model_id": "pansharpening_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733268,
+      "weights_digest": "ced1ba26767ec10895c0d14ad4f47a4797b7c3dffa640d52f755e9563a8fde23"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0919b87e89257e124033457c2f01da7d9cd2b4308b87f121d167317007f49df6",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fd1b2a1a344b5945f28ef33f1626bc0d52ebfafaeced1f4252d84ce937594945",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "1ff06749877a76d4a11042397ceb2bd8624719a07e77e8d3b5589bc05fd87006",
-          "size_bytes": 356
-        }
-      ]
+      "model_id": "pansharpening_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059108,
+      "weights_digest": "41a56a41d18801e4089b7f4ac97cb15fd2a6d14c474899412d2c93bfc297691a"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6e3dbd5e1b13f564f4dab9874247a95ed72940d45e47cd869e5cd50f175ed3be",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3e1efabe4057c8294b1258bdf7ac7fba2d5e540783be5dcec1aef6572fa7c3ee",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "099ddb44d363ce0d85f4543c8b6c3a95a5bbbaca416ab44b195babe5cc376154",
-          "size_bytes": 360
-        }
-      ]
+      "model_id": "pansharpening_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060084,
+      "weights_digest": "eaa6049acd06d8ae5c126b4f94f5caf6357b000b2a5cb67fb0235c984fb04636"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "642c455ec37193ce3bf091454269fd903521c9379d83c7f3086af07e6df97f28",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1beca8d750a4831b23abe04feb86966b18632c0462635dff221fb9cb1edbc916",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "3ab6a5c8e871e0d0191755fea03bbb8726519c617e97f71c0ce6506805820666",
-          "size_bytes": 358
-        }
-      ]
+      "model_id": "pansharpening_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451908,
+      "weights_digest": "fb1bcd5dd5792dcac0b7ca5434f5e0c8812c15a0b0446825c4c936314205f7a1"
     }
-  },
-  "capabilities": [
-    "pansharpening"
-  ]
+  }
 }

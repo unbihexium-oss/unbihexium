@@ -1,91 +1,75 @@
 {
-  "model_id": "maritime_awareness",
-  "name": "Maritime Awareness",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "maritime_awareness",
+  "name": "Maritime Awareness Detector",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "defense",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Maritime Awareness model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects vessels and offshore platforms for maritime domain awareness.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vessel",
+      "offshore_platform"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of vessels and platforms.",
+  "data_sources": [
+    "Very high resolution satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e201a175bd3cc067a37cea3f889dcd4635640ee547c0dd5b9b759df75c1dfb74",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a15f0b27e66e94c99ee5c62e8de50ef5970be9f267e3387432157529144d40b9",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "78b431aa37331a8eb01458d49c04120e60d47def0e6ace44fd0471a6aaa11acb",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "maritime_awareness_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730614,
+      "weights_digest": "c06677f0608186b4a2b2251635eda9d27083ba75833e95207ef3bc03212393fd"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b995f406f482b7f5738c3f0caa3fda545d900aca1b5f7bce821894dd641a411f",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "74dba542cb62e90fb2e386f46df4d1a1efd4f250d3fb1a329fe9121213511c7d",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "eae5748f9c9ea3f2b352d05e4c113ef4c62d306b1ccad9512b23062e11c1f690",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "maritime_awareness_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049190,
+      "weights_digest": "18cfca599543c26128f1d8d3d4752589649878fa172672ea6592d2fabba01bb0"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2e1f589ea014efefe93de87da46589b7cc949f5be0cdd5883c97a18730c305c3",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "488fd8bc9fc08d101ee66a9cc817a11733fb446b304ad53ac8d47d67d46f68b9",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "f4708d1f2b5b1c753b881fad6a998a33191c157154777185f5e64e761f7a1e5f",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "maritime_awareness_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038294,
+      "weights_digest": "ea1a63a644f1db5b90c266d1c4493b0d3000cdd61dac88be26f327dc3839f293"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "51376d81cf7a69048df139234bd1ce7e083604dcca7439cb91f100fb988f8585",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "34f5c42d12b8bfb8116a576c3c616c2b22e3032582a4cf1a5fb5e768b9b8e65e",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "40715e4d9cad3d977cd36c6ca1e0780c7463bbdaa34e26894ad46e3eaaf3d978",
-          "size_bytes": 419
-        }
-      ]
+      "model_id": "maritime_awareness_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413638,
+      "weights_digest": "b3e384d172bfa17405a41a1f76788ce41b2542fdb4b909c2f4c3bd1d6024d12d"
     }
-  },
-  "capabilities": [
-    "maritime_awareness"
-  ]
+  }
 }

@@ -1,91 +1,70 @@
 {
-  "model_id": "panchromatic_processor",
-  "name": "Panchromatic Processor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "panchromatic_processor",
+  "name": "Panchromatic Denoiser",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Panchromatic Processor model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Reduces noise in panchromatic imagery.",
+  "inputs": {
+    "bands": [
+      "pan"
+    ],
+    "dates": 1,
+    "channels": [
+      "pan"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "pan"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Clean panchromatic references.",
+  "data_sources": [
+    "Panchromatic satellite imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0a4da4b825f13acc815c08a1f317223c43b346fc0c1d4da27bc08ab09d4b3eb4",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f551ebed04ada0dc0e209691a48d95aac8833d76f15dd3b905129e8775c332a7",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "f55ea012b0ced163ed4fcb13c17acb4c688e4cd97e80eba3c4b6858c4158d49c",
-          "size_bytes": 363
-        }
-      ]
+      "model_id": "panchromatic_processor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732641,
+      "weights_digest": "0f89f1d05898c3bda549857207f00c3968362a625d71c74c3b43a8c365cfdb89"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bf57285b9c8f504aadc5ac2bfc3cf9582604ac0c5beb7da946af02895ac64749",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "60f42cc4b7cc568fe4963ed28755c8d723d1befefd17c70583af621fd1c8ded2",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "52eda95e181c649073667827448954a2c7c41ce98c2eb711b034ff5bdd348f11",
-          "size_bytes": 363
-        }
-      ]
+      "model_id": "panchromatic_processor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7057857,
+      "weights_digest": "5f6c270966844d6a9707ec503b6acaec99988072ecb3822a6665a64bf628644b"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "713dee5e3a82c8e720a01883e43ef2289bc4b4ef216da7dff8337d54d99757ed",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ae52bc912b59028725660e2fc173305c2a7df1ba0abcbd88a259b884027b8a42",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "d3f9aa83a062aad66a4d5c185aa2e97a36008c2e91ae86b60316aad6113485fb",
-          "size_bytes": 367
-        }
-      ]
+      "model_id": "panchromatic_processor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058209,
+      "weights_digest": "961f3c7c0ada9ec38f0296f39c94a0916112508192f8463701e60208e9fa7363"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "94a2a00e70b1a578010084982a597300e609bba6485cf22239880bb4f8ee3bc2",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ef969197890d11b6eb1f42e36b77413851220f1ccf16045f7de3bf01334357e7",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "f9d9d9544fc7e7e50abe261fcc5e6a1278c2a3c23cc40a90a4df5a62b0768f17",
-          "size_bytes": 365
-        }
-      ]
+      "model_id": "panchromatic_processor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449409,
+      "weights_digest": "efdad6103c61a4b634d847f546ee69d7705b0c30c1cf7d65ed670d4fbcc023c1"
     }
-  },
-  "capabilities": [
-    "panchromatic_processor"
-  ]
+  }
 }

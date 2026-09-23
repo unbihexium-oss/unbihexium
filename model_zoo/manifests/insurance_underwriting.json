@@ -1,91 +1,97 @@
 {
-  "model_id": "insurance_underwriting",
-  "name": "Insurance Underwriting",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "insurance_underwriting",
+  "name": "Insurance Risk Scorer",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "risk",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Insurance Underwriting model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores the natural hazard risk of an insured site.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "hazard_score",
+      "exposure_score"
+    ],
+    "units": [
+      "1",
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Claims history or risk model scores per site.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "population and road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "fa661f4b07a36341867e4b5bcc82c6c595921ed2b7b0f676490ada1f6b59acd5",
-          "size_bytes": 1643
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f262d70a7e86b35cd6e3d6fcb17ebebacafc675c7fdd1134e66f92dd7f95dae1",
-          "size_bytes": 3709
-        },
-        {
-          "name": "config.json",
-          "sha256": "e2610fe9c35f8935280ebcea341a2bf0fe2d39673ee1eef61c8484320fbd407d",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "insurance_underwriting_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 495522,
+      "weights_digest": "6aef3a494b566a4344f5ccaefec8e0da39b28604bc15f9a62a65983adde324fe"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4c87385bdea8e2f477b9c90b326acbbb1f9029d4ef08672a048d0a6b142f6f98",
-          "size_bytes": 5677
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0834881c1957db7233ef2ffefc003090a5a6e50216b108063abcbff00ce5042a",
-          "size_bytes": 7613
-        },
-        {
-          "name": "config.json",
-          "sha256": "c2588fef90321397bb0b7cb98b7a5b4dba086f51d288ba9b3c3c6a95ce54cbec",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "insurance_underwriting_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3747138,
+      "weights_digest": "9e1b2fe0139603d3310645945965b8eff4349ae7aacf2fab05b04c5b904c3a62"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "fd17f8e73d89f1e8e87d0e46e7c9d62aaae248ea42f3235f2a2db228f88ec4fc",
-          "size_bytes": 14641
-        },
-        {
-          "name": "model.pt",
-          "sha256": "166cacb2d9aa695a4cf4ed5ad4d05d41911cf16b569cf33fbab1d9f77e1566e2",
-          "size_bytes": 16573
-        },
-        {
-          "name": "config.json",
-          "sha256": "7a5793923b50aaaf6f12a4472af407af83eb81b3b01048cd7a638c05d56601ae",
-          "size_bytes": 188
-        }
-      ]
+      "model_id": "insurance_underwriting_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14609186,
+      "weights_digest": "6c371454fbe0b8ed50f928db20d8e2393c0dc809c9b777cbbe53d74f2d23ec9e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ed4d37734f0228603d49c70f8fb9443396c0cf816f3edc4b1541cf9da7d316f9",
-          "size_bytes": 44855
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8777d6257d996132aae3fed88148ccadfceaa4a5d6cb38f37c14c87964012d39",
-          "size_bytes": 46781
-        },
-        {
-          "name": "config.json",
-          "sha256": "ff729a5aff7d66d7abaca47af0665303321c0c1ccd9c3834cda49b29cb667e4d",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "insurance_underwriting_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37766530,
+      "weights_digest": "4cb28f4705828e8a5dc70082693d34fff9240d001537ceebbc46b2881727fe29"
     }
-  },
-  "capabilities": [
-    "insurance_underwriting"
-  ]
+  }
 }

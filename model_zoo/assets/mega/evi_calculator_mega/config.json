@@ -1,8 +1,0 @@
-{
-  "model_id": "evi_calculator_mega",
-  "task": "index",
-  "variant": "mega",
-  "params": 2956803,
-  "resolution": 512,
-  "base_channels": 128
-}

@@ -1,126 +1,124 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/zoo/verify.py
+# Title       : File checksums and model digest verification
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, standard library only
+# =============================================================================
+#
+# Abstract
+# --------
+# Two levels of integrity checking are provided:
+#
+#   file level    SHA-256 of files, and the sha256sum-compatible model.sha256
+#                 file written next to every cached model
+#   weight level  the digest of the weights (unbihexium.ai.models.init),
+#                 compared with the published digest of the model zoo; this
+#                 is independent of how the checkpoint file was serialised
+#
+# The weight-level check needs PyTorch and is performed by
+# unbihexium.zoo.store.verify_model.
+# =============================================================================
 
-"""Model verification utilities.
-
-Provides SHA256 verification for model artifacts to ensure integrity.
-"""
-
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
 from __future__ import annotations
 
+# SHA-256 of files.
 import hashlib
+
+# Represent file paths.
 from pathlib import Path
 
-
-class VerificationError(Exception):
-    """Raised when model verification fails."""
-
-
-def compute_sha256(filepath: Path) -> str:
-    """Compute SHA256 hash of a file.
-
-    Args:
-        filepath: Path to file.
-
-    Returns:
-        Hexadecimal SHA256 hash string.
-    """
-    sha256 = hashlib.sha256()
-    with open(filepath, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha256.update(chunk)
-    return sha256.hexdigest()
+# Size of the blocks read while hashing, 1 MiB.
+BLOCK_SIZE = 1 << 20
 
 
-def read_sha256_file(sha_path: Path) -> dict[str, str]:
-    """Read SHA256 hashes from a .sha256 file.
-
-    Format: <hash>  <filename>
-
-    Args:
-        sha_path: Path to .sha256 file.
-
-    Returns:
-        Dictionary mapping filename to expected hash.
-    """
-    hashes = {}
-    with open(sha_path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                hash_value = parts[0]
-                filename = parts[-1]
-                hashes[filename] = hash_value
-    return hashes
+# Raised when a file or model does not match its expected checksum.
+class VerificationError(RuntimeError):
+    # No behaviour beyond RuntimeError; the class exists for precise handling.
+    pass
 
 
-def verify_file(
-    filepath: Path,
-    expected_sha256: str,
-) -> bool:
-    """Verify a file against expected SHA256 hash.
-
-    Args:
-        filepath: Path to file to verify.
-        expected_sha256: Expected SHA256 hash.
-
-    Returns:
-        True if verification passes.
-
-    Raises:
-        VerificationError: If verification fails.
-    """
-    if not filepath.exists():
-        raise VerificationError(f"File not found: {filepath}")
-
-    actual = compute_sha256(filepath)
-    if actual != expected_sha256.lower():
-        raise VerificationError(
-            f"SHA256 mismatch for {filepath.name}: "
-            f"expected {expected_sha256[:16]}..., got {actual[:16]}..."
-        )
-
-    return True
+# Compute the SHA-256 of a file.
+def compute_sha256(path: str | Path) -> str:
+    # Incremental hash.
+    hasher = hashlib.sha256()
+    # Read the file in binary mode.
+    with Path(path).open("rb") as fh:
+        # Read blocks until the end of the file.
+        for block in iter(lambda: fh.read(BLOCK_SIZE), b""):
+            # Feed each block to the hash.
+            hasher.update(block)
+    # Hexadecimal digest.
+    return hasher.hexdigest()
 
 
-def verify_model(
-    model_dir: Path,
-    files_to_verify: list[str] | None = None,
-) -> dict[str, bool]:
-    """Verify all artifacts in a model directory.
+# Write a sha256sum-compatible checksum file for files in one directory.
+def write_sha256_file(
+    directory: str | Path,  # Directory holding the files.
+    names: list[str],  # File names to include.
+    filename: str = "model.sha256",  # Name of the checksum file.
+) -> Path:  # Path of the checksum file.
+    # Normalise the directory.
+    directory = Path(directory)
+    # One "<digest>  <name>" line per existing file, in sorted order.
+    present = [n for n in sorted(names) if (directory / n).is_file()]
+    # One checksum line per file.
+    lines = [f"{compute_sha256(directory / n)}  {n}" for n in present]
+    # Path of the checksum file.
+    target = directory / filename
+    # Write the lines with a final newline.
+    target.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Return the path.
+    return target
 
-    Args:
-        model_dir: Path to model directory.
-        files_to_verify: Specific files to verify. If None, verifies all .onnx files.
 
-    Returns:
-        Dictionary mapping filename to verification result.
+# Read a sha256sum-compatible checksum file into {name: digest}.
+def read_sha256_file(path: str | Path) -> dict[str, str]:
+    # Mapping of file names to digests.
+    result: dict[str, str] = {}
+    # Parse every line.
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        # Split into digest and name; sha256sum uses two separator characters.
+        parts = line.strip().split(maxsplit=1)
+        # Ignore blank and malformed lines.
+        if len(parts) == 2:
+            # A leading "*" marks binary mode in sha256sum output.
+            result[parts[1].lstrip("*")] = parts[0].lower()
+    # Return the mapping.
+    return result
 
-    Raises:
-        VerificationError: If any verification fails.
-    """
-    results = {}
 
-    sha_path = model_dir / "model.sha256"
-    if not sha_path.exists():
-        raise VerificationError(f"SHA256 file not found: {sha_path}")
+# Verify a file against an expected SHA-256 digest.
+def verify_file(path: str | Path, expected: str) -> bool:
+    # Missing files fail verification.
+    if not Path(path).is_file():
+        # The file does not exist.
+        return False
+    # Compare case-insensitively.
+    return compute_sha256(path) == expected.lower()
 
-    expected_hashes = read_sha256_file(sha_path)
 
-    if files_to_verify is None:
-        files_to_verify = list(expected_hashes.keys())
+# Verify every file listed in a model.sha256 file.
+def verify_directory(directory: str | Path, filename: str = "model.sha256") -> dict[str, bool]:
+    # Normalise the directory.
+    directory = Path(directory)
+    # Expected digests.
+    expected = read_sha256_file(directory / filename)
+    # Check each listed file.
+    return {name: verify_file(directory / name, digest) for name, digest in expected.items()}
 
-    for filename in files_to_verify:
-        filepath = model_dir / filename
 
-        if filename not in expected_hashes:
-            raise VerificationError(f"No expected hash for {filename}")
-
-        verify_file(filepath, expected_hashes[filename])
-        results[filename] = True
-
-    return results
+# =============================================================================
+# End of module src/unbihexium/zoo/verify.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

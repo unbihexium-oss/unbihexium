@@ -1,91 +1,93 @@
 {
-  "model_id": "field_surveyor",
-  "name": "Field Surveyor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "field_surveyor",
+  "name": "Field Productivity Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "agriculture",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Field Surveyor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates within-field productivity zones as relative yield.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "relative_yield"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      2.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Yield monitor data normalised by the field mean.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "57fb281bcf35d77ac3acce931fe77c7067cb05a97b96dae5545cbf8af41758d1",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8f4774d09467bb9baa5872c40cf3203784c8343df4ebee43534f1dd8752e100c",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "72152e20fb943d8464f62c6015a304c9ac37d11f561af0c85d3636072cef327b",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "field_surveyor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "61e53017e62ce5e05208985b2ce961c65c6220c0085842bea798788c8e0bef9d"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0df9c12376b97489f5ee15643a99168f751e482d394dc2068bf436e557b83f4c",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e190125a8ed6f78b4682aa7aec55984c3e00ed3aca8b7ea80451299537d41569",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "dd64c22052482e9bb580df6c78eafa789167a2161375bab327cb2d18226da24a",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "field_surveyor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "9f0d5d6709eda84f68e3d58d201b54766eb70d36d6b4ee6a38f5144e56d070ca"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "65b160bff252dc34da7d229680ab9b69f6463d515334a1573ab534fcee90b359",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9ea026bba9742693f2c072b77aaeca8fdca870debd8a5353751a506ab52ad14c",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "a6ad145947dd4535d0ed1c535f1b28aef99b7807d5e61b0a68e1b3679e7b3c2d",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "field_surveyor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "a52faadca19c7d9bbf94c7f1bed4b475bb2c5125f91d6b0a2e29b2a42f4058ae"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c967c82a26c42231c4aa47a8dd3b6a7e7f9ff5f171001fca21bfd1bf676f9947",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fa66bad469454d15bc568c1dad2e5f79219e7e637b37cc573773d3db02fae1b4",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "c3989b59f96925d8bae965eb7a426958f32ca14b25bb36903490c7df5be8532e",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "field_surveyor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "736ee7acefe0226d5d31184606fd8f8b3083737399be478e684cdba06695b364"
     }
-  },
-  "capabilities": [
-    "field_surveyor"
-  ]
+  }
 }

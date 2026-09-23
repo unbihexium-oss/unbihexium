@@ -1,91 +1,98 @@
 {
-  "model_id": "perennial_garden_suitability",
+  "$schema": "../manifest.schema.json",
+  "family": "perennial_garden_suitability",
   "name": "Perennial Garden Suitability",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "agriculture",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Perennial Garden Suitability model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores land suitability for orchards and perennial crops.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "suitability"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Suitability scores from land evaluation.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6a1bbc43c4081ae22c89d36086ede26d6d9e78ee2b1f132153bd5d04cadf0a29",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e95e7654978d278fbf36429d5f11cc7a3896448aae75f6c49ee0f856cde61e59",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "3335528b1241a5a7a2143a87b88a822b4d9a7e317025d9b1f545c0c1a42cde96",
-          "size_bytes": 192
-        }
-      ]
+      "model_id": "perennial_garden_suitability_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "937709c66a3acf2c2918a120aa464879601d8a42e334913b44544bce469e4211"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ca6b78ac310ae621f845f8f29ae29026d9f8778ef0e18a10bea582a83c8a2962",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6ed6ba4d4c438faa34450a21645622aa114cbc988a4f24c8c0b64a6d2631b2a6",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "c2eab67f9acbcbc74c16d72860703fb1381b35ace8a119ae03850d6c2c7995dd",
-          "size_bytes": 192
-        }
-      ]
+      "model_id": "perennial_garden_suitability_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "c10450176b61e721be5009bd9fcbe35d5122b2e492102b100ca849ab67e63825"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f7acc59e88204faa5433687bb8d1a46d31a0dea5a14f5b4ab846eb2da00a725e",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "58c751e9ef11fa4c134e611f3581be315cca1fa260ea908b3eab65c00bfeae7f",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "e1f708ab2ae1f863d0a6356353089eb62642dcd2bb376d903c912c933bbf952e",
-          "size_bytes": 194
-        }
-      ]
+      "model_id": "perennial_garden_suitability_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "0437638b42b9bbe8dfa3e481f860986a1f46457630bcf65ebdb0a6d7ea88cf94"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0a2c2286546765ec8779536fec06825d83af2c5e3d5265c32787aa2fabdf2d95",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "784a7dae008d9db17378f94c1a5a3bdfc921509b4e262b4c2c12dbdff4faf114",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "92eb65366f3ea9599d7f66fa1070ee0f5c1715e19a07b08dbd88165e50694c91",
-          "size_bytes": 192
-        }
-      ]
+      "model_id": "perennial_garden_suitability_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "101bd71e9bee1ab6e01a41dfb184864c6e06e4ba9665da68580d74519480df80"
     }
-  },
-  "capabilities": [
-    "perennial_garden_suitability"
-  ]
+  }
 }

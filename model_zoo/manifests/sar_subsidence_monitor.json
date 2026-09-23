@@ -1,91 +1,82 @@
 {
-  "model_id": "sar_subsidence_monitor",
-  "name": "Sar Subsidence Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_subsidence_monitor",
+  "name": "Subsidence Velocity Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "sar",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Subsidence Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates mean subsidence velocity from a stack of six displacement maps.",
+  "inputs": {
+    "bands": [
+      "los_t1",
+      "los_t2",
+      "los_t3",
+      "los_t4",
+      "los_t5",
+      "los_t6"
+    ],
+    "dates": 1,
+    "channels": [
+      "los_t1",
+      "los_t2",
+      "los_t3",
+      "los_t4",
+      "los_t5",
+      "los_t6"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "velocity"
+    ],
+    "units": [
+      "mm a-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Velocity from persistent scatterer or SBAS processing.",
+  "data_sources": [
+    "Sentinel-1 InSAR time series"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8c94127951476fa2278011d28d19feb21b7377b391fe2d7666f51f4cdd40215e",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c9493f712a54c6c09c83d9511cc22842b27203ebaebedbfcac32fb3371d33e81",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "e86a02d08dc75305f28cf27c94b2109eb2ad24616bfe2ce5e500c83e4263d40d",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_subsidence_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733361,
+      "weights_digest": "6faaf230e3c6d5bda49b266542bf00033cd548fd597b0f290d456cf5d9fab496"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "590479c56c1ec7e062b5e90e9870184bd9a401100ce5f0aeb8f030dd0edf2c94",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "944c4b8790564fb288cffae300c9f5a5df6e0fe84a9cbe8f782cfe43c4d32b93",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "6ae4223f359d7b3d9fa092406553d58aa82b9791b75f40f1363e01558f5a6270",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_subsidence_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059297,
+      "weights_digest": "12ee598aecc20da125a21497a75a4198b10c8ad08d3df4757634dbdbba063f83"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "353c61cb8075fa4b3d5d4eae3ffac42646f8803e3fdd064c5e76bc66a5a853b7",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d7fcb5ff3e8e066aca5cce4a4a8f0cc5773af92a2921cedd8eda5f1c068cc71e",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "9b635bd4db3e51dc388333cd7be7cf441678cec2afa55729ef8ccf2da4988304",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "sar_subsidence_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060369,
+      "weights_digest": "984a5a2c1b1b86182b494b2b11177f0b31231a0b4569a60ab10dc0ba4dade89e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6e487b02670c2b152f49897091495eb3cf99b565b522c1194350b8541fec39b7",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7c041113105be8873b8c4f1d98acd04d9017857cc2ffa547c6d97f568cf84c40",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "7ebf693c1249ac9dfaa3a02368d996fdd3473a6faa67bac2aface311ee617c8b",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_subsidence_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452289,
+      "weights_digest": "6be7aae4b311d71a20ef30bd1147e3acf7804ee3deeb2b4af7e6c5333b7477eb"
     }
-  },
-  "capabilities": [
-    "sar_subsidence_monitor"
-  ]
+  }
 }

@@ -1,91 +1,76 @@
 {
-  "model_id": "super_resolution",
-  "name": "Super Resolution",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "super_resolution",
+  "name": "Super-Resolution",
+  "version": "2.0.0",
   "task": "super_resolution",
-  "architecture": "srcnn",
+  "domain": "imaging",
+  "architecture": "residual_subpixel",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Super Resolution model for super_resolution.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Increases the spatial resolution of RGB imagery by a factor of four.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 4,
+    "formula": null,
+    "layout": "Tensor (N, K, sH, sW) at s times the input resolution."
+  },
+  "training_labels": "High resolution reference images.",
+  "data_sources": [
+    "Pairs of low and high resolution RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "152e30b5d5974d8a61b2c03ef2240bfe59853e78a4e8602226d733475e2d864b",
-          "size_bytes": 7436
-        },
-        {
-          "name": "model.pt",
-          "sha256": "814f648347c63514557fc019ced48076cf4ca159cdfabf0915085f5540c93471",
-          "size_bytes": 9341
-        },
-        {
-          "name": "config.json",
-          "sha256": "407341ea7a7cbd5039768f108f35c52faf2f7dfa37910abc8e0cbaa34087b2c3",
-          "size_bytes": 364
-        }
-      ]
+      "model_id": "super_resolution_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 134992,
+      "weights_digest": "3d992b6eebd75e544004a08bee9661db6ea78848eb918b2f46d2841e4730a7a3"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d723879968b23cf4be112b3d6c5a54345f1bd15c506009a71d708cd2ddb36a76",
-          "size_bytes": 26857
-        },
-        {
-          "name": "model.pt",
-          "sha256": "30e481da57834d53e3943892146e0b2ea9c92fbe454a40ba8830b10b9ef2f388",
-          "size_bytes": 28605
-        },
-        {
-          "name": "config.json",
-          "sha256": "98b549c473a16c0d396953e7e60149fed5ecb81b3f5176c108fa19003c9559d9",
-          "size_bytes": 364
-        }
-      ]
+      "model_id": "super_resolution_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 657264,
+      "weights_digest": "9977f84d1fa420f6b16d138d33c028781265115f8ca5b0fa750c8b281e6f1c75"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b7c371e6715280b12da0d073433e18c86da3d547f2bee6fe10b3ed6e3805cb5c",
-          "size_bytes": 53649
-        },
-        {
-          "name": "model.pt",
-          "sha256": "950df9b5036873f477c140cf2667cedd9e7c6857836d77e7d1c2f3d0d321fb24",
-          "size_bytes": 55357
-        },
-        {
-          "name": "config.json",
-          "sha256": "af74a835cc6d3e3989797a9ba50ad7b145cc8233b67a722f48469f93390118a4",
-          "size_bytes": 368
-        }
-      ]
+      "model_id": "super_resolution_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 2784528,
+      "weights_digest": "5254b6e34d26958562de46385d460257caca81ee3b9c9fec622a6d1adf3473c9"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bfb85043ee41eee730f3aa76bb37299ac5f6fd390893f8a02ac7d7eb18b03b6e",
-          "size_bytes": 110291
-        },
-        {
-          "name": "model.pt",
-          "sha256": "345f03120d52d2462472ef22ce18e1fe9cfd3d313f551bc2053fc15fd5059ce6",
-          "size_bytes": 111997
-        },
-        {
-          "name": "config.json",
-          "sha256": "d6124f87ff0925b4086752e4b6aa20b7f30aacfef6c5b599f61bfbeb4cae394f",
-          "size_bytes": 366
-        }
-      ]
+      "model_id": "super_resolution_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 6109872,
+      "weights_digest": "f8bf8132935aefe0c687b15d00ae22b3010084b710c4f59c2041630ecf8f7ae3"
     }
-  },
-  "capabilities": [
-    "super_resolution"
-  ]
+  }
 }

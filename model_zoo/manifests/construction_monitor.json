@@ -1,91 +1,79 @@
 {
-  "model_id": "construction_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "construction_monitor",
   "name": "Construction Monitor",
-  "version": "1.0.0",
-  "task": "segmentation",
-  "architecture": "siamese_unet",
+  "version": "2.0.0",
+  "task": "change_detection",
+  "domain": "urban",
+  "architecture": "unet_early_fusion",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Construction Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects new construction and demolition between two dates.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 2,
+    "channels": [
+      "red_t1",
+      "green_t1",
+      "blue_t1",
+      "red_t2",
+      "green_t2",
+      "blue_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "no_change",
+      "new_construction",
+      "demolition"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of change class logits; softmax over K."
+  },
+  "training_labels": "Construction change masks.",
+  "data_sources": [
+    "Co-registered very high resolution RGB image pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "968be450dcef32b338f7b43da240e5fc33c994e9168ca4d92c6d65835d23c93a",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b444c8c8dea66b938c0362aeb0333c373a5044713b1418bdd12ca42d57cc7ed7",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "07c335a359c46f41707398762200abc45ac6d6af1dcd5e84cbca54bb1711c40a",
-          "size_bytes": 431
-        }
-      ]
+      "model_id": "construction_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733395,
+      "weights_digest": "2cbff6ade84441269c5b1dfa2c617e3039f4670ee8ebfc76716753c7a5ac2be1"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a279aadf2a9cb73f998ad2f73735efea60915161d79824cff2395638adf280ac",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ad782780a3195fcb26c2313cde41b952928e4d9d289b4b698875d7378d4198d0",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "829ab2a394dc33d087c333bcaf25d5bba945f7a3634093153c85c2428d1aceb8",
-          "size_bytes": 431
-        }
-      ]
+      "model_id": "construction_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059363,
+      "weights_digest": "2f09047f118a0d93109dfac4c103caececbab939f6cec987a1d0dca8d2499fc9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8fabb4d82489d769ee38e1632950311f382dfab6c297d3434a9971b136b8eec7",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d979703f1960a9fb5efb91243a471f84d1620108e580ded663a94e6bd7adb5be",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "276228977eb5684f0885450badfe433d53bb6e00205047e5688eed09c18ead94",
-          "size_bytes": 435
-        }
-      ]
+      "model_id": "construction_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060467,
+      "weights_digest": "e61ec305b12f9035484e64535ba6c339ca9b1fa51e7013e3f9f126d287f7fb35"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d6313cd566ee6e91146f202f32f45099f069524bf5c46a9b2e547029feb092cb",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fed7700bcb024d2e08ad8349dcdfdc8056ef1fec1e2291a1dff2741fa987efa6",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "b775be0808aaeda71f6577ab5e537a1fc36da412710e0488a49efb2ae8fd1937",
-          "size_bytes": 433
-        }
-      ]
+      "model_id": "construction_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452419,
+      "weights_digest": "bedea571ec59aff6518a41759aa9a94435b4576d3551e0ac31d69fa1c6195bea"
     }
-  },
-  "capabilities": [
-    "construction_monitor"
-  ]
+  }
 }

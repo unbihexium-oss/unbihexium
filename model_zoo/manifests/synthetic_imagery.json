@@ -1,91 +1,74 @@
 {
-  "model_id": "synthetic_imagery",
-  "name": "Synthetic Imagery",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "synthetic_imagery",
+  "name": "SAR to Optical Translator",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "ai",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Synthetic Imagery model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Synthesises an optical RGB image from SAR backscatter, for example to fill cloud gaps.",
+  "inputs": {
+    "bands": [
+      "VV",
+      "VH"
+    ],
+    "dates": 1,
+    "channels": [
+      "VV",
+      "VH"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Co-located cloud-free optical images.",
+  "data_sources": [
+    "Sentinel-1 GRD with co-located Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "29bf477d55f901521138e589234543e128d7af7ea555f6abd87d96f9a330356f",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a27e8aca98cc45c418b456b90fb4e3d58e1f9a63e14dab49bf4ab3a6d99adefb",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "9c185f6cf87659d6a9cb901cf7efa2d6156c6017850d3f80db806693516ac54f",
-          "size_bytes": 358
-        }
-      ]
+      "model_id": "synthetic_imagery_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732819,
+      "weights_digest": "806a26075803baceac0103654f0f2b6781a998e594428a5c11ffb69f00ac8c78"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b39e8eef031d4825442a1253f9342c27bd430400895aac565a0b6329cca5f2f8",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d0682258618e8dd026c5fa7c255a66baf94297c8076df97d349183450298ee90",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "4d83737d43c6969bc66dcba1d49c52f87ee899e35b554975ce811480bb93969f",
-          "size_bytes": 358
-        }
-      ]
+      "model_id": "synthetic_imagery_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058211,
+      "weights_digest": "135a1442059b58b646a27a1bb6122533251fec1ae39c7da5c1dc9d57b113eb0e"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4d8eb9ac3dda9abb8028718ca6a491575f0522ce7a2f88ba1a411dc1a573324d",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a23b5d2e1b8b120d8f9affdf39ef7b16bdec75c6e49512a75859d611d283c1a1",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "1289ac09f81e90d4d2831264a472d03a4e28dd6bf0fd83c13bbeec05baebc7b5",
-          "size_bytes": 362
-        }
-      ]
+      "model_id": "synthetic_imagery_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058739,
+      "weights_digest": "36fa6a39b89c24234b521b4e130c1221b317db578d32c3349713176abdb628ed"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8a9c1c7c96148c5360167c62cb4b16b4243627a2d4ebe650e2b979c7f73858c7",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6b6ddacd48bc418f12795aac5d821cea3aa0c8f9c5be379fb36f36dacc6a61e0",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "c72ae23aef8a2adeddc2ef0cd16706d16f2326837ee607dcfe92995b5aa174fe",
-          "size_bytes": 360
-        }
-      ]
+      "model_id": "synthetic_imagery_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450115,
+      "weights_digest": "6b9f2458c6e5e55d18e8a36f46b796f66710e4d636e5b6c438a628dba4f5ac79"
     }
-  },
-  "capabilities": [
-    "synthetic_imagery"
-  ]
+  }
 }

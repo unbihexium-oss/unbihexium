@@ -1,91 +1,76 @@
 {
-  "model_id": "encroachment_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "encroachment_detector",
   "name": "Encroachment Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "assets",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Encroachment Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects structures and vehicles inside protected corridors such as pipeline and power line rights of way.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "structure",
+      "vehicle",
+      "excavation"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of structures, vehicles and excavations.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "20c91aa7c827988dc9ef5180b69059b0281efb183e544e0075634045ecaf7bd8",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f5486ff51b85c4537aa8bc3ff74a3638fc31a8b57c0a91aad2998907b6ac7907",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "4decab63e938f6bbc5ff313e9737a8dc0f0ca604b617b5cf63421ea886633810",
-          "size_bytes": 409
-        }
-      ]
+      "model_id": "encroachment_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730647,
+      "weights_digest": "f51d5e3bc7ea8ab5c92187150c6a0b43c75210300fa76671efbafdce47f02689"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "25f25cb9b52ce7bd27334bc5af959a04366a0462b5e1c0e196bdecb4e3a0ff40",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1a8c98b344b58a75ce11b4af37ff936da99e36df67466b920bf96495149c0bd4",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "1f3686b69044bc262dea81775179a81cd2c6c15a5d1a02ffe59aac11296efdfa",
-          "size_bytes": 409
-        }
-      ]
+      "model_id": "encroachment_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049255,
+      "weights_digest": "4729c16b77eae29be4b619e89444932e75e0879d3b67734fcb07c3fb74d981d0"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "97abcc71dc42bc23f968c3a91dd86d6d0292590203209ce0bd38f7b91488e585",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c489de366ffead245d4cc897727313a2cce6cae3237bb855859568685519fdb8",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "3542ff0bd7f06acfb9220e2437a98d05ba64ab201d0ba9466ef4ba4b42363c15",
-          "size_bytes": 413
-        }
-      ]
+      "model_id": "encroachment_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038391,
+      "weights_digest": "7a6a11f4c623fdbb77fd4ea5a9dcb343285f904924d0f9e67aaaec7c34c516eb"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "408ab107a65ace72225cf6d8d7cecc81225526cc073202928dcfb80a4fe9ded3",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "59692938453dea2ee855229329cc67fbb540079b88fc51162add705e959d298c",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "b006e6d8af1216e3e94622c33b2d59285bdb8c87fe8a046dcd442ec231ec0b4a",
-          "size_bytes": 411
-        }
-      ]
+      "model_id": "encroachment_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413767,
+      "weights_digest": "bf7281658719c190760357230acb45456dca9323ab13d6736cf12f49e3ac4163"
     }
-  },
-  "capabilities": [
-    "encroachment_detector"
-  ]
+  }
 }

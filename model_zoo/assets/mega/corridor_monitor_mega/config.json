@@ -1,8 +1,0 @@
-{
-  "model_id": "corridor_monitor_mega",
-  "task": "segmentation",
-  "variant": "mega",
-  "params": 4107010,
-  "resolution": 512,
-  "base_channels": 128
-}

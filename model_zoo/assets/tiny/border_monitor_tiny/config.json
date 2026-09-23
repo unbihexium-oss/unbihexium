@@ -1,8 +1,0 @@
-{
-  "model_id": "border_monitor_tiny",
-  "task": "detection",
-  "variant": "tiny",
-  "params": 143201,
-  "resolution": 64,
-  "base_channels": 32
-}

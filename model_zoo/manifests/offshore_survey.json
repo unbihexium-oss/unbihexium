@@ -1,91 +1,93 @@
 {
-  "model_id": "offshore_survey",
-  "name": "Offshore Survey",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "offshore_survey",
+  "name": "Bathymetry Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "water",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Offshore Survey model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates shallow water depth (satellite-derived bathymetry).",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "depth"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": [
+      0.0,
+      30.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Echo sounding or LiDAR bathymetry.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c89137c218251142ff09029ad5f67c2c049d9dd6cdee0969e54825764b944818",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0b1c0f7caf40e2bc2f9fa04c1c623ade331dfbe5717439b2ce0dbcbf572f9bcf",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "859637c2c8b2986f906236f33a287237cfd75b4572b9e3f368eebca3a94d56d2",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "offshore_survey_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "56cd1baba6f9777167055512400544a40df946618947a357995933fb2074d1fd"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "82e287b1dc85553832c2f6393e9448d2a8198e410779a1f07e63bc67b7b644e7",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "574e32f35ed71b62b1a6c7da60262d83099e8eaf4a3ce80f9f5379d4f08a1b29",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "1ad4b314f2e8cec1672bdeb568ac1d42bfec6d462e451c9ec6e541400d777e42",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "offshore_survey_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "815ed22de4baf1ff984a35620cca069f0ddc09b06ae4916148247e827aa74cb5"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9aae5400c0b20fac8b90e9564d8e1db772e01c22339038b521c5753da3a6c226",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "94257a6c0ace849f682e46f13cc704d155d026dd62088658f71394107a46b6ed",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "e955d4637e99dedd12330aaeb1d1514a8f6e89eb9ab336ed29b2bbc510e17941",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "offshore_survey_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "02c4a7a08d7840a744ab2609eb7ea4ca04049203f4217b96d3404c91179e0c86"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f6d51c44f5542323600bec7247725091dcd5ad8cc2fb276f3e8b8d539764828e",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "437f2345ab1a30aa5852ca12c03b6a9924c233d9bf35f0c1c522f669c5cf4dde",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "1c9ae58bddc88022ffd8120b522665edce1c0e574d7f6f1f473be151422dd319",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "offshore_survey_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "07093f18fb75b082551f7178420e6b3a4ecd5559bdc6f8bee6fb548ede5030e6"
     }
-  },
-  "capabilities": [
-    "offshore_survey"
-  ]
+  }
 }

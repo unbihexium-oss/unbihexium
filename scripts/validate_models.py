@@ -6,197 +6,197 @@
 # =============================================================================
 # Project     : Unbihexium
 # Module      : scripts/validate_models.py
-# Title       : Model zoo loading validation
+# Title       : End-to-end validation of the model zoo models
 # Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 # Affiliation : University of Helsinki
 # Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
 # Licence     : Mozilla Public License 2.0, see LICENSE.txt
-# Python      : CPython 3.10 to 3.14, requires PyTorch (unbihexium[torch])
+# Python      : CPython 3.10 to 3.14, requires PyTorch; --onnx also requires
+#               onnx and onnxruntime
 # =============================================================================
 #
 # Abstract
 # --------
-# Validates that every model of the model zoo (130 capabilities in four size
-# variants, 520 models in total) can be loaded. For each model directory under
-# model_zoo/assets/<variant>/ the script checks that:
+# Validates every model of the model zoo end to end. For each selected model
+# the script:
 #
-#   - config.json, model.pt, model.onnx and model.sha256 exist;
-#   - config.json is valid JSON and contains the "params" and "task" keys;
-#   - model.pt loads with PyTorch and contains a "model_state_dict" entry.
-#
-# The script prints a per-variant and an overall summary and lists up to ten
-# errors. The weight files must be downloaded from Git LFS first
-# (`git lfs pull`); LFS pointer files fail the PyTorch loading check.
-#
-# Security note
-# -------------
-# torch.load is called with weights_only=False, which unpickles arbitrary
-# Python objects. Run the script only on model files from this repository.
+#   1. builds the model with its deterministic starter weights;
+#   2. compares the weights digest with the published digest;
+#   3. runs a forward pass on a random input and checks the output shape
+#      and that the output is finite;
+#   4. with --onnx, exports the model to ONNX and compares ONNX Runtime with
+#      PyTorch on a second input size.
 #
 # Usage
 # -----
-#   python scripts/validate_models.py
-#
-# The script must run from the repository root.
+#   python scripts/validate_models.py                    # all 520 models
+#   python scripts/validate_models.py --variant tiny     # 130 tiny models
+#   python scripts/validate_models.py --variant tiny --onnx
+#   python scripts/validate_models.py --family ship_detector
 #
 # Exit status
 # -----------
-#   0  every model passed
+#   0  every selected model passed
 #   1  at least one model failed
 # =============================================================================
 
-# Parse the config.json files.
-import json
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
+from __future__ import annotations
+
+# Command line parsing.
+import argparse
 
 # Set the exit status of the script.
 import sys
 
-# Walk the model zoo directory tree.
+# Temporary directory for ONNX exports.
+import tempfile
+
+# Measure the time per model.
+import time
+
+# Represent file paths.
 from pathlib import Path
 
-# Load the PyTorch checkpoints.
+# Tensors and inference mode.
 import torch
 
+# Model construction.
+from unbihexium.ai.models import DETECTION_STRIDE, build_model
 
-# Validate every model and return True when all of them passed.
-def validate_models():
-    # Directory that holds one subdirectory per size variant.
-    root = Path("model_zoo/assets")
-    # Size variants of the model zoo, from smallest to largest.
-    variants = ["tiny", "base", "large", "mega"]
+# Catalogue and registry.
+from unbihexium.zoo import Task, Variant, get_model, list_specs
 
-    # Number of model directories checked in all variants.
-    total_checked = 0
-    # Number of model directories that passed every check.
-    total_passed = 0
-    # Error messages of the models that failed.
-    errors = []
+# Spatial size of the validation input; divisible by 2**depth of every variant.
+SIZE = 64
 
-    # Top rule of the report banner.
-    print("=" * 60)
-    # Report title.
-    print("MODEL VALIDATION")
-    # Bottom rule of the report banner.
-    print("=" * 60)
 
-    # Validate the models of each size variant.
-    for v in variants:
-        # Directory of this variant.
-        vpath = root / v
-        # A variant may be missing in a partial checkout.
-        if not vpath.exists():
-            # Report the skipped variant.
-            print(f"\n[SKIP] Variant {v} not found")
-            # Continue with the next variant.
-            continue
+# Expected output shape for a batch of one input of size SIZE.
+def expected_shape(spec) -> tuple[int, ...]:
+    # Number of outputs.
+    k = spec.out_channels
+    # Detectors predict at stride 4 with four extra channels.
+    if spec.task is Task.DETECTION:
+        # Heatmaps, size and offset.
+        return (1, k + 4, SIZE // DETECTION_STRIDE, SIZE // DETECTION_STRIDE)
+    # Scene regressors predict one vector.
+    if spec.task is Task.SCENE_REGRESSION:
+        # One value per target.
+        return (1, k)
+    # Super-resolution scales the output.
+    if spec.task is Task.SUPER_RESOLUTION:
+        # Upscaled output.
+        return (1, k, SIZE * spec.scale, SIZE * spec.scale)
+    # Dense tasks keep the input size.
+    return (1, k, SIZE, SIZE)
 
-        # Every entry of the variant directory is one model.
-        models = list(vpath.iterdir())
-        # Number of models of this variant that passed.
-        v_passed = 0
 
-        # Heading with the variant name and its number of models.
-        print(f"\n{v.upper()} ({len(models)} models):")
+# Validate one model and return an error message or None.
+def validate(spec, variant: Variant, onnx_dir: Path | None) -> str | None:
+    # Build the starter model.
+    model = build_model(spec.family, variant)
+    # Published registry entry.
+    entry = get_model(model.model_id)
+    # The digest must match the published one.
+    if entry is None or model.digest() != entry.weights_digest:
+        # Report the mismatch.
+        return "weights digest differs from the published digest"
+    # Random input with values in [0, 1).
+    x = torch.rand(1, spec.in_channels, SIZE, SIZE)
+    # Forward pass without gradients.
+    with torch.no_grad():
+        # Output of the model.
+        y = model(x)
+    # The output shape must match the task.
+    if tuple(y.shape) != expected_shape(spec):
+        # Report the wrong shape.
+        return f"output shape {tuple(y.shape)} != expected {expected_shape(spec)}"
+    # The output must be finite.
+    if not torch.isfinite(y).all():
+        # Report non-finite values.
+        return "output contains NaN or infinite values"
+    # Optional ONNX export and comparison.
+    if onnx_dir is not None:
+        # Export module; imported here because it needs onnx.
+        from unbihexium.zoo.export import export_onnx  # Export and verify.
 
-        # Validate each model directory.
-        for m in models:
-            # Model configuration.
-            cfg_path = m / "config.json"
-            # PyTorch checkpoint.
-            pt_path = m / "model.pt"
-            # ONNX export.
-            onnx_path = m / "model.onnx"
-            # SHA-256 digests of the weight files.
-            sha_path = m / "model.sha256"
+        # Export and verify against ONNX Runtime.
+        export_onnx(model, onnx_dir / f"{model.model_id}.onnx")
+    # The model passed.
+    return None
 
-            # Count the model as checked.
-            total_checked += 1
 
-            # Check all files exist
-            if not all(p.exists() for p in [cfg_path, pt_path, onnx_path, sha_path]):
-                # Record the failure.
-                errors.append(f"{m.name}: Missing files")
-                # Continue with the next model.
-                continue
-
-            # Check config is valid JSON
-            try:
-                # Parse the configuration file.
-                cfg = json.load(open(cfg_path))
-                # The configuration must describe the parameters and the task.
-                if "params" not in cfg or "task" not in cfg:
-                    # Record the failure.
-                    errors.append(f"{m.name}: Invalid config")
-                    # Continue with the next model.
-                    continue
-            # Any error while reading or parsing counts as a parse error.
-            except:
-                # Record the failure.
-                errors.append(f"{m.name}: Config parse error")
-                # Continue with the next model.
-                continue
-
-            # Check PT file loads
-            try:
-                # Load the checkpoint on the CPU so that no GPU is required.
-                data = torch.load(pt_path, weights_only=False, map_location="cpu")
-                # The checkpoint must contain the model weights.
-                if "model_state_dict" not in data:
-                    # Record the failure.
-                    errors.append(f"{m.name}: Invalid PT structure")
-                    # Continue with the next model.
-                    continue
-            # Record the loading error message.
-            except Exception as e:
-                # Include the PyTorch error in the message.
-                errors.append(f"{m.name}: PT load error: {e}")
-                # Continue with the next model.
-                continue
-
-            # Count the model as passed for this variant.
-            v_passed += 1
-            # Count the model as passed overall.
-            total_passed += 1
-
-        # Summary line of the variant.
-        print(f"  Passed: {v_passed}/{len(models)}")
-
-    # Top rule of the summary banner.
-    print("\n" + "=" * 60)
-    # Summary title.
-    print("SUMMARY")
-    # Bottom rule of the summary banner.
-    print("=" * 60)
-    # Number of models checked.
-    print(f"Total Models Checked: {total_checked}")
-    # Number of models that passed.
-    print(f"Total Passed: {total_passed}")
-    # Number of models that failed.
-    print(f"Total Failed: {total_checked - total_passed}")
-
-    # List the errors when there are any.
-    if errors:
-        # Heading with the number of errors.
-        print(f"\nErrors ({len(errors)}):")
-        # Show at most the first ten errors.
-        for e in errors[:10]:
-            # One error per line.
-            print(f"  - {e}")
-        # Say how many errors were not shown.
-        if len(errors) > 10:
-            # Number of hidden errors.
-            print(f"  ... and {len(errors) - 10} more")
-
-    # Success only when every checked model passed.
-    return total_passed == total_checked
+# Validate the selected models and return the exit status.
+def main(argv: list[str]) -> int:
+    # Argument parser.
+    parser = argparse.ArgumentParser(description="Validate the model zoo models")
+    # Restrict to one variant.
+    parser.add_argument("--variant", choices=[v.value for v in Variant], help="only this variant")
+    # Restrict to one family.
+    parser.add_argument("--family", help="only this model family")
+    # Also export and compare ONNX.
+    parser.add_argument("--onnx", action="store_true", help="export to ONNX and compare")
+    # Parse the arguments.
+    args = parser.parse_args(argv)
+    # Selected variants.
+    variants = [Variant(args.variant)] if args.variant else list(Variant)
+    # Selected families.
+    specs = [s for s in list_specs() if args.family in (None, s.family)]
+    # Unknown families select nothing.
+    if not specs:
+        # Report the unknown family.
+        print(f"unknown family {args.family!r}")
+        # Fail.
+        return 1
+    # Failures as (model id, message).
+    failures: list[tuple[str, str]] = []
+    # Number of validated models.
+    checked = 0
+    # Directory for ONNX files, removed at the end.
+    with tempfile.TemporaryDirectory() as tmp:
+        # ONNX directory when requested.
+        onnx_dir = Path(tmp) if args.onnx else None
+        # Validate every selected model.
+        for spec in specs:
+            # Every selected variant.
+            for variant in variants:
+                # Start time of the model.
+                start = time.perf_counter()
+                # Validate and capture unexpected exceptions as failures.
+                try:
+                    # Error message or None.
+                    problem = validate(spec, variant, onnx_dir)
+                # Any exception is a failure of this model.
+                except Exception as exc:  # Report every failure.
+                    # Exception type and message.
+                    problem = f"{type(exc).__name__}: {exc}"
+                # Count the model.
+                checked += 1
+                # Model id of the validated model.
+                model_id = spec.model_id(variant)
+                # Record failures.
+                if problem:
+                    # Keep the failure.
+                    failures.append((model_id, problem))
+                # Progress line with the result and duration.
+                status = "FAIL" if problem else "ok"
+                # Print the progress line.
+                print(f"{status:4} {model_id} ({time.perf_counter() - start:.1f} s)", flush=True)
+    # Summary.
+    print(f"\n{checked} models validated, {len(failures)} failed.")
+    # Details of the failures.
+    for model_id, problem in failures:
+        # One line per failure.
+        print(f"  {model_id}: {problem}")
+    # Success only without failures.
+    return 1 if failures else 0
 
 
 # Run the validation when the file is executed as a script.
 if __name__ == "__main__":
-    # Validate all models.
-    success = validate_models()
-    # Exit with 0 on success and 1 on failure.
-    sys.exit(0 if success else 1)
+    # Pass the command line arguments without the script name.
+    sys.exit(main(sys.argv[1:]))
 
 # =============================================================================
 # End of module scripts/validate_models.py

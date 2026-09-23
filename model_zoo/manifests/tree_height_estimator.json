@@ -1,91 +1,98 @@
 {
-  "model_id": "tree_height_estimator",
-  "name": "Tree Height Estimator",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "tree_height_estimator",
+  "name": "Canopy Height Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "forestry",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Tree Height Estimator model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates canopy height from optical and radar data.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "VV",
+      "VH"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "VV",
+      "VH"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "canopy_height"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": [
+      0.0,
+      60.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Canopy height from airborne or spaceborne LiDAR.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Sentinel-1 GRD"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0f14905f953ffd3761c594cc9c831c157e1b78cd9ef55c4022d417df5d7544bf",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "774d3954a183d6521856b2f17d7e91c6b05f65761c41f6dcec73f6baf830dbc2",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "a173b2febf803dbf8c40ab4a4e298bcbf527736c004e082c097dc241c8f5ca01",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "tree_height_estimator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "83ff75687ca30c52ee33f9916a465e1a56efe344bf3b824473d3f4042af9d656"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dd49c3d0bd11866e458a4bad9e204c52deed0b2827488b6556d111e14b2a76b0",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a52da0cc811d8bba4df4c293de32b4d59e5e6899a73ed064dc7009dc57ea8a01",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "d433483d3e473897d57b7b61c8ddc100fc5c8bf44707bd273028d742129c1d6e",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "tree_height_estimator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "d99e479c31d30a1af27d724a0af24120809573c2640d28cf16191027eea5e0ba"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "116401a1c7abfd8c63a8b829aa3eaee5014a5696ac6e852f2179770230f6d2a5",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "65c1f0cf495db63a61050c7bcb4b0c6b1b14b7933c79ff16a39d5b4ad715bf7c",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "094a2c2f6186573b89af30cd542635abb99fbef5f2fa9585ad2c43e5b022de19",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "tree_height_estimator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "a1526ad385bd3d36798f79e53f755f85ccbd6e6c24a05db22789d611b826fc17"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cfa8045f97fe39519a1b77de43e46528ddffb280b381811f4b5312c22280b141",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a8e74bb200d17a29831c7bc1ffd8ca4a98d05b20d6a1339baa2e3baf9f25f38a",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "0382fdc1bb704540981f1bc58b2309e155d0f4bc1d5f81d455187b086034b2f5",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "tree_height_estimator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "e9f1db06849d98b9abfe7a3778dc5ee3b3290921d53b9c641cefac2eca63afd4"
     }
-  },
-  "capabilities": [
-    "tree_height_estimator"
-  ]
+  }
 }

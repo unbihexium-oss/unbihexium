@@ -1,91 +1,97 @@
 {
-  "model_id": "zonal_statistics",
-  "name": "Zonal Statistics",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "zonal_statistics",
+  "name": "Zonal Cover Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "analysis",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Zonal Statistics model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the fractional cover of vegetation, water and built-up area in a chip.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vegetation_fraction",
+      "water_fraction",
+      "built_up_fraction"
+    ],
+    "units": [
+      "1",
+      "1",
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Cover fractions per chip from reference land cover maps.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "71396f7e39a1c4d074edb058c2a654060d81d41328e52a3844dd7200b558cbbd",
-          "size_bytes": 1195
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d1928aa73ea6b55bcc02d3323bb7a17ab1bac2b9b198ae85fd98a3ff7d4b290e",
-          "size_bytes": 3261
-        },
-        {
-          "name": "config.json",
-          "sha256": "21ce7d57d90629d83a85608cbb290557f4c5bee6c621db39649951727341b19a",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "zonal_statistics_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 495555,
+      "weights_digest": "b00c71736648950d5b8e9e8a6505943e5200b91f3b93cf0f056eb0e88af7249a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "aa31e8e281c24a6165942c457c57167757289b7a487632be78b79181ed20f4a5",
-          "size_bytes": 3885
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7791d08ac5f3941a9ae668d7bfe5577ec0f48c58727301526a437e6641eeda28",
-          "size_bytes": 5821
-        },
-        {
-          "name": "config.json",
-          "sha256": "b122358f49e8629600614258693ef17f8de92b0d5bfdac446c104e09465dd388",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "zonal_statistics_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3747203,
+      "weights_digest": "a0b611c7ecede7193e5a725f9db31feeda03981cb7316f6c31955df8780e3c8c"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "61ac1c0732b79cb1320555d6d02a845edf4213552df4503ea918a50b6bf18c93",
-          "size_bytes": 11057
-        },
-        {
-          "name": "model.pt",
-          "sha256": "149e02216ec89c1d80f5ebf7a707885692415aa08c25f2c953094573fddc9c5d",
-          "size_bytes": 12989
-        },
-        {
-          "name": "config.json",
-          "sha256": "7999eb4a202b22c180ba8faa2b4af169dab84a43b25271d1da558dec2e3953dd",
-          "size_bytes": 181
-        }
-      ]
+      "model_id": "zonal_statistics_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14609283,
+      "weights_digest": "6e8f0367219299c315cd8ccd94c03e668425899eef90a0a01a386ac35cce7c00"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4f850d0fbede3a7af467afca3fad0673bb3c6e726481300b204a04bd63068211",
-          "size_bytes": 37687
-        },
-        {
-          "name": "model.pt",
-          "sha256": "eda65a2b3e39976de453bb67ab61ef039cca8d027c59bba7b76b911551feae03",
-          "size_bytes": 39613
-        },
-        {
-          "name": "config.json",
-          "sha256": "6b06b3968adb20f217fc71facc452369f5d2cb9d545c98da44e00187993f0a3b",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "zonal_statistics_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37766659,
+      "weights_digest": "a07fea2e7c23f5e1f1e050894d4050bcc9b4b3b7a10c62c4eae2d34fe7022182"
     }
-  },
-  "capabilities": [
-    "zonal_statistics"
-  ]
+  }
 }

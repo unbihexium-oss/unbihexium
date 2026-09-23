@@ -1,91 +1,95 @@
 {
-  "model_id": "environmental_risk",
+  "$schema": "../manifest.schema.json",
+  "family": "environmental_risk",
   "name": "Environmental Risk",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "risk",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Environmental Risk model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores combined environmental risk.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "risk_score"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Environmental risk scores.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "population and road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "835a742126db7f084cf256c33a4514911116499e50bb9929e882146cc5e1eabd",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d40f82b6b32ac7021f4fafbb399a3aaa3eec5c833d9fa7c8a3f6cdd19c603335",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "2f405b66d94240f238aafe1a56f2bfb1fa5a5c9e99408324a0764f87fbdcaac5",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "environmental_risk_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "4a5bfd880ce8ad81b1117ae5c01bb536d5c67725b449d290cb43d4e27fc21210"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2aa5af4bd8440cbba2a7adb6af7baded6b85a58e79f2e54d21d3700ac422cd0d",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9746fc77717fad7801ed428361b6154b7cbe982b719a627cc12cdae75b8dbf02",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "e5dee81b7aaba8f8d22c1e6dcee7c38803cbae14b794d7ef7b014210d5301a90",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "environmental_risk_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "d66111f6474bf428c77e25799c80f553cf8a223dd335bb23d421692f5bb91981"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "96d9352ab25060020ab6a9f34f084a6c00154745883f1639d31384bde6c15fca",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3809cb2404e4212b17b83f4ab1a2e9978642497db711d25f88fedd508a7dcae3",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "c5d3d05fbae264d04a13f2befa7584bc0bce800c97351d0656e4175bec7af214",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "environmental_risk_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "347f8f0c0d4e11a063dfc14a4b4ab70f63960683dca9f0eddca9d16fe265f6e7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "11447834f072f09ee697d637cbd829ff389571567e62528c71ecf73f19fd5267",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e8529ddb470eacf89d38fabd3d9ff3077d6d80443075d8c5afa07e25c92b7412",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "15ef40ad566b336a23550cc91a35e244fc45ea6b75848402b3cbe85a2ab1a248",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "environmental_risk_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "4bec942e88a2aa8168b9fb2fc3822b220827d47ab692742a4a36487c8413eba0"
     }
-  },
-  "capabilities": [
-    "environmental_risk"
-  ]
+  }
 }

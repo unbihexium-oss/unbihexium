@@ -1,91 +1,92 @@
 {
-  "model_id": "pipeline_route_planner",
-  "name": "Pipeline Route Planner",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "pipeline_route_planner",
+  "name": "Pipeline Route Cost Surface",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "assets",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Pipeline Route Planner model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates a construction cost surface used for least-cost pipeline routing.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "cost"
+    ],
+    "units": [
+      "cost units per metre"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Cost rasters from engineering estimates.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "970900baf1f217bead2e6b47c8629297700a20db511cc2f1a85cca3dfb02b211",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9c44c7f574752b8a212cebac4cce066ea31aae4f8a9454ca2f78769dd98eed33",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "13e002452e816111298ebea9013de1bf2162612002833f0280f4801b39d72b25",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "pipeline_route_planner_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "a420d436456a6d9b0eba3244fd353c2b5aeb9318ecdcb7cc6a1e4bef9a5fe5fa"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c394705c643b881b1100b635df6671639f8f3b76c0e8340e0ef107ceceb01a7a",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "28c4e56e5dc1d15a52747d84ebe386a3f078edadcde3e06f360397fda3ac52f5",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "30851b1820d33e7c700a9b76d5a5ab15bb1204ed67cfed937a8b843477dcbf92",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "pipeline_route_planner_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "0e79d8a45b618a04a587a607e364db095af86a28e17381c32a589bf7e34da790"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1fc7f096d0366e0df8f398dbb4ee4a3ad9b1dcb11d069d337553d19465a6623d",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b8c2da07b6839b048dd114d57d34e62755b41da8b458d0355f1ddbbcf6b45480",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "cf13a74dc2f3d47ab26d55ac9352102377f1353ebd72f71f25b18c146e56a959",
-          "size_bytes": 188
-        }
-      ]
+      "model_id": "pipeline_route_planner_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "6cce8ad49310c1c2368bc103d107346c26ef13c4a990f4e366ab237305c7ea69"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7aae66a7e60d452c56d1c11a5f296a95532de80288cc6891144bfe856b898bda",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "50afce1c0c0c6150f65c47793fac46052be732e2a0d6f041ab91917e915c2bd0",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "2c74ad93592e60e659315ece1066f3b4c9b6bf636d630d41e8832d5dbab0e06a",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "pipeline_route_planner_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "d2dc78985ae0a60e5e108c38aaf87e99aae8884a967759c26275d6fea3da658c"
     }
-  },
-  "capabilities": [
-    "pipeline_route_planner"
-  ]
+  }
 }

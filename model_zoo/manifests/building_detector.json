@@ -1,91 +1,75 @@
 {
-  "model_id": "building_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "building_detector",
   "name": "Building Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "urban",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Building Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects individual buildings as bounding boxes.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "building"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of building footprints.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery",
+    "0.3 to 1 m"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1c526382fcaa9869cc9b95164d42c76e24bc7b1e6e974a231bce1fa6e8dca244",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a4f8047e93e03f4934bf9608b1f136a05400ddf7165f2acb8d8266bb1395bb6c",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "b154dbbbbdc1ffdfde4c3f3008d4461b873eb304d6740b73550abdf1f5b646ee",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "building_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "f2eda71812b340ad394cd8dd8228b593f63428f5e1bbbf1cd20cc5cfaa64b8dd"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8c422fce530aa38585002fe5cee242a36b874c1f5a35e94f801a3a88fda0f565",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5b18590bc3b69f18664f86afaede423235e4c7ec8a9f31f5e5896fdf981fa7fd",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "081bc2d20076c9c7d96416e66c20cf43eccd774f973903417b42c594988e8954",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "building_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "be8ccba216a4e95f2384bbd7e26e3ede52ef6b1d2a1810601d8841d0bf0b01be"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "75d3fd9c7826e0ef270662f5931f4b64cdcd8fde2d56b4bd8b1550666d23b3e4",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "16c85353f119a14cb1159c3388207f86e54925aed8991152adf381da25ebd8a5",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "e8fae8a3af8249bc9b84451d4d10781f383298b96dd150b375acb99c8956fda3",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "building_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "42117c7487e2c3de30464bafc4cf40ec6a8be8fff25f5e685d045347acb89afe"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "478f0a7317d8e77cac352e84b3f161db3c2b79bf42d592b0f2d3f073cd830ca6",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "06b7ed778812dd08aa22900ca2cfc55921b3821f5866533f896418a64e9931a5",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "ce9d4ab661081fa3e59073eee67e9126ff6e399ddaf13aa5e3b8d094e897404e",
-          "size_bytes": 403
-        }
-      ]
+      "model_id": "building_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "ff999a8b6ee9c2f1a41ba6ae425c7b6324016b0c91d06fa0c37504fc8f4d3851"
     }
-  },
-  "capabilities": [
-    "building_detector"
-  ]
+  }
 }

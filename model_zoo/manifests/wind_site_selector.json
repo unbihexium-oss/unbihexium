@@ -1,91 +1,98 @@
 {
-  "model_id": "wind_site_selector",
+  "$schema": "../manifest.schema.json",
+  "family": "wind_site_selector",
   "name": "Wind Site Selector",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "energy",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Wind Site Selector model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores suitability for wind turbines.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "suitability"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Suitability scores or existing turbine locations.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "261f0a1a8a7342e7c5d9256d5f290c544c4cbc056bdadcdd7e034f28425bf14c",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b2fc8668ad052145440b898cdaa174b3e9f34c671d8b6dbe740645269b3f1f1e",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "7ab845284bd66adad3b50614d5028eb9de27e4839723e775aa085ec2de975a6b",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "wind_site_selector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "68946245417cd1b902ca3dfef41ac647fbc1b7e8676c8e67cd4de4ee135c7c97"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f9a28c612033bf5ce5667514a3749fa49b8cbca43dd3b7a912ef82ca72274deb",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c195fa6fb48a3ecc83b0ac793723bf8bce9782c5f440a2b3b24a9e5070d1116f",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "55dab914a098411fe7753924842ae304cae3220358f8b8e72649f34e82d766cb",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "wind_site_selector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "66a42796252514715a44dd7631f26b62f8869057c71048fec81383d40c227e0e"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f1cda435f90a14355823d11b04700c77b3e3fe901c240578652c1034f1dc826e",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bb0e98fd209999fc1d269c38434559738c61f89fbc4c17d372e6134bbfcf84ae",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "db7e2405ec8edeea7360a3d7d652991949f9cccaad5597d5d4ba2936795d025c",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "wind_site_selector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "64374c57f881a916515e285fe878bf5496df27c589bd7ece0a0a5fb3ae6b5ca2"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e43ad443077b2f9079cfe72d630f882dfc7750d2c9cff88970d48b44d2a3afde",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3bbd912d604c7a44d8ffc2b3c255925efa9a694225b9c11a62a4fccc20dcfec7",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "fc6d0b3351a8e391e352c693e311e38e7aa828734e02103e38df46c1dfc79ea5",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "wind_site_selector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "75b025295d1e4b2aeb4c2f07823eaaa5427caf42e9e95c6e6930c443a87c5f0c"
     }
-  },
-  "capabilities": [
-    "wind_site_selector"
-  ]
+  }
 }

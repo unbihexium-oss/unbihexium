@@ -1,91 +1,79 @@
 {
-  "model_id": "water_surface_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "water_surface_detector",
   "name": "Water Surface Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "water",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Water Surface Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments open water surfaces.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "water"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Water masks.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "Landsat 8/9",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "32509a08f7d535433caf0d1fe397491fab59b52e9fd6fd2d01fbe1a56bda270e",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2bed2eb59c7037ca1c96d1f53b5cf9aad0215c56e72f18c9c5f8e729bb046d97",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "97cc617cca5e58a0031d0d9e76d6984222c23ab71873ae08c96df55e164fa6a1",
-          "size_bytes": 413
-        }
-      ]
+      "model_id": "water_surface_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733090,
+      "weights_digest": "37ab16434f2af56a4d007ae5b847748c6f897efb7774a293bb6b81282554456a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "055c2b5fa0ac4a5385dbda9a77ab3bf604189aefe520b1a109668c9e325487b2",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5cbbbf9ed43c8c15e5b554246e794c7b688e79386284b8006a085cf5909243e0",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "9f31cb83f4570338847c5f920749ca470a9a77146e55343e83909b859e60aa89",
-          "size_bytes": 413
-        }
-      ]
+      "model_id": "water_surface_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058754,
+      "weights_digest": "701c53fadd7c31344eafbf9a4740ca1844d6449419904aeba645698a37a58664"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "86dba738f5a7913a37d8368b55e788d1454485ff23573ff3ddaac90f4e3f93bb",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "01417d0b6e12551048794db5ae081ce3cf5a02baa4815dcdf6de21db5571bde9",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "11e4ec1de9f8c9d1568d6acf019caa45d512cc7b183951ba971d0f6be3183e10",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "water_surface_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059554,
+      "weights_digest": "ef7c5a613a8f8bb250f6491dbdf350a53d1b17f7f9e1505b91edbef645ed51aa"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ce227fa7f5a6c8e5aa27f68077993ddb933b1d20b3f379a6a2f2e9c74b47f94c",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ff8306a25c460f266b779a1c6aca8158c1f6b4bcde65c5e4772f5d6355a1db19",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "1e0169f3b8037f8ba00a7f3f38044aa6c03fd69fb8abd53b6c625ae5cef59560",
-          "size_bytes": 415
-        }
-      ]
+      "model_id": "water_surface_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451202,
+      "weights_digest": "313a064e3539f706a9e54f9e72033b9098a9e1e5466c271a75f61a1ee01e7130"
     }
-  },
-  "capabilities": [
-    "water_surface_detector"
-  ]
+  }
 }

@@ -1,91 +1,94 @@
 {
-  "model_id": "drought_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "drought_monitor",
   "name": "Drought Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "environment",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Drought Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates a drought severity index.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "drought_severity"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Drought index rasters, for example from soil moisture products.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Landsat 8/9"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "54bceb01cb46af0bea08f0fe06b2592a730c8c2a70c1d3138216162cf7f679c1",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b26fe08652ddb1f75426a00ea0e8509f24a4b0062bf6d6af859eb8cbdbb696e2",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "2c80c254bf39ffc9ad6409476f6aea833e5f3b6d51d90adfd377ae00ac65fbc0",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "drought_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "3bc526979c8d9afcde01d872dd16dd42d1feaed8a66d800ffbb2afd400ea88fa"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7ef5c61b9b0cb10366a7386e0699d55dfbbb14c525aeadb418fad9889cdbf5a0",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1a1065970bf5280b0151965f3fac366e42a75a094d655913b3e2aa9ed71b829d",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "e9f5c76115019dc92dbc35886afad2e45e99ed96c3a854417e3ed5c6171213b0",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "drought_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "605e7f0d127e2a4e339fc0b69fa670cf4c5c07b6586e6209449ae751718d5d07"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "51b4ce5032736f62e6e8395087e621183ccfa9eed3755515eaf954880dd435fd",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "725e08b885db08b121a9a2cde0526d09cc6346ea01ff1fb2aee399911d07b15f",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "99e2f6de7e8cda5e319744fddabdfc4479d61ce9215b3132dc738aababb1aa5b",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "drought_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "13a10c5806c0bff2ef2c30b53c29c7019f17ac74b95392ac28fc6ecd7fe08592"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0697bb0055bd8b72ea696f42aa4b037b7898870c8e793a9e3b3a9267f7443775",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3e86b5b610a2076b8e2be495f1acf32eabed14b0bc63eefee23ad30f9273a586",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "e306aaebe2ce8db699ad9feb224fab5e6b80bbf26e99b4705b9a71d647d15131",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "drought_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "d7a3c0baa8dc85549c857d9b73a8c3b90a11cfaa1a7e92fc48e998d85263b75a"
     }
-  },
-  "capabilities": [
-    "drought_monitor"
-  ]
+  }
 }

@@ -1,91 +1,94 @@
 {
-  "model_id": "crop_classifier",
-  "name": "Crop Classifier",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "crop_classifier",
+  "name": "Crop Type Classifier",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "agriculture",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Crop Classifier model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps crop types per pixel.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "wheat",
+      "maize",
+      "rice",
+      "soybean",
+      "sunflower",
+      "other_crop"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Crop type masks, for example from farmer declarations.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8341e695a52b2b5ebce26abc5fe30a27724b9b77d357d2a0f946b5b5463467f6",
-          "size_bytes": 3806
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c4d25c737d236b5cf71e7166c1044cd9bd90a8b12423110d915dbaf41cb54d84",
-          "size_bytes": 5809
-        },
-        {
-          "name": "config.json",
-          "sha256": "8df8abe49bc243b7b9be7c7f4150e38ab43c07275dcae2f54eccc3b90fd37420",
-          "size_bytes": 450
-        }
-      ]
+      "model_id": "crop_classifier_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734039,
+      "weights_digest": "be881d63284ec626b196c743b8c15881b901c22a532cd159341ac5686d22cf2a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "52318e3e43be537e9bdbb114519ca73e4c99d0fe1d203d5d2e969f4d608a8cc9",
-          "size_bytes": 30739
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3f3809a91cbf0aac933b63fc79c81cf867936dc14293f1fe59387ceb6abc3503",
-          "size_bytes": 32561
-        },
-        {
-          "name": "config.json",
-          "sha256": "b75c502b4914f7085ec327c6d12fd2c54c104d189a1d960868e00c2359f7c66b",
-          "size_bytes": 450
-        }
-      ]
+      "model_id": "crop_classifier_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060647,
+      "weights_digest": "ce5e923880427215b51bb40c4a35ddf2001daa6e16939834c3a1c156358b5fd7"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7af16a64e79edc073990589bb471c07eca7f233de8cf5c2e178eb6e146bd8efc",
-          "size_bytes": 113245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "202b007f864a76749ab6a00509d63a35354afc50c92560686d6d7d2d6620edee",
-          "size_bytes": 115057
-        },
-        {
-          "name": "config.json",
-          "sha256": "f530b14a6f71b252733305a194222fa0795dc85a2c9ed3e42ea1f1231918448b",
-          "size_bytes": 454
-        }
-      ]
+      "model_id": "crop_classifier_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062391,
+      "weights_digest": "4c90d94df816ee5a1060810ff6e6ff8e4859da9d5aba65d1d21fc30c92ceca6a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b688dc9ae452db70b7dfe6e25cd5b4de745d8cd33532e7aa5ba6943c7619ef30",
-          "size_bytes": 437985
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0ebf3fd3fbc1f2da8094efa6edaee1d54bc86f2bcd21b3f7ddb45d2d9ec211a9",
-          "size_bytes": 439793
-        },
-        {
-          "name": "config.json",
-          "sha256": "a269d2e23e87e77ccfb6a2fcf4ce7bb346cf1b13da8407f205375c3cf6fcb1d5",
-          "size_bytes": 452
-        }
-      ]
+      "model_id": "crop_classifier_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454983,
+      "weights_digest": "51bd920a13e07b682c968190c6fa9f745169e2b768cd4f8fbcab06354edede60"
     }
-  },
-  "capabilities": [
-    "crop_classifier"
-  ]
+  }
 }

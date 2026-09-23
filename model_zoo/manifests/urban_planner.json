@@ -1,91 +1,78 @@
 {
-  "model_id": "urban_planner",
-  "name": "Urban Planner",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "urban_planner",
+  "name": "Urban Land Use Mapper",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "urban",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Urban Planner model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps urban land use.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "residential",
+      "commercial",
+      "industrial",
+      "green_space"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Urban land use masks.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "be27f783982339cbf5d1c552a38528bbf3dbfe127de2198354eef735e4ca2a6a",
-          "size_bytes": 3770
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c12c2cd3ec8c5d4d861dc6bb76d2f61a4e8d976c21444329c831f9ab73a09022",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "3dd33e09da6b79923eff7a9091568f9b53cffdff1b86a85a81ca8b58e54f17f2",
-          "size_bytes": 449
-        }
-      ]
+      "model_id": "urban_planner_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732997,
+      "weights_digest": "412a16c713d0c9626a095bf1d09f422cbe7a4d60712f222ffa08516ce69b7b48"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "64dca6c6b01fc722cf3fcabc30639266ec5ea3fe5af51a92c462b86dd7adf932",
-          "size_bytes": 30607
-        },
-        {
-          "name": "model.pt",
-          "sha256": "250ea57fabece1661ebef18a939b5a9ec5f2b4130ed374efc216cb1ce3aa3623",
-          "size_bytes": 32433
-        },
-        {
-          "name": "config.json",
-          "sha256": "bc08f9bab36a88ff4a3e3d09c2dae33dda9e77275a19a66acad17c9de6999225",
-          "size_bytes": 449
-        }
-      ]
+      "model_id": "urban_planner_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058565,
+      "weights_digest": "cf9017655261676be32739a6c68eee481044752009baace5bab20480a86cc33c"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "47b538d36b13829dcd57d29785ead1e3a8d8939e57a3f558b80627393db02df0",
-          "size_bytes": 112985
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8ec327e97c25265743decac0fa8af1692a40f65889b71bd62c7560618aa08b4c",
-          "size_bytes": 114801
-        },
-        {
-          "name": "config.json",
-          "sha256": "0283d86344471159a9f5cd05e27bdf6855bfe52f4fb05567aae375b49642e3f2",
-          "size_bytes": 453
-        }
-      ]
+      "model_id": "urban_planner_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059269,
+      "weights_digest": "8220a8b857053559760a90b5924ca282b37ccc2d0819421eb1387189bc458124"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9d0db4741a35686a76f4031e6d887a83f30cc3f1679e64e629fa8a0ea10bfdb3",
-          "size_bytes": 437469
-        },
-        {
-          "name": "model.pt",
-          "sha256": "efea75278a0fb72987ee8ccbcab384d2ff27736bdb8c0266e9022c8e306a3e2e",
-          "size_bytes": 439281
-        },
-        {
-          "name": "config.json",
-          "sha256": "7d7d6dba85cee1fc64a4cf21704cc1e3b0d0d1e477a23d0a28204f772214106c",
-          "size_bytes": 451
-        }
-      ]
+      "model_id": "urban_planner_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450821,
+      "weights_digest": "5e6da9101ca19a9c62db60f1f96d006fbc855105ee8b79e16f980d76b6107ba2"
     }
-  },
-  "capabilities": [
-    "urban_planner"
-  ]
+  }
 }

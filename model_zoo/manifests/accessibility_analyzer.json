@@ -1,91 +1,92 @@
 {
-  "model_id": "accessibility_analyzer",
-  "name": "Accessibility Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "accessibility_analyzer",
+  "name": "Accessibility Analyser",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "tourism",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Accessibility Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates travel time to the nearest service centre per pixel.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "travel_time"
+    ],
+    "units": [
+      "min"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Travel time rasters from network analysis or surveys.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "population and road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3fdeb7278aee7770bcbc5afdbbd5f1220d6be0e7ffc05cba08dbc75675f068b8",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e6c8a0ea7e8f7b19f149c8f9a6722c8cafc6ac12bf6a95c999daeddfd0a84fcd",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "d2d7da551ec1a719cd99bb345278e9c2e23b2c5c89a426bb34dbec256fb68846",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "accessibility_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "c3a240236b640ac6a29c37a4c92eaf9945b0ec841444c7b8c768b6a33633d1d0"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6ad5a34795bce2cba112f4a39357267f39f05729c7458de862b70cd79a7c9a95",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "abfdefd45f9047ec15743ff388ebadf214ea689fab3e5d408c3743f9f9d767d4",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "ac2d10abf8486fbd61b8166241b2d348082e4e37690afbfe9fbe28dc4a240def",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "accessibility_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "99b03184e6d90860f23b0f843f8e34e1013c74f9842182d857bcab2b66df31f8"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2d26fd176b2ee05b0f1d4b1bc29755cd6bdaae2ed008d7073a263716aeb27a2e",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "199f0abc5e210cf36450d2ca06e17c4bc1d50560288642bcf051241f86cc61e0",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "d7d3c94ef4d2794afcc42cc2755ea9f0db2a949ed03f025c67ca96008399cdd7",
-          "size_bytes": 188
-        }
-      ]
+      "model_id": "accessibility_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "236ae4f14afdfd19414a5301f75d9374df901196768f683ff38decfe58aff15e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2a33ab09f557b5cedafa6dd176bf08d7e3136cfed2a0c971af6af0f02d7009a7",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5a4c98a67c55c6c148633b42138d7d6fb18b5d9ed8f22ee76d1c244cfcb7430b",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "8831b3331bf4aa022dc730e0786447e4b348b3e2422da01a7a4ec1629d729be3",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "accessibility_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "e77bab709795c6230a5a7dc6575eeaec5622086aefa0e74c099db416336d821b"
     }
-  },
-  "capabilities": [
-    "accessibility_analyzer"
-  ]
+  }
 }

@@ -1,91 +1,73 @@
 {
-  "model_id": "sar_flood_detector",
-  "name": "Sar Flood Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_flood_detector",
+  "name": "SAR Flood Detector",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "sar",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Flood Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps flooded areas in radar backscatter.",
+  "inputs": {
+    "bands": [
+      "VV",
+      "VH"
+    ],
+    "dates": 1,
+    "channels": [
+      "VV",
+      "VH"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "non_flooded",
+      "flooded"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Flood masks.",
+  "data_sources": [
+    "Sentinel-1 GRD (sigma0 in dB)"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "99e9b0d93e94e73b0a8cd9e401c0f83f1281dde339fd04c3eedbf9e662917397",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4f1e39f32da949e2b27fef6c24313db7fae6755e65f06ebffc3d742988cb0efa",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "4b88e93fabb722c924c54cb1b2a32ceefb354767095ce20700b87c17a2ce5cc9",
-          "size_bytes": 410
-        }
-      ]
+      "model_id": "sar_flood_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732802,
+      "weights_digest": "8cb4bef626f8e2b6aa68cc3a139d280d02c7a2d3fe8f613e77849bc6b7f19424"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1e80d93c51edd5aa83ee219a7abc68dccad72aad09398122ac0198aabacf0462",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4ffb2ecef27c452b47cf5bcb85af2e73a0432fd2028c88c8701783423b7cf16d",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "887caad68ba414d948f5d43dc5f0be32f17d6601a68a69fec505a42617fd93f6",
-          "size_bytes": 410
-        }
-      ]
+      "model_id": "sar_flood_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058178,
+      "weights_digest": "cd201256c738235d128413ead30f9b6d231536ece2e36e0b713fd1248dd3bed9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a66a34d79557113adc4f63c984c26735cb4482cf4103bdbd21e4726e00899daa",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2d148be74d274c25aa35c0be9cde5b7fc3772a4b73b4e89aa6b664d2b880f2e4",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "5d351f5e453bc09154f0931d54766a93cb14dc6e002deab90250e61c57261467",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "sar_flood_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058690,
+      "weights_digest": "a56c5ae23375e40cacfbda4ec7d389bd1e3493608e3104ed6948128868c0bade"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "94865d95c9fbcab68c046c814f17a7eda0dfe29b542f2628fd150fd2ddcb4714",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "10381de0c0db7038c3435c8a28e759870e5a45a16bb79f298337fb40950f2070",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "d1bae19bd63d7dd93a081b21995e01d45b04f13214fb428a2dbd75fe575a0280",
-          "size_bytes": 412
-        }
-      ]
+      "model_id": "sar_flood_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450050,
+      "weights_digest": "1038f575654e3f4945af9f9e876246bac9e417ca79b48119e2f013aa6043a084"
     }
-  },
-  "capabilities": [
-    "sar_flood_detector"
-  ]
+  }
 }

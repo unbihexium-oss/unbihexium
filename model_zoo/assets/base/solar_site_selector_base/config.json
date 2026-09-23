@@ -1,8 +1,0 @@
-{
-  "model_id": "solar_site_selector_base",
-  "task": "regression",
-  "variant": "base",
-  "params": 268545,
-  "resolution": 128,
-  "base_channels": 64
-}

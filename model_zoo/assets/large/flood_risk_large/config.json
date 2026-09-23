@@ -1,8 +1,0 @@
-{
-  "model_id": "flood_risk_large",
-  "task": "regression",
-  "variant": "large",
-  "params": 598657,
-  "resolution": 256,
-  "base_channels": 96
-}

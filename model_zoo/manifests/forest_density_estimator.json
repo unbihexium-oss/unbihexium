@@ -1,91 +1,93 @@
 {
-  "model_id": "forest_density_estimator",
+  "$schema": "../manifest.schema.json",
+  "family": "forest_density_estimator",
   "name": "Forest Density Estimator",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "forestry",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Forest Density Estimator model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates tree canopy cover.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "canopy_cover"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Canopy cover fraction from LiDAR or high resolution imagery.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "604cec948bab5ba8066f3f262a296b1e478a9a3e1e36cb67a96041dc18a5f5eb",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "83b2b7eb9caf6f67a7d0534d73093a164b5343ff905382ef69d4ae1e52c6f6b0",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "8be78a9646de8f444c30df31d5d17e117ad426f3fa199fa3d79726b66655aae9",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "forest_density_estimator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "5d88e2cd5d37b224d988921ede0cb03462a092c7d4023ea4a0ed213c4b20a183"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e97d4190a87ec66f1ebb32803139f2c8c6029d30ccacaf13c1e851070c0a5bfd",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d803c9d47230cc91a35931a39b31e03243d9743c96044bed44f34598ffff2f51",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "561eac1a0091013ee3157608c44696ca91334e9e33c08bfcc0880abcb73b651e",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "forest_density_estimator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "ea62e26be18ddf91e3e3cc9a55fcab81272a95a77960b3ffff67e31aa4b52bbe"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dce114c4894addac0de1efeea2e3c4f96afd3243a17daa54abe723352d8f8898",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bc6cf9691d5cb3c9fd1adc3c71740a24b9ff06218c2b6af38090ba3c059adb9d",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "025656ab5bac51f50611ad27942f39e7c7d9a41ddcd3e625527239f3f325cace",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "forest_density_estimator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "15675843616452950696edbcdae31bedb14e2be49ee0591f48f616556ae6d898"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bc014c138550aeac36fed20c397f3b840ae73a6cfa9976fa5d3f77ea4088be7a",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "953109e1a033e52d413ca327a72745264d996e0714c09e327b376b117b4147d1",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "64bad3c79ad99d4722c3e5f182bb057bc84efc78a9df0a7912248eecee52edaf",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "forest_density_estimator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "e6b4ce48bb0c332292bb2f440a8301bab2570b993df8d1df5ffbda733145c866"
     }
-  },
-  "capabilities": [
-    "forest_density_estimator"
-  ]
+  }
 }

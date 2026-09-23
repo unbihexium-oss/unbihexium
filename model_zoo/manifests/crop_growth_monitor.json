@@ -1,91 +1,93 @@
 {
-  "model_id": "crop_growth_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "crop_growth_monitor",
   "name": "Crop Growth Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "agriculture",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Crop Growth Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates leaf area index as a measure of crop growth.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "leaf_area_index"
+    ],
+    "units": [
+      "m2 m-2"
+    ],
+    "range": [
+      0.0,
+      8.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Leaf area index measurements or reference products.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "07c2cdf15c8fcab3668f5554cc81e5e8068783fa9e0bb8019a686308e6d1e63b",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "134ad35294cabf8555dcf96d0889bda51b89b7c5a89d2a6bcefc96538a88071f",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "1c4e71a2b0bd85386c3637d7705ab7c4ccf94c988da8e21d9bef0a9792f05a16",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "crop_growth_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "41415443d7adb45b843bf1f565f0284d48e1123b3fb1c6d7ff991e99b41891dc"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f23f266bdfcf34623ad77fbba03e8cb5ac09cefa3b74bc59e63b237aeee6883f",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e5712634379c8175fa87b88ed07ea110466fad257805802950c8c54c0f802977",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "845313570b61a2ed4e90ea36f71387d49f00a73ae67110729582c2c8053a5c96",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "crop_growth_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "9335837c4c8bbe75345c514f424ed40187419ad4acefa6e77e33e10b558e55dd"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4f4cbf352179e7b9b9e5a0577c0e1b5d5a84e46269db38a4b01b1c8ea63f2baf",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7edac7251da19fc02c713d816f9a7dd418eec57cff8d7db6f22a72fddcd116cd",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "fb87383bd81058c6840244f7bda62243b24f5fa69234f4e6ed67d12cdaf3177d",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "crop_growth_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "c2add671dd1b168dc746e4fec88d4752567f31236e80753c46398be0aa82169a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "44efdf1ecc7b06cd6a0c6f35d83717e308b3ceb209af3e7682983619c81430f8",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e8c4b5450a2c3103b28168e14c53d2313ca726806bb55af954bb176475fb14d8",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "5e42a348f1458d022259304f8f607a9df3c569097b42177dcef36a0712d27cbf",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "crop_growth_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "90522b169abc57a85ad351b030a8a4002d6a40a94d020ae37ff4a48cccd428d9"
     }
-  },
-  "capabilities": [
-    "crop_growth_monitor"
-  ]
+  }
 }

@@ -1,91 +1,81 @@
 {
-  "model_id": "resource_allocation",
-  "name": "Resource Allocation",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "resource_allocation",
+  "name": "Service Demand Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "analysis",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Resource Allocation model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates population and service demand of an area for resource allocation.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "population",
+      "service_demand"
+    ],
+    "units": [
+      "persons",
+      "1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Census population and service statistics per chip.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e6b28785b35366946ec9a53dab69bb451b2cefebda544fdad8edd47ada7df40e",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a4be868422dbe0e42b8c359ac7f89c82fd11d7cfaf31638717d8d6772a2d403e",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "6f133357a37b9346a79a85d2ae420b56fba0463bfcdb735fb2b0fe058fa9fda2",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "resource_allocation_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494658,
+      "weights_digest": "274e26bb8a1c519b3dd38cf8bd853fa0b21da37b37e81fbb0901e195ae8e1845"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "717770e25021afe98638af551becad339eaa9ad0138f32a0738a067d375a8354",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7a46b020144b668faec9727047e8afa646d5debc22a93d116da05d017779b28b",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "48a7fed8ce6a895a27caa3083aec41febb8c9b07969d8c3d945ab28e015a8530",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "resource_allocation_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3745410,
+      "weights_digest": "1cf7b3d45b5ee5dd7cf5260f31d9ca9c20345775a0752b9e0ef1dc1dbae5b38b"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "51fe6eb227dbf7959b72256bda41d98a19c65821a07780d50538e6570cfe3a1d",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fdd35873fe3ebdf85699293bbb801342e3acd9d6a678a568595a16ac3059e98c",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "face8646a330e87a60ea6350267dc832c2e77573b4ce1084f432d7ed9e08ac79",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "resource_allocation_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14606594,
+      "weights_digest": "b70dd7f03ed659c598f19c81c6eab8f48f784fa2d9e52fed3f1429aab3b4510e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2f65c371726b3a6979b32f92a1a962c211510f6108bebcd1846e46e7da8866e2",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "89ff3983680a2a1ee836faa5fa67eab34a3369a68f855854cb7f3d21e8dbee70",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "80abb3f090806293b03b9b0abcbeff51b3c83abf50223d6100864468159bd89b",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "resource_allocation_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37763074,
+      "weights_digest": "34024b9c08a8c3fc36626223900ee12a1a452d1b179a2400a18cf0f40a5387c1"
     }
-  },
-  "capabilities": [
-    "resource_allocation"
-  ]
+  }
 }

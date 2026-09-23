@@ -1,91 +1,78 @@
 {
-  "model_id": "leakage_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "leakage_detector",
   "name": "Leakage Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "assets",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Leakage Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects vegetation stress and surface anomalies that indicate pipeline or canal leakage.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir",
+      "swir1"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir",
+      "swir1"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "leak_signature"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of confirmed leak locations.",
+  "data_sources": [
+    "Multispectral satellite or aerial imagery with a short-wave infrared band"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3f1e0c03505359bf395cbdb6921a7752c9ab1a729f97ce1e156aef7dd258a8a9",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bbe0202672ad1369c5e727b31211a5466beb94d4b31f785c520a2ca40fd44f0a",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "1c785fba494445bb90ab9e333d615a1935a3af35b0adf708c60e78753605790d",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "leakage_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730869,
+      "weights_digest": "25bec0a1be5a702c02d4a0214a97af0b64d730be23a403bb4d63a248d9f23023"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a7ee05d95a160041c9f15f3e12859234fd8399a64e6898d05ad577f32c0dcc9e",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "dd495458c114d35b407658107d94a9366366044c71b14d5dd366fe01b49fd68c",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "bcdc037f03cfc3a68c7b7062fc0133e05980846f69c2372a52a426b5af33709a",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "leakage_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049701,
+      "weights_digest": "4fa44cc09a8248f13035b2ce2342ec1e94cd64943d9a767bbcfb336ab0705b69"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e7d0a1841d308b967e9eb6419d23555bb21f2162a8abab5a1d2e2ce950c479f9",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2f8d28318514c750a757a7f6bf8726e9be703ce3075950ae0f737cad3f20299a",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "9e9dcb08a25d31e804facc2aada74a8e1ea5fd8be71e321e7a40c30ccf7acb8d",
-          "size_bytes": 403
-        }
-      ]
+      "model_id": "leakage_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22039061,
+      "weights_digest": "681e0badf37ab9e127edd95bc9a321486a45553dc4ad7375b99d0d82e587aa0a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7f24aeeb91b52b428e51c6b96a773634a7cb626f3e337294530b0b7efc5c5f3c",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5ff401dfc0721b597f273d32f6cfa7dd31cdd097a71e75d10327a0102a4f6515",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "ba7fe9c071f74f1535c20f22055a9ec86c4c046066b1134de6bf7003da560c57",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "leakage_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60414661,
+      "weights_digest": "a32785ced2048631972c38c1b345ae2a03cf9f1b9f42040aa5913badef384778"
     }
-  },
-  "capabilities": [
-    "leakage_detector"
-  ]
+  }
 }

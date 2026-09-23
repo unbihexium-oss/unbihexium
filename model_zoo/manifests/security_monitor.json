@@ -1,91 +1,76 @@
 {
-  "model_id": "security_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "security_monitor",
   "name": "Security Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "defense",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Security Monitor model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects vehicles, vessels and temporary structures around critical sites.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vehicle",
+      "vessel",
+      "temporary_structure"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of the three object classes.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6b0c1db9070e19b02321544dc37a328ffd6913607a106e38620c6acd4a91369d",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c7a819af74bcf3b7ef521f4752d1ebd837def75145d36ca4917ff333bc01471e",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "ddd41e16695028f716de6f1443886624d37734d52fb8af3ffe3e705a9f74c8f7",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "security_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730647,
+      "weights_digest": "459bc17bb672c6a53d5cfdd9cb23a4de43023070c4d76bde36bd591bf8a91036"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a6064eec3840644c6faeef5ca6fd630f09fba29404030f303430ba70a94b0d49",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d97e0a637f4b8d23dbba1dc8c681fa9c4d8802178267918314a21140ec1ead9c",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "30f773201d9910c837c5e4ccf8b7e9cb0fee0402ccb2d807c9614fa9671fd4b8",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "security_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049255,
+      "weights_digest": "21594348dcc33eb7ee8160ad7698f5af7789087996eb4bb9ed3a4519c7993eed"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "49ab7cfd420880d72fd12b77ac3ffbc2430e6c1e8ebe924718e702cb451abff9",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fb9847ab4bfffa08536ee64ff719b9ed0da519dc327521ec7a5c8e7811ec6dd1",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "05a468891947e71cfaa91fe8dc076db8fa26c5a90b4222787b1d7ed97a8422b2",
-          "size_bytes": 418
-        }
-      ]
+      "model_id": "security_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038391,
+      "weights_digest": "f122c21d13eeaa857e6166afb2d74f71bd563870165b94e93ef89dc3cf41e66a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "807279578f827234697d6174df9f8bc212f3bbf4af7ee0a381f3b87afcf3253d",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "15b6115bfc8675e42a2b75166e05a9a85922cfe25dd602bf4bedc263ea7797b5",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "2a853ef3e05dd68b429060fcfaee7c13a2f563c4b2c6dd6ef1b44961149e15cd",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "security_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413767,
+      "weights_digest": "600261af77a1cf520852f59bf3e619c56b8b1fc36bb7c48e3876309cdb9a1904"
     }
-  },
-  "capabilities": [
-    "security_monitor"
-  ]
+  }
 }

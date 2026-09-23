@@ -1,91 +1,99 @@
 {
-  "model_id": "deforestation_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "deforestation_detector",
   "name": "Deforestation Detector",
-  "version": "1.0.0",
-  "task": "segmentation",
-  "architecture": "siamese_unet",
+  "version": "2.0.0",
+  "task": "change_detection",
+  "domain": "forestry",
+  "architecture": "unet_early_fusion",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Deforestation Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects forest loss between two dates.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 2,
+    "channels": [
+      "B02_t1",
+      "B03_t1",
+      "B04_t1",
+      "B05_t1",
+      "B06_t1",
+      "B07_t1",
+      "B08_t1",
+      "B8A_t1",
+      "B11_t1",
+      "B12_t1",
+      "B02_t2",
+      "B03_t2",
+      "B04_t2",
+      "B05_t2",
+      "B06_t2",
+      "B07_t2",
+      "B08_t2",
+      "B8A_t2",
+      "B11_t2",
+      "B12_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "no_change",
+      "forest_loss"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of change class logits; softmax over K."
+  },
+  "training_labels": "Forest loss masks.",
+  "data_sources": [
+    "Sentinel-2 L2A image pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "320dd5d9383383c85fe045af65b1d8c1c27c39b0d66bb4bf7f7b4e3e3d76c939",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "29cde9a627e0ee120122e7a4463b3086a40c91d9b2cb51d555ae16b7ae42f69a",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "16a873048f027ee8046d664d7a8842d162db3f09fb64a6e7ef98029a93fb69dd",
-          "size_bytes": 428
-        }
-      ]
+      "model_id": "deforestation_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 735394,
+      "weights_digest": "7d7ef552b4bc9c7e186b57c379738d63a52d90175fefb4b0966cbc70ba37f03c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9334c05904dc0a584e17d23dfa3cede305330bb6d284bd26620f880ba9bb50d6",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5ff7dbada4aa60d2708c2efe972ae312dac2ff8b88a64c71ea681c8f55c61b79",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "8a63bee83d3ab8e38783cee13635a263b75e40eade346e0a3594e155ec43f86c",
-          "size_bytes": 428
-        }
-      ]
+      "model_id": "deforestation_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7063362,
+      "weights_digest": "7664151a6dbac68e8c393deb2eb576bb641f908b0ee947a89e5e0dadd6d6491f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d8597a762660dd0d700e9c3e26dc2fb3ecd1560a7fea28fd207aa7dde28b667a",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5b6509d5dd212074f3f2074f244d3508c158eadfa90d66ff5ad09ce53b2b4d6c",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "b40847821ac85b927cdb8b05e50016ae9ac314ddc7bf43942ed57b4872ad7f0c",
-          "size_bytes": 432
-        }
-      ]
+      "model_id": "deforestation_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22066466,
+      "weights_digest": "d30efa43d4a0cd4e3f3d3666a3413ca6b265e115f131f7bad164305cddfe641a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2599e203d7055e4d4011aa3f20d135ae26a706c1156a75f450d6d8827d196dc7",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "405f0e5e738744d0c0b16757518f0b89903c0e574767c41bf779d9229b275120",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "0b61e34cf3c8548100e1ad95285f2f1457ecf7de3048e78e030cb294e043e6b7",
-          "size_bytes": 430
-        }
-      ]
+      "model_id": "deforestation_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60460418,
+      "weights_digest": "ef0de83705e592ace8db72853f03ad2ad569f3d8504965be73e3b2d1c4d92f89"
     }
-  },
-  "capabilities": [
-    "deforestation_detector"
-  ]
+  }
 }

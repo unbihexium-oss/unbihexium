@@ -1,91 +1,80 @@
 {
-  "model_id": "ortho_processor",
-  "name": "Ortho Processor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "ortho_processor",
+  "name": "Orthorectification Flow Estimator",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Ortho Processor model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the displacement field that removes relief displacement using a DEM.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue",
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue",
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "dx",
+      "dy"
+    ],
+    "units": [
+      "px",
+      "px"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Displacement fields from rigorous orthorectification.",
+  "data_sources": [
+    "Raw imagery with a co-registered DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e3e4f1f8d2f6fb49c6d5b018a8989167169e696a883ea967c81bd62172cd541b",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e4e53dd93a66aa63d9f39df6c0b87b20cd8164fc6259914463b858663c489028",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "421657534d7d97b0b3790f2903d6c7c05191b57239c54fc51b74c5a1b9a53913",
-          "size_bytes": 356
-        }
-      ]
+      "model_id": "ortho_processor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733090,
+      "weights_digest": "03b2e9be32a2e972b97a57e99b66945465f1ca1270c0bbe4e435775b695f1ffc"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8748390d9fa1b7634d073f19bcc10885af328ccaa52e5bb9aeb57f97f514b344",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "852e89067f3be25f69d5d1e94fd3cee395d084b0a2e600b7fdeb21d92e40db45",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "a97dc2be1068b80a0cb62fbeaa9c620276c3f063dfdabde88b9cc00943bf015a",
-          "size_bytes": 356
-        }
-      ]
+      "model_id": "ortho_processor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058754,
+      "weights_digest": "cfad3d55f0c245d692156a3081b120a994caabfc14e6be4863229f6de37ef253"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d3bc13d014719e8a5f765397f00ef51d77765756f44046e24f526a9dc72262e7",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "afa6b18d863fb066b7efc00a39e42fd550bb4c7ae1443dca45d51dd077f15203",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "cddd554149ab688e45b06d4474c6449405f7f8e1951c4a54e86dcdb5c452d4ec",
-          "size_bytes": 360
-        }
-      ]
+      "model_id": "ortho_processor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059554,
+      "weights_digest": "d1df292375fe6447eb6da7a7a1929524e2cd3fde9652416a9109fc8a02426394"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dc163333bc3062824cd062405f324682e59b3f9fcf8d21e1819b3005c34dfca8",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c1e3e8f0823c49fad4eb9087242d2fa29fcf8011e230a2b69eba4fc183c83764",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "92428d5eb04470462feea8184b664a2258ce47f48c6bc8d25f941a0e53301f1b",
-          "size_bytes": 358
-        }
-      ]
+      "model_id": "ortho_processor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451202,
+      "weights_digest": "2801d62bf66d9571e7fdc12ccf1d5407571d7db912199a538531b9a0f63d9327"
     }
-  },
-  "capabilities": [
-    "ortho_processor"
-  ]
+  }
 }

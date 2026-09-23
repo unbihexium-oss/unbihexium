@@ -1,91 +1,89 @@
 {
-  "model_id": "land_degradation_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "land_degradation_detector",
   "name": "Land Degradation Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "environment",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Land Degradation Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Separates degraded from non-degraded land.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "not_degraded",
+      "degraded"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Degradation masks.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "94747913c6c5b452303a6fb24c654fd6224aafdde25f9c10a7c1a5846538c1d9",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "38a447be91a656e1f47b1fd6cc9a8ac6d195a88aa3bea6e4654b8106c4b9c589",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "7ef517ecdd97914dfa9ea85560b98575b761cb555efe6db153ae05f63f7f7086",
-          "size_bytes": 422
-        }
-      ]
+      "model_id": "land_degradation_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733954,
+      "weights_digest": "8c1191d7fdc91fbda029e084e0953d58a4d4f130938396012ac0e96ca3ec2c67"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7d7ed9ba662a6b63b12eb5276af32b386e69eb22504a16d9d4771589674a3b3f",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fa29ae6e1e6be45a4e799526f78ba4b0f7e205c3b2114d19ece16c13b6a39fc7",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "853ed41e2094c79f8efc5a67896b941e4b956894951ffcb012c811f28bc7330a",
-          "size_bytes": 422
-        }
-      ]
+      "model_id": "land_degradation_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060482,
+      "weights_digest": "17a5b8f6a20b9569d1955f20f73140a213bf8d797b1f24429cbdac78f6d4b538"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "426015d69782b9af6f494dc50f3f458e4d64b157b86437ce8078d2c4c4ac2d74",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7cbfcfb8614c59ca16b0df3446cec2d0e80c0c991568df56535d6454d9138373",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "45f664d097aaf835de83b385e631125a0c384c82bc135a8255e85128d179c9e5",
-          "size_bytes": 426
-        }
-      ]
+      "model_id": "land_degradation_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062146,
+      "weights_digest": "93d9d60c2a8cda65aacc3df4f3d7905fcae8aecef789d23ed62a0ef58cd01047"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "58860b170fb5147f0a68e20ffc08a63e73880cae629d4fc672abf74810dfa636",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b1017cd842190fd501369672e17a1ddad9692e08d8c41928d0c38a0f5803da09",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "063d59ee11895bc7402beb556dfbe80b71725fd059932eeb560e475729a212c7",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "land_degradation_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454658,
+      "weights_digest": "a093f27f1a756c8def6118b0a0927267e816c05a88be873c31955d71f8169e75"
     }
-  },
-  "capabilities": [
-    "land_degradation_detector"
-  ]
+  }
 }

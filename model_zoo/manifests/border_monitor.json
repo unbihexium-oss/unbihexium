@@ -1,91 +1,77 @@
 {
-  "model_id": "border_monitor",
-  "name": "Border Monitor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "border_monitor",
+  "name": "Border Area Monitor",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "defense",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Border Monitor model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects vehicles, vessels and new structures along borders and coastlines for situational awareness.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vehicle",
+      "vessel",
+      "structure"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of vehicles, vessels and structures.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery",
+    "0.3 to 1 m"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "28a816da03499d953f4238a53c83e240559703d9887c99e2dd9d441cd644622f",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6caecd68850d90619a8e144ebdd48dc9c9204521dcbb701ee33ac18c361182c2",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "7ba6d996bc1d88df94929f033b2c544563cb2c2ddf0789109b2b34cb52bf6e9d",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "border_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730647,
+      "weights_digest": "02a7f3bdc9dd3afbe21856362daddf99b8714dca1e27224a48bfccfd43580fe7"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "fd9eee6ab482dd8da9f5bf2084f32d542d3dc98ef714a825608b6b0323a296c2",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "666918b5feeeb1d2169b156204b5ae5f22e8f7f0113556175a1b05f45318eaa5",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "11f2ae3112e9b8ffa7f79bd149eac86adb3d99387b074f1138b841fa0df22b17",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "border_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049255,
+      "weights_digest": "d78418c944e8e0d39440d09efc2d7149f2875b3f7fd2984952954de6d403bbb4"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8dd9ce1168d2dde279a7e2f5668605277cc1dba768dfc0dc87b2451a8489420f",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2d21504599b7fcbee32842e2bdd50a74f2f9afd36557d41c3bcdc319ac45f789",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "021f0dc4aa702df1ea7753078d8e9044fb9510ebf4e313c2194294f0758d1fac",
-          "size_bytes": 409
-        }
-      ]
+      "model_id": "border_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038391,
+      "weights_digest": "2aa0509b87a47bf9dfd40ec35db191b440b40ec7b26b38b1f9f6c803c8b1c61b"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "05216b56c3234ab3ce3168801eb34597bcb06dbd6da8863648aa02eaf0ea1825",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "15b92c389dca0b7fc443c915dc0e9b8ca9c3a9f602f2795df9b35e202a932a5b",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "ec720ff675e04ae18f674fc11aa9c9b5f069dce9f54c7067550d7a3c707232e8",
-          "size_bytes": 407
-        }
-      ]
+      "model_id": "border_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413767,
+      "weights_digest": "eedae95b2333e254400037aba9b317cd27f57fbf05b22ba7af808c73926bc2c0"
     }
-  },
-  "capabilities": [
-    "border_monitor"
-  ]
+  }
 }

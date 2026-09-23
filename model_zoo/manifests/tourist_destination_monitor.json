@@ -1,91 +1,78 @@
 {
-  "model_id": "tourist_destination_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "tourist_destination_monitor",
   "name": "Tourist Destination Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
-  "architecture": "siamese_unet",
+  "domain": "tourism",
+  "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Tourist Destination Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps beaches, built-up areas, vegetation and water around tourist destinations.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "beach",
+      "built_up",
+      "vegetation",
+      "water"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Masks of the land cover classes.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "903b9fd9340a8f8183e779b2aba745e2556d59f57228e3cf9455a761898d5d13",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5793a430bb7a9d6e436ed351158fa6bc5d03638526a977172fca0fdeb5a78c34",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "4a9cfc3a5675145d4cd50be0361924d8f87776d698307994a81c8d12008e8da1",
-          "size_bytes": 429
-        }
-      ]
+      "model_id": "tourist_destination_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732997,
+      "weights_digest": "4398c70719469d39c4cfbf526717c106987f1e70e6baa4d4ffbe78e1ab541298"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "411536f5e8f3607e391fe4419bc69c9840dc606a617442035b56036990eacbad",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "97d59fbefd9a8aa8bbe18c7e39b83573cf5f5dab0a3b3f1c92eaff62f295653b",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "789f05759abcee2ba3767fd0c18a2d9d430ffa0302e5af1d8049ed7da0452568",
-          "size_bytes": 429
-        }
-      ]
+      "model_id": "tourist_destination_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058565,
+      "weights_digest": "b5fbadd6aacd1d0f5186e69e89e85d3df0614ce7dae2cdc03305203663a66925"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ea114ff7f47852a83a0519bba27177d298ea56329358eee674fde72371dbe984",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "73e4c495562941c64de52e4208879f179722738f0fc623f4f8e76ff826883c1f",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "c7f6c214b81087976d6fd7b37e76696de4e782614fab35ed3cb8d5db080c13d5",
-          "size_bytes": 433
-        }
-      ]
+      "model_id": "tourist_destination_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059269,
+      "weights_digest": "c33acbb1162e7b59db629c109d1fa65650a378fa67296576f3a5a57e611e9127"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "905e21c7ced3d963ae00a096248d332a166412f4e5f160345d6bd7699fa12f7b",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "65f400cfb90636c82589b8bcf4862b035d3b24326fda52bee36b33d7c82a7967",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "409c2db2e1f057071b50cf98ea021003934978a1dbc36c8389715108f95dc54b",
-          "size_bytes": 431
-        }
-      ]
+      "model_id": "tourist_destination_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450821,
+      "weights_digest": "67bef88070797b6b26fa067ec734658c7bc182b771f53e86266c90870c93aec3"
     }
-  },
-  "capabilities": [
-    "tourist_destination_monitor"
-  ]
+  }
 }

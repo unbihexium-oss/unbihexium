@@ -1,91 +1,75 @@
 {
-  "model_id": "fire_monitor",
-  "name": "Fire Monitor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "fire_monitor",
+  "name": "Active Fire Detector",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "environment",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Fire Monitor model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects active fire fronts and hotspots in short-wave infrared composites.",
+  "inputs": {
+    "bands": [
+      "B12",
+      "B8A",
+      "B04"
+    ],
+    "dates": 1,
+    "channels": [
+      "B12",
+      "B8A",
+      "B04"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "active_fire"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of active fire areas.",
+  "data_sources": [
+    "Sentinel-2 L1C or L2A",
+    "Landsat 8/9"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "989e50fc0028c2ab9dbb3f0184009c42606f083bbad544f60795853ba311f136",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7058a55b00c553da3518b3ab0d9d543455d9cf2dba889b556845e12f3e051de3",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "50dd17988186a88cfd5fef81c00a7edc04d167082567246313a2786d03f70997",
-          "size_bytes": 392
-        }
-      ]
+      "model_id": "fire_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "f07c42bd7e34d78076b1da22f11530f6ffe785e4438c813081153cb969936efb"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a76482cbc6b363071b6de399d42c2c0696ef0b7322bbf8ed3b31b550199057f0",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "228be985b1e0bdd5707a165946a3c53220e843072a945d250435bfff463241d9",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "81bc917757e08b6765dc8c10eb6381ad1a071c9021605088bf65b83836848edd",
-          "size_bytes": 392
-        }
-      ]
+      "model_id": "fire_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "98cdb80cdda80cd60f68ad3fcb24cf6e8f7316dfc72a896c1a6d57d1396142af"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "349cc435e439e5039837ac1885178068c3a2a2ee36dcab23fbf8c6de4d28fcc4",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "97293bade6bcb2d4f15c0c0a53ff1c25dfa076a6fc2c26570224a9392f3611cf",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "605277544965c90d17e44171fcc8387764aa6cdf9b24157dededba88bba71322",
-          "size_bytes": 396
-        }
-      ]
+      "model_id": "fire_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "e192caed083dae299fdd7839aceced58b0724d6211e20b35a830d18aa7b3c02a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "592bcbd0eac8d7648967dd0211e5025f5ea3298b52615309c12c0abe05ef8c57",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "aeabb6e831d152b4ff2d5809d928c4a9422101f7ef6e00727bf7a4efe6973fe3",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "30a7ada9f9b7adec60c2f289294977a016be9a46346bc04d3f7ac51024d42122",
-          "size_bytes": 394
-        }
-      ]
+      "model_id": "fire_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "9d2173610d42705f508f82b2145369c37fe2e71895aa547d246989f5cc1ecd1e"
     }
-  },
-  "capabilities": [
-    "fire_monitor"
-  ]
+  }
 }

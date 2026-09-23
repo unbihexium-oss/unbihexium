@@ -1,91 +1,81 @@
 {
-  "model_id": "coregistration",
-  "name": "Coregistration",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "coregistration",
+  "name": "Co-registration Flow Estimator",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Coregistration model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the pixel displacement field that aligns a moving image to a reference image.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 2,
+    "channels": [
+      "red_t1",
+      "green_t1",
+      "blue_t1",
+      "red_t2",
+      "green_t2",
+      "blue_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "dx",
+      "dy"
+    ],
+    "units": [
+      "px",
+      "px"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Displacement fields, for example from synthetic warps of a reference image.",
+  "data_sources": [
+    "RGB image pairs of the same area"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "33c1a4b09c12836db23947366d8700c024e0c9d04ec54f1a1141e4d9c71b1bdf",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fa4f77311b0664232c9c9589249292c4f5fefb7b76f472cff92aa610528656cc",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "f03ed5906eefdd02f7a03b13f3e675007ac90d80181e1ed185f361fdfa7d4380",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "coregistration_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733378,
+      "weights_digest": "1fd8aa56f46a3e0f2b55b12c2014adf48e8a73af046867e656f0d80e6ecfb56e"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ce975bda023de17f883bbf331f7eb55a8e734c6c6fac20d9098661ae701dab6c",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "096a6b2629312ccd5e45d82637a6c19550a381ae5b67d20b6f9a3b087c1131da",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "9a081813f58c6b63347e1c3c4b883d00c24ed283fc22efd7f338055fccab66e1",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "coregistration_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059330,
+      "weights_digest": "db8fba7f29de6ebd597e529695d81fb78ad2b15e248e534c46f81c3faea85717"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "69752578ffe6b31e73372c8448d13847bc2fee08afb71383b62178de7abeacdb",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6c33061bff2816a9c872bf232effc6cfa80eda7e70cfbecfe0ba71005589d338",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "60c1dd8b4efc91b78786f1e7ad45eae2f358644ec855aa68260552b3a4493f14",
-          "size_bytes": 359
-        }
-      ]
+      "model_id": "coregistration_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060418,
+      "weights_digest": "0e2da520f4cadb6f13100f5cd42ffa13d3f29c8b1147d2298c1b09b71c46e207"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1c504611917c22b997bf1e2d1f469fcc6887d1463d6ac620a6d9fcadf9051aab",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "88373df59ece850e12c870eaa41c7b544c6a5095889899ee2ebb14df7eae2bd3",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "fcc6a3d9cdbc791ed8715a01a1cb2c063630995ef0dc480cf029e1718bc785ec",
-          "size_bytes": 357
-        }
-      ]
+      "model_id": "coregistration_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452354,
+      "weights_digest": "6d076d2139e9463283f46e052c3aceb4412a269af509f82217da8e0e9bf1ac7e"
     }
-  },
-  "capabilities": [
-    "coregistration"
-  ]
+  }
 }

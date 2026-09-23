@@ -1,0 +1,1517 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Unbihexium model zoo catalogue
+# =============================================================================
+#
+# Single source of truth for the 130 model families of the Unbihexium model
+# zoo. Every family is available in four size variants (tiny, base, large and
+# mega), which gives 520 models. unbihexium.zoo.catalog loads this file;
+# model_zoo/inventory.yaml, the manifests and the model cards are generated
+# from it with `python -m unbihexium.zoo.sync`.
+#
+# The models are starter models ("semi-finished products"): each one has a
+# complete, trainable architecture with the input and output layout of its
+# task and deterministically initialised weights, but it has NOT been trained
+# on Earth observation data. Train or fine-tune a model on labelled data for
+# your area and sensor before you use its predictions (see
+# docs/model_zoo/training.md and RESPONSIBLE_USE.md). The spectral index
+# family is the exception: it computes a published formula and needs no
+# training.
+#
+# Fields
+# ------
+#   id           model family identifier; variants append _tiny, _base, ...
+#   name         human-readable name
+#   task         detection | segmentation | change_detection |
+#                dense_regression | scene_regression | enhancement |
+#                super_resolution | spectral_index
+#   domain       capability domain (unbihexium.registry.CapabilityDomain)
+#   description  what the model does once it is trained
+#   bands        input band set (see band_sets below) or an explicit list
+#   dates        number of co-registered acquisitions stacked on the channel
+#                axis (2 for change detection and stereo pairs)
+#   outputs      class names (detection, segmentation, change detection),
+#                target names (regression) or output bands (image to image)
+#   units        units of regression targets, one per output
+#   range        optional [min, max] of regression targets; [0, 1] targets
+#                use a sigmoid output
+#   scale        upscaling factor (super_resolution only)
+#   formula      index formula identifier (spectral_index only)
+#   labels       the reference data needed to train the model
+#   sources      suitable input data
+# =============================================================================
+
+version: "2.0.0"
+
+# Named input band sets. Band names follow the naming of the data provider.
+band_sets:
+  rgb: [red, green, blue]
+  rgbn: [blue, green, red, nir]
+  pan: [pan]
+  pan_pair: [pan_t1, pan_t2]
+  pan_triplet: [pan_forward, pan_nadir, pan_backward]
+  s2_10: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]
+  s2_13: [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12]
+  s2_swir: [B12, B8A, B04]
+  s1: [VV, VH]
+  s1_vv: [VV]
+  s2_s1: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, VV, VH]
+  landsat_st: [SR_B2, SR_B3, SR_B4, SR_B5, SR_B6, SR_B7, ST_B10]
+  dem: [elevation]
+  dsm: [surface_height]
+  rgb_dsm: [red, green, blue, surface_height]
+  rgbn_dem: [blue, green, red, nir, elevation]
+  s2_dem: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, elevation, slope]
+  insar: [cos_phase, sin_phase, coherence]
+  insar_stack: [los_t1, los_t2, los_t3, los_t4, los_t5, los_t6]
+  ms_pan: [ms_blue, ms_green, ms_red, ms_nir, pan]
+  image_dem: [red, green, blue, elevation]
+  ndvi_stats: [ndvi, ndvi_min, ndvi_max]
+  context: [B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance]
+
+models:
+  # ---------------------------------------------------------------------------
+  # Object detection (19). Anchor-free CenterNet detector: class heatmaps,
+  # box sizes and centre offsets at a quarter of the input resolution.
+  # Labels: axis-aligned bounding boxes in pixel coordinates.
+  # ---------------------------------------------------------------------------
+  - id: aircraft_detector
+    name: Aircraft Detector
+    task: detection
+    domain: ai
+    description: Detects aircraft on aprons, runways and in flight in very high resolution optical imagery.
+    bands: rgb
+    outputs: [aircraft]
+    labels: Bounding boxes of aircraft.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+
+  - id: border_monitor
+    name: Border Area Monitor
+    task: detection
+    domain: defense
+    description: Detects vehicles, vessels and new structures along borders and coastlines for situational awareness.
+    bands: rgb
+    outputs: [vehicle, vessel, structure]
+    labels: Bounding boxes of vehicles, vessels and structures.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+
+  - id: building_detector
+    name: Building Detector
+    task: detection
+    domain: urban
+    description: Detects individual buildings as bounding boxes.
+    bands: rgb
+    outputs: [building]
+    labels: Bounding boxes of building footprints.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+
+  - id: builtup_detector
+    name: Built-up Area Detector
+    task: detection
+    domain: urban
+    description: Detects compact built-up areas such as settlements and industrial sites in multispectral imagery.
+    bands: rgbn
+    outputs: [built_up_area]
+    labels: Bounding boxes of built-up areas.
+    sources: [PlanetScope, SPOT, Sentinel-2 10 m bands]
+
+  - id: crop_detector
+    name: Crop Parcel Detector
+    task: detection
+    domain: agriculture
+    description: Detects cultivated parcels and orchards as bounding boxes.
+    bands: rgbn
+    outputs: [crop_parcel, orchard]
+    labels: Bounding boxes of crop parcels and orchards.
+    sources: [PlanetScope, SPOT, aerial RGBN imagery]
+
+  - id: damage_assessor
+    name: Building Damage Assessor
+    task: detection
+    domain: risk
+    description: Detects damaged and destroyed buildings in post-event imagery for rapid damage assessment.
+    bands: rgb
+    outputs: [damaged_building, destroyed_building]
+    labels: Bounding boxes of buildings graded as damaged or destroyed.
+    sources: [Very high resolution post-event satellite or aerial RGB imagery]
+
+  - id: encroachment_detector
+    name: Encroachment Detector
+    task: detection
+    domain: assets
+    description: Detects structures and vehicles inside protected corridors such as pipeline and power line rights of way.
+    bands: rgb
+    outputs: [structure, vehicle, excavation]
+    labels: Bounding boxes of structures, vehicles and excavations.
+    sources: [Very high resolution satellite or aerial RGB imagery]
+
+  - id: fire_monitor
+    name: Active Fire Detector
+    task: detection
+    domain: environment
+    description: Detects active fire fronts and hotspots in short-wave infrared composites.
+    bands: s2_swir
+    outputs: [active_fire]
+    labels: Bounding boxes of active fire areas.
+    sources: [Sentinel-2 L1C or L2A, Landsat 8/9]
+
+  - id: greenhouse_detector
+    name: Greenhouse Detector
+    task: detection
+    domain: agriculture
+    description: Detects greenhouses and plastic-covered crops.
+    bands: rgb
+    outputs: [greenhouse]
+    labels: Bounding boxes of greenhouses.
+    sources: [Very high resolution satellite or aerial RGB imagery]
+
+  - id: leakage_detector
+    name: Leakage Detector
+    task: detection
+    domain: assets
+    description: Detects vegetation stress and surface anomalies that indicate pipeline or canal leakage.
+    bands: [blue, green, red, nir, swir1]
+    outputs: [leak_signature]
+    labels: Bounding boxes of confirmed leak locations.
+    sources: [Multispectral satellite or aerial imagery with a short-wave infrared band]
+
+  - id: maritime_awareness
+    name: Maritime Awareness Detector
+    task: detection
+    domain: defense
+    description: Detects vessels and offshore platforms for maritime domain awareness.
+    bands: rgb
+    outputs: [vessel, offshore_platform]
+    labels: Bounding boxes of vessels and platforms.
+    sources: [Very high resolution satellite RGB imagery]
+
+  - id: military_objects_detector
+    name: Military Objects Detector
+    task: detection
+    domain: defense
+    description: Detects vehicles, aircraft, vessels and fortified structures for neutral monitoring and verification.
+    bands: rgb
+    outputs: [vehicle, aircraft, vessel, fortified_structure]
+    labels: Bounding boxes of the four object classes.
+    sources: [Very high resolution satellite RGB imagery]
+
+  - id: object_detector
+    name: Generic Object Detector
+    task: detection
+    domain: ai
+    description: Multi-class detector for common objects in overhead imagery.
+    bands: rgb
+    outputs: [building, vehicle, ship, aircraft, storage_tank, bridge]
+    labels: Bounding boxes of the six object classes.
+    sources: [Very high resolution satellite or aerial RGB imagery]
+
+  - id: pivot_inventory
+    name: Centre Pivot Inventory
+    task: detection
+    domain: agriculture
+    description: Detects centre pivot irrigation fields for irrigation inventories.
+    bands: rgbn
+    outputs: [centre_pivot]
+    labels: Bounding boxes of centre pivot fields.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]
+
+  - id: sar_ship_detector
+    name: SAR Ship Detector
+    task: detection
+    domain: sar
+    description: Detects ships in synthetic aperture radar backscatter, independent of cloud cover and daylight.
+    bands: s1
+    outputs: [ship]
+    labels: Bounding boxes of ships in SAR images.
+    sources: [Sentinel-1 GRD (sigma0 in dB), other C- or X-band SAR]
+
+  - id: security_monitor
+    name: Security Monitor
+    task: detection
+    domain: defense
+    description: Detects vehicles, vessels and temporary structures around critical sites.
+    bands: rgb
+    outputs: [vehicle, vessel, temporary_structure]
+    labels: Bounding boxes of the three object classes.
+    sources: [Very high resolution satellite or aerial RGB imagery]
+
+  - id: ship_detector
+    name: Ship Detector
+    task: detection
+    domain: ai
+    description: Detects ships in optical imagery.
+    bands: rgb
+    outputs: [ship]
+    labels: Bounding boxes of ships.
+    sources: [Very high resolution satellite RGB imagery, Sentinel-2 10 m RGB for large vessels]
+
+  - id: target_detector
+    name: Target Detector
+    task: detection
+    domain: defense
+    description: Single-class detector for a user-defined object of interest.
+    bands: rgb
+    outputs: [object_of_interest]
+    labels: Bounding boxes of the object of interest.
+    sources: [Very high resolution satellite or aerial RGB imagery]
+
+  - id: vehicle_detector
+    name: Vehicle Detector
+    task: detection
+    domain: ai
+    description: Detects cars, trucks and buses.
+    bands: rgb
+    outputs: [car, truck, bus]
+    labels: Bounding boxes of vehicles by type.
+    sources: [Aerial or satellite RGB imagery, 0.1 to 0.5 m]
+
+  # ---------------------------------------------------------------------------
+  # Semantic segmentation (26). U-Net with a per-pixel softmax over classes.
+  # Labels: raster masks with one class index per pixel.
+  # ---------------------------------------------------------------------------
+  - id: cloud_mask
+    name: Cloud and Shadow Mask
+    task: segmentation
+    domain: imaging
+    description: Masks clear sky, thick cloud, thin cloud and cloud shadow in Sentinel-2 imagery.
+    bands: s2_13
+    outputs: [clear, thick_cloud, thin_cloud, cloud_shadow]
+    labels: Cloud and shadow masks.
+    sources: [Sentinel-2 L1C]
+
+  - id: corridor_monitor
+    name: Corridor Monitor
+    task: segmentation
+    domain: assets
+    description: Segments vegetation encroachment and structures in infrastructure corridors.
+    bands: rgb
+    outputs: [background, vegetation_encroachment, structure]
+    labels: Masks of vegetation encroachment and structures.
+    sources: [Aerial or satellite RGB imagery, LiDAR-derived orthophotos]
+
+  - id: crop_boundary_delineation
+    name: Crop Boundary Delineation
+    task: segmentation
+    domain: agriculture
+    description: Delineates agricultural field boundaries by segmenting field interiors and boundary lines.
+    bands: rgbn
+    outputs: [background, field_interior, field_boundary]
+    labels: Field polygons rasterised into interiors and boundaries.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: crop_classifier
+    name: Crop Type Classifier
+    task: segmentation
+    domain: agriculture
+    description: Maps crop types per pixel.
+    bands: s2_10
+    outputs: [background, wheat, maize, rice, soybean, sunflower, other_crop]
+    labels: Crop type masks, for example from farmer declarations.
+    sources: [Sentinel-2 L2A]
+
+  - id: desertification_monitor
+    name: Desertification Monitor
+    task: segmentation
+    domain: environment
+    description: Classifies land degradation severity in drylands.
+    bands: s2_10
+    outputs: [not_degraded, low, moderate, severe]
+    labels: Degradation severity masks from field surveys.
+    sources: [Sentinel-2 L2A, Landsat 8/9]
+
+  - id: digitization_2d
+    name: 2D Digitisation
+    task: segmentation
+    domain: imaging
+    description: Segments buildings, roads, water and vegetation for map digitisation.
+    bands: rgb
+    outputs: [background, building, road, water, vegetation]
+    labels: Masks of the four map feature classes.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: erosion_detector
+    name: Erosion Detector
+    task: segmentation
+    domain: environment
+    description: Maps eroded soil surfaces and gullies using spectral and terrain inputs.
+    bands: rgbn_dem
+    outputs: [stable, sheet_erosion, gully]
+    labels: Erosion masks.
+    sources: [Multispectral imagery with a co-registered DEM]
+
+  - id: forest_monitor
+    name: Forest Monitor
+    task: segmentation
+    domain: forestry
+    description: Maps forest cover by forest type.
+    bands: s2_10
+    outputs: [non_forest, broadleaf, coniferous, mixed]
+    labels: Forest type masks.
+    sources: [Sentinel-2 L2A]
+
+  - id: infrastructure_monitor
+    name: Infrastructure Monitor
+    task: segmentation
+    domain: assets
+    description: Segments roads, railways, buildings and bridges.
+    bands: rgb
+    outputs: [background, road, railway, building, bridge]
+    labels: Infrastructure masks.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: land_degradation_detector
+    name: Land Degradation Detector
+    task: segmentation
+    domain: environment
+    description: Separates degraded from non-degraded land.
+    bands: s2_10
+    outputs: [not_degraded, degraded]
+    labels: Degradation masks.
+    sources: [Sentinel-2 L2A]
+
+  - id: lulc_classifier
+    name: Land Use and Land Cover Classifier
+    task: segmentation
+    domain: environment
+    description: Maps land cover in the eleven classes of ESA WorldCover.
+    bands: s2_10
+    outputs: [tree_cover, shrubland, grassland, cropland, built_up, bare_sparse, snow_ice, water, herbaceous_wetland, mangroves, moss_lichen]
+    labels: Land cover masks, for example ESA WorldCover.
+    sources: [Sentinel-2 L2A]
+
+  - id: marine_pollution_detector
+    name: Marine Pollution Detector
+    task: segmentation
+    domain: water
+    description: Segments floating debris and surface pollution at sea.
+    bands: s2_10
+    outputs: [water, floating_debris, oil_sheen]
+    labels: Pollution masks.
+    sources: [Sentinel-2 L2A]
+
+  - id: multi_solution_segmentation
+    name: General Semantic Segmentation
+    task: segmentation
+    domain: ai
+    description: General-purpose semantic segmentation with six common classes.
+    bands: rgb
+    outputs: [background, building, road, water, vegetation, bare_ground]
+    labels: Masks of the six classes.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: plowed_land_detector
+    name: Ploughed Land Detector
+    task: segmentation
+    domain: agriculture
+    description: Segments freshly ploughed fields.
+    bands: rgbn
+    outputs: [background, ploughed]
+    labels: Masks of ploughed fields.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: reservoir_monitor
+    name: Reservoir Monitor
+    task: segmentation
+    domain: water
+    description: Segments the water surface of reservoirs to track storage.
+    bands: rgbn
+    outputs: [background, water]
+    labels: Water masks.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9]
+
+  - id: road_network_analyzer
+    name: Road Network Extractor
+    task: segmentation
+    domain: urban
+    description: Extracts road surfaces for road network mapping.
+    bands: rgb
+    outputs: [background, road]
+    labels: Road masks.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: salinity_detector
+    name: Soil Salinity Detector
+    task: segmentation
+    domain: agriculture
+    description: Classifies soil salinity levels.
+    bands: s2_10
+    outputs: [non_saline, slight, moderate, strong]
+    labels: Salinity class masks from soil sampling.
+    sources: [Sentinel-2 L2A]
+
+  - id: sar_flood_detector
+    name: SAR Flood Detector
+    task: segmentation
+    domain: sar
+    description: Maps flooded areas in radar backscatter.
+    bands: s1
+    outputs: [non_flooded, flooded]
+    labels: Flood masks.
+    sources: [Sentinel-1 GRD (sigma0 in dB)]
+
+  - id: sar_oil_spill_detector
+    name: SAR Oil Spill Detector
+    task: segmentation
+    domain: sar
+    description: Segments oil spills and look-alike dark areas on the sea surface.
+    bands: s1_vv
+    outputs: [sea, oil_spill, look_alike]
+    labels: Oil spill and look-alike masks.
+    sources: [Sentinel-1 GRD VV]
+
+  - id: thematic_mapper
+    name: Thematic Mapper
+    task: segmentation
+    domain: imaging
+    description: Eight-class thematic mapping for general land cover mapping projects.
+    bands: s2_10
+    outputs: [artificial, agricultural, forest, grassland, wetland, water, bare, snow_ice]
+    labels: Thematic masks.
+    sources: [Sentinel-2 L2A]
+
+  - id: topography_mapper
+    name: Landform Mapper
+    task: segmentation
+    domain: imaging
+    description: Classifies landforms from a digital elevation model.
+    bands: dem
+    outputs: [flat, slope, ridge, valley, peak, pit]
+    labels: Landform masks, for example geomorphons.
+    sources: [Copernicus DEM GLO-30, national DEMs]
+
+  - id: tourist_destination_monitor
+    name: Tourist Destination Monitor
+    task: segmentation
+    domain: tourism
+    description: Maps beaches, built-up areas, vegetation and water around tourist destinations.
+    bands: rgb
+    outputs: [background, beach, built_up, vegetation, water]
+    labels: Masks of the land cover classes.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: transportation_mapper
+    name: Transportation Mapper
+    task: segmentation
+    domain: urban
+    description: Maps roads, railways, airports and ports.
+    bands: rgb
+    outputs: [background, road, railway, airport, port]
+    labels: Transport infrastructure masks.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: urban_planner
+    name: Urban Land Use Mapper
+    task: segmentation
+    domain: urban
+    description: Maps urban land use.
+    bands: rgb
+    outputs: [background, residential, commercial, industrial, green_space]
+    labels: Urban land use masks.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: utility_mapper
+    name: Utility Mapper
+    task: segmentation
+    domain: assets
+    description: Segments power lines, pipeline corridors and substations.
+    bands: rgb
+    outputs: [background, power_line, pipeline_corridor, substation]
+    labels: Utility masks.
+    sources: [Aerial RGB imagery]
+
+  - id: water_surface_detector
+    name: Water Surface Detector
+    task: segmentation
+    domain: water
+    description: Segments open water surfaces.
+    bands: rgbn
+    outputs: [background, water]
+    labels: Water masks.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]
+
+  # ---------------------------------------------------------------------------
+  # Change detection (6). U-Net on two co-registered acquisitions stacked on
+  # the channel axis (early fusion). Labels: change masks.
+  # ---------------------------------------------------------------------------
+  - id: asset_condition_change
+    name: Asset Condition Change
+    task: change_detection
+    domain: assets
+    description: Detects changes in the condition of infrastructure assets between two dates.
+    bands: rgb
+    dates: 2
+    outputs: [no_change, deterioration, repair]
+    labels: Change masks.
+    sources: [Co-registered very high resolution RGB image pairs]
+
+  - id: change_detector
+    name: Change Detector
+    task: change_detection
+    domain: ai
+    description: Binary change detection between two dates.
+    bands: rgb
+    dates: 2
+    outputs: [no_change, change]
+    labels: Binary change masks.
+    sources: [Co-registered RGB image pairs]
+
+  - id: construction_monitor
+    name: Construction Monitor
+    task: change_detection
+    domain: urban
+    description: Detects new construction and demolition between two dates.
+    bands: rgb
+    dates: 2
+    outputs: [no_change, new_construction, demolition]
+    labels: Construction change masks.
+    sources: [Co-registered very high resolution RGB image pairs]
+
+  - id: deforestation_detector
+    name: Deforestation Detector
+    task: change_detection
+    domain: forestry
+    description: Detects forest loss between two dates.
+    bands: s2_10
+    dates: 2
+    outputs: [no_change, forest_loss]
+    labels: Forest loss masks.
+    sources: [Sentinel-2 L2A image pairs]
+
+  - id: protected_area_change_detector
+    name: Protected Area Change Detector
+    task: change_detection
+    domain: environment
+    description: Detects land cover change inside protected areas.
+    bands: s2_10
+    dates: 2
+    outputs: [no_change, vegetation_loss, new_structure, other_change]
+    labels: Change masks by change type.
+    sources: [Sentinel-2 L2A image pairs]
+
+  - id: urban_growth_assessor
+    name: Urban Growth Assessor
+    task: change_detection
+    domain: urban
+    description: Detects new built-up area between two dates.
+    bands: s2_10
+    dates: 2
+    outputs: [no_change, urban_expansion]
+    labels: Urban expansion masks.
+    sources: [Sentinel-2 L2A image pairs, Landsat 8/9 image pairs]
+
+  # ---------------------------------------------------------------------------
+  # Dense regression (36). U-Net with a per-pixel regression output.
+  # Labels: reference rasters of the target variable.
+  # ---------------------------------------------------------------------------
+  - id: accessibility_analyzer
+    name: Accessibility Analyser
+    task: dense_regression
+    domain: tourism
+    description: Estimates travel time to the nearest service centre per pixel.
+    bands: context
+    outputs: [travel_time]
+    units: [min]
+    labels: Travel time rasters from network analysis or surveys.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+
+  - id: beekeeping_suitability
+    name: Beekeeping Suitability
+    task: dense_regression
+    domain: agriculture
+    description: Scores the suitability of land for apiaries.
+    bands: s2_dem
+    outputs: [suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Suitability scores from expert assessment or productivity records.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: crop_growth_monitor
+    name: Crop Growth Monitor
+    task: dense_regression
+    domain: agriculture
+    description: Estimates leaf area index as a measure of crop growth.
+    bands: s2_10
+    outputs: [leaf_area_index]
+    units: [m2 m-2]
+    range: [0, 8]
+    labels: Leaf area index measurements or reference products.
+    sources: [Sentinel-2 L2A]
+
+  - id: crop_health_assessor
+    name: Crop Health Assessor
+    task: dense_regression
+    domain: agriculture
+    description: Scores crop health per pixel.
+    bands: s2_10
+    outputs: [health_score]
+    units: ["1"]
+    range: [0, 1]
+    labels: Crop health scores from field inspection.
+    sources: [Sentinel-2 L2A]
+
+  - id: drought_monitor
+    name: Drought Monitor
+    task: dense_regression
+    domain: environment
+    description: Estimates a drought severity index.
+    bands: s2_10
+    outputs: [drought_severity]
+    units: ["1"]
+    range: [0, 1]
+    labels: Drought index rasters, for example from soil moisture products.
+    sources: [Sentinel-2 L2A, Landsat 8/9]
+
+  - id: energy_potential
+    name: Energy Potential
+    task: dense_regression
+    domain: energy
+    description: Estimates annual solar energy potential per pixel.
+    bands: s2_dem
+    outputs: [solar_potential]
+    units: [kWh m-2 a-1]
+    labels: Solar potential rasters from irradiance models.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: environmental_risk
+    name: Environmental Risk
+    task: dense_regression
+    domain: risk
+    description: Scores combined environmental risk.
+    bands: context
+    outputs: [risk_score]
+    units: ["1"]
+    range: [0, 1]
+    labels: Environmental risk scores.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+
+  - id: flood_risk
+    name: Flood Risk
+    task: dense_regression
+    domain: water
+    description: Estimates flood susceptibility per pixel.
+    bands: s2_dem
+    outputs: [flood_susceptibility]
+    units: ["1"]
+    range: [0, 1]
+    labels: Flood susceptibility from historical flood extents or hydraulic models.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: forest_density_estimator
+    name: Forest Density Estimator
+    task: dense_regression
+    domain: forestry
+    description: Estimates tree canopy cover.
+    bands: s2_10
+    outputs: [canopy_cover]
+    units: ["1"]
+    range: [0, 1]
+    labels: Canopy cover fraction from LiDAR or high resolution imagery.
+    sources: [Sentinel-2 L2A]
+
+  - id: grazing_potential
+    name: Grazing Potential
+    task: dense_regression
+    domain: agriculture
+    description: Estimates forage biomass available for grazing.
+    bands: s2_10
+    outputs: [forage_biomass]
+    units: [kg ha-1]
+    labels: Biomass samples from rangeland surveys.
+    sources: [Sentinel-2 L2A]
+
+  - id: hazard_vulnerability
+    name: Hazard Vulnerability
+    task: dense_regression
+    domain: risk
+    description: Scores vulnerability of the built environment to natural hazards.
+    bands: context
+    outputs: [vulnerability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Vulnerability scores from exposure models or loss data.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+
+  - id: landslide_risk
+    name: Landslide Susceptibility
+    task: dense_regression
+    domain: risk
+    description: Estimates landslide susceptibility.
+    bands: s2_dem
+    outputs: [susceptibility]
+    units: ["1"]
+    range: [0, 1]
+    labels: Landslide inventories converted to susceptibility targets.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: mobility_analyzer
+    name: Mobility Analyser
+    task: dense_regression
+    domain: urban
+    description: Estimates traffic intensity per pixel on the road network.
+    bands: context
+    outputs: [traffic_intensity]
+    units: [vehicles h-1]
+    labels: Traffic counts interpolated along roads.
+    sources: [Sentinel-2 L2A, road distance and population rasters]
+
+  - id: perennial_garden_suitability
+    name: Perennial Garden Suitability
+    task: dense_regression
+    domain: agriculture
+    description: Scores land suitability for orchards and perennial crops.
+    bands: s2_dem
+    outputs: [suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Suitability scores from land evaluation.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: pipeline_route_planner
+    name: Pipeline Route Cost Surface
+    task: dense_regression
+    domain: assets
+    description: Estimates a construction cost surface used for least-cost pipeline routing.
+    bands: context
+    outputs: [cost]
+    units: [cost units per metre]
+    labels: Cost rasters from engineering estimates.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+
+  - id: route_planner
+    name: Route Cost Surface
+    task: dense_regression
+    domain: tourism
+    description: Estimates a travel cost surface for least-cost routing.
+    bands: context
+    outputs: [travel_cost]
+    units: [s m-1]
+    labels: Travel cost rasters from speed models.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+
+  - id: seismic_risk
+    name: Seismic Risk
+    task: dense_regression
+    domain: risk
+    description: Scores seismic risk from exposure and terrain.
+    bands: context
+    outputs: [risk_score]
+    units: ["1"]
+    range: [0, 1]
+    labels: Seismic risk scores from hazard and exposure models.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population rasters]
+
+  - id: site_suitability
+    name: Site Suitability
+    task: dense_regression
+    domain: analysis
+    description: Scores general site suitability for development.
+    bands: context
+    outputs: [suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Suitability scores from multi-criteria analysis.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+
+  - id: solar_site_selector
+    name: Solar Site Selector
+    task: dense_regression
+    domain: energy
+    description: Scores suitability for ground-mounted photovoltaic plants.
+    bands: s2_dem
+    outputs: [suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Suitability scores or existing plant locations.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: spatial_analyzer
+    name: Spatial Density Estimator
+    task: dense_regression
+    domain: analysis
+    description: Estimates the density of a mapped phenomenon, for example buildings per hectare.
+    bands: rgbn
+    outputs: [density]
+    units: [ha-1]
+    labels: Density rasters derived from reference vector data.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: viewshed_analyzer
+    name: Visibility Estimator
+    task: dense_regression
+    domain: tourism
+    description: Estimates the fraction of the surrounding area visible from each pixel.
+    bands: dem
+    outputs: [visible_fraction]
+    units: ["1"]
+    range: [0, 1]
+    labels: Visibility rasters from viewshed analysis.
+    sources: [Copernicus DEM GLO-30, national DEMs]
+
+  - id: water_quality_assessor
+    name: Water Quality Assessor
+    task: dense_regression
+    domain: water
+    description: Estimates chlorophyll-a concentration and turbidity in water bodies.
+    bands: s2_10
+    outputs: [chlorophyll_a, turbidity]
+    units: [mg m-3, FNU]
+    labels: In situ water quality samples.
+    sources: [Sentinel-2 L2A]
+
+  - id: wildfire_risk
+    name: Wildfire Risk
+    task: dense_regression
+    domain: risk
+    description: Estimates wildfire susceptibility.
+    bands: s2_dem
+    outputs: [susceptibility]
+    units: ["1"]
+    range: [0, 1]
+    labels: Burned area history converted to susceptibility targets.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: wildlife_habitat_analyzer
+    name: Wildlife Habitat Suitability
+    task: dense_regression
+    domain: environment
+    description: Scores habitat suitability for a target species.
+    bands: s2_dem
+    outputs: [habitat_suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Species occurrence data converted to suitability targets.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: wind_site_selector
+    name: Wind Site Selector
+    task: dense_regression
+    domain: energy
+    description: Scores suitability for wind turbines.
+    bands: s2_dem
+    outputs: [suitability]
+    units: ["1"]
+    range: [0, 1]
+    labels: Suitability scores or existing turbine locations.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: flood_risk_assessor
+    name: Flood Depth Estimator
+    task: dense_regression
+    domain: water
+    description: Estimates flood water depth.
+    bands: s2_dem
+    outputs: [water_depth]
+    units: [m]
+    labels: Flood depth rasters from hydraulic models or surveys.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: geostatistical_analyzer
+    name: Geostatistical Surface Estimator
+    task: dense_regression
+    domain: analysis
+    description: Learns a continuous surface of a sampled variable from covariates, as a learned alternative to kriging.
+    bands: s2_dem
+    outputs: [value]
+    units: [user defined]
+    labels: Point samples rasterised as sparse targets.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: spatial_relationship
+    name: Proximity Estimator
+    task: dense_regression
+    domain: analysis
+    description: Estimates the distance to the nearest mapped feature of interest.
+    bands: rgbn
+    outputs: [distance]
+    units: [m]
+    labels: Distance rasters derived from reference vector data.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: natural_resources_monitor
+    name: Natural Resources Monitor
+    task: dense_regression
+    domain: environment
+    description: Estimates above-ground biomass.
+    bands: s2_s1
+    outputs: [above_ground_biomass]
+    units: [Mg ha-1]
+    labels: Biomass plots or LiDAR-derived biomass rasters.
+    sources: [Sentinel-2 L2A, Sentinel-1 GRD]
+
+  - id: environmental_monitor
+    name: Environmental Condition Monitor
+    task: dense_regression
+    domain: environment
+    description: Scores the ecological condition of land.
+    bands: s2_10
+    outputs: [condition]
+    units: ["1"]
+    range: [0, 1]
+    labels: Ecological condition scores from field assessment.
+    sources: [Sentinel-2 L2A]
+
+  - id: network_analyzer
+    name: Road Network Density Estimator
+    task: dense_regression
+    domain: urban
+    description: Estimates road network density as road length per square kilometre.
+    bands: rgbn
+    outputs: [road_density]
+    units: [km km-2]
+    labels: Road density rasters derived from road vector data.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: watershed_manager
+    name: Runoff Estimator
+    task: dense_regression
+    domain: water
+    description: Estimates a runoff coefficient per pixel for watershed management.
+    bands: s2_dem
+    outputs: [runoff_coefficient]
+    units: ["1"]
+    range: [0, 1]
+    labels: Runoff coefficients from hydrological models.
+    sources: [Sentinel-2 L2A, Copernicus DEM]
+
+  - id: hydroelectric_monitor
+    name: Hydroelectric Reservoir Level Estimator
+    task: dense_regression
+    domain: energy
+    description: Estimates water surface elevation of reservoirs.
+    bands: rgbn_dem
+    outputs: [water_surface_elevation]
+    units: [m]
+    labels: Reservoir level records.
+    sources: [Sentinel-2 10 m bands, Copernicus DEM]
+
+  - id: offshore_survey
+    name: Bathymetry Estimator
+    task: dense_regression
+    domain: water
+    description: Estimates shallow water depth (satellite-derived bathymetry).
+    bands: s2_10
+    outputs: [depth]
+    units: [m]
+    range: [0, 30]
+    labels: Echo sounding or LiDAR bathymetry.
+    sources: [Sentinel-2 L2A]
+
+  - id: onshore_monitor
+    name: Surface Temperature Anomaly
+    task: dense_regression
+    domain: energy
+    description: Estimates land surface temperature anomalies around onshore industrial facilities.
+    bands: landsat_st
+    outputs: [temperature_anomaly]
+    units: [K]
+    labels: Surface temperature anomaly rasters.
+    sources: [Landsat 8/9 Collection 2 Level 2]
+
+  - id: field_surveyor
+    name: Field Productivity Estimator
+    task: dense_regression
+    domain: agriculture
+    description: Estimates within-field productivity zones as relative yield.
+    bands: s2_10
+    outputs: [relative_yield]
+    units: ["1"]
+    range: [0, 2]
+    labels: Yield monitor data normalised by the field mean.
+    sources: [Sentinel-2 L2A]
+
+  # ---------------------------------------------------------------------------
+  # Scene regression (11). Encoder with global pooling and a regression head:
+  # one value per target for a whole image chip.
+  # Labels: one target vector per chip.
+  # ---------------------------------------------------------------------------
+  - id: yield_predictor
+    name: Yield Predictor
+    task: scene_regression
+    domain: agriculture
+    description: Predicts crop yield of a field chip.
+    bands: s2_10
+    outputs: [yield]
+    units: [t ha-1]
+    labels: Field-level yield records.
+    sources: [Sentinel-2 L2A]
+
+  - id: business_valuation
+    name: Economic Activity Estimator
+    task: scene_regression
+    domain: analysis
+    description: Estimates an economic activity index of an area from imagery.
+    bands: rgbn
+    outputs: [activity_index]
+    units: ["1"]
+    labels: Economic indicators aggregated to chips.
+    sources: [Sentinel-2 10 m bands, night lights composites]
+
+  - id: economic_spatial_assessor
+    name: Property Value Estimator
+    task: scene_regression
+    domain: analysis
+    description: Estimates median property value of an area.
+    bands: rgb
+    outputs: [median_value]
+    units: [currency m-2]
+    labels: Property transaction statistics aggregated to chips.
+    sources: [Aerial or satellite RGB imagery]
+
+  - id: insurance_underwriting
+    name: Insurance Risk Scorer
+    task: scene_regression
+    domain: risk
+    description: Scores the natural hazard risk of an insured site.
+    bands: context
+    outputs: [hazard_score, exposure_score]
+    units: ["1", "1"]
+    range: [0, 1]
+    labels: Claims history or risk model scores per site.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+
+  - id: livestock_estimator
+    name: Livestock Estimator
+    task: scene_regression
+    domain: agriculture
+    description: Estimates the number of livestock in a chip.
+    bands: rgb
+    outputs: [head_count]
+    units: [animals]
+    labels: Livestock counts per chip.
+    sources: [Very high resolution RGB imagery]
+
+  - id: resource_allocation
+    name: Service Demand Estimator
+    task: scene_regression
+    domain: analysis
+    description: Estimates population and service demand of an area for resource allocation.
+    bands: rgbn
+    outputs: [population, service_demand]
+    units: [persons, "1"]
+    labels: Census population and service statistics per chip.
+    sources: [Sentinel-2 10 m bands, PlanetScope]
+
+  - id: disaster_management
+    name: Disaster Impact Estimator
+    task: scene_regression
+    domain: risk
+    description: Estimates the fraction of an area affected by a disaster.
+    bands: s2_10
+    outputs: [affected_fraction]
+    units: ["1"]
+    range: [0, 1]
+    labels: Affected area fractions from damage assessments.
+    sources: [Sentinel-2 L2A]
+
+  - id: emergency_disaster_manager
+    name: Emergency Needs Estimator
+    task: scene_regression
+    domain: risk
+    description: Estimates affected population and shelter needs after a disaster.
+    bands: rgbn
+    outputs: [affected_population, shelter_need]
+    units: [persons, persons]
+    labels: Affected population and shelter statistics per chip.
+    sources: [Sentinel-2 10 m bands, very high resolution imagery]
+
+  - id: preparedness_manager
+    name: Preparedness Scorer
+    task: scene_regression
+    domain: risk
+    description: Scores the disaster preparedness of a community area.
+    bands: context
+    outputs: [preparedness]
+    units: ["1"]
+    range: [0, 1]
+    labels: Preparedness scores from surveys.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+
+  - id: timeseries_analyzer
+    name: Phenology Estimator
+    task: scene_regression
+    domain: agriculture
+    description: Estimates start, peak and end of season from a stack of six NDVI observations.
+    bands: [ndvi_t1, ndvi_t2, ndvi_t3, ndvi_t4, ndvi_t5, ndvi_t6]
+    outputs: [start_of_season, peak_of_season, end_of_season]
+    units: [day of year, day of year, day of year]
+    labels: Phenology dates from field observation or reference products.
+    sources: [Sentinel-2 L2A time series, Landsat 8/9 time series]
+
+  - id: zonal_statistics
+    name: Zonal Cover Estimator
+    task: scene_regression
+    domain: analysis
+    description: Estimates the fractional cover of vegetation, water and built-up area in a chip.
+    bands: s2_10
+    outputs: [vegetation_fraction, water_fraction, built_up_fraction]
+    units: ["1", "1", "1"]
+    range: [0, 1]
+    labels: Cover fractions per chip from reference land cover maps.
+    sources: [Sentinel-2 L2A]
+
+  # ---------------------------------------------------------------------------
+  # Terrain and geophysical regression (13). U-Net regression of heights,
+  # displacements and physical quantities. Labels: reference rasters.
+  # ---------------------------------------------------------------------------
+  - id: dem_generator
+    name: DEM from Stereo
+    task: dense_regression
+    domain: imaging
+    description: Estimates terrain elevation from a panchromatic stereo pair.
+    bands: pan_pair
+    outputs: [elevation]
+    units: [m]
+    labels: Reference DEMs, for example LiDAR.
+    sources: [Epipolar-rectified panchromatic stereo pairs]
+
+  - id: digitization_3d
+    name: Building Height Estimator
+    task: dense_regression
+    domain: urban
+    description: Estimates building heights from imagery and a surface model.
+    bands: rgb_dsm
+    outputs: [building_height]
+    units: [m]
+    labels: Building heights from LiDAR or cadastral 3D models.
+    sources: [RGB orthophotos with a DSM]
+
+  - id: dsm_generator
+    name: DSM from Stereo
+    task: dense_regression
+    domain: imaging
+    description: Estimates surface elevation including buildings and trees from a stereo pair.
+    bands: pan_pair
+    outputs: [surface_elevation]
+    units: [m]
+    labels: Reference DSMs, for example LiDAR.
+    sources: [Epipolar-rectified panchromatic stereo pairs]
+
+  - id: dtm_generator
+    name: DTM from DSM
+    task: dense_regression
+    domain: imaging
+    description: Removes buildings and vegetation from a surface model to estimate bare ground elevation.
+    bands: dsm
+    outputs: [ground_elevation]
+    units: [m]
+    labels: Reference DTMs, for example LiDAR ground returns.
+    sources: [Photogrammetric or radar DSMs]
+
+  - id: ground_displacement
+    name: Ground Displacement Estimator
+    task: dense_regression
+    domain: sar
+    description: Estimates line-of-sight ground displacement from a wrapped interferogram.
+    bands: insar
+    outputs: [los_displacement]
+    units: [mm]
+    labels: Unwrapped displacement from InSAR processing or GNSS.
+    sources: [Sentinel-1 SLC interferograms]
+
+  - id: land_surface_temperature
+    name: Land Surface Temperature
+    task: dense_regression
+    domain: environment
+    description: Estimates land surface temperature from reflective and thermal bands.
+    bands: landsat_st
+    outputs: [surface_temperature]
+    units: [K]
+    labels: Land surface temperature products or in situ radiometry.
+    sources: [Landsat 8/9 Collection 2 Level 2]
+
+  - id: model_3d
+    name: Normalised Surface Model
+    task: dense_regression
+    domain: imaging
+    description: Estimates the height of objects above ground (nDSM) from imagery and a surface model.
+    bands: rgb_dsm
+    outputs: [object_height]
+    units: [m]
+    labels: nDSM from LiDAR.
+    sources: [RGB orthophotos with a DSM]
+
+  - id: sar_amplitude
+    name: SAR Backscatter Normaliser
+    task: dense_regression
+    domain: sar
+    description: Estimates terrain-flattened gamma0 backscatter from sigma0 and elevation.
+    bands: [VV, VH, elevation]
+    outputs: [gamma0_vv, gamma0_vh]
+    units: [dB, dB]
+    labels: Terrain-flattened gamma0 from radiometric terrain correction.
+    sources: [Sentinel-1 GRD, Copernicus DEM]
+
+  - id: sar_phase_displacement
+    name: InSAR Phase Unwrapper
+    task: dense_regression
+    domain: sar
+    description: Estimates unwrapped phase from a wrapped interferogram.
+    bands: insar
+    outputs: [unwrapped_phase]
+    units: [rad]
+    labels: Unwrapped phase from SNAPHU or similar processing.
+    sources: [Sentinel-1 SLC interferograms]
+
+  - id: sar_subsidence_monitor
+    name: Subsidence Velocity Estimator
+    task: dense_regression
+    domain: sar
+    description: Estimates mean subsidence velocity from a stack of six displacement maps.
+    bands: insar_stack
+    outputs: [velocity]
+    units: [mm a-1]
+    labels: Velocity from persistent scatterer or SBAS processing.
+    sources: [Sentinel-1 InSAR time series]
+
+  - id: stereo_processor
+    name: Stereo Disparity Estimator
+    task: dense_regression
+    domain: imaging
+    description: Estimates disparity between the two images of an epipolar stereo pair.
+    bands: pan_pair
+    outputs: [disparity]
+    units: [px]
+    labels: Reference disparity maps.
+    sources: [Epipolar-rectified stereo pairs]
+
+  - id: tree_height_estimator
+    name: Canopy Height Estimator
+    task: dense_regression
+    domain: forestry
+    description: Estimates canopy height from optical and radar data.
+    bands: s2_s1
+    outputs: [canopy_height]
+    units: [m]
+    range: [0, 60]
+    labels: Canopy height from airborne or spaceborne LiDAR.
+    sources: [Sentinel-2 L2A, Sentinel-1 GRD]
+
+  - id: tri_stereo_processor
+    name: DSM from Tri-Stereo
+    task: dense_regression
+    domain: imaging
+    description: Estimates surface elevation from a tri-stereo acquisition.
+    bands: pan_triplet
+    outputs: [surface_elevation]
+    units: [m]
+    labels: Reference DSMs.
+    sources: [Epipolar-rectified tri-stereo panchromatic imagery]
+
+  # ---------------------------------------------------------------------------
+  # Enhancement (11). Residual U-Net image-to-image networks.
+  # Labels: target images, displacement fields or clean references.
+  # ---------------------------------------------------------------------------
+  - id: coregistration
+    name: Co-registration Flow Estimator
+    task: enhancement
+    domain: imaging
+    description: Estimates the pixel displacement field that aligns a moving image to a reference image.
+    bands: rgb
+    dates: 2
+    outputs: [dx, dy]
+    units: [px, px]
+    labels: Displacement fields, for example from synthetic warps of a reference image.
+    sources: [RGB image pairs of the same area]
+
+  - id: mosaic_processor
+    name: Mosaic Colour Harmoniser
+    task: enhancement
+    domain: imaging
+    description: Harmonises the radiometry of a scene to a reference for seamless mosaics.
+    bands: rgb
+    outputs: [red, green, blue]
+    labels: Radiometrically harmonised reference scenes.
+    sources: [RGB scenes of overlapping areas]
+
+  - id: mosaicking
+    name: Seamline Blender
+    task: enhancement
+    domain: imaging
+    description: Blends two overlapping scenes into one seamless image.
+    bands: rgb
+    dates: 2
+    outputs: [red, green, blue]
+    labels: Seamlessly blended reference mosaics.
+    sources: [Overlapping RGB scenes]
+
+  - id: multispectral_processor
+    name: Multispectral Denoiser
+    task: enhancement
+    domain: imaging
+    description: Reduces noise and striping in multispectral imagery.
+    bands: s2_10
+    outputs: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]
+    labels: Clean reference images, for example temporal composites.
+    sources: [Sentinel-2 L2A]
+
+  - id: ortho_processor
+    name: Orthorectification Flow Estimator
+    task: enhancement
+    domain: imaging
+    description: Estimates the displacement field that removes relief displacement using a DEM.
+    bands: image_dem
+    outputs: [dx, dy]
+    units: [px, px]
+    labels: Displacement fields from rigorous orthorectification.
+    sources: [Raw imagery with a co-registered DEM]
+
+  - id: orthorectification
+    name: Learned Orthorectification
+    task: enhancement
+    domain: imaging
+    description: Produces an orthorectified image from a raw image and a DEM.
+    bands: image_dem
+    outputs: [red, green, blue]
+    labels: Orthorectified reference images.
+    sources: [Raw imagery with a co-registered DEM]
+
+  - id: panchromatic_processor
+    name: Panchromatic Denoiser
+    task: enhancement
+    domain: imaging
+    description: Reduces noise in panchromatic imagery.
+    bands: pan
+    outputs: [pan]
+    labels: Clean panchromatic references.
+    sources: [Panchromatic satellite imagery]
+
+  - id: pansharpening
+    name: Pansharpening
+    task: enhancement
+    domain: imaging
+    description: Fuses upsampled multispectral bands with the panchromatic band into a sharpened multispectral image.
+    bands: ms_pan
+    outputs: [blue, green, red, nir]
+    labels: Sharpened references, for example by Wald's protocol.
+    sources: [Multispectral and panchromatic bands of the same sensor]
+
+  - id: raster_tiler
+    name: Tile Radiometric Normaliser
+    task: enhancement
+    domain: imaging
+    description: Normalises the radiometry of individual tiles before tiling into a web map.
+    bands: rgb
+    outputs: [red, green, blue]
+    labels: Radiometrically normalised reference tiles.
+    sources: [RGB tiles]
+
+  - id: sar_mapping_workflow
+    name: SAR Despeckler
+    task: enhancement
+    domain: sar
+    description: Removes speckle from dual-polarisation SAR backscatter.
+    bands: s1
+    outputs: [VV, VH]
+    labels: Multi-temporal averages as speckle-free references.
+    sources: [Sentinel-1 GRD]
+
+  - id: synthetic_imagery
+    name: SAR to Optical Translator
+    task: enhancement
+    domain: ai
+    description: Synthesises an optical RGB image from SAR backscatter, for example to fill cloud gaps.
+    bands: s1
+    outputs: [red, green, blue]
+    labels: Co-located cloud-free optical images.
+    sources: [Sentinel-1 GRD with co-located Sentinel-2 L2A]
+
+  # ---------------------------------------------------------------------------
+  # Super-resolution (1). Residual network with sub-pixel convolution.
+  # Labels: high resolution images; inputs are downsampled copies.
+  # ---------------------------------------------------------------------------
+  - id: super_resolution
+    name: Super-Resolution
+    task: super_resolution
+    domain: imaging
+    description: Increases the spatial resolution of RGB imagery by a factor of four.
+    bands: rgb
+    outputs: [red, green, blue]
+    scale: 4
+    labels: High resolution reference images.
+    sources: [Pairs of low and high resolution RGB imagery]
+
+  # ---------------------------------------------------------------------------
+  # Spectral indices (7). Exact implementations of published formulas as
+  # network modules, so that they run in the same pipelines and export to
+  # ONNX. They need no training.
+  # ---------------------------------------------------------------------------
+  - id: evi_calculator
+    name: EVI Calculator
+    task: spectral_index
+    domain: indices
+    description: Enhanced Vegetation Index, 2.5 (NIR - RED) / (NIR + 6 RED - 7.5 BLUE + 1) (Huete et al., 2002).
+    bands: [blue, red, nir]
+    outputs: [evi]
+    formula: evi
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: msi_calculator
+    name: MSI Calculator
+    task: spectral_index
+    domain: indices
+    description: Moisture Stress Index, SWIR1 / NIR (Rock et al., 1986).
+    bands: [nir, swir1]
+    outputs: [msi]
+    formula: msi
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: nbr_calculator
+    name: NBR Calculator
+    task: spectral_index
+    domain: indices
+    description: Normalized Burn Ratio, (NIR - SWIR2) / (NIR + SWIR2) (Key and Benson, 2006).
+    bands: [nir, swir2]
+    outputs: [nbr]
+    formula: nbr
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: ndvi_calculator
+    name: NDVI Calculator
+    task: spectral_index
+    domain: indices
+    description: Normalized Difference Vegetation Index, (NIR - RED) / (NIR + RED) (Rouse et al., 1974).
+    bands: [red, nir]
+    outputs: [ndvi]
+    formula: ndvi
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: ndwi_calculator
+    name: NDWI Calculator
+    task: spectral_index
+    domain: indices
+    description: Normalized Difference Water Index, (GREEN - NIR) / (GREEN + NIR) (McFeeters, 1996).
+    bands: [green, nir]
+    outputs: [ndwi]
+    formula: ndwi
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: savi_calculator
+    name: SAVI Calculator
+    task: spectral_index
+    domain: indices
+    description: Soil Adjusted Vegetation Index, 1.5 (NIR - RED) / (NIR + RED + 0.5) (Huete, 1988).
+    bands: [red, nir]
+    outputs: [savi]
+    formula: savi
+    labels: None, the formula needs no training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+
+  - id: vegetation_condition
+    name: Vegetation Condition Index
+    task: spectral_index
+    domain: indices
+    description: Vegetation Condition Index, (NDVI - NDVImin) / (NDVImax - NDVImin) (Kogan, 1995).
+    bands: ndvi_stats
+    outputs: [vci]
+    formula: vci
+    labels: None, the formula needs no training.
+    sources: [NDVI with its multi-year per-pixel minimum and maximum]

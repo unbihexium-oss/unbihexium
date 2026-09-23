@@ -1,91 +1,90 @@
 {
-  "model_id": "marine_pollution_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "marine_pollution_detector",
   "name": "Marine Pollution Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "water",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Marine Pollution Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments floating debris and surface pollution at sea.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "water",
+      "floating_debris",
+      "oil_sheen"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Pollution masks.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cb67165bd5988ea4244378c6a01208b0890e46cf6c9e89f068248ee3c1932399",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8f43f32f62978bea25a201764e4e4bb35ccb506f79748e70bb63f382de45e23a",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "2a5ab4546c9679c9b78c45f47266708b2f567470fd0eaa33b106a40f52cbceac",
-          "size_bytes": 420
-        }
-      ]
+      "model_id": "marine_pollution_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733971,
+      "weights_digest": "1d23facf80938d81060679ec6ad7ae284f00fa0ddb366022e62d5ef8051e1643"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c6389322d0a707a1806bca4897f439b7a35240f82df187fb6163773ff37cafdb",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f32e84432f4a39f9267bb97c592db88313c0bc39307f1feec27a715618aa8ce0",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "687d90c05cc04e0b72b55cd92b3ae6b724a47a6fcdc4ac1eaca1123dca5f5948",
-          "size_bytes": 420
-        }
-      ]
+      "model_id": "marine_pollution_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060515,
+      "weights_digest": "7134db2efaa5883388fe652379708f5e25462973ca132c7fe6125499f2809566"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a2f7fd273310f36ca94852af861ef98ad3534bf361ca0c32b20a1af5c5f8b30d",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "89232b15c08797f7e558effc710dcedd366c0fa7f321c9e679ce3af073435a11",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "f179dd4354ed972288ce08f38b7c476c0185563bf62248bdf033e9f24e5c5401",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "marine_pollution_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062195,
+      "weights_digest": "a3df6b8cff64c398c43367a1991bda94b897768dcc566a96966fb6ab0c74c5a2"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "672135dadc758976a018926b431f71036cfa06a0beeae0ac24de8735396473ef",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "83cf28af7477625630b933df7a856039d5eed60cb79fec125ccb32efe50ce9e7",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "9608329a33d6109e8870625c6331d185559b7a7598e8c540dadc9e1523416895",
-          "size_bytes": 422
-        }
-      ]
+      "model_id": "marine_pollution_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454723,
+      "weights_digest": "88c77d45e920e5600baed2c36b619c82dfb8fcc0f8f6561d98fe79f4911a620e"
     }
-  },
-  "capabilities": [
-    "marine_pollution_detector"
-  ]
+  }
 }

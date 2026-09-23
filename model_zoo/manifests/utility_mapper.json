@@ -1,91 +1,77 @@
 {
-  "model_id": "utility_mapper",
+  "$schema": "../manifest.schema.json",
+  "family": "utility_mapper",
   "name": "Utility Mapper",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "assets",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Utility Mapper model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments power lines, pipeline corridors and substations.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "power_line",
+      "pipeline_corridor",
+      "substation"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Utility masks.",
+  "data_sources": [
+    "Aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "706f5b48334a656d845f879e7a1b07c02b2be1c634898e7b8cb22143c7169771",
-          "size_bytes": 3770
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3ad95f898838c7d45b15727d1ad277721dfab9cf3040b4aac6e4a950290e8489",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "d0609a9638b228fe409307f87baf0ad7ad4520247c3422a2d1d758682882b6d8",
-          "size_bytes": 434
-        }
-      ]
+      "model_id": "utility_mapper_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732980,
+      "weights_digest": "fb5efffedf73011e24eb5f4377eb12e0825f18a8933aaf7cbfec887e2f80fd25"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a2d34423c5560ddd0de4da7abc3ee70fbd5869bae69a3ec7de54be0e265bc95a",
-          "size_bytes": 30607
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c680c8f26c245ee23d83ae5a6142864fc307edc40e6be4422c5d486f070f6359",
-          "size_bytes": 32433
-        },
-        {
-          "name": "config.json",
-          "sha256": "2883846c316e8ffce1c5b5f533af90690eb25a905cc434cff801abebbb69944d",
-          "size_bytes": 434
-        }
-      ]
+      "model_id": "utility_mapper_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058532,
+      "weights_digest": "a252fe69151e816dca36b596a7c591e2b9738311d62bbcef7e1766af6078ac25"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a2c4e116e2379bca1eac2c8d4000ec4635e8db39a1c68b7e5cd55fcccdc99e7e",
-          "size_bytes": 112985
-        },
-        {
-          "name": "model.pt",
-          "sha256": "16cff07a98aa965b8a757aa1709a683f43fa7c9cf490b67a9125e6afeb0ee288",
-          "size_bytes": 114801
-        },
-        {
-          "name": "config.json",
-          "sha256": "66dc69447acf3b5b3d9dfdd50add1592ae74aff44dc7b16bad109d76d3e9ada7",
-          "size_bytes": 438
-        }
-      ]
+      "model_id": "utility_mapper_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059220,
+      "weights_digest": "4ae023127252c72045380899ca9eb36fecf00611722fb0c4737e213457439efd"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "74c254d94f628883ca837eb9a18a6e90284c2c98ff15d87a3bbe24ab38b0e7fd",
-          "size_bytes": 437469
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c9a4572fc922ee79d60b70ce2928b7f8dc8998b2184915d947639869ea5e6d5a",
-          "size_bytes": 439281
-        },
-        {
-          "name": "config.json",
-          "sha256": "5f5f6e73da3b208fb7738c1e9609c6ccba2214357070023cff49e028a720ebd4",
-          "size_bytes": 436
-        }
-      ]
+      "model_id": "utility_mapper_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450756,
+      "weights_digest": "d1bece03b36705c954afd5e466fe761055198424ccf9b01365800c8e5f80a4b4"
     }
-  },
-  "capabilities": [
-    "utility_mapper"
-  ]
+  }
 }

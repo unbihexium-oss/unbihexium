@@ -1,8 +1,0 @@
-{
-  "model_id": "desertification_monitor_mega",
-  "task": "segmentation",
-  "variant": "mega",
-  "params": 2268802,
-  "resolution": 512,
-  "base_channels": 128
-}

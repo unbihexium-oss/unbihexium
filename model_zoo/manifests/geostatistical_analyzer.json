@@ -1,91 +1,95 @@
 {
-  "model_id": "geostatistical_analyzer",
-  "name": "Geostatistical Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "geostatistical_analyzer",
+  "name": "Geostatistical Surface Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "analysis",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Geostatistical Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Learns a continuous surface of a sampled variable from covariates, as a learned alternative to kriging.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "value"
+    ],
+    "units": [
+      "user defined"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Point samples rasterised as sparse targets.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8eddde7dd8102b7395d4e559585717840a27610ebfe1aef44103e9f8c5818eb3",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "65147cfd25ec0ff6286c95642ffd2c6c0b879cba524ea0393d40eabb17e9264a",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "7c5764288a5788fccf5e922207d6aad8df6d52167dbefb0300e1cfa0d5a7b600",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "geostatistical_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "e7a0ec11cd9caafcda24f7ef5937190fdf44b03e665a5cdb78e87553591a1c53"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b6775d55ad4e113566d034b33651f44375e1921f574d82482d6b9974d917d369",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7e880796d6c7b9bb2e47a70ea4ec4ebd8ea925443334777773c8dcbebfb5542a",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "f70b03ec446176aed332357eb1b10091ca0262a525e54750db4558df6f453f73",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "geostatistical_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "36f274f5a36520ad43e5a442baf7e8b6dcfc5474d89b72503a7c34e105b6049d"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8d71881991a4a0cc759780563744a53abc9f3e84de6c082caacfac037e3e0326",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "61f4d9dc076d90421a72c852ad2e2abf53b50b87372924a5c79ce83fb948d21f",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "97cd264598942936259bbfbd24c5b13808c7b4b3a79490e3fd6fe98c347f557b",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "geostatistical_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "69a037c12b438bea1aa37eb3896bf477352ecb1caca6564e78e50d86cf595e38"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "18dc27c64042f162fc59d836a313c29eaa887f2d315ee030b8dd4a91e3a3f740",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d562042a1ebea19e6e8327a6d0ee3be53d73c24ba6ba17d638ce8221e25c3dec",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "2e83bf43b24333ca5e36ede1741f84bd9ad279870a2445efb1f52f3c3b8d6a5b",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "geostatistical_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "709c9d23559cdc92af7582d7cbca06e54a5f0d2d180ada2d0c773f4463b7553c"
     }
-  },
-  "capabilities": [
-    "geostatistical_analyzer"
-  ]
+  }
 }

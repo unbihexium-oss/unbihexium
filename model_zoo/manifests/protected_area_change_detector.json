@@ -1,91 +1,101 @@
 {
-  "model_id": "protected_area_change_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "protected_area_change_detector",
   "name": "Protected Area Change Detector",
-  "version": "1.0.0",
-  "task": "segmentation",
-  "architecture": "siamese_unet",
+  "version": "2.0.0",
+  "task": "change_detection",
+  "domain": "environment",
+  "architecture": "unet_early_fusion",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Protected Area Change Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects land cover change inside protected areas.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 2,
+    "channels": [
+      "B02_t1",
+      "B03_t1",
+      "B04_t1",
+      "B05_t1",
+      "B06_t1",
+      "B07_t1",
+      "B08_t1",
+      "B8A_t1",
+      "B11_t1",
+      "B12_t1",
+      "B02_t2",
+      "B03_t2",
+      "B04_t2",
+      "B05_t2",
+      "B06_t2",
+      "B07_t2",
+      "B08_t2",
+      "B8A_t2",
+      "B11_t2",
+      "B12_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "no_change",
+      "vegetation_loss",
+      "new_structure",
+      "other_change"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of change class logits; softmax over K."
+  },
+  "training_labels": "Change masks by change type.",
+  "data_sources": [
+    "Sentinel-2 L2A image pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "afab7304442837b83743cbe4e34498668e102c009649443aa8d1ee97dde62731",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b473600ca2639ff66b4c27d416daeff6161143a24a44508fee94660f37d1c2b4",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "e5275a53400d508fd58b9fd1bbd1effc595a6b1d024128e55d86fb3f77dee978",
-          "size_bytes": 435
-        }
-      ]
+      "model_id": "protected_area_change_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 735428,
+      "weights_digest": "8568cafa531fcb74c79bc1e710a661f69d405839f97e26bb0580e9d99432f89e"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c8968bdd84fe0be0a6508588883111138875373a21ccef20edf4dd480acf5d77",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "33912c598226c9f5b9efd22c13fc35b129c99756749852895f4be8145b8cb6a7",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "6f716770623770fb50e21c5f276f2033bf2e5de4de5b560d6234b6866f9322f5",
-          "size_bytes": 435
-        }
-      ]
+      "model_id": "protected_area_change_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7063428,
+      "weights_digest": "bf3e30686589fd8e342d66e0ed9e58b6219a6b26086497bb5ad99ae9b9bae67c"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "45b339823e4e0f486fff5a4a98c5903ce6303fe9df082d42cfa25e6eede9e675",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bce4d3136ca3a9795bd6d4c51d38f513c7e80405c05a622173134ff49e6c1bbe",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "ef3674866ceff61b3749595e0966ade9e17428039827c5f490de1f0235c1f65a",
-          "size_bytes": 439
-        }
-      ]
+      "model_id": "protected_area_change_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22066564,
+      "weights_digest": "ecb5a1034d94366b94200f906c827635b015b3058c45e498568497f52b8a5ec1"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6771b4c605b6784f6d9265fb1f64179242a0ae82581836d0a1cd9737b84effea",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "127e3eb87ea8743d6b7f4ccad8d525008705b03e735c656b34d0b5a34360a405",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "05f3873377ae6627992adeea63a65baa213530a59fe7387d6e20a4b410fa2f31",
-          "size_bytes": 437
-        }
-      ]
+      "model_id": "protected_area_change_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60460548,
+      "weights_digest": "12a10e75a1b2ab621ed4f102057f086e6b07fec776715943c0cabc7449bc6539"
     }
-  },
-  "capabilities": [
-    "protected_area_change_detector"
-  ]
+  }
 }

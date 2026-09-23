@@ -5,24 +5,33 @@ on:
     branches: [main]
     paths:
       - "model_zoo/**"
+      - "src/unbihexium/zoo/**"
+      - "src/unbihexium/ai/models/**"
       - ".github/scripts/check_model_zoo.py"
+      - ".github/workflows/model-zoo.yml"
   pull_request:
     branches: [main]
     paths:
       - "model_zoo/**"
+      - "src/unbihexium/zoo/**"
+      - "src/unbihexium/ai/models/**"
       - ".github/scripts/check_model_zoo.py"
+      - ".github/workflows/model-zoo.yml"
+  schedule:
+    # Weekly full rebuild of all 520 models to detect platform drift.
+    - cron: "0 5 * * 1"
   workflow_dispatch:
     inputs:
-      lfs-tier:
-        description: "Download the weights of this tier with Git LFS and hash them (uses LFS bandwidth)"
+      rebuild:
+        description: "Variants to rebuild and compare with the published digests"
         type: choice
-        default: none
+        default: all
         options:
-          - none
           - tiny
           - base
           - large
           - mega
+          - all
 
 permissions:
   contents: read
@@ -32,25 +41,50 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  integrity:
-    name: Structure and checksums
+  consistency:
+    name: Catalogue, manifests and cards
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-
-      - name: Download weights with Git LFS
-        if: github.event_name == 'workflow_dispatch' && inputs.lfs-tier != 'none'
-        env:
-          TIER: ${{ inputs.lfs-tier }}
-        run: git lfs pull --include "model_zoo/assets/${TIER}/**"
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
-      - name: Check model zoo structure, checksums, cards and manifests
+      # The consistency check reads the catalogue and the generated files
+      # only, so PyTorch is not installed here.
+      - name: Install the package and jsonschema
+        run: python -m pip install --no-deps . && python -m pip install pyyaml jsonschema
+
+      - name: Check that the model zoo files match the catalogue
         run: python .github/scripts/check_model_zoo.py
+
+  reproducibility:
+    name: Rebuild starter weights
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install the package with CPU-only PyTorch
+        run: |
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install . jsonschema
+
+      # Pull requests rebuild the tiny variants; the schedule and manual runs
+      # rebuild the selected variants (all 520 models by default).
+      - name: Rebuild models and compare digests
+        env:
+          REBUILD: ${{ github.event_name == 'pull_request' && 'tiny' || inputs.rebuild || 'all' }}
+        run: python .github/scripts/check_model_zoo.py --rebuild "${REBUILD}"

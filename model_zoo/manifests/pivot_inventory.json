@@ -1,91 +1,78 @@
 {
-  "model_id": "pivot_inventory",
-  "name": "Pivot Inventory",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "pivot_inventory",
+  "name": "Centre Pivot Inventory",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "agriculture",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Pivot Inventory model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects centre pivot irrigation fields for irrigation inventories.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "centre_pivot"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of centre pivot fields.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "Landsat 8/9",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1107847006f667c1cd5367f6bb82c708fd6b59ef046fcc72e5104686a82ca408",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "30688dcadd9a24ef3e1c55e638de29919d95b7fdd8b57ae65087165330a56349",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "49780bd5b3df9ff2c4877ad73b27aebc34efb3566a791f89ccb1185807d1375b",
-          "size_bytes": 396
-        }
-      ]
+      "model_id": "pivot_inventory_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730725,
+      "weights_digest": "53d7ae9907fb039379d94e1a2ae897b082c8af60a5f6498097800f4ee9493dc6"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cd54fd704345edf07bbc69ed154edae9df8dde1eeb548ed3a2cfffe443369187",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "817a22425bfd533cec975564f63eb76502b290017579f4e5d610b18c560159ea",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "c75205f31cb891f592a2624af3281ab1ee6422fe64b252f42ad27860e5a2f0cd",
-          "size_bytes": 396
-        }
-      ]
+      "model_id": "pivot_inventory_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049413,
+      "weights_digest": "bc1a26ae96644349a6db5ea07c4c7a65ea681b53c6dafb9bfc5e8e771a6300b9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "010bd07f86646d890e88103eb7ae8b93c101076740def301ca6a6a9eba9418ff",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d9acd0ff4ced692fc213cf5ab9e7f726b883bca4d8185f4e6c843aa45870ac7f",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "d46ccc13f8bf79e399c4e04cb383062ff8eda010b84b0f6bd4d76f929d6dfd98",
-          "size_bytes": 400
-        }
-      ]
+      "model_id": "pivot_inventory_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038629,
+      "weights_digest": "46b590a011de881352f2383c4d9234661522fe7e8b533bbe54e36a28690074d5"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "19efb713461bfdb7c2a02ecbdc9b4df23545c017990c4b507af585cec23606d3",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3a136e036068483c3fbcf9264c9d2f7f69fb82f1a3158912eb5ca8a8dacac6f8",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "c3231dd18a2d9a5cd1c7667145b9871dfbe1cdaa09aa8576b094d56e6a902d0f",
-          "size_bytes": 398
-        }
-      ]
+      "model_id": "pivot_inventory_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60414085,
+      "weights_digest": "4ae259625f2cdb23b10529b1bbe68add6727be5fd3fc895dc1021bea44b82a86"
     }
-  },
-  "capabilities": [
-    "pivot_inventory"
-  ]
+  }
 }

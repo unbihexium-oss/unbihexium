@@ -1,8 +1,0 @@
-{
-  "model_id": "damage_assessor_base",
-  "task": "detection",
-  "variant": "base",
-  "params": 569025,
-  "resolution": 128,
-  "base_channels": 64
-}

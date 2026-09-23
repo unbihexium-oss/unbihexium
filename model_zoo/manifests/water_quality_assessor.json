@@ -1,91 +1,92 @@
 {
-  "model_id": "water_quality_assessor",
+  "$schema": "../manifest.schema.json",
+  "family": "water_quality_assessor",
   "name": "Water Quality Assessor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "water",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Water Quality Assessor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates chlorophyll-a concentration and turbidity in water bodies.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "chlorophyll_a",
+      "turbidity"
+    ],
+    "units": [
+      "mg m-3",
+      "FNU"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "In situ water quality samples.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b27932aba0561967d9f3d2b11b7ab4faeb9f22b4aa0e575aca4d725e0075bfa3",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "68e238088f1abd00e01d041a817a2774db5ca0e2f6171512dc89773f12a782f8",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "b0ff001e4ea46e9bec0ded2c207735913b9888781fa7aeadbffbf6e5c946e7d7",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "water_quality_assessor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733954,
+      "weights_digest": "28d5cc931ec67edfd98973083a9c17e39fcd7c0a6892ecf0c2efea65ca6b9a29"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a42ce5f1b0d227515409f7703efc0d243729508eca406e1c3d25f75af5cae234",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9f427aa37c81ce59631047dc4dabb7b47c1c8c0b154b16ed91cc5444a87470f0",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "d0f37eb061a918c75a4b6b652306107c5162a45b31614736ffc816f7d2cd566c",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "water_quality_assessor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060482,
+      "weights_digest": "556f7848d6629f852930a0a53bb363d812f2298dcad117b72e0bc5d7ccc5eae4"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6a8b490d67c7819903595331a7276296adfc456f08e7e8cd22bf0d16f6f5d4d2",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "13de2b6ebdb73220b438c5d9a5086cda951908d9180998a6fd358f704a260205",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "a68d7fd950b63141610737808001792546229aa75c4e764e720edbef9959fe9b",
-          "size_bytes": 188
-        }
-      ]
+      "model_id": "water_quality_assessor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062146,
+      "weights_digest": "d27c1dcc7022093a334e7a677b8f8aaa008d77aa4179667b0579a959b1ad3a96"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d333db099667a9004594e1acbf4f757f605c12ed54d32a3daf0f93bc669e0a65",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6d4c9b661a630910ba06a86783280c89fbd9c1eeb2a90dfa9dfb48dcb2b6e00c",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "d5334df32401958a8d11d66523462b9a7b12dde1db751ae81281de096ddeb905",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "water_quality_assessor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454658,
+      "weights_digest": "9cc5040098f1714e5ad135805027d6dfb4b6b1dfb18b91d2ef0d9a15c07e9fdd"
     }
-  },
-  "capabilities": [
-    "water_quality_assessor"
-  ]
+  }
 }

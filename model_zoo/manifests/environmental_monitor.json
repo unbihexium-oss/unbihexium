@@ -1,91 +1,93 @@
 {
-  "model_id": "environmental_monitor",
-  "name": "Environmental Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "environmental_monitor",
+  "name": "Environmental Condition Monitor",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "environment",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Environmental Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores the ecological condition of land.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "condition"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Ecological condition scores from field assessment.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f60be7dae295b8d9af069d96e153967e422326076601e45bdda28f19d66bb85e",
-          "size_bytes": 1483
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ae1f3b12089ab6610a3aee75dc1ac2397303456ecedde973da92d537ee419985",
-          "size_bytes": 3581
-        },
-        {
-          "name": "config.json",
-          "sha256": "3d170cf1d0da9d8c215ac9508795d94aec0b6fabcf475978a47d04d24ee99f3b",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "environmental_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "bd98b1490381eedd04b381dd595d0da8a9c78992d260ff3f750473651e4ecbd7"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0566d0681a456de27acc0f8438b9e439d5c1b137498015e690524e86cf057058",
-          "size_bytes": 5037
-        },
-        {
-          "name": "model.pt",
-          "sha256": "693eec5d79d78006166c399d8595ffe6cca6dfe16edef72da0223d0b1f967187",
-          "size_bytes": 6973
-        },
-        {
-          "name": "config.json",
-          "sha256": "36fbaa5d01beb6daae2621df9ded6aabb104696f75fcaea4efda9fd64f32f03a",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "environmental_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "7cc7520b2437bc500d4e491ad731d6841c8b3f4854d59b7bac07dfe12f5c5934"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d292e4e95627b6df2cf455e419138d37a3e71362420a39b2af83c69cc1155d8d",
-          "size_bytes": 13361
-        },
-        {
-          "name": "model.pt",
-          "sha256": "85cdbaa5eacc43f4e5be635930f8f11ff968de24fc322165e717f76d259a0421",
-          "size_bytes": 15293
-        },
-        {
-          "name": "config.json",
-          "sha256": "00a542e6256c8cbf2ef289408a0adef8c24eea24fe73fb13fa42d44cac7c59e4",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "environmental_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "dfceb0a314259fe624e55617e7789447c5324cde9d638117c98e6e99454bff5f"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "aad8ded8252f82d494a8a1275196f613c5cab5fa05125b404b9b7a0a25826f22",
-          "size_bytes": 42295
-        },
-        {
-          "name": "model.pt",
-          "sha256": "846bf8a39be14ca3f3c944817cac9c64075fbec2b8fb6a860cdd0b22fdf55bae",
-          "size_bytes": 44221
-        },
-        {
-          "name": "config.json",
-          "sha256": "3ae423cdd370bee9b4d3d0e4588a4a8a52fa3e5711f08cfb9b81aafb134c1ae5",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "environmental_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "930370f9e7defb32a91b51a1156711c6022a087d859e2f7deaa2864ee620bf32"
     }
-  },
-  "capabilities": [
-    "environmental_monitor"
-  ]
+  }
 }

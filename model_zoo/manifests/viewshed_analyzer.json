@@ -1,91 +1,76 @@
 {
-  "model_id": "viewshed_analyzer",
-  "name": "Viewshed Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "viewshed_analyzer",
+  "name": "Visibility Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "tourism",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Viewshed Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the fraction of the surrounding area visible from each pixel.",
+  "inputs": {
+    "bands": [
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "visible_fraction"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Visibility rasters from viewshed analysis.",
+  "data_sources": [
+    "Copernicus DEM GLO-30",
+    "national DEMs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0c55ebf33b885f64cb9094b1a1a84746f1f47608323decb306affc39b9869c06",
-          "size_bytes": 1195
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9b4134fc09708a9f6038d9526cae1cd69c9befc92d836b399d3076ba698eb5da",
-          "size_bytes": 3261
-        },
-        {
-          "name": "config.json",
-          "sha256": "900e9e52a92cd78fb0fe4f9952ffcf4a380a7b7855431b4241e64fbb320eca24",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "viewshed_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732641,
+      "weights_digest": "042a2cbe3266348e95b1df05ee9905b8d929ae7c01bbb0572a8af448983f2e66"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "01654fc90fd38cca78e04c4ecc56a2fd1aae02e63bacb2a5ea8298c2a70b2caf",
-          "size_bytes": 3885
-        },
-        {
-          "name": "model.pt",
-          "sha256": "53e95cda3c28b9f370117f0e1bf5a6e3ad9cd2dd924ce79af74057f79e0a5f16",
-          "size_bytes": 5821
-        },
-        {
-          "name": "config.json",
-          "sha256": "88df6adb7ca0dce1bbb71246a1958a77741ed971b9a20b41e568db080dbb203a",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "viewshed_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7057857,
+      "weights_digest": "3058491fbce3824e8b2f36ca4e029ecfcb851c13bb7154e2e71dcbb635d524c1"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e12fa91add84ab18aee2b30370529c0ec6723e3b8ff2adb85336cc45abbd2681",
-          "size_bytes": 11057
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d652ca7e5fc2cef2ee72502358bdc2db9c338ac073eb971d539a2ee90b5990fc",
-          "size_bytes": 12989
-        },
-        {
-          "name": "config.json",
-          "sha256": "ece39cf4b8bf06f913e4330ad3b19bb43597471da83905aec7cae0ab779f7bde",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "viewshed_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058209,
+      "weights_digest": "8116adff75828b28d430e64ded6fd84f04f1b3afc5fb029b15a782c928b75820"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0976f0d0a677a99d69d478bce807b83ffd987110f983160696057051e63fe168",
-          "size_bytes": 37687
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6993b1f9d5e1b7cfbd37481779e118db4cdf8f146eefbb1ff842c1fb7d31ced6",
-          "size_bytes": 39613
-        },
-        {
-          "name": "config.json",
-          "sha256": "c4cc6ec917d8159964db44ac12ac903063eab905dbd4d843db8f1a52952f91dc",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "viewshed_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449409,
+      "weights_digest": "8747b85f567acb75c9542100db784186745c9b49a571ee38b23e4c34563d6548"
     }
-  },
-  "capabilities": [
-    "viewshed_analyzer"
-  ]
+  }
 }

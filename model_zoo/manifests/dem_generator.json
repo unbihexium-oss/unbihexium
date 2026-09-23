@@ -1,91 +1,74 @@
 {
-  "model_id": "dem_generator",
-  "name": "Dem Generator",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "dem_generator",
+  "name": "DEM from Stereo",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "imaging",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Dem Generator model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates terrain elevation from a panchromatic stereo pair.",
+  "inputs": {
+    "bands": [
+      "pan_t1",
+      "pan_t2"
+    ],
+    "dates": 1,
+    "channels": [
+      "pan_t1",
+      "pan_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "elevation"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Reference DEMs, for example LiDAR.",
+  "data_sources": [
+    "Epipolar-rectified panchromatic stereo pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cb14db4f028dc53b93014755d739fa2748071b837590d54ef609084aa0546763",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "208494df5aacd5301a757b98a825b55ea387af4aa90ea5fa53a0dda7eb30a69e",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "d15dafd7ea54076e57d2128d98172a7182fa6221664c36c9b36447cbd3585a7d",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dem_generator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732785,
+      "weights_digest": "7cef49a6076fe6ebec844768dff5fb1aff4f27776132a83f3b6e0cf040d4b494"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "86864ab03948ae84eebf2ebb9a5b17e54e55c97a6fcef0bb14b1e3c7a5a2572b",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ea2c7c785e2fadac862739266cc0c7daf965e741f3251e7dd41ace47b985254f",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "4c73f67fe00eaba50fe4b11460562fa19ce4a522518c0847fde5812120c32014",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dem_generator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058145,
+      "weights_digest": "3b3c0112bda94efc82729499fd79a6c55bba02d512632251ff1f243f60c697d5"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5846cfa3405cf4777e0aa77e8621c3f8c48120fbddeffdcb36ed0305890d5086",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1b3dec96fef24c1f8fff0bee0d15bdc4a9a9d7978485a2ddaca10458de63e379",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "5f36a3c497af0aabd26b6bfb00af8f60545ad4aa64b0bddc4f9f90f9a68d63ea",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "dem_generator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058641,
+      "weights_digest": "7f858eb0f820ce6c30c75953537c7743d32c7137216e99699125a55bebb34fcd"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "031b04fa53b777f76ba20dd7fbc9ee315f6f9920bbc0c13cfd1e6001848c4fbd",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f0a19397801f6ba51d916a30df15e771325c2725de4c6346b3c10a21a80b37f4",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "116c8d0bc2502b4aa86cf1d818ea5fc079ce53c1de21186c09e116159602480c",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dem_generator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449985,
+      "weights_digest": "e6d192cc1323f71ba459769677ed74579aa07c94b5395dc15dfb82cefc4bbff9"
     }
-  },
-  "capabilities": [
-    "dem_generator"
-  ]
+  }
 }

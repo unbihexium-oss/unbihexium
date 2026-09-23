@@ -1,91 +1,75 @@
 {
-  "model_id": "evi_calculator",
-  "name": "Evi Calculator",
-  "version": "1.0.0",
-  "task": "index",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "evi_calculator",
+  "name": "EVI Calculator",
+  "version": "2.0.0",
+  "task": "spectral_index",
+  "domain": "indices",
+  "architecture": "spectral_formula",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Evi Calculator model for index.",
-  "artifacts": {
+  "status": "reference",
+  "trained": false,
+  "description": "Enhanced Vegetation Index, 2.5 (NIR - RED) / (NIR + 6 RED - 7.5 BLUE + 1) (Huete et al., 2002).",
+  "inputs": {
+    "bands": [
+      "blue",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "evi"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": "evi",
+    "layout": "Tensor (N, 1, H, W) with the index value; NaN where undefined."
+  },
+  "training_labels": "None, the formula needs no training.",
+  "data_sources": [
+    "Surface reflectance from Sentinel-2",
+    "Landsat or similar sensors"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "131eb7c6af014b31350f72aecf778c5afcd672a8a4225ee81005f29a0ed567be",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "958c0ed9b824469e4e50dc282ec35651dda7185aea8805c96a66a7eb8a8a4fc9",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "0b40fe501d3a3bb9af41e59c0ce4ef45b52c0731ea5ebe5fb1fde3de40f0bf6e",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "evi_calculator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0cfc162de84cf45a7a78696d6f480bbed92e8ada0e0d1fbccdd0ec6b45da0f4f",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "55c7b78e7900e69b5246e68183231aa249a84df0ce99cd952712dea661a9e0c3",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "00dee586bc4c8bfcde276f4fc6fb2dea0203dc99ae4e1a7da8691461a72f871c",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "evi_calculator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6b4985df374c8011d13f5c1f779bfb838aab027f79a0b5385d69281c7bc6e2df",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c880e6095da35015569bbe881f79dd85edd6054d727f623e436b0a48b34c672f",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "293f4e5afffa0848add9f4e69ba31ad2aa8145430bdff253d9c22738531a62de",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "evi_calculator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "08c9d9e3b732903601033b974c1a1a027759cfb9e9441e2625199b0c69add10e",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1003421588615c0c5d7267d21f906fe69f0a4fa1463a45306f243c40cb68c329",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "6c85e9ae4012d7d7fbd5dfce7d0c2d339268672f7d03519e5edcd48cfc15f750",
-          "size_bytes": 351
-        }
-      ]
+      "model_id": "evi_calculator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
-  },
-  "capabilities": [
-    "evi_calculator"
-  ]
+  }
 }

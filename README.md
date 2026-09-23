@@ -20,7 +20,7 @@
 
 <p align="center">
   <a href="model_zoo/"><img src="https://img.shields.io/badge/Models-520-FF6B35?style=flat-square&logo=huggingface&logoColor=white" alt="Models"></a>
-  <a href="model_zoo/"><img src="https://img.shields.io/badge/Parameters-515M-9C27B0?style=flat-square" alt="Parameters"></a>
+  <a href="model_zoo/MODEL_CARDS.md"><img src="https://img.shields.io/badge/Model_families-130-9C27B0?style=flat-square" alt="Model families"></a>
   <a href="model_zoo/"><img src="https://img.shields.io/badge/Architectures-130-E91E63?style=flat-square" alt="Architectures"></a>
   <a href="https://onnx.ai/"><img src="https://img.shields.io/badge/ONNX-supported-005CFF?style=flat-square&logo=onnx&logoColor=white" alt="ONNX"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch"></a>
@@ -74,7 +74,7 @@
 
 ## Executive Summary
 
-**Unbihexium** is a production-grade, enterprise-ready Python library for geospatial artificial intelligence, Earth observation analytics, and remote sensing workflows. The library provides a unified, extensible framework encompassing **520 pre-trained models** with **515 million total parameters** across 4 variant tiers (tiny, base, large, mega), 12 capability domains, and comprehensive tooling for end-to-end geospatial analysis pipelines.
+**Unbihexium** is a production-grade, enterprise-ready Python library for geospatial artificial intelligence, Earth observation analytics, and remote sensing workflows. The library provides a unified, extensible framework encompassing **520 trainable starter models** (130 model families in 4 variant tiers: tiny, base, large, mega) with deterministic, verifiable starter weights, 12 capability domains, and comprehensive tooling for end-to-end geospatial analysis pipelines.
 
 The library is named after the theoretical chemical element with atomic number 126, symbolizing the comprehensive and foundational nature of this framework in bridging Earth observation data with artificial intelligence capabilities.
 
@@ -111,71 +111,38 @@ The library is named after the theoretical chemical element with atomic number 1
 
 ## Model Zoo Overview
 
-### Comprehensive Model Statistics
+The model zoo offers **130 model families in four size variants (520 models, 10,655,126,116 parameters in total)**. Every learned model is a **starter model**: a complete, trainable architecture for its task with deterministic starter weights, generated locally and verifiable against the published SHA-256 digest in [`src/unbihexium/zoo/digests.json`](src/unbihexium/zoo/digests.json). The starter models are **not trained on Earth observation data**; train or fine-tune them on labelled data for your area and sensor before using their predictions. The seven spectral index models implement published formulas exactly and need no training.
 
-The Unbihexium Model Zoo represents a comprehensive collection of **520 production-ready models** organized into 130 base architectures across 4 variant tiers. Each model has been trained on curated datasets and validated for production deployment.
+```python
+from unbihexium.zoo import list_models, load_model
 
-#### Variant Specifications
-
-| Variant | Count | Resolution | Base Channels | Parameter Range | Average Parameters | Total Parameters |
-| --------- | ------- | ------------ | --------------- | ----------------- | ------------------- | ------------------ |
-| **tiny** | 130 | 64 x 64 px | 32 | 49,667 - 258,754 | 133,755 | 17,388,189 |
-| **base** | 130 | 128 x 128 px | 64 | 191,491 - 1,029,506 | 530,267 | 68,934,749 |
-| **large** | 130 | 256 x 256 px | 96 | 425,475 - 2,312,258 | 1,189,538 | 154,639,901 |
-| **mega** | 130 | 512 x 512 px | 128 | 751,619 - 4,107,010 | 2,111,567 | 274,503,645 |
-
-#### Total Parameter Count
-
-The aggregate parameter count across all variants:
-
-$$
-P_{total} = \sum_{v \in \mathcal{V}} \sum_{m=1}^{130} P_{v,m} = 515,466,484
-$$
-
-Where $\mathcal{V} = \{tiny, base, large, mega\}$ represents the set of variant tiers.
-
-### Task Distribution
-
-```mermaid
-pie title Model Distribution by Task (520 Total)
-    "Regression" : 188
-    "Segmentation" : 128
-    "Detection" : 76
-    "Terrain" : 52
-    "Enhancement" : 44
-    "Index" : 28
-    "Super Resolution" : 4
+model = load_model("ship_detector_base")  # built locally, digest verified
+print(model.summary())
 ```
 
-### Detailed Task Statistics
+The catalogue of all families, with their inputs, outputs, required training labels and suitable data sources, is [`src/unbihexium/zoo/catalog.yaml`](src/unbihexium/zoo/catalog.yaml); the per-family model cards are listed in [`model_zoo/MODEL_CARDS.md`](model_zoo/MODEL_CARDS.md).
 
-| Task | Models per Variant | Total Models | Min Parameters | Max Parameters | Average Parameters | Primary Metric |
-| ------ | ------------------- | -------------- | ---------------- | ---------------- | ------------------- | ---------------- |
-| Regression | 47 | 188 | 67,329 | 1,065,473 | 498,942 | R-squared |
-| Segmentation | 32 | 128 | 143,266 | 4,107,010 | 1,307,290 | mIoU |
-| Detection | 19 | 76 | 143,201 | 2,269,059 | 1,064,595 | mAP@0.5 |
-| Terrain | 13 | 52 | 186,177 | 2,956,545 | 1,387,041 | RMSE |
-| Enhancement | 11 | 44 | 186,243 | 2,956,803 | 1,387,203 | PSNR |
-| Index | 7 | 28 | 186,243 | 2,956,803 | 1,387,203 | MAE |
-| Super Resolution | 1 | 4 | 49,667 | 751,619 | 354,563 | PSNR |
+### Variants
 
-### Parameter Scaling Analysis
+| Variant | Base channels | Encoder levels | Blocks per level | Tile size | Parameters per model (learned models) | Total parameters |
+| --- | --- | --- | --- | --- | --- | --- |
+| **tiny** | 16 | 3 | 1 | 256 px | 134,992 to 735,428 | 86,951,209 |
+| **base** | 32 | 4 | 1 | 256 px | 657,264 to 7,063,428 | 825,294,793 |
+| **large** | 48 | 4 | 2 | 512 px | 2,784,528 to 22,066,564 | 2,611,810,665 |
+| **mega** | 64 | 5 | 2 | 512 px | 6,109,872 to 60,460,548 | 7,131,069,449 |
 
-The relationship between variant parameters follows a consistent scaling pattern:
+### Tasks and architectures
 
-$$
-\frac{P_{base}}{P_{tiny}} \approx 3.96, \quad \frac{P_{large}}{P_{base}} \approx 2.24, \quad \frac{P_{mega}}{P_{large}} \approx 1.78
-$$
-
-This scaling relationship can be approximated by:
-
-$$
-P_{variant} = P_{tiny} \times \left(\frac{C_{variant}}{C_{tiny}}\right)^{\alpha}
-$$
-
-Where $C$ represents the base channel count and $\alpha \approx 2.0$ for convolutional architectures.
-
----
+| Task | Families | Models | Architecture |
+| --- | --- | --- | --- |
+| detection | 19 | 76 | CenterNet (anchor-free, stride 4) |
+| segmentation | 26 | 104 | U-Net |
+| change detection | 6 | 24 | U-Net on two stacked acquisitions |
+| dense regression | 49 | 196 | U-Net with regression output |
+| scene regression | 11 | 44 | Residual encoder with pooled regression head |
+| enhancement | 11 | 44 | Residual U-Net (image to image) |
+| super resolution | 1 | 4 | EDSR-style residual network with sub-pixel convolution |
+| spectral index | 7 | 28 | Exact formula (no weights) |
 
 ## System Architecture
 
@@ -490,13 +457,6 @@ conda install -c conda-forge unbihexium cudatoolkit=11.8
 git clone https://github.com/unbihexium-oss/unbihexium.git
 cd unbihexium
 
-# IMPORTANT: Install Git LFS and pull model files
-git lfs install
-git lfs pull  # Downloads all 520 ONNX models (~4 GB)
-
-# OR pull specific models only
-git lfs pull --include "model_zoo/assets/tiny/*"  # ~500 MB
-
 # Create virtual environment
 python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
@@ -509,7 +469,7 @@ pip install -e ".[dev,test,docs]"
 pytest tests/
 ```
 
-**Note:** Without `git lfs pull`, model files will be LFS pointers (131 bytes) instead of actual model weights. Models require Git LFS to function correctly.
+**Note:** The model zoo needs no large downloads. Starter weights are generated locally from the model id and verified against the published digests; install `unbihexium[torch]` to build, train and export models.
 
 #### Docker Installation
 
@@ -762,7 +722,7 @@ We welcome contributions from the community. Please review:
   url          = {https://github.com/unbihexium-oss/unbihexium},
   doi          = {10.5281/zenodo.0000000},
   license      = {MPL-2.0},
-  note         = {520 models, 515M parameters, 12 capability domains}
+  note         = {130 model families in 4 variants, 12 capability domains}
 }
 ```
 

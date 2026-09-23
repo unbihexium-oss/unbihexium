@@ -1,123 +1,1174 @@
-# Capability to Model Mapping
-# Maps every capability_id to its primary model(s)
-
-version: "1.0.0"
-last_updated: "2025-12-19"
-
+# Capability to model mapping, generated from src/unbihexium/zoo/catalog.yaml by
+# `python -m unbihexium.zoo.sync`. Do not edit by hand.
+version: 2.0.0
 mappings:
-  # Vision / EO AI
-  ship_detection:
-    primary_model_id: ubx-det-multiclass-1.0.0
-    description: Ship detection using multi-class detector with ship label
-
-  building_detection:
-    primary_model_id: ubx-det-multiclass-1.0.0
-    description: Building footprint detection
-
-  aircraft_detection:
-    primary_model_id: ubx-det-multiclass-1.0.0
-    description: Aircraft detection using multi-class detector
-
-  vehicle_detection:
-    primary_model_id: ubx-det-multiclass-1.0.0
-    description: Vehicle detection using multi-class detector
-
-  super_resolution:
-    primary_model_id: ubx-sr-srcnn-1.0.0
-    description: Image super-resolution using SRCNN
-
-  change_detection:
-    primary_model_id: ubx-change-siamese-1.0.0
-    description: Generic change detection using siamese network
-
-  water_segmentation:
-    primary_model_id: ubx-seg-multiclass-unet-1.0.0
-    description: Water body segmentation
-
-  crop_segmentation:
-    primary_model_id: ubx-seg-multiclass-unet-1.0.0
-    description: Crop type segmentation
-
-  greenhouse_detection:
-    primary_model_id: ubx-seg-multiclass-unet-1.0.0
-    description: Greenhouse detection via segmentation
-
-  landcover_classification:
-    primary_model_id: ubx-lulc-seg-1.0.0
-    description: Land use / land cover classification
-
-  # Boundary / Agriculture
-  crop_boundary:
-    primary_model_id: ubx-boundary-crop-1.0.0
-    description: Crop field boundary delineation
-
-  yield_prediction:
-    primary_model_id: ubx-yield-reg-1.0.0
-    description: Crop yield prediction
-
-  # Network / Tourism
-  routing_analysis:
-    primary_model_id: ubx-routing-heuristics-pack-1.0.0
-    description: Routing heuristics for network analysis
-
-  suitability_analysis:
-    primary_model_id: ubx-suitability-mlp-1.0.0
-    description: Multi-criteria suitability scoring
-
-  # Flood / Water
+  aircraft_detector:
+    name: Aircraft Detector
+    task: detection
+    primary_model_id: aircraft_detector_base
+    model_ids:
+    - aircraft_detector_tiny
+    - aircraft_detector_base
+    - aircraft_detector_large
+    - aircraft_detector_mega
+  border_monitor:
+    name: Border Area Monitor
+    task: detection
+    primary_model_id: border_monitor_base
+    model_ids:
+    - border_monitor_tiny
+    - border_monitor_base
+    - border_monitor_large
+    - border_monitor_mega
+  building_detector:
+    name: Building Detector
+    task: detection
+    primary_model_id: building_detector_base
+    model_ids:
+    - building_detector_tiny
+    - building_detector_base
+    - building_detector_large
+    - building_detector_mega
+  builtup_detector:
+    name: Built-up Area Detector
+    task: detection
+    primary_model_id: builtup_detector_base
+    model_ids:
+    - builtup_detector_tiny
+    - builtup_detector_base
+    - builtup_detector_large
+    - builtup_detector_mega
+  crop_detector:
+    name: Crop Parcel Detector
+    task: detection
+    primary_model_id: crop_detector_base
+    model_ids:
+    - crop_detector_tiny
+    - crop_detector_base
+    - crop_detector_large
+    - crop_detector_mega
+  damage_assessor:
+    name: Building Damage Assessor
+    task: detection
+    primary_model_id: damage_assessor_base
+    model_ids:
+    - damage_assessor_tiny
+    - damage_assessor_base
+    - damage_assessor_large
+    - damage_assessor_mega
+  encroachment_detector:
+    name: Encroachment Detector
+    task: detection
+    primary_model_id: encroachment_detector_base
+    model_ids:
+    - encroachment_detector_tiny
+    - encroachment_detector_base
+    - encroachment_detector_large
+    - encroachment_detector_mega
+  fire_monitor:
+    name: Active Fire Detector
+    task: detection
+    primary_model_id: fire_monitor_base
+    model_ids:
+    - fire_monitor_tiny
+    - fire_monitor_base
+    - fire_monitor_large
+    - fire_monitor_mega
+  greenhouse_detector:
+    name: Greenhouse Detector
+    task: detection
+    primary_model_id: greenhouse_detector_base
+    model_ids:
+    - greenhouse_detector_tiny
+    - greenhouse_detector_base
+    - greenhouse_detector_large
+    - greenhouse_detector_mega
+  leakage_detector:
+    name: Leakage Detector
+    task: detection
+    primary_model_id: leakage_detector_base
+    model_ids:
+    - leakage_detector_tiny
+    - leakage_detector_base
+    - leakage_detector_large
+    - leakage_detector_mega
+  maritime_awareness:
+    name: Maritime Awareness Detector
+    task: detection
+    primary_model_id: maritime_awareness_base
+    model_ids:
+    - maritime_awareness_tiny
+    - maritime_awareness_base
+    - maritime_awareness_large
+    - maritime_awareness_mega
+  military_objects_detector:
+    name: Military Objects Detector
+    task: detection
+    primary_model_id: military_objects_detector_base
+    model_ids:
+    - military_objects_detector_tiny
+    - military_objects_detector_base
+    - military_objects_detector_large
+    - military_objects_detector_mega
+  object_detector:
+    name: Generic Object Detector
+    task: detection
+    primary_model_id: object_detector_base
+    model_ids:
+    - object_detector_tiny
+    - object_detector_base
+    - object_detector_large
+    - object_detector_mega
+  pivot_inventory:
+    name: Centre Pivot Inventory
+    task: detection
+    primary_model_id: pivot_inventory_base
+    model_ids:
+    - pivot_inventory_tiny
+    - pivot_inventory_base
+    - pivot_inventory_large
+    - pivot_inventory_mega
+  sar_ship_detector:
+    name: SAR Ship Detector
+    task: detection
+    primary_model_id: sar_ship_detector_base
+    model_ids:
+    - sar_ship_detector_tiny
+    - sar_ship_detector_base
+    - sar_ship_detector_large
+    - sar_ship_detector_mega
+  security_monitor:
+    name: Security Monitor
+    task: detection
+    primary_model_id: security_monitor_base
+    model_ids:
+    - security_monitor_tiny
+    - security_monitor_base
+    - security_monitor_large
+    - security_monitor_mega
+  ship_detector:
+    name: Ship Detector
+    task: detection
+    primary_model_id: ship_detector_base
+    model_ids:
+    - ship_detector_tiny
+    - ship_detector_base
+    - ship_detector_large
+    - ship_detector_mega
+  target_detector:
+    name: Target Detector
+    task: detection
+    primary_model_id: target_detector_base
+    model_ids:
+    - target_detector_tiny
+    - target_detector_base
+    - target_detector_large
+    - target_detector_mega
+  vehicle_detector:
+    name: Vehicle Detector
+    task: detection
+    primary_model_id: vehicle_detector_base
+    model_ids:
+    - vehicle_detector_tiny
+    - vehicle_detector_base
+    - vehicle_detector_large
+    - vehicle_detector_mega
+  cloud_mask:
+    name: Cloud and Shadow Mask
+    task: segmentation
+    primary_model_id: cloud_mask_base
+    model_ids:
+    - cloud_mask_tiny
+    - cloud_mask_base
+    - cloud_mask_large
+    - cloud_mask_mega
+  corridor_monitor:
+    name: Corridor Monitor
+    task: segmentation
+    primary_model_id: corridor_monitor_base
+    model_ids:
+    - corridor_monitor_tiny
+    - corridor_monitor_base
+    - corridor_monitor_large
+    - corridor_monitor_mega
+  crop_boundary_delineation:
+    name: Crop Boundary Delineation
+    task: segmentation
+    primary_model_id: crop_boundary_delineation_base
+    model_ids:
+    - crop_boundary_delineation_tiny
+    - crop_boundary_delineation_base
+    - crop_boundary_delineation_large
+    - crop_boundary_delineation_mega
+  crop_classifier:
+    name: Crop Type Classifier
+    task: segmentation
+    primary_model_id: crop_classifier_base
+    model_ids:
+    - crop_classifier_tiny
+    - crop_classifier_base
+    - crop_classifier_large
+    - crop_classifier_mega
+  desertification_monitor:
+    name: Desertification Monitor
+    task: segmentation
+    primary_model_id: desertification_monitor_base
+    model_ids:
+    - desertification_monitor_tiny
+    - desertification_monitor_base
+    - desertification_monitor_large
+    - desertification_monitor_mega
+  digitization_2d:
+    name: 2D Digitisation
+    task: segmentation
+    primary_model_id: digitization_2d_base
+    model_ids:
+    - digitization_2d_tiny
+    - digitization_2d_base
+    - digitization_2d_large
+    - digitization_2d_mega
+  erosion_detector:
+    name: Erosion Detector
+    task: segmentation
+    primary_model_id: erosion_detector_base
+    model_ids:
+    - erosion_detector_tiny
+    - erosion_detector_base
+    - erosion_detector_large
+    - erosion_detector_mega
+  forest_monitor:
+    name: Forest Monitor
+    task: segmentation
+    primary_model_id: forest_monitor_base
+    model_ids:
+    - forest_monitor_tiny
+    - forest_monitor_base
+    - forest_monitor_large
+    - forest_monitor_mega
+  infrastructure_monitor:
+    name: Infrastructure Monitor
+    task: segmentation
+    primary_model_id: infrastructure_monitor_base
+    model_ids:
+    - infrastructure_monitor_tiny
+    - infrastructure_monitor_base
+    - infrastructure_monitor_large
+    - infrastructure_monitor_mega
+  land_degradation_detector:
+    name: Land Degradation Detector
+    task: segmentation
+    primary_model_id: land_degradation_detector_base
+    model_ids:
+    - land_degradation_detector_tiny
+    - land_degradation_detector_base
+    - land_degradation_detector_large
+    - land_degradation_detector_mega
+  lulc_classifier:
+    name: Land Use and Land Cover Classifier
+    task: segmentation
+    primary_model_id: lulc_classifier_base
+    model_ids:
+    - lulc_classifier_tiny
+    - lulc_classifier_base
+    - lulc_classifier_large
+    - lulc_classifier_mega
+  marine_pollution_detector:
+    name: Marine Pollution Detector
+    task: segmentation
+    primary_model_id: marine_pollution_detector_base
+    model_ids:
+    - marine_pollution_detector_tiny
+    - marine_pollution_detector_base
+    - marine_pollution_detector_large
+    - marine_pollution_detector_mega
+  multi_solution_segmentation:
+    name: General Semantic Segmentation
+    task: segmentation
+    primary_model_id: multi_solution_segmentation_base
+    model_ids:
+    - multi_solution_segmentation_tiny
+    - multi_solution_segmentation_base
+    - multi_solution_segmentation_large
+    - multi_solution_segmentation_mega
+  plowed_land_detector:
+    name: Ploughed Land Detector
+    task: segmentation
+    primary_model_id: plowed_land_detector_base
+    model_ids:
+    - plowed_land_detector_tiny
+    - plowed_land_detector_base
+    - plowed_land_detector_large
+    - plowed_land_detector_mega
+  reservoir_monitor:
+    name: Reservoir Monitor
+    task: segmentation
+    primary_model_id: reservoir_monitor_base
+    model_ids:
+    - reservoir_monitor_tiny
+    - reservoir_monitor_base
+    - reservoir_monitor_large
+    - reservoir_monitor_mega
+  road_network_analyzer:
+    name: Road Network Extractor
+    task: segmentation
+    primary_model_id: road_network_analyzer_base
+    model_ids:
+    - road_network_analyzer_tiny
+    - road_network_analyzer_base
+    - road_network_analyzer_large
+    - road_network_analyzer_mega
+  salinity_detector:
+    name: Soil Salinity Detector
+    task: segmentation
+    primary_model_id: salinity_detector_base
+    model_ids:
+    - salinity_detector_tiny
+    - salinity_detector_base
+    - salinity_detector_large
+    - salinity_detector_mega
+  sar_flood_detector:
+    name: SAR Flood Detector
+    task: segmentation
+    primary_model_id: sar_flood_detector_base
+    model_ids:
+    - sar_flood_detector_tiny
+    - sar_flood_detector_base
+    - sar_flood_detector_large
+    - sar_flood_detector_mega
+  sar_oil_spill_detector:
+    name: SAR Oil Spill Detector
+    task: segmentation
+    primary_model_id: sar_oil_spill_detector_base
+    model_ids:
+    - sar_oil_spill_detector_tiny
+    - sar_oil_spill_detector_base
+    - sar_oil_spill_detector_large
+    - sar_oil_spill_detector_mega
+  thematic_mapper:
+    name: Thematic Mapper
+    task: segmentation
+    primary_model_id: thematic_mapper_base
+    model_ids:
+    - thematic_mapper_tiny
+    - thematic_mapper_base
+    - thematic_mapper_large
+    - thematic_mapper_mega
+  topography_mapper:
+    name: Landform Mapper
+    task: segmentation
+    primary_model_id: topography_mapper_base
+    model_ids:
+    - topography_mapper_tiny
+    - topography_mapper_base
+    - topography_mapper_large
+    - topography_mapper_mega
+  tourist_destination_monitor:
+    name: Tourist Destination Monitor
+    task: segmentation
+    primary_model_id: tourist_destination_monitor_base
+    model_ids:
+    - tourist_destination_monitor_tiny
+    - tourist_destination_monitor_base
+    - tourist_destination_monitor_large
+    - tourist_destination_monitor_mega
+  transportation_mapper:
+    name: Transportation Mapper
+    task: segmentation
+    primary_model_id: transportation_mapper_base
+    model_ids:
+    - transportation_mapper_tiny
+    - transportation_mapper_base
+    - transportation_mapper_large
+    - transportation_mapper_mega
+  urban_planner:
+    name: Urban Land Use Mapper
+    task: segmentation
+    primary_model_id: urban_planner_base
+    model_ids:
+    - urban_planner_tiny
+    - urban_planner_base
+    - urban_planner_large
+    - urban_planner_mega
+  utility_mapper:
+    name: Utility Mapper
+    task: segmentation
+    primary_model_id: utility_mapper_base
+    model_ids:
+    - utility_mapper_tiny
+    - utility_mapper_base
+    - utility_mapper_large
+    - utility_mapper_mega
+  water_surface_detector:
+    name: Water Surface Detector
+    task: segmentation
+    primary_model_id: water_surface_detector_base
+    model_ids:
+    - water_surface_detector_tiny
+    - water_surface_detector_base
+    - water_surface_detector_large
+    - water_surface_detector_mega
+  asset_condition_change:
+    name: Asset Condition Change
+    task: change_detection
+    primary_model_id: asset_condition_change_base
+    model_ids:
+    - asset_condition_change_tiny
+    - asset_condition_change_base
+    - asset_condition_change_large
+    - asset_condition_change_mega
+  change_detector:
+    name: Change Detector
+    task: change_detection
+    primary_model_id: change_detector_base
+    model_ids:
+    - change_detector_tiny
+    - change_detector_base
+    - change_detector_large
+    - change_detector_mega
+  construction_monitor:
+    name: Construction Monitor
+    task: change_detection
+    primary_model_id: construction_monitor_base
+    model_ids:
+    - construction_monitor_tiny
+    - construction_monitor_base
+    - construction_monitor_large
+    - construction_monitor_mega
+  deforestation_detector:
+    name: Deforestation Detector
+    task: change_detection
+    primary_model_id: deforestation_detector_base
+    model_ids:
+    - deforestation_detector_tiny
+    - deforestation_detector_base
+    - deforestation_detector_large
+    - deforestation_detector_mega
+  protected_area_change_detector:
+    name: Protected Area Change Detector
+    task: change_detection
+    primary_model_id: protected_area_change_detector_base
+    model_ids:
+    - protected_area_change_detector_tiny
+    - protected_area_change_detector_base
+    - protected_area_change_detector_large
+    - protected_area_change_detector_mega
+  urban_growth_assessor:
+    name: Urban Growth Assessor
+    task: change_detection
+    primary_model_id: urban_growth_assessor_base
+    model_ids:
+    - urban_growth_assessor_tiny
+    - urban_growth_assessor_base
+    - urban_growth_assessor_large
+    - urban_growth_assessor_mega
+  accessibility_analyzer:
+    name: Accessibility Analyser
+    task: dense_regression
+    primary_model_id: accessibility_analyzer_base
+    model_ids:
+    - accessibility_analyzer_tiny
+    - accessibility_analyzer_base
+    - accessibility_analyzer_large
+    - accessibility_analyzer_mega
+  beekeeping_suitability:
+    name: Beekeeping Suitability
+    task: dense_regression
+    primary_model_id: beekeeping_suitability_base
+    model_ids:
+    - beekeeping_suitability_tiny
+    - beekeeping_suitability_base
+    - beekeeping_suitability_large
+    - beekeeping_suitability_mega
+  crop_growth_monitor:
+    name: Crop Growth Monitor
+    task: dense_regression
+    primary_model_id: crop_growth_monitor_base
+    model_ids:
+    - crop_growth_monitor_tiny
+    - crop_growth_monitor_base
+    - crop_growth_monitor_large
+    - crop_growth_monitor_mega
+  crop_health_assessor:
+    name: Crop Health Assessor
+    task: dense_regression
+    primary_model_id: crop_health_assessor_base
+    model_ids:
+    - crop_health_assessor_tiny
+    - crop_health_assessor_base
+    - crop_health_assessor_large
+    - crop_health_assessor_mega
+  drought_monitor:
+    name: Drought Monitor
+    task: dense_regression
+    primary_model_id: drought_monitor_base
+    model_ids:
+    - drought_monitor_tiny
+    - drought_monitor_base
+    - drought_monitor_large
+    - drought_monitor_mega
+  energy_potential:
+    name: Energy Potential
+    task: dense_regression
+    primary_model_id: energy_potential_base
+    model_ids:
+    - energy_potential_tiny
+    - energy_potential_base
+    - energy_potential_large
+    - energy_potential_mega
+  environmental_risk:
+    name: Environmental Risk
+    task: dense_regression
+    primary_model_id: environmental_risk_base
+    model_ids:
+    - environmental_risk_tiny
+    - environmental_risk_base
+    - environmental_risk_large
+    - environmental_risk_mega
   flood_risk:
-    primary_model_id: ubx-flood-risk-mlp-1.0.0
-    description: Flood risk scoring
-
-  water_quality:
-    primary_model_id: ubx-water-quality-reg-1.0.0
-    description: Water quality parameter estimation
-
-  # Environment / Forestry
-  deforestation_detection:
-    primary_model_id: ubx-deforestation-change-1.0.0
-    description: Deforestation change detection
-
-  forest_monitoring:
-    primary_model_id: ubx-deforestation-change-1.0.0
-    description: Forest monitoring via change detection
-
-  # Asset / Energy
-  corridor_monitoring:
-    primary_model_id: ubx-corridor-change-1.0.0
-    description: Pipeline corridor change monitoring
-
-  site_selection:
-    primary_model_id: ubx-site-selection-mlp-1.0.0
-    description: Wind/solar site suitability
-
-  leakage_detection:
-    primary_model_id: ubx-leakage-anomaly-1.0.0
-    description: Leakage anomaly detection
-
-  # Urban
-  builtup_detection:
-    primary_model_id: ubx-builtup-seg-1.0.0
-    description: Built-up area segmentation
-
-  urban_expansion:
-    primary_model_id: ubx-builtup-seg-1.0.0
-    description: Urban expansion monitoring
-
-  # Risk / Preparedness
+    name: Flood Risk
+    task: dense_regression
+    primary_model_id: flood_risk_base
+    model_ids:
+    - flood_risk_tiny
+    - flood_risk_base
+    - flood_risk_large
+    - flood_risk_mega
+  forest_density_estimator:
+    name: Forest Density Estimator
+    task: dense_regression
+    primary_model_id: forest_density_estimator_base
+    model_ids:
+    - forest_density_estimator_tiny
+    - forest_density_estimator_base
+    - forest_density_estimator_large
+    - forest_density_estimator_mega
+  grazing_potential:
+    name: Grazing Potential
+    task: dense_regression
+    primary_model_id: grazing_potential_base
+    model_ids:
+    - grazing_potential_tiny
+    - grazing_potential_base
+    - grazing_potential_large
+    - grazing_potential_mega
+  hazard_vulnerability:
+    name: Hazard Vulnerability
+    task: dense_regression
+    primary_model_id: hazard_vulnerability_base
+    model_ids:
+    - hazard_vulnerability_tiny
+    - hazard_vulnerability_base
+    - hazard_vulnerability_large
+    - hazard_vulnerability_mega
+  landslide_risk:
+    name: Landslide Susceptibility
+    task: dense_regression
+    primary_model_id: landslide_risk_base
+    model_ids:
+    - landslide_risk_tiny
+    - landslide_risk_base
+    - landslide_risk_large
+    - landslide_risk_mega
+  mobility_analyzer:
+    name: Mobility Analyser
+    task: dense_regression
+    primary_model_id: mobility_analyzer_base
+    model_ids:
+    - mobility_analyzer_tiny
+    - mobility_analyzer_base
+    - mobility_analyzer_large
+    - mobility_analyzer_mega
+  perennial_garden_suitability:
+    name: Perennial Garden Suitability
+    task: dense_regression
+    primary_model_id: perennial_garden_suitability_base
+    model_ids:
+    - perennial_garden_suitability_tiny
+    - perennial_garden_suitability_base
+    - perennial_garden_suitability_large
+    - perennial_garden_suitability_mega
+  pipeline_route_planner:
+    name: Pipeline Route Cost Surface
+    task: dense_regression
+    primary_model_id: pipeline_route_planner_base
+    model_ids:
+    - pipeline_route_planner_tiny
+    - pipeline_route_planner_base
+    - pipeline_route_planner_large
+    - pipeline_route_planner_mega
+  route_planner:
+    name: Route Cost Surface
+    task: dense_regression
+    primary_model_id: route_planner_base
+    model_ids:
+    - route_planner_tiny
+    - route_planner_base
+    - route_planner_large
+    - route_planner_mega
+  seismic_risk:
+    name: Seismic Risk
+    task: dense_regression
+    primary_model_id: seismic_risk_base
+    model_ids:
+    - seismic_risk_tiny
+    - seismic_risk_base
+    - seismic_risk_large
+    - seismic_risk_mega
+  site_suitability:
+    name: Site Suitability
+    task: dense_regression
+    primary_model_id: site_suitability_base
+    model_ids:
+    - site_suitability_tiny
+    - site_suitability_base
+    - site_suitability_large
+    - site_suitability_mega
+  solar_site_selector:
+    name: Solar Site Selector
+    task: dense_regression
+    primary_model_id: solar_site_selector_base
+    model_ids:
+    - solar_site_selector_tiny
+    - solar_site_selector_base
+    - solar_site_selector_large
+    - solar_site_selector_mega
+  spatial_analyzer:
+    name: Spatial Density Estimator
+    task: dense_regression
+    primary_model_id: spatial_analyzer_base
+    model_ids:
+    - spatial_analyzer_tiny
+    - spatial_analyzer_base
+    - spatial_analyzer_large
+    - spatial_analyzer_mega
+  viewshed_analyzer:
+    name: Visibility Estimator
+    task: dense_regression
+    primary_model_id: viewshed_analyzer_base
+    model_ids:
+    - viewshed_analyzer_tiny
+    - viewshed_analyzer_base
+    - viewshed_analyzer_large
+    - viewshed_analyzer_mega
+  water_quality_assessor:
+    name: Water Quality Assessor
+    task: dense_regression
+    primary_model_id: water_quality_assessor_base
+    model_ids:
+    - water_quality_assessor_tiny
+    - water_quality_assessor_base
+    - water_quality_assessor_large
+    - water_quality_assessor_mega
   wildfire_risk:
-    primary_model_id: ubx-wildfire-risk-1.0.0
-    description: Wildfire risk scoring
-
-  fire_detection:
-    primary_model_id: ubx-fire-detect-1.0.0
-    description: Active fire detection
-
-  # SAR
-  sar_amplitude_analysis:
-    primary_model_id: ubx-sar-amp-clf-1.0.0
-    description: SAR amplitude classification
-
-  insar_displacement:
-    primary_model_id: ubx-sar-phase-demo-1.0.0
-    description: InSAR displacement estimation (research-grade)
+    name: Wildfire Risk
+    task: dense_regression
+    primary_model_id: wildfire_risk_base
+    model_ids:
+    - wildfire_risk_tiny
+    - wildfire_risk_base
+    - wildfire_risk_large
+    - wildfire_risk_mega
+  wildlife_habitat_analyzer:
+    name: Wildlife Habitat Suitability
+    task: dense_regression
+    primary_model_id: wildlife_habitat_analyzer_base
+    model_ids:
+    - wildlife_habitat_analyzer_tiny
+    - wildlife_habitat_analyzer_base
+    - wildlife_habitat_analyzer_large
+    - wildlife_habitat_analyzer_mega
+  wind_site_selector:
+    name: Wind Site Selector
+    task: dense_regression
+    primary_model_id: wind_site_selector_base
+    model_ids:
+    - wind_site_selector_tiny
+    - wind_site_selector_base
+    - wind_site_selector_large
+    - wind_site_selector_mega
+  flood_risk_assessor:
+    name: Flood Depth Estimator
+    task: dense_regression
+    primary_model_id: flood_risk_assessor_base
+    model_ids:
+    - flood_risk_assessor_tiny
+    - flood_risk_assessor_base
+    - flood_risk_assessor_large
+    - flood_risk_assessor_mega
+  geostatistical_analyzer:
+    name: Geostatistical Surface Estimator
+    task: dense_regression
+    primary_model_id: geostatistical_analyzer_base
+    model_ids:
+    - geostatistical_analyzer_tiny
+    - geostatistical_analyzer_base
+    - geostatistical_analyzer_large
+    - geostatistical_analyzer_mega
+  spatial_relationship:
+    name: Proximity Estimator
+    task: dense_regression
+    primary_model_id: spatial_relationship_base
+    model_ids:
+    - spatial_relationship_tiny
+    - spatial_relationship_base
+    - spatial_relationship_large
+    - spatial_relationship_mega
+  natural_resources_monitor:
+    name: Natural Resources Monitor
+    task: dense_regression
+    primary_model_id: natural_resources_monitor_base
+    model_ids:
+    - natural_resources_monitor_tiny
+    - natural_resources_monitor_base
+    - natural_resources_monitor_large
+    - natural_resources_monitor_mega
+  environmental_monitor:
+    name: Environmental Condition Monitor
+    task: dense_regression
+    primary_model_id: environmental_monitor_base
+    model_ids:
+    - environmental_monitor_tiny
+    - environmental_monitor_base
+    - environmental_monitor_large
+    - environmental_monitor_mega
+  network_analyzer:
+    name: Road Network Density Estimator
+    task: dense_regression
+    primary_model_id: network_analyzer_base
+    model_ids:
+    - network_analyzer_tiny
+    - network_analyzer_base
+    - network_analyzer_large
+    - network_analyzer_mega
+  watershed_manager:
+    name: Runoff Estimator
+    task: dense_regression
+    primary_model_id: watershed_manager_base
+    model_ids:
+    - watershed_manager_tiny
+    - watershed_manager_base
+    - watershed_manager_large
+    - watershed_manager_mega
+  hydroelectric_monitor:
+    name: Hydroelectric Reservoir Level Estimator
+    task: dense_regression
+    primary_model_id: hydroelectric_monitor_base
+    model_ids:
+    - hydroelectric_monitor_tiny
+    - hydroelectric_monitor_base
+    - hydroelectric_monitor_large
+    - hydroelectric_monitor_mega
+  offshore_survey:
+    name: Bathymetry Estimator
+    task: dense_regression
+    primary_model_id: offshore_survey_base
+    model_ids:
+    - offshore_survey_tiny
+    - offshore_survey_base
+    - offshore_survey_large
+    - offshore_survey_mega
+  onshore_monitor:
+    name: Surface Temperature Anomaly
+    task: dense_regression
+    primary_model_id: onshore_monitor_base
+    model_ids:
+    - onshore_monitor_tiny
+    - onshore_monitor_base
+    - onshore_monitor_large
+    - onshore_monitor_mega
+  field_surveyor:
+    name: Field Productivity Estimator
+    task: dense_regression
+    primary_model_id: field_surveyor_base
+    model_ids:
+    - field_surveyor_tiny
+    - field_surveyor_base
+    - field_surveyor_large
+    - field_surveyor_mega
+  yield_predictor:
+    name: Yield Predictor
+    task: scene_regression
+    primary_model_id: yield_predictor_base
+    model_ids:
+    - yield_predictor_tiny
+    - yield_predictor_base
+    - yield_predictor_large
+    - yield_predictor_mega
+  business_valuation:
+    name: Economic Activity Estimator
+    task: scene_regression
+    primary_model_id: business_valuation_base
+    model_ids:
+    - business_valuation_tiny
+    - business_valuation_base
+    - business_valuation_large
+    - business_valuation_mega
+  economic_spatial_assessor:
+    name: Property Value Estimator
+    task: scene_regression
+    primary_model_id: economic_spatial_assessor_base
+    model_ids:
+    - economic_spatial_assessor_tiny
+    - economic_spatial_assessor_base
+    - economic_spatial_assessor_large
+    - economic_spatial_assessor_mega
+  insurance_underwriting:
+    name: Insurance Risk Scorer
+    task: scene_regression
+    primary_model_id: insurance_underwriting_base
+    model_ids:
+    - insurance_underwriting_tiny
+    - insurance_underwriting_base
+    - insurance_underwriting_large
+    - insurance_underwriting_mega
+  livestock_estimator:
+    name: Livestock Estimator
+    task: scene_regression
+    primary_model_id: livestock_estimator_base
+    model_ids:
+    - livestock_estimator_tiny
+    - livestock_estimator_base
+    - livestock_estimator_large
+    - livestock_estimator_mega
+  resource_allocation:
+    name: Service Demand Estimator
+    task: scene_regression
+    primary_model_id: resource_allocation_base
+    model_ids:
+    - resource_allocation_tiny
+    - resource_allocation_base
+    - resource_allocation_large
+    - resource_allocation_mega
+  disaster_management:
+    name: Disaster Impact Estimator
+    task: scene_regression
+    primary_model_id: disaster_management_base
+    model_ids:
+    - disaster_management_tiny
+    - disaster_management_base
+    - disaster_management_large
+    - disaster_management_mega
+  emergency_disaster_manager:
+    name: Emergency Needs Estimator
+    task: scene_regression
+    primary_model_id: emergency_disaster_manager_base
+    model_ids:
+    - emergency_disaster_manager_tiny
+    - emergency_disaster_manager_base
+    - emergency_disaster_manager_large
+    - emergency_disaster_manager_mega
+  preparedness_manager:
+    name: Preparedness Scorer
+    task: scene_regression
+    primary_model_id: preparedness_manager_base
+    model_ids:
+    - preparedness_manager_tiny
+    - preparedness_manager_base
+    - preparedness_manager_large
+    - preparedness_manager_mega
+  timeseries_analyzer:
+    name: Phenology Estimator
+    task: scene_regression
+    primary_model_id: timeseries_analyzer_base
+    model_ids:
+    - timeseries_analyzer_tiny
+    - timeseries_analyzer_base
+    - timeseries_analyzer_large
+    - timeseries_analyzer_mega
+  zonal_statistics:
+    name: Zonal Cover Estimator
+    task: scene_regression
+    primary_model_id: zonal_statistics_base
+    model_ids:
+    - zonal_statistics_tiny
+    - zonal_statistics_base
+    - zonal_statistics_large
+    - zonal_statistics_mega
+  dem_generator:
+    name: DEM from Stereo
+    task: dense_regression
+    primary_model_id: dem_generator_base
+    model_ids:
+    - dem_generator_tiny
+    - dem_generator_base
+    - dem_generator_large
+    - dem_generator_mega
+  digitization_3d:
+    name: Building Height Estimator
+    task: dense_regression
+    primary_model_id: digitization_3d_base
+    model_ids:
+    - digitization_3d_tiny
+    - digitization_3d_base
+    - digitization_3d_large
+    - digitization_3d_mega
+  dsm_generator:
+    name: DSM from Stereo
+    task: dense_regression
+    primary_model_id: dsm_generator_base
+    model_ids:
+    - dsm_generator_tiny
+    - dsm_generator_base
+    - dsm_generator_large
+    - dsm_generator_mega
+  dtm_generator:
+    name: DTM from DSM
+    task: dense_regression
+    primary_model_id: dtm_generator_base
+    model_ids:
+    - dtm_generator_tiny
+    - dtm_generator_base
+    - dtm_generator_large
+    - dtm_generator_mega
+  ground_displacement:
+    name: Ground Displacement Estimator
+    task: dense_regression
+    primary_model_id: ground_displacement_base
+    model_ids:
+    - ground_displacement_tiny
+    - ground_displacement_base
+    - ground_displacement_large
+    - ground_displacement_mega
+  land_surface_temperature:
+    name: Land Surface Temperature
+    task: dense_regression
+    primary_model_id: land_surface_temperature_base
+    model_ids:
+    - land_surface_temperature_tiny
+    - land_surface_temperature_base
+    - land_surface_temperature_large
+    - land_surface_temperature_mega
+  model_3d:
+    name: Normalised Surface Model
+    task: dense_regression
+    primary_model_id: model_3d_base
+    model_ids:
+    - model_3d_tiny
+    - model_3d_base
+    - model_3d_large
+    - model_3d_mega
+  sar_amplitude:
+    name: SAR Backscatter Normaliser
+    task: dense_regression
+    primary_model_id: sar_amplitude_base
+    model_ids:
+    - sar_amplitude_tiny
+    - sar_amplitude_base
+    - sar_amplitude_large
+    - sar_amplitude_mega
+  sar_phase_displacement:
+    name: InSAR Phase Unwrapper
+    task: dense_regression
+    primary_model_id: sar_phase_displacement_base
+    model_ids:
+    - sar_phase_displacement_tiny
+    - sar_phase_displacement_base
+    - sar_phase_displacement_large
+    - sar_phase_displacement_mega
+  sar_subsidence_monitor:
+    name: Subsidence Velocity Estimator
+    task: dense_regression
+    primary_model_id: sar_subsidence_monitor_base
+    model_ids:
+    - sar_subsidence_monitor_tiny
+    - sar_subsidence_monitor_base
+    - sar_subsidence_monitor_large
+    - sar_subsidence_monitor_mega
+  stereo_processor:
+    name: Stereo Disparity Estimator
+    task: dense_regression
+    primary_model_id: stereo_processor_base
+    model_ids:
+    - stereo_processor_tiny
+    - stereo_processor_base
+    - stereo_processor_large
+    - stereo_processor_mega
+  tree_height_estimator:
+    name: Canopy Height Estimator
+    task: dense_regression
+    primary_model_id: tree_height_estimator_base
+    model_ids:
+    - tree_height_estimator_tiny
+    - tree_height_estimator_base
+    - tree_height_estimator_large
+    - tree_height_estimator_mega
+  tri_stereo_processor:
+    name: DSM from Tri-Stereo
+    task: dense_regression
+    primary_model_id: tri_stereo_processor_base
+    model_ids:
+    - tri_stereo_processor_tiny
+    - tri_stereo_processor_base
+    - tri_stereo_processor_large
+    - tri_stereo_processor_mega
+  coregistration:
+    name: Co-registration Flow Estimator
+    task: enhancement
+    primary_model_id: coregistration_base
+    model_ids:
+    - coregistration_tiny
+    - coregistration_base
+    - coregistration_large
+    - coregistration_mega
+  mosaic_processor:
+    name: Mosaic Colour Harmoniser
+    task: enhancement
+    primary_model_id: mosaic_processor_base
+    model_ids:
+    - mosaic_processor_tiny
+    - mosaic_processor_base
+    - mosaic_processor_large
+    - mosaic_processor_mega
+  mosaicking:
+    name: Seamline Blender
+    task: enhancement
+    primary_model_id: mosaicking_base
+    model_ids:
+    - mosaicking_tiny
+    - mosaicking_base
+    - mosaicking_large
+    - mosaicking_mega
+  multispectral_processor:
+    name: Multispectral Denoiser
+    task: enhancement
+    primary_model_id: multispectral_processor_base
+    model_ids:
+    - multispectral_processor_tiny
+    - multispectral_processor_base
+    - multispectral_processor_large
+    - multispectral_processor_mega
+  ortho_processor:
+    name: Orthorectification Flow Estimator
+    task: enhancement
+    primary_model_id: ortho_processor_base
+    model_ids:
+    - ortho_processor_tiny
+    - ortho_processor_base
+    - ortho_processor_large
+    - ortho_processor_mega
+  orthorectification:
+    name: Learned Orthorectification
+    task: enhancement
+    primary_model_id: orthorectification_base
+    model_ids:
+    - orthorectification_tiny
+    - orthorectification_base
+    - orthorectification_large
+    - orthorectification_mega
+  panchromatic_processor:
+    name: Panchromatic Denoiser
+    task: enhancement
+    primary_model_id: panchromatic_processor_base
+    model_ids:
+    - panchromatic_processor_tiny
+    - panchromatic_processor_base
+    - panchromatic_processor_large
+    - panchromatic_processor_mega
+  pansharpening:
+    name: Pansharpening
+    task: enhancement
+    primary_model_id: pansharpening_base
+    model_ids:
+    - pansharpening_tiny
+    - pansharpening_base
+    - pansharpening_large
+    - pansharpening_mega
+  raster_tiler:
+    name: Tile Radiometric Normaliser
+    task: enhancement
+    primary_model_id: raster_tiler_base
+    model_ids:
+    - raster_tiler_tiny
+    - raster_tiler_base
+    - raster_tiler_large
+    - raster_tiler_mega
+  sar_mapping_workflow:
+    name: SAR Despeckler
+    task: enhancement
+    primary_model_id: sar_mapping_workflow_base
+    model_ids:
+    - sar_mapping_workflow_tiny
+    - sar_mapping_workflow_base
+    - sar_mapping_workflow_large
+    - sar_mapping_workflow_mega
+  synthetic_imagery:
+    name: SAR to Optical Translator
+    task: enhancement
+    primary_model_id: synthetic_imagery_base
+    model_ids:
+    - synthetic_imagery_tiny
+    - synthetic_imagery_base
+    - synthetic_imagery_large
+    - synthetic_imagery_mega
+  super_resolution:
+    name: Super-Resolution
+    task: super_resolution
+    primary_model_id: super_resolution_base
+    model_ids:
+    - super_resolution_tiny
+    - super_resolution_base
+    - super_resolution_large
+    - super_resolution_mega
+  evi_calculator:
+    name: EVI Calculator
+    task: spectral_index
+    primary_model_id: evi_calculator_base
+    model_ids:
+    - evi_calculator_tiny
+    - evi_calculator_base
+    - evi_calculator_large
+    - evi_calculator_mega
+  msi_calculator:
+    name: MSI Calculator
+    task: spectral_index
+    primary_model_id: msi_calculator_base
+    model_ids:
+    - msi_calculator_tiny
+    - msi_calculator_base
+    - msi_calculator_large
+    - msi_calculator_mega
+  nbr_calculator:
+    name: NBR Calculator
+    task: spectral_index
+    primary_model_id: nbr_calculator_base
+    model_ids:
+    - nbr_calculator_tiny
+    - nbr_calculator_base
+    - nbr_calculator_large
+    - nbr_calculator_mega
+  ndvi_calculator:
+    name: NDVI Calculator
+    task: spectral_index
+    primary_model_id: ndvi_calculator_base
+    model_ids:
+    - ndvi_calculator_tiny
+    - ndvi_calculator_base
+    - ndvi_calculator_large
+    - ndvi_calculator_mega
+  ndwi_calculator:
+    name: NDWI Calculator
+    task: spectral_index
+    primary_model_id: ndwi_calculator_base
+    model_ids:
+    - ndwi_calculator_tiny
+    - ndwi_calculator_base
+    - ndwi_calculator_large
+    - ndwi_calculator_mega
+  savi_calculator:
+    name: SAVI Calculator
+    task: spectral_index
+    primary_model_id: savi_calculator_base
+    model_ids:
+    - savi_calculator_tiny
+    - savi_calculator_base
+    - savi_calculator_large
+    - savi_calculator_mega
+  vegetation_condition:
+    name: Vegetation Condition Index
+    task: spectral_index
+    primary_model_id: vegetation_condition_base
+    model_ids:
+    - vegetation_condition_tiny
+    - vegetation_condition_base
+    - vegetation_condition_large
+    - vegetation_condition_mega

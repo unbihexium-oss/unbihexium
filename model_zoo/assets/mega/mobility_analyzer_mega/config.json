@@ -1,8 +1,0 @@
-{
-  "model_id": "mobility_analyzer_mega",
-  "task": "regression",
-  "variant": "mega",
-  "params": 1059329,
-  "resolution": 512,
-  "base_channels": 128
-}

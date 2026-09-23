@@ -1,91 +1,78 @@
 {
-  "model_id": "digitization_2d",
-  "name": "Digitization 2D",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "digitization_2d",
+  "name": "2D Digitisation",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "imaging",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Digitization 2D model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments buildings, roads, water and vegetation for map digitisation.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "building",
+      "road",
+      "water",
+      "vegetation"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Masks of the four map feature classes.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "efc599a9fbcc7571a399c6574e890be3e9c725735c6442bf0ba69ecb2d000f5a",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "890056b5d89f7721fe0c1d3a3d93d2056a984c1afaec2f14a819944dbfafc58b",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "e7f94a831a773304ce5b3f18198f89bada0e6940508760ed136038e2045f633b",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "digitization_2d_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732997,
+      "weights_digest": "4558c9f31f4e03b240b3ae135be997c94bd846fb0cb44dec665dd61f3c9232b9"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c11ffbfbd4967e09c604edc9957d91b7f858d96d6c247752235e5277ed59144f",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a04520268b60cfdcce920b5143d8f6df1c8bd0a41f06ae8368db8dce54dc80af",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "8abc6dc82fcfe8d28abdbcfcc00705ae99343be3ad823f507d4b21187c0d39e5",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "digitization_2d_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058565,
+      "weights_digest": "03d0537b05aacc0a646f7d6e3b6bab543bba59d3530a4165e8cf52dc46859113"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6801b087b6c6161c5ddff2a3992b276e658134096d4a5d45ded64ff501fdd24c",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "014bc24f7e365def64bb4c542aa599625b127cf51332a6708f2f0f441cb2de52",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "d342ffad600ecfde02f5b6a2bfde50f2e7303b7cdb03cfdd8d3d259ed766eaf4",
-          "size_bytes": 418
-        }
-      ]
+      "model_id": "digitization_2d_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059269,
+      "weights_digest": "baf627394fc363b2e54004aca7555fe0f47b97ed633befd835bf525bff53c676"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "12365ee8717a0e069491c0efb8afe605515695ef1ef597a98c9f39740ab6d9d6",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9933001c58617f19d05bedef67e5968dfa9f7da318e11fed333da3ed62e14d29",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "26f68c801711437e61ae64924771d99d2e360fb1743482dc12311dba590be60e",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "digitization_2d_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450821,
+      "weights_digest": "629e71d90579798bc68f39c6a09e0c87451f91410d0a765aff8674ba854ef994"
     }
-  },
-  "capabilities": [
-    "digitization_2d"
-  ]
+  }
 }

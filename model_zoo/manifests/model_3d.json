@@ -1,91 +1,78 @@
 {
-  "model_id": "model_3d",
-  "name": "Model 3D",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "model_3d",
+  "name": "Normalised Surface Model",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "imaging",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Model 3D model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the height of objects above ground (nDSM) from imagery and a surface model.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue",
+      "surface_height"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue",
+      "surface_height"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "object_height"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "nDSM from LiDAR.",
+  "data_sources": [
+    "RGB orthophotos with a DSM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5b8cd0fd12ba4f918b97bd288fb90e1e23c2f5b24fa1e20de1f1e59fca6d945e",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b6ea9da73f9ae4b4ff3e20e1f842beedb7d20cbf8f78998b068e2f22bc886366",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "f85174db45491555dc1d4b7dd1fc8fee4edd4fad0be77f2a970fc3c9d207f559",
-          "size_bytes": 171
-        }
-      ]
+      "model_id": "model_3d_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733073,
+      "weights_digest": "80f3b6f9cf9d71eab090a43c72259b7bc2c87821f312439e114967c2a4fc505a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f529ddb46eb33f0a77f8edba9f6c760b29f6b89e2559b3728973bd2449964f5b",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "58801da7fa825e73ce10d2f80d333201aac75c5420a11e74daf92f1af2f6651b",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "209942f437535a3d2f958a32d49a447d3530a07397a96ce12b8d8eacb632efd7",
-          "size_bytes": 171
-        }
-      ]
+      "model_id": "model_3d_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058721,
+      "weights_digest": "5e66ea87f2b8bdd2f5626d93eeeb776803406bc664bb2208d7fa3aeb965e097b"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9c9017e054597a06401110615e28ab662281b41a5657c073a9e765c09a7bcba6",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "67dfd650affe3de389441db84b2a68935f881acc5069ba4b2d70a5dc8e8d623c",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "ddb77a3656eba8979da54ea26f203d985deade4360574ac214319818c4be611b",
-          "size_bytes": 173
-        }
-      ]
+      "model_id": "model_3d_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059505,
+      "weights_digest": "c1743f10c137fd96257afd5ef67c0f924efb58035e0d366f817f15903a7aaa82"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "529f928a8e98e0f936f20ff67dfef65fc99b9bd975ee1ff02e1134330122934f",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a7a2fe308b64b1938ab3ddd7480981e42a2d2d6f477b948a5ba2dd1e07527c9a",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "abc559eb7f82d49634f11318196704d79bc6e7580833257c1bd52239a60a71ca",
-          "size_bytes": 171
-        }
-      ]
+      "model_id": "model_3d_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451137,
+      "weights_digest": "5e472d3a884f9a434fd3c1ae66c09f2c64c0c4d86e358d25533b6d61de97f24b"
     }
-  },
-  "capabilities": [
-    "model_3d"
-  ]
+  }
 }

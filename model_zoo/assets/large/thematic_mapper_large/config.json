@@ -1,8 +1,0 @@
-{
-  "model_id": "thematic_mapper_large",
-  "task": "segmentation",
-  "variant": "large",
-  "params": 1277859,
-  "resolution": 256,
-  "base_channels": 96
-}

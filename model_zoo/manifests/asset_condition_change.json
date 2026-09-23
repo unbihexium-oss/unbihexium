@@ -1,91 +1,79 @@
 {
-  "model_id": "asset_condition_change",
+  "$schema": "../manifest.schema.json",
+  "family": "asset_condition_change",
   "name": "Asset Condition Change",
-  "version": "1.0.0",
-  "task": "segmentation",
-  "architecture": "siamese_unet",
+  "version": "2.0.0",
+  "task": "change_detection",
+  "domain": "assets",
+  "architecture": "unet_early_fusion",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Asset Condition Change model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects changes in the condition of infrastructure assets between two dates.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 2,
+    "channels": [
+      "red_t1",
+      "green_t1",
+      "blue_t1",
+      "red_t2",
+      "green_t2",
+      "blue_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "no_change",
+      "deterioration",
+      "repair"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of change class logits; softmax over K."
+  },
+  "training_labels": "Change masks.",
+  "data_sources": [
+    "Co-registered very high resolution RGB image pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "822b528e61288a5215976956c6710dc20f86e65cfa96a8b332f4f502c56eb23b",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5d2fed2d2c15a06879f2c041246089d34a9cbdf0d35856559b816eccf2968642",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "a4af991b4e4ed67178097459525a3ab144def4848383e8ffe9483012ae7cf971",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "asset_condition_change_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733395,
+      "weights_digest": "e25ca107094fee9a9ca86fce56606e1ba79b22fc26999df1461286aa10f67ca5"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b59c5923608aea42a9ee3ab7e3d0ea33fa2f9ad54466cee7881496782f13a5d2",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ad532991ecc4d6d93a867d6fed5090710bac419ddaed0a226190a62ca354a5b8",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "ec5cc3f43f41ea53790ed2f52aca3056441d6593e3b14d6f758fad1b7fb9a277",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "asset_condition_change_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059363,
+      "weights_digest": "a04605f81e41be40a3832b13c7721a3cd0f304c180c0445554d68e19c4c9dc0a"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0be76011618dfcddebfeb35a12c7f5262f7b359ce689032984d835eb5f0eddc3",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4696ea7b09348218451603cb0af87274cd6db8d994e56a4ce7edea046dd335eb",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "cc12fdbcfe50daf68a6bf838748a2d64384a8ab1154a4e1263b656268b7467aa",
-          "size_bytes": 428
-        }
-      ]
+      "model_id": "asset_condition_change_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060467,
+      "weights_digest": "920aeef736946d4842921b719e9dc84ed54ea2e4e2d077b94170f43f6ce17303"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "12156d22205a94c648602e8226a1e33f70a0b02230ecc54e0eb997b348caaa86",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "29a780fcf52d74cca7e0807a577d0a1c99b3d304546bb4327b9656704eadc2f6",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "7fd3c4d09694f92123fd3e6d416d04312b9d881d7838e95a8f5b0875ce944b22",
-          "size_bytes": 426
-        }
-      ]
+      "model_id": "asset_condition_change_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452419,
+      "weights_digest": "104b19829eff520ea14191c646c7e755fd73803684140b31533deb4ceb72a04b"
     }
-  },
-  "capabilities": [
-    "asset_condition_change"
-  ]
+  }
 }

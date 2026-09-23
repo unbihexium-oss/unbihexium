@@ -1,241 +1,229 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Model Manifest Schema",
-  "description": "Schema for model manifest files in the Unbihexium Model Zoo",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/manifest.schema.json",
+  "title": "Unbihexium model zoo manifest",
+  "description": "Manifest of one model family of the Unbihexium model zoo. Manifests are generated from src/unbihexium/zoo/catalog.yaml by `python -m unbihexium.zoo.sync`.",
   "type": "object",
+  "additionalProperties": false,
   "required": [
-    "model_id",
+    "family",
     "name",
     "version",
     "task",
+    "domain",
     "architecture",
     "license",
-    "artifacts"
+    "status",
+    "trained",
+    "description",
+    "inputs",
+    "outputs",
+    "training_labels",
+    "data_sources",
+    "variants"
   ],
   "properties": {
-    "model_id": {
+    "$schema": {
+      "type": "string"
+    },
+    "family": {
       "type": "string",
-      "pattern": "^ubx-[a-z0-9-]+-[0-9]+\\.[0-9]+\\.[0-9]+$",
-      "description": "Unique model identifier"
+      "pattern": "^[a-z][a-z0-9_]*[a-z0-9]$",
+      "description": "Model family identifier."
     },
     "name": {
       "type": "string",
-      "description": "Human-readable model name"
+      "minLength": 1
     },
     "version": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-      "description": "Semantic version"
+      "description": "Version of the catalogue the manifest was generated from."
     },
     "task": {
-      "type": "string",
       "enum": [
-        "super_resolution",
         "detection",
         "segmentation",
         "change_detection",
-        "boundary_detection",
-        "classification",
-        "regression",
-        "risk_scoring",
-        "anomaly_detection",
-        "suitability",
-        "routing",
-        "insar"
-      ],
-      "description": "Primary task type"
+        "dense_regression",
+        "scene_regression",
+        "enhancement",
+        "super_resolution",
+        "spectral_index"
+      ]
+    },
+    "domain": {
+      "type": "string"
     },
     "architecture": {
-      "type": "string",
-      "description": "Model architecture identifier"
+      "enum": [
+        "centernet",
+        "unet",
+        "unet_early_fusion",
+        "unet_regression",
+        "encoder_regressor",
+        "unet_image_to_image",
+        "residual_subpixel",
+        "spectral_formula"
+      ]
     },
     "license": {
-      "type": "string",
-      "description": "License identifier"
+      "const": "MPL-2.0"
     },
     "status": {
-      "type": "string",
       "enum": [
-        "production",
-        "research",
-        "experimental"
+        "starter",
+        "reference"
       ],
-      "default": "production"
+      "description": "starter: trainable architecture with deterministic starter weights, not trained; reference: exact implementation of a published formula."
+    },
+    "trained": {
+      "type": "boolean",
+      "description": "Whether the published weights were trained on Earth observation data."
     },
     "description": {
       "type": "string",
-      "description": "Detailed model description"
+      "minLength": 1
     },
-    "input": {
+    "inputs": {
       "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "image",
-            "tensor",
-            "tabular",
-            "config"
-          ]
-        },
-        "channels": {
-          "type": "integer"
-        },
-        "height": {
-          "type": "integer"
-        },
-        "width": {
-          "type": "integer"
-        },
-        "features": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "normalization": {
-          "type": "object",
-          "properties": {
-            "mean": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            },
-            "std": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          }
-        }
-      }
-    },
-    "output": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "image",
-            "tensor",
-            "boxes",
-            "mask",
-            "scalar",
-            "vector"
-          ]
-        },
-        "channels": {
-          "type": "integer"
-        },
-        "classes": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "artifacts": {
-      "type": "object",
+      "additionalProperties": false,
       "required": [
-        "tiny"
+        "bands",
+        "dates",
+        "channels"
       ],
       "properties": {
-        "tiny": {
-          "type": "object",
-          "required": [
-            "files"
-          ],
-          "properties": {
-            "files": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "sha256"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "sha256": {
-                    "type": "string",
-                    "pattern": "^[a-f0-9]{64}$"
-                  },
-                  "size_bytes": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          }
+        "bands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
         },
-        "full": {
-          "type": "object",
-          "properties": {
-            "release_tag": {
-              "type": "string"
-            },
-            "files": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "sha256"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "sha256": {
-                    "type": "string"
-                  },
-                  "size_bytes": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          }
+        "dates": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
         }
       }
     },
-    "metrics": {
+    "outputs": {
       "type": "object",
-      "additionalProperties": {
-        "type": "number"
-      }
-    },
-    "training": {
-      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "names",
+        "units",
+        "range",
+        "scale",
+        "formula",
+        "layout"
+      ],
       "properties": {
-        "dataset": {
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "units": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "range": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "scale": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "formula": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "layout": {
           "type": "string"
-        },
-        "epochs": {
-          "type": "integer"
-        },
-        "batch_size": {
-          "type": "integer"
-        },
-        "optimizer": {
-          "type": "string"
-        },
-        "learning_rate": {
-          "type": "number"
         }
       }
     },
-    "capabilities": {
+    "training_labels": {
+      "type": "string"
+    },
+    "data_sources": {
       "type": "array",
       "items": {
         "type": "string"
-      },
-      "description": "List of capability_ids this model supports"
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tiny",
+        "base",
+        "large",
+        "mega"
+      ],
+      "patternProperties": {
+        "^(tiny|base|large|mega)$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model_id",
+            "tile_size",
+            "base_channels",
+            "depth",
+            "num_parameters",
+            "weights_digest"
+          ],
+          "properties": {
+            "model_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*_(tiny|base|large|mega)$"
+            },
+            "tile_size": {
+              "type": "integer",
+              "minimum": 32
+            },
+            "base_channels": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "depth": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "num_parameters": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "weights_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -1,91 +1,73 @@
 {
-  "model_id": "msi_calculator",
-  "name": "Msi Calculator",
-  "version": "1.0.0",
-  "task": "index",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "msi_calculator",
+  "name": "MSI Calculator",
+  "version": "2.0.0",
+  "task": "spectral_index",
+  "domain": "indices",
+  "architecture": "spectral_formula",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Msi Calculator model for index.",
-  "artifacts": {
+  "status": "reference",
+  "trained": false,
+  "description": "Moisture Stress Index, SWIR1 / NIR (Rock et al., 1986).",
+  "inputs": {
+    "bands": [
+      "nir",
+      "swir1"
+    ],
+    "dates": 1,
+    "channels": [
+      "nir",
+      "swir1"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "msi"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": "msi",
+    "layout": "Tensor (N, 1, H, W) with the index value; NaN where undefined."
+  },
+  "training_labels": "None, the formula needs no training.",
+  "data_sources": [
+    "Surface reflectance from Sentinel-2",
+    "Landsat or similar sensors"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f790a79d42217809e065434fc77acf6e8da51ddc5052e75fd6bc88fed2baf5db",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2b16b33375eba1fecb484f138f04808d3864263006d95f9f93f1ae99763a88b9",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "a3cf393aad85287582c79d41739c04b45322d2d47c5239cb51ca2c47bb1e187e",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "msi_calculator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "06828b6e03b3eda237d5bcb3fe0abcd27e17e891cb2ca97266922768b2156d56",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "552d4f46ca21c9c99dfb90930d2059221ab4accbfde1a5573dcd55ff2f3ad058",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "cb3f2624fe39587a47e49a3eb00c2bcdba3bddbc44f263b1ae48da59b14bfd26",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "msi_calculator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bd0ac31f86c001ed1c51766be5b079f2092ae78d4559e58af96b61684ee61cf3",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "994818d7e154d93af09f17335b6732d06555e93656c0b3ee7621d84dd3fdb471",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "b2e293fa400bae26bfe9347b220c2e463245f1cd6a7f11808c95e49cf2ba97d7",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "msi_calculator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "290432f34f7f23a33493e482592bf9c6219dc21b4d6995085bedc0494be20c89",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2ac33d292d12d558b8b4d5701019e79b231deb270a61c11e4d39dea253df58f3",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "7f4b1f682dc8754184a75b793a9caa2a24a6b08046837624ac3ce1298f7ccf54",
-          "size_bytes": 351
-        }
-      ]
+      "model_id": "msi_calculator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
-  },
-  "capabilities": [
-    "msi_calculator"
-  ]
+  }
 }

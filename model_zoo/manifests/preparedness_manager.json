@@ -1,91 +1,95 @@
 {
-  "model_id": "preparedness_manager",
-  "name": "Preparedness Manager",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "preparedness_manager",
+  "name": "Preparedness Scorer",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "risk",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Preparedness Manager model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores the disaster preparedness of a community area.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "preparedness"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Preparedness scores from surveys.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "population and road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b7abf6bca05978cd8925cef1baab6939ea05425ef3b3e31b6123c1992455f17d",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1e7807b9632aa79be9498c20176a74fcf4f234247c5b5eadd37299aee48f80aa",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "5ca0cc42462d214966d5b0de917cab83b26357884126f9bc580e419e97ab3f0a",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "preparedness_manager_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 495489,
+      "weights_digest": "cae9a826cf5977a5d7247019bda21baaaf1fb9f0ccb67a4f9369c2e22cb62079"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b859634d2895fe0aa3202c91bd4c30f72245615b2cd2956586b821f542fc77fc",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8d25918809d9b839f73fadfa73a5e6432bb43ec2ae0966ee6fdc298c86f883d7",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "4859be0f063fa33ce1df90fd543bb0b743770d0a05ac954bd2d613324c8fa02d",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "preparedness_manager_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3747073,
+      "weights_digest": "23767f595c1e6465f81152235945601b9424e9b11afed925c5f83fdc86e0c0ed"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "092c16ec71ccb774f80cac9a86be1f013ed2e993401e8528a028c697f6cae14a",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1722886d5f035a40ff71db53af6ccd58a0c2cd4d4b700d1302b8231dbada4e44",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "09bacc7b4d68fc7d7d521581e6060ceb5c394e45cd8d371e1061e24dff7cb03b",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "preparedness_manager_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14609089,
+      "weights_digest": "5553a3b46000345761c3c703f14a2460b4121121c81efe7f794f6314358a9330"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a581e0f6dd57c8bdb7a71379c6ed3618d1213c79b864f620425127e607bbe136",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6ba49dee2395412468e136e618457cb35f41e3f18c10e9d0ee7b374e991c6f14",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "14a089fe75f91898e8e7d04023157238265e9b04efc5871b067c8c0686b6dd0a",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "preparedness_manager_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37766401,
+      "weights_digest": "673f0b9f2e3adcfeb240430032c98abd1d3cbbbe5468017ae402a34297df3f66"
     }
-  },
-  "capabilities": [
-    "preparedness_manager"
-  ]
+  }
 }
