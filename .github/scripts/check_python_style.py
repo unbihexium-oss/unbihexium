@@ -77,20 +77,46 @@ STYLE_ROOTS = (
     "examples/serving/",  # Serving example.
     "src/unbihexium/zoo/",  # Model zoo.
     "src/unbihexium/ai/",  # Task APIs, inference, training and architectures.
+    "src/unbihexium/__init__.py",  # Package entry point.
+    "src/unbihexium/_version.py",  # Package version.
+    "src/unbihexium/analysis/",  # Networks, suitability and zonal statistics.
     "src/unbihexium/cli/",  # Command line interface.
+    "src/unbihexium/config/",  # Settings.
+    "src/unbihexium/core/",  # Rasters, vectors, indices, sensors and pipelines.
+    "src/unbihexium/geostat/",  # Variograms, kriging and spatial autocorrelation.
+    "src/unbihexium/indices/",  # Spectral index functions.
+    "src/unbihexium/io/",  # GeoJSON, GeoTIFF, GeoParquet, STAC and Zarr.
     "src/unbihexium/metrics/",  # Accuracy assessment.
     "src/unbihexium/postprocessing/",  # Map cleaning and vectorisation.
     "src/unbihexium/preprocessing/",  # Radiometry, masks and pansharpening.
+    "src/unbihexium/registry/",  # Capability, model and pipeline registries.
+    "src/unbihexium/sar/",  # SAR calibration, filters, InSAR and polarimetry.
+    "src/unbihexium/serving/",  # REST service.
+    "src/unbihexium/terrain/",  # Terrain derivatives, hydrology and visibility.
+    "src/unbihexium/utils/",  # Hashing, logging, timing, seeding and files.
     "src/unbihexium/visualization/",  # Colour maps and quicklooks.
+    "tests/benchmarks/",  # Throughput and memory measurements.
     "tests/unit/test_ai.py",  # Tests of the task APIs.
     "tests/unit/test_ai_data.py",  # Tests of the datasets.
     "tests/unit/test_ai_utils.py",  # Tests of decoding, metrics and transforms.
+    "tests/unit/test_analysis.py",  # Tests of the analysis package.
     "tests/unit/test_cli.py",  # Tests of the command line.
+    "tests/unit/test_config.py",  # Tests of the settings.
+    "tests/unit/test_core.py",  # Tests of the core package.
+    "tests/unit/test_geostat.py",  # Tests of geostatistics.
+    "tests/unit/test_indices.py",  # Tests of the spectral indices.
+    "tests/unit/test_io.py",  # Tests of input and output.
     "tests/unit/test_metrics.py",  # Tests of the accuracy assessment.
     "tests/unit/test_models.py",  # Tests of the architectures.
+    "tests/unit/test_pipeline.py",  # Tests of pipelines and provenance.
     "tests/unit/test_postprocessing.py",  # Tests of postprocessing.
     "tests/unit/test_preprocessing.py",  # Tests of preprocessing.
+    "tests/unit/test_registry.py",  # Tests of the registries.
+    "tests/unit/test_sar.py",  # Tests of SAR processing.
+    "tests/unit/test_serving.py",  # Tests of the REST service.
+    "tests/unit/test_terrain.py",  # Tests of terrain analysis.
     "tests/unit/test_training.py",  # Tests of training.
+    "tests/unit/test_utils.py",  # Tests of the utilities.
     "tests/unit/test_visualization.py",  # Tests of visualisation.
     "tests/unit/test_zoo_catalog.py",  # Tests of the catalogue.
     "tests/unit/test_zoo_store.py",  # Tests of the model store.
