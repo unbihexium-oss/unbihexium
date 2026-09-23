@@ -1,0 +1,50 @@
+name: Links
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  lychee:
+    name: Check links
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Check links in Markdown and notebooks
+        id: lychee
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: >-
+            --config .github/lychee.toml
+            './**/*.md'
+            './examples/**/*.ipynb'
+          output: lychee/report.md
+          fail: false
+
+      - name: Open or update the broken links issue
+        if: steps.lychee.outputs.exit_code != 0
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Broken links report
+        run: |
+          number=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file lychee/report.md
+          else
+            gh issue create --title "$TITLE" --label documentation --body-file lychee/report.md
+          fi
