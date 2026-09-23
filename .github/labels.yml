@@ -29,6 +29,9 @@
 - name: security
   color: "ee0701"
   description: "Security hardening; report vulnerabilities privately"
+- name: tests
+  color: "bfdadc"
+  description: "Tests and test configuration"
 - name: breaking-change
   color: "e11d21"
   description: "Changes existing behaviour and requires a major version"
