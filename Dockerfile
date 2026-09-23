@@ -18,14 +18,17 @@
 # --------
 # Builds the Unbihexium container image with the ONNX Runtime inference
 # backend and the FastAPI REST service, installed from the pinned versions in
-# requirements.txt. Model weights are not included; they are downloaded into
+# requirements.txt, each wheel checked against its SHA-256 hash. Model weights are not included; they are downloaded into
 # the cache directory on first use and verified with SHA256. The first line
 # selects the Dockerfile syntax and must stay the first line of the file.
 #
 # Base image
 #   python:3.14.7-slim-trixie: CPython 3.14.7 on Debian 13 (trixie), the
-#   current stable Debian release in September 2026. Dependabot proposes base
-#   image updates monthly (.github/dependabot.yml).
+#   current stable Debian release in September 2026. Both stages pin the
+#   image by the digest of its multi-platform manifest list, so a rebuild
+#   uses exactly the reviewed image (OpenSSF Scorecard, Pinned-Dependencies).
+#   Dependabot proposes tag and digest updates monthly
+#   (.github/dependabot.yml).
 #
 # Build
 #   docker build -t unbihexium:local .
@@ -67,7 +70,7 @@
 # Creates a virtual environment in /opt/venv with all dependencies and the
 # Unbihexium package.
 # -----------------------------------------------------------------------------
-FROM python:3.14.7-slim-trixie AS builder
+FROM python:3.14.7-slim-trixie@sha256:caaf356f40667c496d405780745b9ac25771c189a51dfcc42430d531ea09f8a2 AS builder
 
 # Disable the pip cache and version check, silence the root user warning and
 # skip .pyc files, which keeps the build stage small and quiet.
@@ -88,9 +91,8 @@ ENV PATH="/opt/venv/bin:${PATH}"
 # requirements.txt does not change, which keeps rebuilds after source changes
 # fast.
 COPY requirements.txt ./
-# Upgrade pip, then install binary wheels only from the lock file.
-RUN python -m pip install --upgrade pip \
-    && python -m pip install --only-binary=:all: -r requirements.txt
+# Install binary wheels only, each checked against its hash in the lock file.
+RUN python -m pip install --only-binary=:all: --require-hashes -r requirements.txt
 
 # Install Unbihexium itself without resolving dependencies again, so exactly
 # the locked versions are used. The licence files are required by the package
@@ -98,16 +100,17 @@ RUN python -m pip install --upgrade pip \
 COPY pyproject.toml README.md LICENSE.txt NOTICE NOTICE.md ./
 # Copy the package sources.
 COPY src/ ./src/
-# Install the package without dependencies and verify that the installed
-# requirements are consistent.
-RUN python -m pip install --no-deps . \
+# Build the wheel of the package, install it without dependencies and verify
+# that the installed requirements are consistent.
+RUN python -m pip wheel --no-deps --wheel-dir /tmp/dist . \
+    && python -m pip install --no-deps /tmp/dist/unbihexium-*.whl \
     && python -m pip check
 
 # -----------------------------------------------------------------------------
 # Stage 2: runtime
 # Contains only the Python runtime and the virtual environment.
 # -----------------------------------------------------------------------------
-FROM python:3.14.7-slim-trixie AS runtime
+FROM python:3.14.7-slim-trixie@sha256:caaf356f40667c496d405780745b9ac25771c189a51dfcc42430d531ea09f8a2 AS runtime
 
 # Package version recorded in the image metadata.
 ARG VERSION=1.0.1
