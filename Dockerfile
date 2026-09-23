@@ -1,13 +1,26 @@
 # syntax=docker/dockerfile:1
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# Unbihexium container image
+# Project     : Unbihexium
+# File        : Dockerfile
+# Title       : Unbihexium container image
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Dockerfile, built by Docker BuildKit
 # =============================================================================
 #
-# Contents
-#   The image contains Unbihexium with the ONNX Runtime inference backend and
-#   the FastAPI REST service, installed from the pinned versions in
-#   requirements.txt. Model weights are not included; they are downloaded into
-#   the cache directory on first use and verified with SHA256.
+# Abstract
+# --------
+# Builds the Unbihexium container image with the ONNX Runtime inference
+# backend and the FastAPI REST service, installed from the pinned versions in
+# requirements.txt. Model weights are not included; they are downloaded into
+# the cache directory on first use and verified with SHA256. The first line
+# selects the Dockerfile syntax and must stay the first line of the file.
 #
 # Base image
 #   python:3.14.7-slim-trixie: CPython 3.14.7 on Debian 13 (trixie), the
@@ -44,6 +57,9 @@
 #   - The container runs as the unprivileged user "unbihexium" (UID 1000).
 #   - The image is scanned with Grype by .github/workflows/container-scan.yml
 #     and an SBOM is attached by .github/workflows/docker.yml.
+#
+# Docker reads a `#` only at the start of a line as a comment, so every
+# comment stands on its own line above the instruction it explains.
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -53,20 +69,26 @@
 # -----------------------------------------------------------------------------
 FROM python:3.14.7-slim-trixie AS builder
 
+# Disable the pip cache and version check, silence the root user warning and
+# skip .pyc files, which keeps the build stage small and quiet.
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_ROOT_USER_ACTION=ignore \
     PYTHONDONTWRITEBYTECODE=1
 
+# Working directory for the package sources during the build.
 WORKDIR /build
 
+# Create the virtual environment that is later copied into the runtime stage.
 RUN python -m venv /opt/venv
+# Put the virtual environment first on PATH so that python and pip use it.
 ENV PATH="/opt/venv/bin:${PATH}"
 
 # Install the locked dependencies first. This layer is cached as long as
 # requirements.txt does not change, which keeps rebuilds after source changes
 # fast.
 COPY requirements.txt ./
+# Upgrade pip, then install binary wheels only from the lock file.
 RUN python -m pip install --upgrade pip \
     && python -m pip install --only-binary=:all: -r requirements.txt
 
@@ -74,7 +96,10 @@ RUN python -m pip install --upgrade pip \
 # the locked versions are used. The licence files are required by the package
 # metadata (PEP 639).
 COPY pyproject.toml README.md LICENSE.txt NOTICE NOTICE.md ./
+# Copy the package sources.
 COPY src/ ./src/
+# Install the package without dependencies and verify that the installed
+# requirements are consistent.
 RUN python -m pip install --no-deps . \
     && python -m pip check
 
@@ -84,8 +109,11 @@ RUN python -m pip install --no-deps . \
 # -----------------------------------------------------------------------------
 FROM python:3.14.7-slim-trixie AS runtime
 
+# Package version recorded in the image metadata.
 ARG VERSION=1.0.1
+# Git commit the image was built from.
 ARG VCS_REF=unknown
+# Build time in RFC 3339 format.
 ARG BUILD_DATE=unknown
 
 # Open Container Initiative image annotations.
@@ -108,19 +136,25 @@ LABEL org.opencontainers.image.title="Unbihexium" \
 RUN groupadd --gid 1000 unbihexium \
     && useradd --uid 1000 --gid 1000 --create-home --shell /usr/sbin/nologin unbihexium
 
+# Copy the ready virtual environment from the builder stage.
 COPY --from=builder /opt/venv /opt/venv
 
+# Use the virtual environment, write logs unbuffered, skip .pyc files and
+# point Unbihexium at its home and model cache directories.
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     UNBIHEXIUM_HOME=/home/unbihexium \
     UNBIHEXIUM_CACHE=/home/unbihexium/.cache/unbihexium
 
+# Drop root privileges for everything that follows, including the container.
 USER unbihexium
+# Start in the home directory of the unprivileged user.
 WORKDIR /home/unbihexium
 
 # Model cache. Mount a volume here to keep downloaded models between runs.
 RUN mkdir -p "${UNBIHEXIUM_CACHE}"
+# Declare the cache as a volume so that it survives container restarts.
 VOLUME ["/home/unbihexium/.cache/unbihexium"]
 
 # Port of the REST API when started with uvicorn.
@@ -134,3 +168,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
 # Default: show the command line help. Override the command to run the API or
 # any other unbihexium command.
 CMD ["unbihexium", "--help"]
+
+# =============================================================================
+# End of file Dockerfile
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,134 +1,180 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: unbihexium-api
-  labels:
-    app: unbihexium
-    component: api
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: unbihexium
-      component: api
-  template:
-    metadata:
-      labels:
-        app: unbihexium
-        component: api
-    spec:
-      containers:
-        - name: unbihexium
-          image: ghcr.io/unbihexium-oss/unbihexium:latest
-          ports:
-            - containerPort: 8000
-              name: http
-          env:
-            - name: UNBIHEXIUM_CACHE_DIR
-              value: /data/cache
-            - name: UNBIHEXIUM_LOG_LEVEL
-              value: INFO
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "2Gi"
-              cpu: "1000m"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          volumeMounts:
-            - name: model-cache
-              mountPath: /data/cache
-      volumes:
-        - name: model-cache
-          persistentVolumeClaim:
-            claimName: unbihexium-cache-pvc
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : deploy/kubernetes/deployment.yaml
+# Title       : Kubernetes manifests for the Unbihexium REST API
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Kubernetes manifests (multi-document YAML), read by kubectl
+# =============================================================================
+#
+# Abstract
+# --------
+# Plain manifests that run the REST API on Kubernetes without Helm. The file
+# holds five documents separated by `---`:
+#
+#   Deployment               the API pods with probes and the model cache
+#   Service                  cluster-internal load balancing on port 80
+#   PersistentVolumeClaim    storage for downloaded models
+#   HorizontalPodAutoscaler  scales the pods between 2 and 10 replicas
+#   Ingress                  public HTTPS access through ingress-nginx
+#
+# Apply with `kubectl apply -f deploy/kubernetes/deployment.yaml`. The same
+# defaults are in the Helm chart under deploy/helm/unbihexium/.
+#
+# Note for maintainers: the package reads its model cache directory from
+# UNBIHEXIUM_CACHE (see src/unbihexium/zoo/store.py). The
+# UNBIHEXIUM_CACHE_DIR variable set below is not read by the package, so the
+# pods keep the UNBIHEXIUM_CACHE path of the image
+# (/home/unbihexium/.cache/unbihexium) rather than the /data/cache volume.
+# =============================================================================
+
+apiVersion: apps/v1  # API group of Deployments.
+kind: Deployment  # Runs and updates a set of identical pods.
+metadata:  # Identity of the Deployment.
+  name: unbihexium-api  # Referenced by the autoscaler below.
+  labels:  # Labels of the Deployment object.
+    app: unbihexium  # Application name.
+    component: api  # Part of the application.
+spec:  # Desired state.
+  replicas: 3  # Initial pod count; the autoscaler adjusts it.
+  selector:  # Pods managed by this Deployment.
+    matchLabels:  # Must match the pod template labels.
+      app: unbihexium  # Application name.
+      component: api  # Part of the application.
+  template:  # Pod template.
+    metadata:  # Pod identity.
+      labels:  # Labels used by the selector and the Service.
+        app: unbihexium  # Application name.
+        component: api  # Part of the application.
+    spec:  # Pod specification.
+      containers:  # Containers of the pod.
+        - name: unbihexium  # Container name.
+          image: ghcr.io/unbihexium-oss/unbihexium:latest  # Image published by the Docker workflow; pin a release tag in production.
+          ports:  # Ports exposed by the container.
+            - containerPort: 8000  # Port of uvicorn.
+              name: http  # Name referenced by probes and Services.
+          env:  # Environment variables.
+            - name: UNBIHEXIUM_CACHE_DIR  # Cache path; see the note in the abstract.
+              value: /data/cache  # Mount path of the cache volume.
+            - name: UNBIHEXIUM_LOG_LEVEL  # Log level read by unbihexium.utils.log.
+              value: INFO  # Log informational messages and above.
+          resources:  # Compute resources.
+            requests:  # Resources reserved for scheduling.
+              memory: "512Mi"  # Runtime and one small model.
+              cpu: "250m"  # A quarter of a core when idle.
+            limits:  # Upper bounds enforced by the kubelet.
+              memory: "2Gi"  # Room for several loaded models.
+              cpu: "1000m"  # One CPU core.
+          livenessProbe:  # Restart the container when it stops answering.
+            httpGet:  # HTTP check.
+              path: /health  # Health endpoint of the API.
+              port: 8000  # Port of uvicorn.
+            initialDelaySeconds: 30  # Allow time for start-up.
+            periodSeconds: 10  # Check every ten seconds.
+          readinessProbe:  # Send traffic only to pods that answer.
+            httpGet:  # HTTP check.
+              path: /health  # Health endpoint of the API.
+              port: 8000  # Port of uvicorn.
+            initialDelaySeconds: 5  # First check shortly after start.
+            periodSeconds: 5  # Check every five seconds.
+          volumeMounts:  # Volumes mounted into the container.
+            - name: model-cache  # Volume defined below.
+              mountPath: /data/cache  # Location of the model cache.
+      volumes:  # Volumes of the pod.
+        - name: model-cache  # Model cache volume.
+          persistentVolumeClaim:  # Backed by the claim below.
+            claimName: unbihexium-cache-pvc  # Name of the claim.
+# Second document: the Service.
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: unbihexium-api
-  labels:
-    app: unbihexium
-spec:
-  type: ClusterIP
-  ports:
-    - port: 80
-      targetPort: 8000
-      protocol: TCP
-      name: http
-  selector:
-    app: unbihexium
-    component: api
+apiVersion: v1  # Core API group.
+kind: Service  # Stable address in front of the pods.
+metadata:  # Identity of the Service.
+  name: unbihexium-api  # Referenced by the Ingress below.
+  labels:  # Labels of the Service object.
+    app: unbihexium  # Application name.
+spec:  # Desired state.
+  type: ClusterIP  # Reachable inside the cluster; the Ingress exposes it.
+  ports:  # Ports of the Service.
+    - port: 80  # Port of the Service.
+      targetPort: 8000  # Port of uvicorn in the pods.
+      protocol: TCP  # Transport protocol.
+      name: http  # Port name.
+  selector:  # Pods that receive the traffic.
+    app: unbihexium  # Application name.
+    component: api  # Part of the application.
+# Third document: the PersistentVolumeClaim.
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: unbihexium-cache-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: standard
+apiVersion: v1  # Core API group.
+kind: PersistentVolumeClaim  # Request for persistent storage.
+metadata:  # Identity of the claim.
+  name: unbihexium-cache-pvc  # Referenced by the Deployment above.
+spec:  # Desired storage.
+  accessModes:  # How the volume can be mounted.
+    - ReadWriteOnce  # Read-write by a single node.
+  resources:  # Storage size.
+    requests:  # Requested capacity.
+      storage: 10Gi  # Capacity for the model cache.
+  storageClassName: standard  # Storage class of the cluster.
+# Fourth document: the HorizontalPodAutoscaler.
 ---
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: unbihexium-api-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: unbihexium-api
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: 80
+apiVersion: autoscaling/v2  # API group of autoscalers with memory metrics.
+kind: HorizontalPodAutoscaler  # Scales the Deployment with the load.
+metadata:  # Identity of the autoscaler.
+  name: unbihexium-api-hpa  # Autoscaler name.
+spec:  # Desired behaviour.
+  scaleTargetRef:  # Object that is scaled.
+    apiVersion: apps/v1  # API group of the target.
+    kind: Deployment  # Kind of the target.
+    name: unbihexium-api  # Deployment above.
+  minReplicas: 2  # Keep two pods for availability.
+  maxReplicas: 10  # Upper bound of the scaling.
+  metrics:  # Metrics that drive the scaling.
+    - type: Resource  # Resource usage of the pods.
+      resource:  # Resource metric.
+        name: cpu  # CPU usage.
+        target:  # Target value.
+          type: Utilization  # Percentage of the request.
+          averageUtilization: 70  # Add pods above 70 percent CPU use.
+    - type: Resource  # Resource usage of the pods.
+      resource:  # Resource metric.
+        name: memory  # Memory usage.
+        target:  # Target value.
+          type: Utilization  # Percentage of the request.
+          averageUtilization: 80  # Add pods above 80 percent memory use.
+# Fifth document: the Ingress.
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: unbihexium-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  tls:
-    - hosts:
-        - api.unbihexium.org
-      secretName: unbihexium-tls
-  rules:
-    - host: api.unbihexium.org
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: unbihexium-api
-                port:
-                  number: 80
+apiVersion: networking.k8s.io/v1  # API group of Ingresses.
+kind: Ingress  # External HTTP routing.
+metadata:  # Identity of the Ingress.
+  name: unbihexium-ingress  # Ingress name.
+  annotations:  # Controller and certificate settings.
+    kubernetes.io/ingress.class: nginx  # Handled by ingress-nginx.
+    cert-manager.io/cluster-issuer: letsencrypt-prod  # Obtain the TLS certificate from Let's Encrypt.
+spec:  # Routing rules.
+  tls:  # TLS termination.
+    - hosts:  # Host names covered by the certificate.
+        - api.unbihexium.org  # Public host name of the API.
+      secretName: unbihexium-tls  # Secret that cert-manager fills with the certificate.
+  rules:  # Routing rules.
+    - host: api.unbihexium.org  # Public host name of the API.
+      http:  # HTTP routing.
+        paths:  # URL paths.
+          - path: /  # Every path.
+            pathType: Prefix  # Match the path and everything below it.
+            backend:  # Destination of the requests.
+              service:  # Service above.
+                name: unbihexium-api  # Service name.
+                port:  # Service port.
+                  number: 80  # Port of the Service.
+
+# =============================================================================
+# End of file deploy/kubernetes/deployment.yaml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
