@@ -253,6 +253,8 @@ markupsafe==3.0.3
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
+ml-dtypes==0.6.0
+    # via onnx
 more-itertools==11.1.0 ; platform_machine != 'ppc64le' and platform_machine != 's390x'
     # via
     #   jaraco-classes
@@ -314,8 +316,10 @@ numpy==2.2.6 ; python_full_version < '3.11'
     #   geopandas
     #   h5py
     #   imageio
+    #   ml-dtypes
     #   netcdf4
     #   numcodecs
+    #   onnx
     #   onnxruntime
     #   pandas
     #   pyogrio
@@ -337,8 +341,10 @@ numpy==2.4.6 ; python_full_version == '3.11.*'
     #   geopandas
     #   h5py
     #   imageio
+    #   ml-dtypes
     #   netcdf4
     #   numcodecs
+    #   onnx
     #   onnxruntime
     #   pandas
     #   pyogrio
@@ -359,8 +365,10 @@ numpy==2.5.3 ; python_full_version >= '3.12'
     #   geopandas
     #   h5py
     #   imageio
+    #   ml-dtypes
     #   netcdf4
     #   numcodecs
+    #   onnx
     #   onnxruntime
     #   pandas
     #   pyogrio
@@ -413,6 +421,8 @@ nvidia-nvshmem-cu13==3.4.5 ; sys_platform == 'linux'
     # via torch
 nvidia-nvtx==13.0.85 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
     # via cuda-toolkit
+onnx==1.23.0
+    # via unbihexium (pyproject.toml)
 onnxruntime==1.23.2 ; python_full_version < '3.11'
     # via unbihexium (pyproject.toml)
 onnxruntime==1.30.0 ; python_full_version >= '3.11'
@@ -477,6 +487,7 @@ pre-commit==4.6.2
     # via unbihexium (pyproject.toml)
 protobuf==7.36.2
     # via
+    #   onnx
     #   onnxruntime
     #   ray
 psutil==7.2.2
@@ -794,6 +805,7 @@ typing-extensions==4.16.0
     #   exceptiongroup
     #   fastapi
     #   numcodecs
+    #   onnx
     #   pydantic
     #   pydantic-core
     #   pyright

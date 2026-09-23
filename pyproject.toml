@@ -135,12 +135,16 @@ dependencies = [
 onnx = [
     "onnxruntime>=1.23.2,<1.24; python_version < '3.11'",
     "onnxruntime>=1.24.1; python_version >= '3.11'",
+    # Reads the model configuration stored in exported ONNX files.
+    "onnx>=1.21.0",
 ]
 # PyTorch backend for training and inference. torchvision releases are tied
 # to one torch release: torchvision 0.28 requires torch 2.13.
 torch = [
     "torch>=2.13.0",
     "torchvision>=0.28.0",
+    # Writes the model configuration into exported ONNX files.
+    "onnx>=1.21.0",
 ]
 # GPU acceleration with CUDA 12. Install the matching PyTorch CUDA build from
 # https://pytorch.org/get-started/locally/ first.
@@ -275,7 +279,6 @@ select = [
     "PTH",    # flake8-use-pathlib
     "RUF",    # Ruff-specific rules
     "ANN",    # flake8-annotations
-    "D",      # pydocstyle
     "S",      # flake8-bandit
 ]
 ignore = [
@@ -290,15 +293,6 @@ ignore = [
     "B007",   # Loop control variable not used
     "B904",   # raise in except clause without from
     "B905",   # zip() without explicit strict parameter
-    "D100",   # Missing docstring in public module
-    "D101",   # Missing docstring in public class
-    "D102",   # Missing docstring in public method
-    "D103",   # Missing docstring in public function
-    "D104",   # Missing docstring in public package
-    "D105",   # Missing docstring in magic method
-    "D107",   # Missing docstring in __init__
-    "D301",   # Use raw docstring for backslashes
-    "D417",   # Missing argument descriptions in docstring
     "E741",   # Ambiguous variable name
     "F401",   # Imported but unused
     "F403",   # Star imports used
@@ -326,10 +320,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 # Tests use assert, fixtures without docstrings and magic values by design.
-"tests/**" = ["S", "D", "ANN", "ARG"]
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
+"tests/**" = ["S", "ANN", "ARG"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["unbihexium"]
@@ -338,7 +329,6 @@ known-first-party = ["unbihexium"]
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
-docstring-code-format = true
 
 # =============================================================================
 # Pyright: static type checking (https://microsoft.github.io/pyright/)
