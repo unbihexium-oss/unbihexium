@@ -49,7 +49,7 @@ jobs:  # Jobs of the workflow.
       contents: read  # Read the label file.
       issues: write  # Create and edit labels.
     steps:  # Steps of the sync job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the label definitions.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the label definitions.
 
       - name: Synchronise labels from .github/labels.yml  # Create and update labels.
         uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d  # v6.0.0; Label synchronisation action.

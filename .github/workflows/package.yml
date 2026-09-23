@@ -51,7 +51,7 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 15  # Cancel a hung build after 15 minutes.
     steps:  # Steps of the build job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit to package.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit to package.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 

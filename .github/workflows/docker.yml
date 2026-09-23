@@ -49,7 +49,7 @@ jobs:  # Jobs of the workflow.
       contents: read  # Read the repository.
       packages: write  # Push the image to the GitHub Container Registry.
     steps:  # Steps of the build job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit to build.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit to build.
 
       - name: Set up Docker Buildx  # Enable BuildKit and the GitHub Actions cache backend.
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3.12.0; Official Buildx setup action.
