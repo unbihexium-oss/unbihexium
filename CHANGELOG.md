@@ -42,6 +42,11 @@ Where:
 
 ## [Unreleased]
 
+### Added (Unreleased)
+
+- Official support for Python 3.13 and 3.14; Python 3.10 through 3.14 are now supported and tested in CI
+- Python version support policy in VERSIONING.md
+
 ### Changed (Unreleased)
 
 - Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)
