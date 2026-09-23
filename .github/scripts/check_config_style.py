@@ -39,8 +39,9 @@
 # the comment of the line that opens them.
 #
 # Files that cannot hold comments are not checked: JSON, NumPy arrays, the
-# empty py.typed marker, the Markdown and notebook documentation (own rules)
-# and the licence and notice texts, which are reproduced verbatim.
+# empty py.typed marker, the Markdown and notebook documentation (own rules),
+# the fuzzer inputs in fuzz/corpus/ and the licence and notice texts, which
+# are reproduced verbatim.
 #
 # Usage
 # -----
@@ -92,6 +93,7 @@ SKIPPED = (
     re.compile(r"^LICENSES/"),  # Licence texts for REUSE, verbatim.
     re.compile(r"^NOTICE$"),  # Legal notice text, reproduced verbatim.
     re.compile(r"(^|/)py\.typed$"),  # Empty PEP 561 marker.
+    re.compile(r"^fuzz/corpus/"),  # Fuzzer inputs, reproduced byte for byte.
 )  # End of the skipped patterns.
 
 

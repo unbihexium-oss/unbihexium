@@ -75,6 +75,7 @@ STYLE_ROOTS = (
     "scripts/",  # Maintenance scripts.
     "examples/scripts/",  # Example scripts.
     "examples/serving/",  # Serving example.
+    "fuzz/",  # Fuzz targets.
     "src/unbihexium/zoo/",  # Model zoo.
     "src/unbihexium/ai/",  # Task APIs, inference, training and architectures.
     "src/unbihexium/__init__.py",  # Package entry point.
@@ -106,6 +107,7 @@ STYLE_ROOTS = (
     "tests/unit/test_cli.py",  # Tests of the command line.
     "tests/unit/test_config.py",  # Tests of the settings.
     "tests/unit/test_core.py",  # Tests of the core package.
+    "tests/unit/test_fuzz_targets.py",  # Regression tests of the fuzz targets.
     "tests/unit/test_geostat.py",  # Tests of geostatistics.
     "tests/unit/test_indices.py",  # Tests of the spectral indices.
     "tests/unit/test_io.py",  # Tests of input and output.

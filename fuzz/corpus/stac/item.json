@@ -1,0 +1,1 @@
+{"type":"Feature","id":"a","stac_version":"1.0.0","bbox":[0,0,1,1],"geometry":{"type":"Point","coordinates":[0.5,0.5]},"properties":{"datetime":"2024-01-01T00:00:00Z"},"links":[{"rel":"self","href":"https://example.com/a.json"}],"assets":{"visual":{"href":"a.tif"}}}
