@@ -1,202 +1,245 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/ai/segmentation.py
+# Title       : Semantic segmentation and change detection
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy and PyTorch or ONNX
+#               Runtime
+# =============================================================================
+#
+# Abstract
+# --------
+# SemanticSegmenter assigns a class to every pixel with a U-Net of the model
+# zoo and returns a georeferenced SegmentationResult with the class map,
+# optional class probabilities, class fractions and areas.
+#
+# Thresholds
+# ----------
+# For two-class models (background and target) a pixel belongs to the target
+# class when its probability is at least `threshold` (default 0.5). For
+# models with more classes, `threshold` is the minimum probability of the
+# winning class; pixels below it are set to the no-data label 255.
+#
+# ChangeDetector compares two acquisitions of the same area. predict_pair
+# stacks the bands of both dates in the order the model expects (first date,
+# then second date) and returns the change map.
+#
+# The subclasses select common catalogue families: water, land cover,
+# clouds, crops, SAR flood and oil spill mapping. Pass a trained checkpoint
+# through `weights`; the starter weights are untrained.
+# =============================================================================
 
-"""Segmentation pipelines for satellite imagery."""
-
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+# Represent file paths.
+from pathlib import Path
+
+# Type of loosely structured values.
 from typing import Any
 
+# Arrays.
 import numpy as np
+
+# Array type annotations.
 from numpy.typing import NDArray
 
-from unbihexium.core.pipeline import Pipeline, PipelineConfig
+# Task API base and pipeline registration.
+from unbihexium.ai.base import ZooTask, register_task_pipeline
+
+# Detectors that earlier releases exported from this module.
+from unbihexium.ai.detection import CropDetector, GreenhouseDetector
+
+# Result record.
+from unbihexium.ai.results import SegmentationResult
+
+# Label of pixels without a class.
+from unbihexium.ai.transforms import IGNORE_INDEX
+
+# Raster container.
 from unbihexium.core.raster import Raster
-from unbihexium.registry.pipelines import PipelineRegistry
+
+# Task enumeration.
+from unbihexium.zoo.catalog import Task
+
+# Names kept for backward compatibility of imports.
+__all__ = [
+    "ChangeDetector",  # Bi-temporal change detection.
+    "CloudMasker",  # Cloud and shadow masks.
+    "CropClassifier",  # Crop type maps.
+    "CropDetector",  # Crop field detector, re-exported.
+    "FloodMapper",  # SAR flood maps.
+    "GreenhouseDetector",  # Greenhouse detector, re-exported.
+    "LandCoverClassifier",  # Land use and land cover maps.
+    "OilSpillDetector",  # SAR oil spill maps.
+    "SegmentationResult",  # Result record.
+    "SemanticSegmenter",  # Generic segmenter.
+    "WaterDetector",  # Water surface maps.
+]  # End of the export list.
 
 
-@dataclass
-class SegmentationResult:
-    """Result of semantic segmentation."""
+# Per-pixel classification with a model zoo U-Net.
+class SemanticSegmenter(ZooTask):
+    # Land use and land cover by default.
+    default_model = "lulc_classifier"
+    # Segmentation and change detection models.
+    tasks = (Task.SEGMENTATION, Task.CHANGE_DETECTION)
 
-    mask: NDArray[np.floating[Any]] | None = None
-    class_names: list[str] = field(default_factory=list)
-    source: str = ""
-    model_id: str = ""
-
-    @property
-    def num_classes(self) -> int:
-        return len(self.class_names)
-
-    def get_class_mask(self, class_id: int) -> NDArray[np.floating[Any]] | None:
-        if self.mask is None:
-            return None
-        return (self.mask == class_id).astype(np.float32)
-
-    def to_raster(self, metadata: Any = None) -> Raster:
-        return Raster.from_array(self.mask if self.mask is not None else np.array([]))
-
-
-class SemanticSegmenter:
-    """Base semantic segmentation model."""
-
+    # Configure the segmenter.
     def __init__(
-        self,
-        model_id: str = "segmenter",
-        class_names: list[str] | None = None,
-        tile_size: int = 512,
-        overlap: int = 64,
-    ) -> None:
-        self.model_id = model_id
-        self.class_names = class_names or ["background", "foreground"]
-        self.tile_size = tile_size
-        self.overlap = overlap
-
-    def predict(self, raster: Raster) -> SegmentationResult:
-        """Run segmentation on a raster."""
-        raster.load()
-        if raster.data is None:
-            return SegmentationResult(source=str(raster.source), model_id=self.model_id)
-
-        mask = self._segment_tiles(raster)
-        return SegmentationResult(
-            mask=mask,
-            class_names=self.class_names,
-            source=str(raster.source),
-            model_id=self.model_id,
-        )
-
-    def _segment_tiles(self, raster: Raster) -> NDArray[np.floating[Any]]:
-        """Segment using tiled inference."""
-        from unbihexium.core.tile import TileGrid
-
-        grid = TileGrid.from_raster(raster, tile_size=self.tile_size, overlap=self.overlap)
-
-        # Create output mask
-        output = np.zeros((raster.height, raster.width), dtype=np.float32)
-
-        for tile in grid.tiles(raster):
-            tile_mask = self._segment_single(tile.data)
-            row_off, col_off = tile.offset
-            h, w = tile.height, tile.width
-            output[row_off : row_off + h, col_off : col_off + w] = tile_mask[:h, :w]
-
-        return output
-
-    def _segment_single(self, data: NDArray[np.floating[Any]]) -> NDArray[np.floating[Any]]:
-        """Segment a single tile."""
-        # Placeholder - actual model inference
-        _, h, w = data.shape
-        return np.zeros((h, w), dtype=np.float32)
-
-
-class ChangeDetector(SemanticSegmenter):
-    """Bi-temporal change detection."""
-
-    def __init__(self, threshold: float = 0.5) -> None:
-        super().__init__(
-            model_id="change_detector",
-            class_names=["no_change", "change"],
-        )
+        self,  # The segmenter.
+        model: Any = None,  # Family, model id, checkpoint, ONNX file or ZooModel.
+        threshold: float | None = 0.5,  # Probability threshold, see the module header.
+        return_probabilities: bool = False,  # Keep the class probabilities.
+        **kwargs: Any,  # Options of ZooTask (variant, weights, device, ...).
+    ) -> None:  # The constructor returns nothing.
+        # Model selection and inference options.
+        super().__init__(model, **kwargs)
+        # Probability threshold.
         self.threshold = threshold
+        # Whether to keep the probabilities.
+        self.return_probabilities = return_probabilities
 
-    def predict_pair(self, raster1: Raster, raster2: Raster) -> SegmentationResult:
-        """Detect changes between two rasters."""
-        raster1.load()
-        raster2.load()
+    # Class map from class probabilities (K, H, W).
+    def labels(self, probabilities: NDArray[np.float32]) -> NDArray[np.uint8]:
+        # Pixels without valid input have NaN probabilities.
+        invalid = ~np.isfinite(probabilities).all(axis=0)
+        # Replace NaN so that argmax is defined.
+        p = np.nan_to_num(probabilities, nan=0.0)
+        # Two-class models: threshold on the target class.
+        if p.shape[0] == 2 and self.threshold is not None:
+            # Target where its probability reaches the threshold.
+            labels = (p[1] >= self.threshold).astype(np.uint8)
+        # More classes: most likely class.
+        else:
+            # Winning class.
+            labels = np.argmax(p, axis=0).astype(np.uint8)
+            # Uncertain pixels get the no-data label.
+            if self.threshold is not None:
+                # Probability of the winning class below the threshold.
+                labels[p.max(axis=0) < self.threshold] = IGNORE_INDEX
+        # Invalid pixels get the no-data label.
+        labels[invalid] = IGNORE_INDEX
+        # Return the class map.
+        return labels
 
-        if raster1.data is None or raster2.data is None:
-            return SegmentationResult(model_id=self.model_id)
-
-        # Simple difference-based change detection
-        diff = np.abs(raster1.data.mean(axis=0) - raster2.data.mean(axis=0))
-        mask = (diff > self.threshold).astype(np.float32)
-
+    # Segment an image, raster or raster file.
+    def predict(self, image: Raster | NDArray[Any] | str | Path) -> SegmentationResult:
+        # Array and georeferencing.
+        data, crs, transform, source = self.prepare(image)
+        # Blended class probabilities.
+        probabilities = self.predictor.dense(data)
+        # Result with the class map.
         return SegmentationResult(
-            mask=mask,
-            class_names=self.class_names,
-            model_id=self.model_id,
-        )
+            mask=self.labels(probabilities),  # Class map.
+            classes=self.outputs,  # Class names.
+            model_id=self.model_id,  # Model.
+            probabilities=probabilities if self.return_probabilities else None,  # Probabilities.
+            source=source,  # Input.
+            crs=crs,  # Coordinate system.
+            transform=transform,  # Georeferencing.
+            nodata=IGNORE_INDEX,  # No-data label.
+        )  # End of the result.
 
 
+# Bi-temporal change detection.
+class ChangeDetector(SemanticSegmenter):
+    # Generic change detector of the catalogue.
+    default_model = "change_detector"
+    # Change detection models only.
+    tasks = (Task.CHANGE_DETECTION,)
+
+    # Detect changes between two acquisitions of the same grid.
+    def predict_pair(
+        self,  # The detector.
+        before: Raster | NDArray[Any] | str | Path,  # First acquisition.
+        after: Raster | NDArray[Any] | str | Path,  # Second acquisition.
+    ) -> SegmentationResult:  # Change map.
+        # First date with its georeferencing.
+        first, crs, transform, source = self.prepare(before)
+        # Second date.
+        second, _, _, _ = self.prepare(after)
+        # Both dates must share the grid.
+        if first.shape != second.shape:
+            # Explain the problem.
+            raise ValueError(f"the images differ in shape: {first.shape} and {second.shape}")
+        # Stack the dates on the band axis.
+        stacked = np.concatenate([first, second], axis=0)
+        # Georeferenced raster of the stack.
+        raster = Raster.from_array(stacked, crs=crs, transform=transform)
+        # Remember the sources.
+        raster.source = source
+        # Run the segmentation on the stack.
+        return self.predict(raster)
+
+
+# Water surfaces.
 class WaterDetector(SemanticSegmenter):
-    """Water surface detection."""
-
-    def __init__(self) -> None:
-        super().__init__(
-            model_id="water_detector",
-            class_names=["land", "water"],
-        )
+    # Catalogue family.
+    default_model = "water_surface_detector"
 
 
-class CropDetector(SemanticSegmenter):
-    """Crop detection and classification."""
-
-    def __init__(self, crop_classes: list[str] | None = None) -> None:
-        classes = crop_classes or ["background", "crop"]
-        super().__init__(
-            model_id="crop_detector",
-            class_names=classes,
-        )
+# Land use and land cover.
+class LandCoverClassifier(SemanticSegmenter):
+    # Catalogue family.
+    default_model = "lulc_classifier"
 
 
-class GreenhouseDetector(SemanticSegmenter):
-    """Greenhouse detection."""
-
-    def __init__(self) -> None:
-        super().__init__(
-            model_id="greenhouse_detector",
-            class_names=["background", "greenhouse"],
-        )
+# Clouds and cloud shadows.
+class CloudMasker(SemanticSegmenter):
+    # Catalogue family.
+    default_model = "cloud_mask"
 
 
-# Register segmentation pipelines
-@PipelineRegistry.register(
-    pipeline_id="change_detection",
-    name="Change Detection Pipeline",
-    description="Bi-temporal change detection",
-    domains=["ai", "change"],
-)
-def create_change_detection_pipeline(**kwargs: Any) -> Pipeline:
-    config = PipelineConfig(
-        pipeline_id="change_detection",
-        name="Change Detection",
-        parameters=kwargs,
-    )
-    pipeline = Pipeline(config)
-    detector = ChangeDetector(threshold=kwargs.get("threshold", 0.5))
-
-    def detect_step(inputs: dict[str, Any]) -> dict[str, Any]:
-        raster1 = Raster.from_file(inputs["input1"])
-        raster2 = Raster.from_file(inputs["input2"])
-        result = detector.predict_pair(raster1, raster2)
-        return {"result": result}
-
-    pipeline.add_step(detect_step)
-    return pipeline
+# Crop types.
+class CropClassifier(SemanticSegmenter):
+    # Catalogue family.
+    default_model = "crop_classifier"
 
 
-@PipelineRegistry.register(
-    pipeline_id="water_detection",
-    name="Water Detection Pipeline",
-    description="Detect water surfaces in satellite imagery",
-    domains=["ai", "water"],
-)
-def create_water_detection_pipeline(**kwargs: Any) -> Pipeline:
-    config = PipelineConfig(
-        pipeline_id="water_detection",
-        name="Water Detection",
-        parameters=kwargs,
-    )
-    pipeline = Pipeline(config)
-    detector = WaterDetector()
+# Floods in SAR imagery.
+class FloodMapper(SemanticSegmenter):
+    # Catalogue family.
+    default_model = "sar_flood_detector"
 
-    def detect_step(inputs: dict[str, Any]) -> dict[str, Any]:
-        raster = Raster.from_file(inputs["input"])
-        result = detector.predict(raster)
-        return {"result": result, "input": inputs["input"]}
 
-    pipeline.add_step(detect_step)
-    return pipeline
+# Oil spills in SAR imagery.
+class OilSpillDetector(SemanticSegmenter):
+    # Catalogue family.
+    default_model = "sar_oil_spill_detector"
+
+
+# Pipeline: change detection between two raster files.
+create_change_detection_pipeline = register_task_pipeline(
+    "change_detection",  # Registry id.
+    "Change Detection Pipeline",  # Name.
+    "Bi-temporal change detection",  # Description.
+    ["ai", "change"],  # Domains.
+    ChangeDetector,  # Task API.
+    inputs=("input1", "input2"),  # Two acquisitions.
+    method="predict_pair",  # Pairwise method.
+)  # End of the registration.
+
+# Pipeline: water mapping on a raster file.
+create_water_detection_pipeline = register_task_pipeline(
+    "water_detection",  # Registry id.
+    "Water Detection Pipeline",  # Name.
+    "Detect water surfaces in satellite imagery",  # Description.
+    ["ai", "water"],  # Domains.
+    WaterDetector,  # Task API.
+)  # End of the registration.
+
+
+# =============================================================================
+# End of module src/unbihexium/ai/segmentation.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
