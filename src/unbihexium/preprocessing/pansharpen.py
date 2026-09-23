@@ -148,8 +148,10 @@ def upsample_to_pan(
         raise ValueError(f"ms must be (C, h, w), got shape {m.shape}")
     # Zoom factors of rows and columns; bands are kept.
     factors = (1.0, shape[0] / m.shape[1], shape[1] / m.shape[2])
-    # Pixel-area aligned interpolation keeps the footprint of the image.
-    out = zoom(m, factors, order=order, mode="grid-mirror", grid_mode=True)
+    # Pixel-area aligned interpolation keeps the footprint of the image; edge
+    # replication keeps constant bands constant (SciPy before 1.17 overshoots
+    # with the mirror modes).
+    out = zoom(m, factors, order=order, mode="nearest", grid_mode=True)
     # Return the upsampled bands.
     return out
 

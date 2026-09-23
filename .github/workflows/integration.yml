@@ -99,5 +99,5 @@ jobs:
       # Wait up to 30 seconds for the server, then require a healthy answer.
       - name: Test API endpoints
         run: |
-          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && exit 0; sleep 1; done
+          for _ in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && exit 0; sleep 1; done
           exit 1
