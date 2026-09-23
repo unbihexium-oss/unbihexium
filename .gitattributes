@@ -107,11 +107,14 @@ docs/** linguist-documentation
 requirements*.txt linguist-generated
 
 # -----------------------------------------------------------------------------
-# git archive: exclude repository automation from source archives
+# git archive: exclude development-only files from source archives
 # -----------------------------------------------------------------------------
+# .github/ stays in the archives: OpenSSF Scorecard reads the workflows from
+# the GitHub source archive, and without them it cannot assess the
+# Dangerous-Workflow, Token-Permissions, Pinned-Dependencies and Packaging
+# checks. The sdist and the wheel are built by hatchling and do not use
+# git archive.
 
-# Workflows and CI scripts are not needed to build or use the package.
-.github/ export-ignore
 # The pre-commit configuration is only used during development.
 .pre-commit-config.yaml export-ignore
 
