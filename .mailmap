@@ -1,3 +1,17 @@
-# Maps commit identities to a canonical name and e-mail address for
-# git shortlog, git blame and contributor statistics.
+# =============================================================================
+# .mailmap: canonical names and e-mail addresses of contributors
+# https://git-scm.com/docs/gitmailmap
+# =============================================================================
+#
+# Git uses this file in `git shortlog`, `git blame` and `git log --use-mailmap`
+# to merge commits made under different identities into one contributor.
+#
+# Format
+#   Proper Name <proper@email> <commit@email>
+#   Proper Name <proper@email> Commit Name <commit@email>
+#
+# Check the result with:
+#   git shortlog --summary --numbered --email
+# =============================================================================
+
 Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi> <olaf.laitinen@gmail.com>
