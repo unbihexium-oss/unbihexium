@@ -1,0 +1,35 @@
+# Code owners are requested for review automatically on pull requests that
+# touch the matching paths. Later patterns take precedence over earlier ones.
+
+# Default owner for everything in the repository
+*                           @olaflaitinen
+
+# Library source and tests
+/src/                       @olaflaitinen
+/tests/                     @olaflaitinen
+
+# Model zoo: weights, manifests, model cards and checksums
+/model_zoo/                 @olaflaitinen
+
+# Documentation and examples
+/docs/                      @olaflaitinen
+/examples/                  @olaflaitinen
+
+# Repository automation, templates and release configuration
+/.github/                   @olaflaitinen
+
+# Packaging and containers
+/pyproject.toml             @olaflaitinen
+/Dockerfile                 @olaflaitinen
+/docker-compose.yml         @olaflaitinen
+
+# Licence, legal and policy documents
+/LICENSE.txt                @olaflaitinen
+/NOTICE                     @olaflaitinen
+/NOTICE.md                  @olaflaitinen
+/THIRD_PARTY_NOTICES.md     @olaflaitinen
+/COMPLIANCE.md              @olaflaitinen
+/PRIVACY.md                 @olaflaitinen
+/SECURITY.md                @olaflaitinen
+/CODE_OF_CONDUCT.md         @olaflaitinen
+/GOVERNANCE.md              @olaflaitinen
