@@ -1,159 +1,103 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/postprocessing/__init__.py
+# Title       : Refinement of model outputs into map products
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy, SciPy, rasterio and
+#               Shapely
+# =============================================================================
+#
+# Abstract
+# --------
+# Turns scores and class maps into clean, publishable map products:
+#
+#   activations   thresholds, argmax, confidence masks, entropy and margin
+#   morphology    opening and closing, small object and hole removal,
+#                 minimum mapping unit sieve, majority filter, connected
+#                 components and their statistics
+#   vectorize     raster to polygons, simplification, GeoDataFrame output
+#   tiles         tile windows and blended stitching of tiled predictions
+#
+# Usage
+# -----
+#   from unbihexium.postprocessing import confidence_mask, sieve
+#   labels = confidence_mask(probabilities, min_confidence=0.6)
+#   labels = sieve(labels, min_size=9, nodata=255)
+# =============================================================================
 
-"""Postprocessing module for result refinement.
+# Activations and class maps.
+from unbihexium.postprocessing.activations import (
+    argmax,  # Class map from scores.
+    confidence_mask,  # Class map with rejected pixels.
+    margin,  # Best minus second-best probability.
+    prediction_entropy,  # Normalised Shannon entropy.
+    sigmoid,  # Logistic function.
+    softmax,  # Softmax.
+    threshold,  # Binary map.
+)  # End of the activation imports.
 
-This module provides functions and classes for postprocessing
-model outputs into usable geospatial products.
-"""
+# Morphology and regions.
+from unbihexium.postprocessing.morphology import (
+    component_statistics,  # Statistics per region.
+    connected_components,  # Region labelling.
+    fill_small_holes,  # Hole filling.
+    majority_filter,  # Modal filter.
+    morphology_clean,  # Binary morphology.
+    remove_small_objects,  # Small object removal.
+    sieve,  # Minimum mapping unit.
+    structuring_element,  # Footprints.
+)  # End of the morphology imports.
 
-from __future__ import annotations
+# Tiles.
+from unbihexium.postprocessing.tiles import (
+    blend_weights,  # Tile weights.
+    stitch_tiles,  # Mosaicking.
+    tile_positions,  # Tile origins.
+)  # End of the tile imports.
 
-import numpy as np
-from numpy.typing import NDArray
+# Vectorisation.
+from unbihexium.postprocessing.vectorize import (
+    as_affine,  # Transform conversion.
+    polygons_to_geodataframe,  # GeoDataFrame output.
+    raster_to_polygons,  # Polygonisation.
+    simplify_polygons,  # Douglas-Peucker simplification.
+)  # End of the vectorisation imports.
 
-
-def threshold(predictions: NDArray, threshold: float = 0.5, above: bool = True) -> NDArray:
-    """Apply threshold to predictions.
-
-    Args:
-        predictions: Prediction array
-        threshold: Threshold value
-        above: If True, values above threshold are 1
-
-    Returns:
-        Binary array
-    """
-    if above:
-        return (predictions > threshold).astype(np.uint8)
-    return (predictions < threshold).astype(np.uint8)
-
-
-def argmax(predictions: NDArray, axis: int = 0) -> NDArray:
-    """Apply argmax for multi-class predictions.
-
-    Args:
-        predictions: Prediction array with class probabilities
-        axis: Axis along which to compute argmax
-
-    Returns:
-        Class label array
-    """
-    return np.argmax(predictions, axis=axis).astype(np.uint8)
-
-
-def softmax(predictions: NDArray, axis: int = 0) -> NDArray:
-    """Apply softmax to logits.
-
-    Args:
-        predictions: Logit array
-        axis: Axis along which to compute softmax
-
-    Returns:
-        Probability array
-    """
-    exp_p = np.exp(predictions - np.max(predictions, axis=axis, keepdims=True))
-    return exp_p / np.sum(exp_p, axis=axis, keepdims=True)
-
-
-def sigmoid(predictions: NDArray) -> NDArray:
-    """Apply sigmoid to logits.
-
-    Args:
-        predictions: Logit array
-
-    Returns:
-        Probability array
-    """
-    return 1 / (1 + np.exp(-predictions))
-
-
-def morphology_clean(mask: NDArray, operation: str = "open", kernel_size: int = 3) -> NDArray:
-    """Apply morphological operations to clean mask.
-
-    Args:
-        mask: Binary mask array
-        operation: 'open', 'close', 'erode', 'dilate'
-        kernel_size: Size of structuring element
-
-    Returns:
-        Cleaned mask array
-    """
-    from scipy.ndimage import binary_closing, binary_dilation, binary_erosion, binary_opening
-
-    ops = {
-        "open": binary_opening,
-        "close": binary_closing,
-        "erode": binary_erosion,
-        "dilate": binary_dilation,
-    }
-
-    structure = np.ones((kernel_size, kernel_size))
-    return ops[operation](mask, structure=structure).astype(mask.dtype)
-
-
-def remove_small_objects(mask: NDArray, min_size: int = 100) -> NDArray:
-    """Remove small connected components from mask.
-
-    Args:
-        mask: Binary mask array
-        min_size: Minimum object size in pixels
-
-    Returns:
-        Cleaned mask array
-    """
-    from scipy.ndimage import label
-
-    labeled, num_features = label(mask)
-    sizes = np.bincount(labeled.ravel())
-
-    mask_sizes = sizes > min_size
-    mask_sizes[0] = False  # Background
-
-    return mask_sizes[labeled].astype(mask.dtype)
-
-
-def stitch_tiles(
-    tiles: list[NDArray],
-    positions: list[tuple[int, int]],
-    output_shape: tuple[int, ...],
-    overlap: int = 0,
-) -> NDArray:
-    """Stitch tiles back into full image.
-
-    Args:
-        tiles: List of tile arrays
-        positions: List of (row, col) positions
-        output_shape: Shape of output array
-        overlap: Overlap between tiles
-
-    Returns:
-        Stitched array
-    """
-    output = np.zeros(output_shape, dtype=tiles[0].dtype)
-    weights = np.zeros(output_shape[:2], dtype=np.float32)
-
-    for tile, (r, c) in zip(tiles, positions):
-        h, w = tile.shape[-2:]
-        if tile.ndim == 3:
-            output[:, r : r + h, c : c + w] += tile
-        else:
-            output[r : r + h, c : c + w] += tile
-        weights[r : r + h, c : c + w] += 1
-
-    weights = np.maximum(weights, 1)
-    if output.ndim == 3:
-        return output / weights[np.newaxis, ...]
-    return output / weights
-
-
+# Public names of the package.
 __all__ = [
-    "threshold",
-    "argmax",
-    "softmax",
-    "sigmoid",
-    "morphology_clean",
-    "remove_small_objects",
-    "stitch_tiles",
-]
+    "argmax",  # Class map from scores.
+    "as_affine",  # Transform conversion.
+    "blend_weights",  # Tile weights.
+    "component_statistics",  # Statistics per region.
+    "confidence_mask",  # Class map with rejected pixels.
+    "connected_components",  # Region labelling.
+    "fill_small_holes",  # Hole filling.
+    "majority_filter",  # Modal filter.
+    "margin",  # Best minus second-best probability.
+    "morphology_clean",  # Binary morphology.
+    "polygons_to_geodataframe",  # GeoDataFrame output.
+    "prediction_entropy",  # Normalised Shannon entropy.
+    "raster_to_polygons",  # Polygonisation.
+    "remove_small_objects",  # Small object removal.
+    "sieve",  # Minimum mapping unit.
+    "sigmoid",  # Logistic function.
+    "simplify_polygons",  # Douglas-Peucker simplification.
+    "softmax",  # Softmax.
+    "stitch_tiles",  # Mosaicking.
+    "structuring_element",  # Footprints.
+    "threshold",  # Binary map.
+    "tile_positions",  # Tile origins.
+]  # End of the public names.
+
+# =============================================================================
+# End of module src/unbihexium/postprocessing/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
