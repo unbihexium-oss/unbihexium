@@ -1,0 +1,75 @@
+name: Text Policy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  text-policy:
+    name: English only, no emojis, no em dashes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Check tracked text files
+        run: python .github/scripts/check_text_policy.py
+
+  commit-messages:
+    name: Commit messages
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Check commit messages of the pull request
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import subprocess
+          import sys
+
+          log = subprocess.run(
+              ["git", "log", "--format=%H%x00%B%x01", f"{os.environ['BASE_SHA']}..{os.environ['HEAD_SHA']}"],
+              check=True, capture_output=True, text=True,
+          ).stdout
+          bad = re.compile("[\U0001f000-\U0001faff\u2600-\u27bf\u2b00-\u2bff\ufe0f\u2014\u2015\u011e\u011f\u0130\u0131\u015e\u015f]")
+          failures = 0
+          for entry in filter(None, (e.strip() for e in log.split("\x01"))):
+              sha, message = entry.split("\x00", 1)
+              match = bad.search(message)
+              if match:
+                  failures += 1
+                  print(f"::error::Commit {sha[:10]} contains a forbidden character U+{ord(match.group(0)):04X}")
+          sys.exit(1 if failures else 0)
+          PY
