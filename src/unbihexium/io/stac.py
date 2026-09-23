@@ -60,6 +60,9 @@ from __future__ import annotations
 # JSON files.
 import json
 
+# Fractional seconds of RFC 3339 times.
+import re
+
 # Iterators.
 from collections.abc import Iterable, Iterator
 
@@ -112,13 +115,11 @@ def parse_datetime(value: str | datetime) -> datetime:
         # Add the time.
         text += "T00:00:00+00:00"
     # Python 3.10 accepts only 0, 3 or 6 fraction digits; pad or cut to 6.
-    if "." in text:
-        # Split the fraction from the zone.
-        head, _, rest = text.partition(".")
-        # Digits of the fraction.
-        digits = "".join(c for c in rest if c.isdigit())
-        # Zone after the digits.
-        zone = rest[len(digits) :]
+    match = re.match(r"^(.*?[T ]\d{2}:\d{2}:\d{2})\.(\d+)(.*)$", text)
+    # Rewrite the fraction when present.
+    if match:
+        # Time, fraction digits and zone.
+        head, digits, zone = match.groups()
         # Six digits.
         text = f"{head}.{(digits + '000000')[:6]}{zone}"
     # Parse the text.
