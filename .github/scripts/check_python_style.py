@@ -78,12 +78,20 @@ STYLE_ROOTS = (
     "src/unbihexium/zoo/",  # Model zoo.
     "src/unbihexium/ai/",  # Task APIs, inference, training and architectures.
     "src/unbihexium/cli/",  # Command line interface.
+    "src/unbihexium/metrics/",  # Accuracy assessment.
+    "src/unbihexium/postprocessing/",  # Map cleaning and vectorisation.
+    "src/unbihexium/preprocessing/",  # Radiometry, masks and pansharpening.
+    "src/unbihexium/visualization/",  # Colour maps and quicklooks.
     "tests/unit/test_ai.py",  # Tests of the task APIs.
     "tests/unit/test_ai_data.py",  # Tests of the datasets.
     "tests/unit/test_ai_utils.py",  # Tests of decoding, metrics and transforms.
     "tests/unit/test_cli.py",  # Tests of the command line.
+    "tests/unit/test_metrics.py",  # Tests of the accuracy assessment.
     "tests/unit/test_models.py",  # Tests of the architectures.
+    "tests/unit/test_postprocessing.py",  # Tests of postprocessing.
+    "tests/unit/test_preprocessing.py",  # Tests of preprocessing.
     "tests/unit/test_training.py",  # Tests of training.
+    "tests/unit/test_visualization.py",  # Tests of visualisation.
     "tests/unit/test_zoo_catalog.py",  # Tests of the catalogue.
     "tests/unit/test_zoo_store.py",  # Tests of the model store.
 )  # End of the directory list.
