@@ -1,14 +1,43 @@
-# OpenSSF Security Insights, specification 2.0.0
-# https://github.com/ossf/security-insights
+# =============================================================================
+# OpenSSF Security Insights
+# =============================================================================
+#
+# Machine-readable description of the security posture of this repository,
+# following the OpenSSF Security Insights specification 2.2.0:
+#   https://github.com/ossf/security-insights
+#   https://github.com/ossf/security-insights/blob/v2.2.0/spec/schema.md
+#
+# Consumers such as the OpenSSF Scorecard, LFX Insights, CLOMonitor and
+# package registries read this file to find the security contact, the
+# vulnerability disclosure policy, the tools that scan the code, and how
+# releases are built and attested.
+#
+# Maintenance
+# -----------
+# - Update `last-updated` whenever a value below changes, and
+#   `last-reviewed` at least every six months even when nothing changes.
+# - Add a tool below when a workflow starts running a new scanner, and
+#   remove it when the workflow is deleted.
+# - The Repository Config workflow validates this file against the CUE
+#   schema of the specification:
+#     git clone --depth 1 --branch v2.2.0 https://github.com/ossf/security-insights
+#     cd security-insights
+#     cue vet -c -d '#SecurityInsights' ./spec /path/to/security-insights.yml
+# =============================================================================
+
 header:
-  schema-version: 2.0.0
-  last-updated: '2026-09-23'
-  last-reviewed: '2026-09-23'
+  schema-version: 2.2.0
+  last-updated: "2026-09-23"
+  last-reviewed: "2026-09-23"
   url: https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml
   comment: |
-    Security posture of the Unbihexium repository. Update last-updated and
-    last-reviewed whenever the security process or tooling changes.
+    Security posture of the Unbihexium repository: the Python library, the
+    command line interface, the REST service, the model zoo and the
+    container image built from it.
 
+# -----------------------------------------------------------------------------
+# Project: people, documentation and vulnerability reporting
+# -----------------------------------------------------------------------------
 project:
   name: Unbihexium
   homepage: https://github.com/unbihexium-oss/unbihexium
@@ -23,26 +52,49 @@ project:
   documentation:
     quickstart-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/quickstart.md
     detailed-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/index.md
+    design: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/architecture/overview.md
     code-of-conduct: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md
     release-process: https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md
     support-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md
+    signature-verification: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/security/supply_chain_security.md
   repositories:
     - name: unbihexium
       url: https://github.com/unbihexium-oss/unbihexium
       comment: |
-        Library, command line interface, REST service, model zoo and documentation.
+        Library, command line interface, REST service, model zoo, container
+        image definition, deployment manifests and documentation.
   vulnerability-reporting:
     reports-accepted: true
     bug-bounty-available: false
     contact:
-      name: Unbihexium maintainers
+      name: Olaf Yunus Laitinen Imanov
+      affiliation: Unbihexium OSS Foundation
       email: yunus.z.imanov@helsinki.fi
+      social: https://github.com/olaflaitinen
       primary: true
     policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md
+    in-scope:
+      - Source code of the unbihexium Python package under src/
+      - Command line interface and REST service (unbihexium.serving)
+      - Model zoo weights, manifests and checksums under model_zoo/
+      - Container image built from the Dockerfile
+      - Deployment manifests under deploy/
+      - GitHub Actions workflows and release pipeline under .github/
+    out-of-scope:
+      - Vulnerabilities in third-party dependencies that are already publicly known; report them to the upstream project
+      - Deployments operated by third parties
+      - Findings that require an already compromised host or a malicious local administrator
+      - Denial of service through intentionally oversized inputs without a practical amplification
     comment: |
       Report vulnerabilities privately through GitHub private vulnerability
-      reporting at https://github.com/unbihexium-oss/unbihexium/security/advisories/new.
+      reporting at
+      https://github.com/unbihexium-oss/unbihexium/security/advisories/new,
+      never in a public issue. Reports are handled under the coordinated
+      disclosure process in SECURITY.md.
 
+# -----------------------------------------------------------------------------
+# Repository: status, licence, release process and security tooling
+# -----------------------------------------------------------------------------
 repository:
   url: https://github.com/unbihexium-oss/unbihexium
   status: active
@@ -65,83 +117,164 @@ repository:
   license:
     url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
     expression: MPL-2.0
+
+  # Releases are built by the Release workflow when a version tag is pushed,
+  # uploaded to PyPI, and attested with GitHub artifact attestations
+  # and SLSA provenance.
   release:
     changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md
     automated-pipeline: true
     attestations:
-      - name: Build provenance
+      - name: GitHub build provenance
         predicate-uri: https://slsa.dev/provenance/v1
         location: https://github.com/unbihexium-oss/unbihexium/attestations
-        comment: GitHub artifact attestations created by the Release and SLSA Provenance workflows.
+        comment: |
+          Created by actions/attest-build-provenance in the Release and SLSA
+          Provenance workflows for every file in dist/. Verify with
+          `gh attestation verify <file> --repo unbihexium-oss/unbihexium`.
+      - name: SLSA level 3 provenance
+        predicate-uri: https://slsa.dev/provenance/v1
+        location: https://github.com/unbihexium-oss/unbihexium/releases
+        comment: |
+          Created by the slsa-framework/slsa-github-generator generic
+          generator and attached to each GitHub release as a .intoto.jsonl
+          file. Verify with slsa-verifier.
     distribution-points:
       - uri: pkg:pypi/unbihexium
-        comment: Python Package Index
+        comment: Python Package Index, uploaded by the Release workflow
       - uri: https://github.com/unbihexium-oss/unbihexium/releases
         comment: GitHub releases with SHA256SUMS.txt and SLSA provenance
       - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium
-        comment: Container image on the GitHub Container Registry
+        comment: Container image on the GitHub Container Registry; the Docker workflow stores an SPDX SBOM of each pushed image as a workflow artifact
     license:
       url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
       expression: MPL-2.0
+
   security:
     assessments:
       self:
         comment: |
-          No formal security self-assessment has been published yet.
+          No formal security self-assessment has been published yet. The
+          threat model and security controls are described in
+          docs/architecture/security_model.md.
+    champions:
+      - name: Olaf Yunus Laitinen Imanov
+        affiliation: Unbihexium OSS Foundation
+        email: yunus.z.imanov@helsinki.fi
+        social: https://github.com/olaflaitinen
+        primary: true
+
+    # Every tool below runs in a workflow under .github/workflows/. `adhoc`
+    # means the workflow can also be started by hand (workflow_dispatch) or
+    # runs on a schedule; `release` means it gates the release pipeline.
     tools:
       - name: Dependabot
         type: SCA
+        comment: |
+          Weekly version updates for pip and GitHub Actions, monthly for
+          the Docker base image (.github/dependabot.yml), and security
+          updates for known vulnerabilities.
         rulesets:
-          - built-in
+          - default
         integration:
           adhoc: false
           ci: true
           release: false
-      - name: Bandit
-        type: SAST
-        rulesets:
-          - built-in
-        integration:
-          adhoc: false
-          ci: true
-          release: false
-      - name: pip-audit
-        type: SCA
-        rulesets:
-          - built-in
-        integration:
-          adhoc: false
-          ci: true
-          release: false
+        results: {}
       - name: Dependency Review
         type: SCA
+        comment: |
+          Blocks pull requests that add dependencies with high or critical
+          vulnerabilities or with licences denied by the project policy
+          (Security workflow).
         rulesets:
           - .github/dependency-review-config.yml
         integration:
           adhoc: false
           ci: true
           release: false
+        results: {}
+      - name: pip-audit
+        type: SCA
+        comment: |
+          Checks the installed dependencies against the PyPI advisory
+          database (Security workflow, `make security`).
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+        results: {}
+      - name: Bandit
+        type: SAST
+        comment: |
+          Static analysis of src/ for common Python security issues
+          (Security workflow, pre-commit, `make security`).
+        rulesets:
+          - pyproject.toml
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+        results: {}
       - name: TruffleHog
         type: secret
+        comment: |
+          Scans pushed commits and pull requests for verified secrets
+          (Secret Scan workflow).
         rulesets:
-          - built-in
+          - default
         integration:
-          adhoc: false
+          adhoc: true
           ci: true
           release: false
+        results: {}
       - name: Grype
         type: container
+        comment: |
+          Scans the container image for vulnerable packages and uploads the
+          results to GitHub code scanning (Container Scan workflow).
         rulesets:
-          - built-in
+          - default
         integration:
           adhoc: true
           ci: true
           release: false
+        results:
+          ci:
+            name: Grype SARIF report
+            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
+            location: https://github.com/unbihexium-oss/unbihexium/security/code-scanning
+            comment: Visible to repository maintainers in GitHub code scanning.
+      - name: actionlint
+        type: SAST
+        comment: |
+          Lints GitHub Actions workflows, including shellcheck of run steps
+          and detection of untrusted input in scripts (Workflow Lint
+          workflow, pre-commit).
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+        results: {}
       - name: OpenSSF Scorecard
         type: other
+        comment: |
+          Weekly assessment of repository security practices (Scorecard
+          workflow). Results are published to the OpenSSF Scorecard API and
+          uploaded to GitHub code scanning.
         rulesets:
-          - built-in
+          - default
         integration:
           adhoc: true
           ci: true
           release: false
+        results:
+          ci:
+            name: OpenSSF Scorecard results
+            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
+            location: https://scorecard.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium
+            comment: Public Scorecard report for the default branch.
