@@ -139,4 +139,4 @@ See [examples/notebooks/README.md](../../examples/notebooks/README.md) for the c
 
 ---
 
-**Copyright 2025 Unbihexium OSS Foundation. Apache-2.0 License.**
+**Copyright 2025 Unbihexium OSS Foundation. MPL-2.0 License.**
