@@ -128,4 +128,6 @@ class TestCapabilityMapping:
 
         for cap_id, cap_info in mapping["mappings"].items():
             model_id = cap_info["primary_model_id"]
-            assert model_id in model_ids, f"Capability {cap_id} references unknown model: {model_id}"
+            assert model_id in model_ids, (
+                f"Capability {cap_id} references unknown model: {model_id}"
+            )

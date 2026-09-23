@@ -27,7 +27,6 @@ from unbihexium.core.pipeline import Pipeline, PipelineConfig, PipelineRun
 from unbihexium.core.raster import Raster
 from unbihexium.registry.pipelines import PipelineRegistry
 
-
 # Fixtures
 
 
