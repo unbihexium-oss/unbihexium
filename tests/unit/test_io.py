@@ -217,16 +217,18 @@ class TestZarrIO:
 
             data = np.random.rand(4, 64, 64).astype(np.float32)
 
-            write_zarr(data, zarr_path, chunks=(1, 32, 32))
+            write_zarr(zarr_path, data, chunks=(1, 32, 32))
             assert zarr_path.exists()
 
-            loaded = read_zarr(zarr_path)
+            loaded, _ = read_zarr(zarr_path)
             assert loaded.shape == data.shape
-            np.testing.assert_array_almost_equal(loaded[:], data, decimal=5)
+            np.testing.assert_array_almost_equal(loaded, data, decimal=5)
 
     def test_zarr_chunking(self) -> None:
         """Test that Zarr respects chunk specification."""
-        from unbihexium.io.zarr_io import read_zarr, write_zarr
+        import zarr
+
+        from unbihexium.io.zarr_io import write_zarr
 
         with tempfile.TemporaryDirectory() as tmpdir:
             zarr_path = Path(tmpdir) / "chunked.zarr"
@@ -234,10 +236,10 @@ class TestZarrIO:
             data = np.zeros((8, 128, 128), dtype=np.float32)
             chunks = (2, 64, 64)
 
-            write_zarr(data, zarr_path, chunks=chunks)
-            loaded = read_zarr(zarr_path)
+            write_zarr(zarr_path, data, chunks=chunks)
+            stored = zarr.open(str(zarr_path), mode="r")
 
-            assert loaded.chunks == chunks
+            assert stored.chunks == chunks
 
 
 # Parquet Tests
