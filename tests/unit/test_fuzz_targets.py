@@ -22,6 +22,8 @@
 #
 #   regression_degenerate_ring    rewind flipped rings of zero area on every
 #                                 call
+#   regression_collinear_ring     rewind flipped rings of collinear points,
+#                                 whose area is only rounding error
 #   regression_mixed_dimensions   rings mixing 2-D and 3-D positions broke
 #                                 the shoelace area
 #   regression_type_not_string    a non-string "type" raised TypeError
@@ -88,8 +90,8 @@ def test_corpus(name: str, path: Path) -> None:
 def test_regressions_present() -> None:
     # Names of the regression files.
     names = {p.stem for _, p in CORPUS if p.name.startswith("regression_")}
-    # Six bugs, six inputs.
-    assert len(names) == 6
+    # Seven bugs, seven inputs.
+    assert len(names) == 7
 
 
 # Random bytes and mutated corpus files satisfy the contract.
