@@ -75,6 +75,7 @@ jobs:  # Jobs of the workflow.
             type=sha
 
       - name: Build and push  # Build the image and push it outside pull requests.
+        id: build  # Identifier for reading the image digest.
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8  # v6.19.2; Official build action.
         with:  # Inputs of the build action.
           context: .  # Build from the repository root.
@@ -88,7 +89,7 @@ jobs:  # Jobs of the workflow.
         if: github.event_name != 'pull_request'  # Only images that were pushed.
         uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26  # v0.24.2; Syft-based SBOM action.
         with:  # Inputs of the SBOM action.
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}  # Image reference by commit SHA.
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}  # The pushed image, by digest.
           artifact-name: sbom-docker.spdx.json  # Name of the uploaded SPDX artifact.
 
 # =============================================================================
