@@ -5,38 +5,38 @@
 # =============================================================================
 # Project     : Unbihexium
 # Module      : .github/scripts/check_model_zoo.py
-# Title       : Model zoo structure and integrity check
+# Title       : Model zoo consistency and reproducibility check
 # Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 # Affiliation : University of Helsinki
 # Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
 # Licence     : Mozilla Public License 2.0, see LICENSE.txt
-# Python      : CPython 3.10 to 3.14, standard library only
+# Python      : CPython 3.10 to 3.14, requires unbihexium and jsonschema;
+#               --rebuild also requires PyTorch
 # =============================================================================
 #
 # Abstract
 # --------
-# Checks the structure and integrity of the model zoo. For every model variant
-# under model_zoo/assets/<tier>/<name>/ the script verifies that:
+# Checks the model zoo of the repository:
 #
-#   - the required files exist (config.json, metrics.json, model.onnx,
-#     model.pt and model.sha256);
-#   - config.json and metrics.json are valid JSON;
-#   - the SHA-256 recorded in model.sha256 matches each weight file. For Git
-#     LFS pointer files the oid in the pointer is compared; for downloaded
-#     files the content is hashed;
-#   - a model card exists at model_zoo/cards/<name>.md and declares the
-#     MPL-2.0 licence;
-#   - a manifest exists in model_zoo/manifests/ for the model family.
+#   1. every generated file (digests.json, inventory, capability map,
+#      manifests, cards, checksums) is in sync with catalog.yaml
+#      (`python -m unbihexium.zoo.sync --check`);
+#   2. every manifest validates against model_zoo/manifest.schema.json;
+#   3. there is exactly one manifest and one card per model family, and no
+#      stale files from removed families;
+#   4. with --rebuild, the models of the selected variants are rebuilt and
+#      their weights digests compared with the published ones, which proves
+#      that the starter weights are reproducible on the CI platform.
 #
 # Usage
 # -----
 #   python .github/scripts/check_model_zoo.py
-#
-# The script must run from the repository root.
+#   python .github/scripts/check_model_zoo.py --rebuild tiny
+#   python .github/scripts/check_model_zoo.py --rebuild all
 #
 # Exit status
 # -----------
-#   0  every variant passed every check
+#   0  the model zoo is consistent (and reproducible, with --rebuild)
 #   1  at least one problem was found
 # =============================================================================
 
@@ -44,174 +44,150 @@
 # every supported Python version.
 from __future__ import annotations
 
-# Compute SHA-256 digests of weight files.
-import hashlib
+# Command line parsing.
+import argparse
 
-# Validate the JSON configuration and metrics files.
+# Parse manifests.
 import json
-
-# Recognise Git LFS pointer files.
-import re
 
 # Set the exit status of the script.
 import sys
 
-# Walk the model zoo directory tree.
+# Represent file paths.
 from pathlib import Path
 
-# Root directory of the model zoo, relative to the repository root.
+# JSON Schema validation of the manifests.
+import jsonschema
+
+# Catalogue of the installed package.
+from unbihexium.zoo.catalog import Variant, list_specs
+
+# Generator of the model zoo files.
+from unbihexium.zoo.sync import load_digests  # Published digests.
+from unbihexium.zoo.sync import main as sync_main  # File synchronisation.
+
+# Model zoo directory of the repository.
 ROOT = Path("model_zoo")
 
-# Files that every model variant directory must contain.
-REQUIRED = ("config.json", "metrics.json", "model.onnx", "model.pt", "model.sha256")
 
-# Weight files whose digests are recorded in model.sha256.
-WEIGHTS = ("model.onnx", "model.pt")
-
-# Size tiers, one directory each under model_zoo/assets/.
-TIERS = ("tiny", "base", "large", "mega")
-
-# A Git LFS pointer file: the spec version line followed by the SHA-256 oid of
-# the real content. re.S lets ".*?" cross the line between them.
-POINTER = re.compile(rb"^version https://git-lfs.github.com/spec/v1\n.*?oid sha256:([0-9a-f]{64})", re.S)
-
-
-# Return the SHA-256 of a weight file and whether the file is an LFS pointer.
-def file_sha256(path: Path) -> tuple[str, bool]:
-    # A pointer file is small, so its first 512 bytes contain the whole pointer.
-    head = path.read_bytes()[:512]
-    # Try to read the file as a Git LFS pointer.
-    match = POINTER.match(head)
-    # For a pointer, the oid is the digest of the real content.
-    if match:
-        # Return the oid as text and flag the file as a pointer.
-        return match.group(1).decode(), True
-    # Otherwise hash the downloaded content.
-    digest = hashlib.sha256()
-    # Read the file in binary mode.
-    with path.open("rb") as fh:
-        # Read 1 MiB chunks until read() returns an empty bytes object.
-        for chunk in iter(lambda: fh.read(1 << 20), b""):
-            # Feed each chunk to the digest.
-            digest.update(chunk)
-    # Return the hexadecimal digest and flag the file as real content.
-    return digest.hexdigest(), False
-
-
-# Print a problem as a GitHub Actions error annotation on the given path.
-def error(path: Path, message: str) -> None:
+# Print a problem as a GitHub Actions error annotation.
+def error(path: Path | str, message: str) -> None:
     # The ::error:: prefix makes the message an annotation in the job log.
     print(f"::error file={path}::{message}")
 
 
-# Run all checks and return the exit status.
-def main() -> int:
-    # Counters for problems, variants, LFS pointers and hashed weight files.
-    failures = variants = pointers = hashed = 0
-    # Model families that have a manifest, named after the manifest file.
-    families = {p.stem for p in (ROOT / "manifests").glob("*.json")}
+# Validate the manifests and look for missing or stale files.
+def check_files() -> int:
+    # Number of problems.
+    failures = 0
+    # Schema of the manifests.
+    schema = json.loads((ROOT / "manifest.schema.json").read_text(encoding="utf-8"))
+    # Validator for the schema's draft.
+    validator = jsonschema.validators.validator_for(schema)(schema)
+    # Families of the catalogue.
+    families = {spec.family for spec in list_specs()}
+    # Families that have a manifest.
+    manifests = {p.stem for p in (ROOT / "manifests").glob("*.json")}
+    # Families that have a card.
+    cards = {p.stem for p in (ROOT / "cards").glob("*.md")}
+    # Every family needs a manifest and a card.
+    for family in sorted(families - manifests):
+        # Report the missing manifest.
+        error(ROOT / "manifests", f"no manifest for {family}")
+        # Count the problem.
+        failures += 1
+    # Every family needs a card.
+    for family in sorted(families - cards):
+        # Report the missing card.
+        error(ROOT / "cards", f"no model card for {family}")
+        # Count the problem.
+        failures += 1
+    # Files of families that no longer exist.
+    for stale in sorted((manifests | cards) - families):
+        # Report the stale file.
+        error(ROOT, f"file for unknown family {stale}; remove it")
+        # Count the problem.
+        failures += 1
+    # Validate every manifest against the schema.
+    for path in sorted((ROOT / "manifests").glob("*.json")):
+        # Parse the manifest.
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        # Report every schema violation.
+        for problem in validator.iter_errors(manifest):
+            # Location and message of the violation.
+            error(path, f"{'/'.join(map(str, problem.path)) or '<root>'}: {problem.message}")
+            # Count the problem.
+            failures += 1
+    # Return the number of problems.
+    return failures
 
-    # Visit every size tier.
-    for tier in TIERS:
-        # Visit the variant directories of the tier in a stable order.
-        for variant in sorted((ROOT / "assets" / tier).iterdir()):
-            # Ignore stray files next to the variant directories.
-            if not variant.is_dir():
-                # Continue with the next entry.
-                continue
-            # Count the variant.
-            variants += 1
-            # Collect the required files that are missing.
-            missing = [name for name in REQUIRED if not (variant / name).is_file()]
-            # Without all files the remaining checks cannot run.
-            if missing:
-                # Report the missing files.
-                error(variant, f"Missing files: {', '.join(missing)}")
+
+# Rebuild models and compare their digests with the published ones.
+def check_rebuild(selection: str) -> int:
+    # PyTorch is needed only for this check.
+    from unbihexium.ai.models import build_model  # Builds models.
+
+    # Published digests.
+    digests = load_digests()
+    # Variants to rebuild.
+    variants = list(Variant) if selection == "all" else [Variant(selection)]
+    # Number of problems and of rebuilt models.
+    failures = checked = 0
+    # Every family in the selected variants.
+    for spec in list_specs():
+        # Every selected variant.
+        for variant in variants:
+            # Build the starter model.
+            model = build_model(spec.family, variant)
+            # Count the model.
+            checked += 1
+            # Compare with the published digest.
+            if model.digest() != digests.get(model.model_id, {}).get("weights_digest"):
+                # Report the mismatch.
+                error(
+                    "src/unbihexium/zoo/digests.json",  # File with the published digests.
+                    f"{model.model_id}: rebuilt digest differs",  # Message.
+                )  # End of the report.
                 # Count the problem.
                 failures += 1
-                # Continue with the next variant.
-                continue
+            # Free the memory before the next model.
+            del model
+    # Summary.
+    print(f"Rebuilt {checked} models: {checked - failures} reproduce their published digest.")
+    # Return the number of problems.
+    return failures
 
-            # Both metadata files must be valid JSON.
-            for name in ("config.json", "metrics.json"):
-                # Parse the file to detect syntax errors.
-                try:
-                    # The parsed content itself is not needed.
-                    json.loads((variant / name).read_text(encoding="utf-8"))
-                # Report invalid JSON with the parser message.
-                except json.JSONDecodeError as exc:
-                    # Include the position reported by the parser.
-                    error(variant / name, f"Invalid JSON: {exc}")
-                    # Count the problem.
-                    failures += 1
 
-            # Map each weight file name to the digest recorded in model.sha256.
-            recorded = {}
-            # model.sha256 uses the sha256sum format: "<digest>  <file name>".
-            for line in (variant / "model.sha256").read_text(encoding="utf-8").splitlines():
-                # Split the line at whitespace.
-                parts = line.split()
-                # Ignore lines that are not "<digest> <name>".
-                if len(parts) == 2:
-                    # Store the digest under the file name.
-                    recorded[parts[1]] = parts[0]
-            # Compare the recorded digest of every weight file.
-            for weight in WEIGHTS:
-                # Compute the actual digest and whether the file is a pointer.
-                actual, is_pointer = file_sha256(variant / weight)
-                # Count pointer files (True adds 1, False adds 0).
-                pointers += is_pointer
-                # Count files whose content was hashed.
-                hashed += not is_pointer
-                # A missing or different recorded digest is a problem.
-                if recorded.get(weight) != actual:
-                    # Report both digests so that the mismatch is visible.
-                    error(variant / weight, f"SHA256 {actual} does not match model.sha256 ({recorded.get(weight)})")
-                    # Count the problem.
-                    failures += 1
-
-            # Each variant has a model card named after the variant.
-            card = ROOT / "cards" / f"{variant.name}.md"
-            # The card must exist.
-            if not card.is_file():
-                # Report the missing card.
-                error(card, "Model card missing")
-                # Count the problem.
-                failures += 1
-            # The card must state the licence of the model.
-            elif "MPL-2.0" not in card.read_text(encoding="utf-8"):
-                # Report the missing licence statement.
-                error(card, "Model card does not declare the MPL-2.0 licence")
-                # Count the problem.
-                failures += 1
-
-            # The family name is the variant name without its tier suffix.
-            family = variant.name.rsplit("_", 1)[0]
-            # Every family needs a manifest.
-            if family not in families:
-                # Report the missing manifest.
-                error(variant, f"No manifest model_zoo/manifests/{family}.json")
-                # Count the problem.
-                failures += 1
-
-    # Summarise what was checked.
-    print(f"Checked {variants} variants: {pointers} LFS pointers and {hashed} downloaded files verified.")
-    # Fail when any problem was found.
-    if failures:
-        # Print the number of problems.
-        print(f"{failures} model zoo problem(s) found.")
-        # Non-zero exit status fails the CI job.
-        return 1
-    # Confirm that every check passed.
-    print("Model zoo check passed.")
-    # Zero exit status marks success.
-    return 0
+# Run the checks and return the exit status.
+def main(argv: list[str]) -> int:
+    # Argument parser.
+    parser = argparse.ArgumentParser(description="Check the model zoo")
+    # Optional rebuild of one variant or all.
+    parser.add_argument(
+        "--rebuild",  # Option name.
+        choices=["tiny", "base", "large", "mega", "all"],  # Variants or all.
+        help="rebuild models and compare their digests",  # Help text.
+    )  # End of the option.
+    # Parse the arguments.
+    args = parser.parse_args(argv)
+    # Generated files must be in sync with the catalogue.
+    failures = sync_main(["--root", ".", "--check"])
+    # Manifests, cards and stale files.
+    failures += check_files()
+    # Reproducibility of the starter weights.
+    if args.rebuild:
+        # Rebuild and compare digests.
+        failures += check_rebuild(args.rebuild)
+    # Summary.
+    print("Model zoo check passed." if not failures else f"{failures} model zoo problem(s) found.")
+    # Non-zero exit status fails the CI job.
+    return 1 if failures else 0
 
 
 # Run the check when the file is executed as a script.
 if __name__ == "__main__":
-    # Exit with the status returned by main().
-    sys.exit(main())
+    # Pass the command line arguments without the script name.
+    sys.exit(main(sys.argv[1:]))
 
 # =============================================================================
 # End of module .github/scripts/check_model_zoo.py

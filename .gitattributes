@@ -20,10 +20,10 @@
 
 # -----------------------------------------------------------------------------
 # Git LFS: model weights
-# Every model variant under model_zoo/assets/ stores its ONNX and PyTorch
-# weights in Git LFS. Run `git lfs install` before cloning to download them;
-# without Git LFS the files are small pointer files whose oid is verified
-# against model.sha256 by .github/scripts/check_model_zoo.py.
+# The starter weights of the model zoo are generated locally from the model
+# id and are not committed (see src/unbihexium/zoo/catalog.yaml). Weight files
+# that are committed anyway, for example fine-tuned checkpoints, are stored
+# in Git LFS instead of the Git history.
 # -----------------------------------------------------------------------------
 *.onnx filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
