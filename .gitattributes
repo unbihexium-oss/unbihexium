@@ -18,4 +18,3 @@
 examples/notebooks/*.ipynb linguist-documentation
 model_zoo/cards/** linguist-documentation
 docs/** linguist-documentation
-LICENSES/** linguist-vendored

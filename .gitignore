@@ -180,3 +180,7 @@ Thumbs.db
 
 # Pre-commit
 .pre-commit-config.yaml.bak
+
+# Copy of LICENSE.txt that the REUSE checks create for `reuse lint`. The
+# repository keeps a single licence text, LICENSE.txt, at the root.
+/LICENSES/

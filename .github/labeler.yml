@@ -62,7 +62,6 @@ compliance:
           - "CITATION.md"
           - "codemeta.json"
           - "REUSE.toml"
-          - "LICENSES/**"
           - "RESPONSIBLE_USE.md"
 
 security:
