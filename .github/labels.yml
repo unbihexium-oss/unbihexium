@@ -1,0 +1,84 @@
+# Label definitions synchronised to the repository by .github/workflows/labels.yml.
+# Issue forms, Dependabot and the release notes configuration rely on these labels.
+
+# Type
+- name: bug
+  color: "d73a4a"
+  description: "Something does not work as documented"
+- name: enhancement
+  color: "a2eeef"
+  description: "New feature or improvement"
+- name: documentation
+  color: "0075ca"
+  description: "Documentation, docstrings, notebooks or model cards"
+- name: question
+  color: "d876e3"
+  description: "Usage question"
+- name: model-zoo
+  color: "5319e7"
+  description: "Model weights, manifests, model cards or checksums"
+- name: performance
+  color: "fbca04"
+  description: "Speed, memory or scaling"
+- name: compliance
+  color: "b60205"
+  description: "Licensing, privacy, AI regulation, export control or ethics"
+- name: build
+  color: "c5def5"
+  description: "Installation, packaging or container build"
+- name: security
+  color: "ee0701"
+  description: "Security hardening; report vulnerabilities privately"
+- name: breaking-change
+  color: "e11d21"
+  description: "Changes existing behaviour and requires a major version"
+
+# Automation
+- name: dependencies
+  color: "0366d6"
+  description: "Dependency updates"
+- name: ci
+  color: "ededed"
+  description: "Continuous integration and GitHub Actions"
+- name: docker
+  color: "0db7ed"
+  description: "Dockerfile and container images"
+
+# Status
+- name: needs-triage
+  color: "ffffff"
+  description: "Awaiting classification by a maintainer"
+- name: needs-information
+  color: "fef2c0"
+  description: "More information is required from the author"
+- name: confirmed
+  color: "0e8a16"
+  description: "Reproduced or accepted by a maintainer"
+- name: blocked
+  color: "000000"
+  description: "Blocked by another issue or an external factor"
+
+# Resolution
+- name: duplicate
+  color: "cfd3d7"
+  description: "This issue or pull request already exists"
+- name: invalid
+  color: "e4e669"
+  description: "This does not seem right"
+- name: wontfix
+  color: "ffffff"
+  description: "This will not be worked on"
+
+# Contribution
+- name: good first issue
+  color: "7057ff"
+  description: "Good for newcomers"
+- name: help wanted
+  color: "008672"
+  description: "Extra attention is needed"
+- name: ai-assisted
+  color: "bfd4f2"
+  description: "Declared as prepared with AI assistance"
+- name: ignore-for-release
+  color: "eeeeee"
+  description: "Excluded from generated release notes"
