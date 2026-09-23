@@ -65,17 +65,17 @@ jobs:  # Jobs of the workflow.
       matrix:  # Values of the matrix.
         language: [python, actions]  # Interpreted languages, no build needed.
     steps:  # Steps of the analysis job.
-      - uses: actions/checkout@v6  # Check out the commit under analysis.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under analysis.
 
       - name: Initialise CodeQL  # Download CodeQL and create the database.
-        uses: github/codeql-action/init@v4  # Official CodeQL action.
+        uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd  # v4.38.1; Official CodeQL action.
         with:  # Inputs of the init step.
           languages: ${{ matrix.language }}  # Language of this matrix job.
           build-mode: none  # Python and workflows are analysed from source.
           queries: security-extended  # Default queries plus lower-precision security queries.
 
       - name: Analyse  # Run the queries and upload the SARIF results.
-        uses: github/codeql-action/analyze@v4  # Official CodeQL action.
+        uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd  # v4.38.1; Official CodeQL action.
         with:  # Inputs of the analyze step.
           category: /language:${{ matrix.language }}  # One code scanning category per language.
 

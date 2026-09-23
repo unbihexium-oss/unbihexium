@@ -47,14 +47,14 @@ jobs:  # Jobs of the workflow.
     name: Build and Push Docker Image  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Docker.
     steps:  # Steps of the build job.
-      - uses: actions/checkout@v6  # Check out the commit to build.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit to build.
 
       - name: Set up Docker Buildx  # Enable BuildKit and the GitHub Actions cache backend.
-        uses: docker/setup-buildx-action@v3  # Official Buildx setup action.
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f  # v3.12.0; Official Buildx setup action.
 
       - name: Log in to Container Registry  # Authenticate to GHCR for the push.
         if: github.event_name != 'pull_request'  # Pull requests never push.
-        uses: docker/login-action@v3  # Official registry login action.
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9  # v3.7.0; Official registry login action.
         with:  # Inputs of the login action.
           registry: ${{ env.REGISTRY }}  # Log in to ghcr.io.
           username: ${{ github.actor }}  # User that triggered the run.
@@ -62,7 +62,7 @@ jobs:  # Jobs of the workflow.
 
       - name: Extract metadata  # Compute image tags and OCI labels.
         id: meta  # Identifier for reading the outputs later.
-        uses: docker/metadata-action@v5  # Official metadata action.
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051  # v5.10.0; Official metadata action.
         with:  # Inputs of the metadata action.
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}  # Full image reference without tag.
           tags: |  # Tag rules, one per line.
@@ -73,7 +73,7 @@ jobs:  # Jobs of the workflow.
             type=sha
 
       - name: Build and push  # Build the image and push it outside pull requests.
-        uses: docker/build-push-action@v6  # Official build action.
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8  # v6.19.2; Official build action.
         with:  # Inputs of the build action.
           context: .  # Build from the repository root.
           push: ${{ github.event_name != 'pull_request' }}  # Push only for pushes and tags.
@@ -84,7 +84,7 @@ jobs:  # Jobs of the workflow.
 
       - name: Generate SBOM  # Produce a software bill of materials for the pushed image.
         if: github.event_name != 'pull_request'  # Only images that were pushed.
-        uses: anchore/sbom-action@v0  # Syft-based SBOM action.
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26  # v0.24.2; Syft-based SBOM action.
         with:  # Inputs of the SBOM action.
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}  # Image reference by commit SHA.
           artifact-name: sbom-docker.spdx.json  # Name of the uploaded SPDX artifact.

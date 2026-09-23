@@ -51,10 +51,10 @@ jobs:  # Jobs of the workflow.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
     steps:  # Steps of the integration job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: ${{ matrix.python-version }}  # Version from the matrix.
           cache: "pip"  # Cache downloaded wheels between runs.
@@ -85,10 +85,10 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     needs: integration  # Start only after all integration jobs passed.
     steps:  # Steps of the end-to-end job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for the tests.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
           cache: "pip"  # Cache downloaded wheels between runs.
@@ -112,10 +112,10 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     needs: integration  # Start only after all integration jobs passed.
     steps:  # Steps of the API job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for the server.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
           cache: "pip"  # Cache downloaded wheels between runs.

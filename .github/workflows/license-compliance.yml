@@ -54,12 +54,12 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 5  # The check takes seconds; cancel a hung job early.
     steps:  # Steps of the headers job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the check script.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
@@ -71,12 +71,12 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 10  # Cancel a hung job after ten minutes.
     steps:  # Steps of the REUSE job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the reuse tool.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
@@ -100,12 +100,12 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 20  # Installing the dependencies takes a few minutes.
     steps:  # Steps of the dependency job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the package.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 

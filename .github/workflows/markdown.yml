@@ -49,7 +49,7 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Node.js.
     timeout-minutes: 10  # Cancel a hung job after ten minutes.
     steps:  # Steps of the lint job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 

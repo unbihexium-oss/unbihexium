@@ -42,10 +42,10 @@ jobs:  # Jobs of the workflow.
   release:  # Build, attest and publish.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the release job.
-      - uses: actions/checkout@v6  # Check out the tagged commit.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the tagged commit.
 
       - name: Set up Python  # Install the interpreter for the build.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
@@ -66,12 +66,12 @@ jobs:  # Jobs of the workflow.
           sha256sum -- * > ../checksums/SHA256SUMS.txt
 
       - name: Generate attestations  # Sign build provenance for the distributions.
-        uses: actions/attest-build-provenance@v3  # Official attestation action.
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f  # v3.2.0; Official attestation action.
         with:  # Inputs of the attestation action.
           subject-path: dist/*  # Attest every distribution file.
 
       - name: Create GitHub Release  # Publish the release page with its assets.
-        uses: softprops/action-gh-release@v2  # Release creation action.
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2; Release creation action.
         with:  # Inputs of the release action.
           files: |  # Assets attached to the release, one pattern per line.
             dist/*
@@ -79,7 +79,7 @@ jobs:  # Jobs of the workflow.
           generate_release_notes: true  # Build the notes from merged pull requests.
 
       - name: Publish to PyPI  # Upload the distributions to PyPI.
-        uses: pypa/gh-action-pypi-publish@release/v1  # Official PyPA publish action.
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # v1.14.2; Official PyPA publish action.
         with:  # Inputs of the publish action.
           password: ${{ secrets.PYPI_API_TOKEN }}  # PyPI API token from the repository secrets.
 
