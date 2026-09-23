@@ -96,6 +96,9 @@ STYLE_ROOTS = (
     "src/unbihexium/utils/",  # Hashing, logging, timing, seeding and files.
     "src/unbihexium/visualization/",  # Colour maps and quicklooks.
     "tests/benchmarks/",  # Throughput and memory measurements.
+    "tests/conftest.py",  # Shared fixtures.
+    "tests/e2e/",  # End-to-end workflows.
+    "tests/integration/",  # Integration tests.
     "tests/unit/test_ai.py",  # Tests of the task APIs.
     "tests/unit/test_ai_data.py",  # Tests of the datasets.
     "tests/unit/test_ai_utils.py",  # Tests of decoding, metrics and transforms.
