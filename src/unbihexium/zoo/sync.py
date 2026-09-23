@@ -48,6 +48,9 @@ import argparse
 # JSON output.
 import json
 
+# Parse the lines of the generated YAML.
+import re
+
 # Exit status.
 import sys
 
@@ -114,6 +117,133 @@ OUTPUT_LAYOUT = {
     Task.SPECTRAL_INDEX: "Tensor (N, 1, H, W) with the index value; NaN where undefined.",  # Index.
 }  # End of the output layout table.
 
+# Rule line of the header and footer blocks of generated text files.
+RULE = "# " + "=" * 77
+
+# Explanation of the keys of the generated YAML files, used as comments.
+KEY_COMMENTS = {
+    "version": "Catalogue version the file was generated from.",  # Version.
+    "families": "Number of model families.",  # Family count.
+    "models": "Number of models: four size variants per family.",  # Model count.
+    "entries": "One summary per model family, in catalogue order.",  # Entry list.
+    "family": "Family identifier; the model ids append the variant.",  # Family id.
+    "name": "Human-readable name.",  # Name.
+    "task": "Task, which fixes the input and output layout.",  # Task.
+    "domain": "Capability domain of the family.",  # Domain.
+    "architecture": "Network architecture of the task.",  # Architecture.
+    "in_channels": "Number of input bands the model expects.",  # Input bands.
+    "outputs": "Output classes, targets or bands, in channel order.",  # Outputs.
+    "license": "Licence of the model weights.",  # Licence.
+    "status": "starter: untrained weights; reference: exact formula.",  # Status.
+    "mappings": "One mapping per model family, in catalogue order.",  # Mapping list.
+    "primary_model_id": "Default model of the family (base variant).",  # Default.
+    "model_ids": "Models of the family: tiny, base, large and mega.",  # Model ids.
+}  # End of the key comments.
+
+# Comments of list items, keyed by the key of the list.
+ITEM_COMMENTS = {
+    "outputs": "Output channel {n}.",  # Output channel.
+    "model_ids": "Variant {n} of the family.",  # Variant.
+}  # End of the item comments.
+
+# Indentation, list dash and key of a YAML line written by yaml.safe_dump.
+YAML_LINE = re.compile(r"^(?P<indent>\s*)(?P<dash>- )?(?:(?P<key>[\w.-]+):(?: |$))?")
+
+
+# Header block of a generated text file.
+def generated_header(path: str, title: str, fmt: str, abstract: list[str]) -> str:
+    # Lines of the block.
+    lines = [
+        "# This Source Code Form is subject to the terms of the Mozilla Public",  # Notice.
+        "# License, v. 2.0. If a copy of the MPL was not distributed with this",  # Notice.
+        "# file, You can obtain one at https://mozilla.org/MPL/2.0/.",  # Notice.
+        "#",  # Separator.
+        RULE,  # Opening rule.
+        "# Project     : Unbihexium",  # Project.
+        f"# File        : {path}",  # Repository path.
+        f"# Title       : {title}",  # Title.
+        "# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>",  # Author.
+        "# Affiliation : University of Helsinki",  # Affiliation.
+        "# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors",  # Copyright.
+        "# Licence     : Mozilla Public License 2.0, see LICENSE.txt",  # Licence.
+        f"# Format      : {fmt}",  # Format.
+        RULE,  # Closing rule of the fields.
+        "#",  # Separator.
+        "# Abstract",  # Section title.
+        "# --------",  # Underline.
+        *[f"# {line}".rstrip() for line in abstract],  # Abstract text.
+        RULE,  # Closing rule.
+    ]  # End of the lines.
+    # One line each, and a blank line before the data.
+    return "\n".join(lines) + "\n\n"
+
+
+# Footer block of a generated text file.
+def generated_footer(path: str) -> str:
+    # Lines of the block.
+    lines = [
+        "",  # Blank line after the data.
+        RULE,  # Opening rule.
+        f"# End of file {path}",  # Closing line.
+        "# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).",  # Project.
+        "# Cite the project as described in CITATION.cff.",  # Citation.
+        RULE,  # Closing rule.
+    ]  # End of the lines.
+    # One line each.
+    return "\n".join(lines) + "\n"
+
+
+# Add an explanatory comment to every line of YAML written by yaml.safe_dump.
+def annotate_yaml(text: str) -> str:
+    # Keys of the enclosing mappings with their columns.
+    parents: list[tuple[int, str]] = []
+    # Item counters of the open lists, by key.
+    counters: dict[str, int] = {}
+    # Annotated lines.
+    out = []
+    # Walk over the lines.
+    for line in text.splitlines():
+        # Parse the line; the pattern matches every line.
+        match = YAML_LINE.match(line)
+        # Column of the key or item.
+        column = len(match.group("indent")) + (2 if match.group("dash") else 0)
+        # Close the mappings that this line leaves.
+        while parents and parents[-1][0] >= column:
+            # Leave the mapping.
+            parents.pop()
+        # Key of the line, if any.
+        key = match.group("key")
+        # Key of the enclosing mapping or list.
+        parent = parents[-1][1] if parents else ""
+        # A plain list item.
+        if match.group("dash") and not key:
+            # Number the items of the list.
+            counters[parent] = counters.get(parent, 0) + 1
+            # Comment of the item.
+            comment = ITEM_COMMENTS.get(parent, "List item {n}.").format(n=counters[parent])
+        # A known key.
+        elif key in KEY_COMMENTS:
+            # Explanation of the key.
+            comment = KEY_COMMENTS[key]
+        # A family key of the capability map.
+        elif parent == "mappings":
+            # Name the family.
+            comment = f"Mapping of the {key} family."
+        # Anything else.
+        else:
+            # Generic explanation.
+            comment = "Generated value."
+        # A key may open a nested mapping or list.
+        if key:
+            # Remember it.
+            parents.append((column, key))
+            # Its items are numbered from one.
+            counters[key] = 0
+        # Line with its comment.
+        out.append(f"{line}  # {comment}")
+    # Joined lines with a final newline.
+    return "\n".join(out) + "\n"
+
 
 # Compute the digest table by building every model.
 def compute_digests(verbose: bool = True) -> dict[str, dict[str, Any]]:
@@ -168,10 +298,21 @@ def render_digests(table: dict[str, dict[str, Any]]) -> str:
 
 # Render the inventory of model families as YAML text.
 def render_inventory(specs: list[ModelSpec]) -> str:
-    # Header comment and the data.
-    header = (
-        "# Model zoo inventory, generated from src/unbihexium/zoo/catalog.yaml by\n"
-        "# `python -m unbihexium.zoo.sync`. Do not edit by hand.\n"
+    # Header block.
+    header = generated_header(
+        "model_zoo/inventory.yaml",  # Repository path.
+        "Inventory of the model zoo families",  # Title.
+        "YAML, generated by python -m unbihexium.zoo.sync",  # Format.
+        [  # Abstract lines.
+            "One summary per model family of the Unbihexium model zoo: task,",  # Abstract.
+            "architecture, input bands, outputs, licence and status. Every family",  # Abstract.
+            "has four size variants (tiny, base, large and mega). Starter models",  # Abstract.
+            "have untrained weights and must be trained before use; reference",  # Abstract.
+            "models compute an exact spectral index formula.",  # Abstract.
+            "",  # Blank line.
+            "Generated from src/unbihexium/zoo/catalog.yaml by",  # Abstract.
+            "`python -m unbihexium.zoo.sync`. Do not edit by hand.",  # Abstract.
+        ],  # End of the abstract.
     )  # End of the header.
     # One summary entry per family.
     data = {
@@ -193,16 +334,27 @@ def render_inventory(specs: list[ModelSpec]) -> str:
             for s in specs  # One per family.
         ],  # End of the entry list.
     }  # End of the data.
-    # Dump the YAML without reordering keys.
-    return header + yaml.safe_dump(data, sort_keys=False, allow_unicode=False, width=100)
+    # YAML without reordering keys, with a comment on every line.
+    body = annotate_yaml(yaml.safe_dump(data, sort_keys=False, allow_unicode=False, width=100))
+    # Header, data and footer.
+    return header + body + generated_footer("model_zoo/inventory.yaml")
 
 
 # Render the mapping of families to model ids as YAML text.
 def render_capability_map(specs: list[ModelSpec]) -> str:
-    # Header comment.
-    header = (
-        "# Capability to model mapping, generated from src/unbihexium/zoo/catalog.yaml by\n"
-        "# `python -m unbihexium.zoo.sync`. Do not edit by hand.\n"
+    # Header block.
+    header = generated_header(
+        "model_zoo/capability_to_models.yaml",  # Repository path.
+        "Mapping of the model zoo capabilities to model ids",  # Title.
+        "YAML, generated by python -m unbihexium.zoo.sync",  # Format.
+        [  # Abstract lines.
+            "Maps every model family (capability) to its four model ids and names",  # Abstract.
+            "the default model, the base variant. Tools that select a model for a",  # Abstract.
+            "capability read this file.",  # Abstract.
+            "",  # Blank line.
+            "Generated from src/unbihexium/zoo/catalog.yaml by",  # Abstract.
+            "`python -m unbihexium.zoo.sync`. Do not edit by hand.",  # Abstract.
+        ],  # End of the abstract.
     )  # End of the header.
     # Family -> description and model ids.
     data = {
@@ -217,8 +369,10 @@ def render_capability_map(specs: list[ModelSpec]) -> str:
             for s in specs  # One per family.
         },  # End of the mappings.
     }  # End of the data.
-    # Dump the YAML without reordering keys.
-    return header + yaml.safe_dump(data, sort_keys=False, allow_unicode=False, width=100)
+    # YAML without reordering keys, with a comment on every line.
+    body = annotate_yaml(yaml.safe_dump(data, sort_keys=False, allow_unicode=False, width=100))
+    # Header, data and footer.
+    return header + body + generated_footer("model_zoo/capability_to_models.yaml")
 
 
 # Digest record of one model, or an empty record.
@@ -431,8 +585,29 @@ def render_card_index(specs: list[ModelSpec], digests: dict[str, dict[str, Any]]
 
 # Render the checksum list of all models.
 def render_checksums(digests: dict[str, dict[str, Any]]) -> str:
-    # One "<digest>  <model id>" line per model, sorted by id.
-    return "".join(f"{digests[k]['weights_digest']}  {k}\n" for k in sorted(digests))
+    # Header block.
+    header = generated_header(
+        "model_zoo/checksums.txt",  # Repository path.
+        "Weights digests of the model zoo",  # Title.
+        "Text, one '<digest>  <model id>  # comment' line per model",  # Format.
+        [  # Abstract lines.
+            "SHA-256 weights digest of every model of the zoo, sorted by model id.",  # Abstract.
+            "The digest covers the sorted state dict entries (key, shape and",  # Abstract.
+            "float32 little-endian bytes), so it does not depend on the file format",  # Abstract.
+            "of a checkpoint. `unbihexium zoo verify` checks a cached model against",  # Abstract.
+            "the same digests, which are packaged in src/unbihexium/zoo/digests.json.",  # Abstract.
+            "The comment of each line gives the number of parameters of the model.",  # Abstract.
+            "",  # Blank line.
+            "Generated by `python -m unbihexium.zoo.sync`. Do not edit by hand.",  # Abstract.
+        ],  # End of the abstract.
+    )  # End of the header.
+    # One line per model, sorted by id, with the parameter count as comment.
+    lines = [
+        f"{digests[k]['weights_digest']}  {k}  # {digests[k]['num_parameters']:,} parameters.\n"  # Entry.
+        for k in sorted(digests)  # Every model.
+    ]  # End of the lines.
+    # Header, entries and footer.
+    return header + "".join(lines) + generated_footer("model_zoo/checksums.txt")
 
 
 # All generated files: path relative to the repository root -> content.
