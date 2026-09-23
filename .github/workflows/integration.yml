@@ -68,12 +68,12 @@ jobs:  # Jobs of the workflow.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run integration tests  # Run the integration test tier.
         run: |  # Shell script run by bash.
@@ -95,12 +95,12 @@ jobs:  # Jobs of the workflow.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run E2E tests  # Run the end-to-end test tier.
         run: |  # Shell script run by bash.
@@ -122,12 +122,12 @@ jobs:  # Jobs of the workflow.
 
       - name: Install dependencies  # Install the package with the serving extra only.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with FastAPI and uvicorn.
-          python -m pip install -e ".[serving]"
+          # Install the locked, hashed runtime environment, which includes FastAPI and uvicorn.
+          python -m pip install --require-hashes -r requirements.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Start API server  # Launch the server in the background.
         run: |  # Shell script run by bash.

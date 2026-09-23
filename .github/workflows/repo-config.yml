@@ -78,7 +78,7 @@ jobs:  # Jobs of the workflow.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install validators  # Install the schema validator, PyYAML and yamllint.
-        run: python -m pip install check-jsonschema pyyaml yamllint  # Latest releases from PyPI.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools: check-jsonschema, PyYAML and yamllint.
 
       - name: Issue forms  # The numbered issue forms.
         run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml  # Validate against the GitHub issue forms schema.

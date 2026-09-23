@@ -58,8 +58,8 @@ jobs:  # Jobs of the workflow.
 
       - name: Build package  # Create the sdist and the wheel in dist/.
         run: |  # Shell script run by bash.
-          # Install the PEP 517 frontend.
-          python -m pip install build
+          # Install the locked, hashed CI tools, including the PEP 517 frontend.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
           # Build both distributions in an isolated environment.
           python -m build
 

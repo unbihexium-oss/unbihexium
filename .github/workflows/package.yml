@@ -61,7 +61,7 @@ jobs:  # Jobs of the workflow.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install build tools  # Install the PEP 517 frontend and the checker.
-        run: python -m pip install build twine  # build creates, twine checks the distributions.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools: build creates, twine checks.
 
       - name: Build sdist and wheel  # Create both distributions in dist/.
         run: python -m build  # Builds in an isolated environment.
@@ -135,8 +135,6 @@ jobs:  # Jobs of the workflow.
         run: |  # Shell script run by bash.
           # Create an isolated virtual environment.
           python -m venv /tmp/venv
-          # Upgrade pip in the environment so that current wheels are found.
-          /tmp/venv/bin/python -m pip install --upgrade pip
           # Install the wheel with its runtime dependencies.
           /tmp/venv/bin/python -m pip install dist/*.whl
 

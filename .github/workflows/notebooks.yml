@@ -61,7 +61,7 @@ jobs:  # Jobs of the workflow.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install nbformat  # Install the notebook format validator.
-        run: python -m pip install nbformat  # Only dependency of the check script.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including nbformat.
 
       - name: Check format and absence of outputs  # Run the notebook check.
         run: python .github/scripts/check_notebooks.py examples/notebooks  # Validate every notebook in the directory.

@@ -52,7 +52,7 @@ jobs:  # Jobs of the workflow.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install build tools  # Install the PEP 517 frontend.
-        run: pip install build  # Latest build release from PyPI.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including build.
 
       - name: Build package  # Create the sdist and the wheel in dist/.
         run: python -m build  # Builds in an isolated environment.

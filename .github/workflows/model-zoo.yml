@@ -89,7 +89,7 @@ jobs:  # Jobs of the workflow.
       # The consistency check reads the catalogue and the generated files
       # only, so PyTorch is not installed here.
       - name: Install the package and jsonschema
-        run: python -m pip install --no-deps . && python -m pip install pyyaml jsonschema  # Package without dependencies, plus the two libraries the check needs.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt && python -m pip install --no-deps -e .  # Hashed tools (PyYAML, jsonschema), then the package without dependencies.
 
       - name: Check that the model zoo files match the catalogue  # Run the consistency check.
         run: python .github/scripts/check_model_zoo.py  # Without --rebuild only the files are compared.
@@ -112,8 +112,12 @@ jobs:  # Jobs of the workflow.
         run: |  # Shell script run by bash.
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package and the schema validator.
-          python -m pip install . jsonschema
+          # Install the locked, hashed runtime dependencies.
+          python -m pip install --require-hashes -r requirements.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
+          # Install the locked, hashed CI tools, including the schema validator.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
 
       # Pull requests rebuild the tiny variants; the schedule and manual runs
       # rebuild the selected variants (all 520 models by default).
