@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "task": "super_resolution",
     "architecture": "srcnn",
-    "license": "Apache-2.0",
+    "license": "MPL-2.0",
     "status": "production",
     "description": "Super-resolution model based on SRCNN architecture. Upscales images by 2x using learned convolutional filters.",
     "input": {

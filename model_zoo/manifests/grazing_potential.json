@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "task": "regression",
   "architecture": "mlp",
-  "license": "Apache-2.0",
+  "license": "MPL-2.0",
   "status": "production",
   "description": "Grazing Potential model for regression.",
   "artifacts": {

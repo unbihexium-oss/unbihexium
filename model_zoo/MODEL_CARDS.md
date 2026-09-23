@@ -79,7 +79,7 @@ All models are trained and validated on data from:
 
 ## License
 
-All models are released under the Apache 2.0 License.
+All models are released under the Mozilla Public License 2.0 (MPL-2.0).
 
 ## Citation
 

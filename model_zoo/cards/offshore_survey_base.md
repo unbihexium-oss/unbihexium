@@ -9,7 +9,7 @@
 | Architecture | MLP |
 | Variant | base |
 | Resolution | 64x64 |
-| License | Apache-2.0 |
+| License | MPL-2.0 |
 
 ## Description
 

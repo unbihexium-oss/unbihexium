@@ -9,7 +9,7 @@
 | Architecture | RESNET_FPN |
 | Variant | tiny |
 | Resolution | 32x32 |
-| License | Apache-2.0 |
+| License | MPL-2.0 |
 
 ## Description
 

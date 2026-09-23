@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "task": "detection",
   "architecture": "resnet_fpn",
-  "license": "Apache-2.0",
+  "license": "MPL-2.0",
   "status": "production",
   "description": "Vehicle Detector model for detection.",
   "artifacts": {

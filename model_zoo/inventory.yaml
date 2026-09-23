@@ -11,105 +11,105 @@ models:
     name: Aircraft Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: building_detector
     name: Building Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: builtup_detector
     name: Built-up Area Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: crop_detector
     name: Crop Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: greenhouse_detector
     name: Greenhouse Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: object_detector
     name: Generic Object Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: ship_detector
     name: Ship Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: target_detector
     name: Target Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: vehicle_detector
     name: Vehicle Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: damage_assessor
     name: Damage Assessor
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: encroachment_detector
     name: Encroachment Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: fire_monitor
     name: Fire Monitor
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: border_monitor
     name: Border Monitor
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: military_objects_detector
     name: Military Objects Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: sar_ship_detector
     name: SAR Ship Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # Segmentation (27 models)
@@ -117,189 +117,189 @@ models:
     name: Change Detector
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: cloud_mask
     name: Cloud Mask
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: crop_classifier
     name: Crop Classifier
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: lulc_classifier
     name: Land Use Land Cover Classifier
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: multi_solution_segmentation
     name: Multi-Solution Segmentation
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: protected_area_change_detector
     name: Protected Area Change Detector
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: water_surface_detector
     name: Water Surface Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: thematic_mapper
     name: Thematic Mapper
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: transportation_mapper
     name: Transportation Mapper
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: urban_planner
     name: Urban Planner
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: utility_mapper
     name: Utility Mapper
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: topography_mapper
     name: Topography Mapper
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: crop_boundary_delineation
     name: Crop Boundary Delineation
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: plowed_land_detector
     name: Plowed Land Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: salinity_detector
     name: Salinity Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: deforestation_detector
     name: Deforestation Detector
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: desertification_monitor
     name: Desertification Monitor
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: erosion_detector
     name: Erosion Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: forest_monitor
     name: Forest Monitor
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: land_degradation_detector
     name: Land Degradation Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: construction_monitor
     name: Construction Monitor
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: corridor_monitor
     name: Corridor Monitor
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: infrastructure_monitor
     name: Infrastructure Monitor
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: urban_growth_assessor
     name: Urban Growth Assessor
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: road_network_analyzer
     name: Road Network Analyzer
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: digitization_2d
     name: 2D Digitization
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: tourist_destination_monitor
     name: Tourist Destination Monitor
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # Risk / Regression (40+ models)
@@ -307,322 +307,322 @@ models:
     name: Flood Risk Scorer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: flood_risk_assessor
     name: Flood Risk Assessor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: hazard_vulnerability
     name: Hazard Vulnerability
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: landslide_risk
     name: Landslide Risk
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: seismic_risk
     name: Seismic Risk
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: wildfire_risk
     name: Wildfire Risk
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: environmental_risk
     name: Environmental Risk
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: disaster_management
     name: Disaster Management
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: emergency_disaster_manager
     name: Emergency Disaster Manager
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: preparedness_manager
     name: Preparedness Manager
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: crop_growth_monitor
     name: Crop Growth Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: crop_health_assessor
     name: Crop Health Assessor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: livestock_estimator
     name: Livestock Estimator
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: yield_predictor
     name: Yield Predictor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: beekeeping_suitability
     name: Beekeeping Suitability
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: grazing_potential
     name: Grazing Potential
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: perennial_garden_suitability
     name: Perennial Garden Suitability
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: drought_monitor
     name: Drought Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: natural_resources_monitor
     name: Natural Resources Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: wildlife_habitat_analyzer
     name: Wildlife Habitat Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: watershed_manager
     name: Watershed Manager
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: environmental_monitor
     name: Environmental Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: pipeline_route_planner
     name: Pipeline Route Planner
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: route_planner
     name: Route Planner
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: accessibility_analyzer
     name: Accessibility Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: network_analyzer
     name: Network Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: viewshed_analyzer
     name: Viewshed Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: energy_potential
     name: Energy Potential
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: hydroelectric_monitor
     name: Hydroelectric Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: solar_site_selector
     name: Solar Site Selector
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: wind_site_selector
     name: Wind Site Selector
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: offshore_survey
     name: Offshore Survey
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: onshore_monitor
     name: Onshore Monitor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: business_valuation
     name: Business Valuation
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: economic_spatial_assessor
     name: Economic Spatial Assessor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: insurance_underwriting
     name: Insurance Underwriting
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: site_suitability
     name: Site Suitability
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: resource_allocation
     name: Resource Allocation
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: water_quality_assessor
     name: Water Quality Assessor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: geostatistical_analyzer
     name: Geostatistical Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: mobility_analyzer
     name: Mobility Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: spatial_analyzer
     name: Spatial Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: spatial_relationship
     name: Spatial Relationship
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: timeseries_analyzer
     name: Timeseries Analyzer
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: zonal_statistics
     name: Zonal Statistics
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: field_surveyor
     name: Field Surveyor
     task: regression
     architecture: mlp
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # CNN-based regression/processing
@@ -630,98 +630,98 @@ models:
     name: SAR Amplitude
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: sar_phase_displacement
     name: SAR Phase Displacement
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: sar_subsidence_monitor
     name: SAR Subsidence Monitor
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: ground_displacement
     name: Ground Displacement
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: forest_density_estimator
     name: Forest Density Estimator
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: dem_generator
     name: DEM Generator
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: dsm_generator
     name: DSM Generator
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: dtm_generator
     name: DTM Generator
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: digitization_3d
     name: 3D Digitization
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: model_3d
     name: 3D Model
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: stereo_processor
     name: Stereo Processor
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: tri_stereo_processor
     name: Tri-Stereo Processor
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: tree_height_estimator
     name: Tree Height Estimator
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: land_surface_temperature
     name: Land Surface Temperature
     task: regression
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # SAR Segmentation
@@ -729,35 +729,35 @@ models:
     name: SAR Flood Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: sar_oil_spill_detector
     name: SAR Oil Spill Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: reservoir_monitor
     name: Reservoir Monitor
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: marine_pollution_detector
     name: Marine Pollution Detector
     task: segmentation
     architecture: unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: asset_condition_change
     name: Asset Condition Change
     task: segmentation
     architecture: siamese_unet
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # Detection additional
@@ -765,28 +765,28 @@ models:
     name: Leakage Detector
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: pivot_inventory
     name: Pivot Inventory
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: maritime_awareness
     name: Maritime Awareness
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: security_monitor
     name: Security Monitor
     task: detection
     architecture: resnet_fpn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # Enhancement / Super-Resolution
@@ -794,84 +794,84 @@ models:
     name: Super Resolution
     task: super_resolution
     architecture: srcnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: pansharpening
     name: Pansharpening
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: orthorectification
     name: Orthorectification
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: coregistration
     name: Coregistration
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: mosaicking
     name: Mosaicking
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: mosaic_processor
     name: Mosaic Processor
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: ortho_processor
     name: Ortho Processor
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: raster_tiler
     name: Raster Tiler
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: sar_mapping_workflow
     name: SAR Mapping Workflow
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: multispectral_processor
     name: Multispectral Processor
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: panchromatic_processor
     name: Panchromatic Processor
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: synthetic_imagery
     name: Synthetic Imagery
     task: enhancement
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   # Index Calculators
@@ -879,47 +879,47 @@ models:
     name: EVI Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: msi_calculator
     name: MSI Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: nbr_calculator
     name: NBR Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: ndvi_calculator
     name: NDVI Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: ndwi_calculator
     name: NDWI Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: savi_calculator
     name: SAVI Calculator
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
 
   - model_id: vegetation_condition
     name: Vegetation Condition
     task: index
     architecture: cnn
-    license: Apache-2.0
+    license: MPL-2.0
     status: production
