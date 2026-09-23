@@ -507,89 +507,52 @@ unbihexium device status
 
 ## Quick Start
 
+The learned models of the zoo are untrained starter models: train them on labelled data before relying on their output. The spectral index models are exact formulas and work immediately.
+
 ### CLI Usage
 
 ```bash
-# List all models with detailed statistics
-unbihexium zoo list --verbose
+# Browse the catalogue
+unbihexium zoo list --task detection --variant tiny
+unbihexium zoo info ship_detector_base
 
-# Filter models by task type
-unbihexium zoo list --task detection --variant mega
+# Check a training setup on synthetic data, then train on your own dataset
+unbihexium train ship_detector_tiny --synthetic 64 --epochs 5 --chip-size 64
+unbihexium train ship_detector_base --data path/to/dataset --epochs 50
 
-# Download a specific model with verification
-unbihexium zoo download ship_detector_base --verify
+# Evaluate the trained model and run it on a scene
+unbihexium evaluate runs/ship_detector_base/best.pt --data path/to/dataset --split test
+unbihexium predict runs/ship_detector_base/best.pt scene.tif ships.geojson
 
-# Run single-image inference
-unbihexium infer ship_detector_base \
-    --input satellite_image.tif \
-    --output detections.tif \
-    --confidence 0.5
+# Export to ONNX and run without PyTorch
+unbihexium zoo export runs/ship_detector_base/best.pt ship_detector.onnx
+unbihexium predict ship_detector.onnx scene.tif ships.geojson
 
-# Run batch inference on directory
-unbihexium infer building_detector_large \
-    --input data/images/ \
-    --output results/ \
-    --batch-size 8 \
-    --workers 4
-
-# Run a complete pipeline
-unbihexium pipeline run detection \
-    --config pipeline_config.yaml \
-    --input data/ \
-    --output results/ \
-    --progress
+# Exact spectral indices need no training
+unbihexium index ndvi -i sentinel2.tif -o ndvi.tif
 ```
 
 ### Python API
 
 ```python
-from unbihexium import Pipeline, Config
-from unbihexium.zoo import get_model, list_models, download_model
+from unbihexium.ai import LandCoverClassifier, ShipDetector
+from unbihexium.ai.training import TrainConfig, train
 
-# Discover available models
-models = list_models(task="detection", variant="mega")
-print(f"Found {len(models)} detection models")
+# Train a detector on a dataset folder (see docs/model_zoo/training.md)
+result = train("ship_detector_base", "path/to/dataset", TrainConfig(epochs=50))
+print(result.best_metrics["map50"], result.best_checkpoint)
 
-for model in models[:5]:
-    print(f"  - {model.id}: {model.params:,} parameters")
+# Detect ships in a GeoTIFF with the trained weights
+detections = ShipDetector(weights=result.best_checkpoint, threshold=0.4).predict("scene.tif")
+print(detections.count, detections.counts_by_class())
+geojson = detections.to_geojson()
 
-# Download model if not cached
-model_path = download_model("ship_detector_mega", verify=True)
-
-# Load model for inference
-model = get_model("ship_detector_mega")
-print(f"Loaded model with {model.num_parameters:,} parameters")
-
-# Create pipeline with configuration
-config = Config(
-    tile_size=512,
-    overlap=64,
-    batch_size=4,
-    device="cuda:0",
-    precision="fp16"
-)
-
-pipeline = Pipeline.from_config(
-    capability="ship_detection",
-    variant="mega",
-    config=config
-)
-
-# Run inference
-results = pipeline.run("satellite_image.tif")
-
-# Access predictions
-for detection in results.detections:
-    print(f"Class: {detection.label}")
-    print(f"Confidence: {detection.score:.4f}")
-    print(f"Bounding Box: {detection.bbox}")
-    print(f"Centroid: {detection.centroid}")
-
-# Export results
-results.to_geojson("detections.geojson")
-results.to_shapefile("detections.shp")
-results.to_geotiff("detections.tif")
+# Land cover with class areas in square metres
+land_cover = LandCoverClassifier(weights="runs/lulc/best.pt").predict("sentinel2.tif")
+print(land_cover.class_areas())
 ```
+
+See [docs/model_zoo/training.md](docs/model_zoo/training.md) for the dataset layout and [docs/model_zoo/inference.md](docs/model_zoo/inference.md) for tiling, backends and output formats.
 
 ---
 

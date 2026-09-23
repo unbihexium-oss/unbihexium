@@ -51,6 +51,13 @@ Where:
 - `python -m unbihexium.zoo.sync` to generate the digests, manifests, model cards and inventory from the catalogue, and a JSON Schema for the manifests
 - Model Zoo workflow that checks the generated files and rebuilds the models to prove that their digests are reproducible
 - Python documentation style check (`.github/scripts/check_python_style.py`) for the converted directories
+- Training for every learned task (`unbihexium.ai.training`, `unbihexium train`): dataset folders with GeoTIFF or NumPy images, class masks, pixel or GeoJSON boxes and scene targets, random and grid chips, augmentation, normalisation statistics stored in the checkpoint, task losses, AdamW with warm-up and cosine decay, validation, best and last checkpoints, early stopping and a JSON history
+- Synthetic datasets for every trainable task to check a training setup without data (`--synthetic`)
+- Evaluation metrics for every task: mAP at IoU 0.5 and 0.5 to 0.95, confusion matrix with IoU, F1 and kappa, MAE, RMSE, bias and R squared, PSNR and SSIM (`unbihexium evaluate`)
+- Tiled inference with seamless blending, no-data handling and PyTorch or ONNX Runtime backends (`unbihexium.ai.inference.Predictor`); ONNX files carry their configuration so that inference needs no PyTorch
+- Task APIs backed by the model zoo: detectors (ships, SAR ships, buildings, aircraft, vehicles, greenhouses, crop fields, pivots, fires), segmenters (land cover, water, clouds, crops, SAR floods and oil spills), change detection, dense and scene regression, enhancement and super-resolution, with georeferenced results, GeoJSON and GeoTIFF output
+- Commands `unbihexium train`, `evaluate`, `predict`, `zoo build`, `zoo export`, `zoo info` and `zoo clear`; `unbihexium index` now computes and writes the index
+- Guides `docs/model_zoo/training.md` and `docs/model_zoo/inference.md`
 - Official support for Python 3.13 and 3.14; Python 3.10 through 3.14 are now supported and tested in CI
 - Python version support policy in VERSIONING.md
 - Issue forms for bug reports, feature requests, documentation, model zoo, performance, compliance, build and questions, each with about 95 mandatory questions, an AI usage declaration and regulatory confirmations
@@ -76,6 +83,8 @@ Where:
 ### Fixed (Unreleased)
 
 - `unbihexium.ai` could not be imported because the `super_resolution` module and package had the same name
+- The detection, segmentation and super-resolution classes returned empty or interpolated placeholder results instead of running a model
+- `unbihexium index` read the input but did not compute or write the index, and `from unbihexium.cli import cli` failed
 - The model zoo registry referenced a task that does not exist and failed on import
 - Invalid YAML in `.github/FUNDING.yml`
 - SLSA provenance workflow, which called the reusable generator as a step and could not run
@@ -91,6 +100,8 @@ Where:
 
 ### Changed (Unreleased)
 
+- Task APIs take a catalogue model, a trained checkpoint or an ONNX file (`weights=`) and default to the base variant; `SuperResolution` uses the catalogue factor 4 unless `scale_factor` is given; `CropDetector` and `GreenhouseDetector` are detectors, as in the catalogue, and remain importable from `unbihexium.ai.segmentation`
+- `unbihexium zoo download` and `unbihexium infer` are kept as hidden aliases of `zoo build` and `predict`
 - Python files outside the package (`.github/scripts/`, `scripts/` and `examples/`) use `#` comments instead of docstrings, carry an academic header and footer with project, module, author, affiliation, copyright and licence, and have a comment for every line of code; behaviour is unchanged and the example API keeps its OpenAPI descriptions
 - Contact address in package metadata, citation files, the container image, the Helm chart and the security, privacy, conduct and support policies changed to `yunus.z.imanov@helsinki.fi`
 - Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)
