@@ -173,19 +173,19 @@ graph TB
         I1[Image T1] --> C[Concat 6ch]
         I2[Image T2] --> C
     end
-    
+
     subgraph "Shared Encoder"
         C --> E1[Conv 6->base, stride=1]
         E1 --> E2[Conv base->2*base, stride=2]
         E2 --> E3[Conv 2*base->4*base, stride=2]
     end
-    
+
     subgraph "Decoder"
         E3 --> D1[UpConv 4*base->2*base]
         D1 --> D2[UpConv 2*base->base]
         D2 --> Out[Conv base->2]
     end
-    
+
     Out --> SM[Softmax]
     SM --> CM[Change Mask]
 ```
@@ -319,7 +319,7 @@ chm.save("canopy_height_model.tif")
 # Calculate biomass
 with rasterio.open("canopy_height_model.tif") as src:
     heights = src.read(1)
-    
+
 # Apply allometric equation (simplified)
 agb = 0.0673 * (0.5 * 20**2 * heights)**0.976  # Assuming D=20cm, rho=0.5
 carbon = agb * 0.47

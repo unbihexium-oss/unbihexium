@@ -12,7 +12,7 @@ graph LR
     B --> C[Package]
     C --> D[Distribute]
     D --> E[Deploy]
-    
+
     A -.-> F[Code Review]
     B -.-> G[Reproducible]
     C -.-> H[SBOM]

@@ -12,17 +12,17 @@ flowchart TB
         A[Maintainers]
         B[Core Team]
     end
-    
+
     subgraph Contributors
         C[Regular Contributors]
         D[Occasional Contributors]
     end
-    
+
     subgraph Community
         E[Users]
         F[Reporters]
     end
-    
+
     A --> B
     B --> C
     C --> D

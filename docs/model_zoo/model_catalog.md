@@ -95,7 +95,7 @@ graph TB
         U2 -.->| Skip | U6
         U3 -.->| Skip | U5
     end
-    
+
     subgraph "Siamese Architecture"
         S1[Image T1] --> S2[Shared Encoder]
         S3[Image T2] --> S2
@@ -103,7 +103,7 @@ graph TB
         S4 --> S5[Decoder]
         S5 --> S6[Change Mask]
     end
-    
+
     subgraph "MLP Architecture"
         M1[Features] --> M2[Linear + BN + ReLU]
         M2 --> M3[Linear + BN + ReLU]
@@ -163,13 +163,13 @@ graph LR
         A2[Image T2] --> B1
         B1 --> C1["Combined 6ch"]
     end
-    
+
     subgraph "Encoder (Shared Weights)"
         C1 --> D1[Conv 6->base]
         D1 --> D2[Conv base->2*base]
         D2 --> D3[Conv 2*base->4*base]
     end
-    
+
     subgraph "Decoder"
         D3 --> E1[ConvT 4*base->2*base]
         E1 --> E2[ConvT 2*base->base]

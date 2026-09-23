@@ -11,7 +11,7 @@ graph TB
     A[Model Artifacts] --> B[GitHub Releases]
     A --> C[PyPI Package]
     A --> D[Docker Images]
-    
+
     B --> E[Large models]
     C --> F[Tiny models only]
     D --> G[All variants]

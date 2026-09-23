@@ -14,7 +14,7 @@ _unbihexium_completions() {
 
     # Main commands
     local commands="detect segment predict analyze export serve info version help"
-    
+
     # Subcommand options
     local detect_opts="--model --variant --threshold --output --format --tile-size"
     local segment_opts="--model --variant --threshold --output --format --tile-size"
@@ -22,16 +22,16 @@ _unbihexium_completions() {
     local analyze_opts="--type --input --output --stats"
     local export_opts="--format --model --output"
     local serve_opts="--host --port --workers --reload"
-    
+
     # Model variants
     local variants="tiny base large mega"
-    
+
     # Detection models
     local detect_models="ship building aircraft vehicle solar_panel oil_storage"
-    
+
     # Segmentation models
     local segment_models="water crop forest urban road cloud"
-    
+
     # Output formats
     local formats="geotiff cog zarr netcdf shapefile geojson"
 

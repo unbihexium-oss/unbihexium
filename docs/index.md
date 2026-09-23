@@ -23,15 +23,15 @@ graph TB
     A --> G[Model Zoo]
     A --> H[Security]
     A --> I[Operations]
-    
+
     B --> B1[Installation]
     B --> B2[Quickstart]
     B --> B3[Configuration]
-    
+
     C --> C1[Detection]
     C --> C2[Indices]
     C --> C3[Geostatistics]
-    
+
     D --> D1[CLI]
     D --> D2[API]
     D --> D3[Config Schema]

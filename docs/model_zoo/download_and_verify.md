@@ -12,7 +12,7 @@ sequenceDiagram
     participant CLI
     participant Cache
     participant Remote
-    
+
     User->>CLI: unbihexium zoo download model_id
     CLI->>Cache: Check local cache
     alt Cached

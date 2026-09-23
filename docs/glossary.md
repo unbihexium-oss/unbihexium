@@ -11,15 +11,15 @@ graph TB
     A[Concepts] --> B[Core]
     A --> C[Models]
     A --> D[Processing]
-    
+
     B --> B1[Pipeline]
     B --> B2[Capability]
     B --> B3[Registry]
-    
+
     C --> C1[ONNX]
     C --> C2[Variant]
     C --> C3[Manifest]
-    
+
     D --> D1[Tiling]
     D --> D2[Inference]
     D --> D3[Export]

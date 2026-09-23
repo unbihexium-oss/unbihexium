@@ -22,18 +22,18 @@ flowchart TB
         B[Static Analysis]
         C[Dependency Scanning]
     end
-    
+
     subgraph Detection
         D[Runtime Monitoring]
         E[Vulnerability Reports]
     end
-    
+
     subgraph Response
         F[Triage]
         G[Patch]
         H[Disclosure]
     end
-    
+
     Prevention --> Detection
     Detection --> Response
 ```

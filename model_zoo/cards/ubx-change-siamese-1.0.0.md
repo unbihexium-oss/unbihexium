@@ -24,12 +24,12 @@ graph TB
         E2[Conv Block 2]
         E3[Conv Block 3]
     end
-    
+
     I1[Image T1] --> E1
     I2[Image T2] --> E1
-    
+
     E1 --> E2 --> E3
-    
+
     E3 --> DIFF[Feature Difference]
     DIFF --> DEC[Decoder]
     DEC --> OUT[Change Mask]

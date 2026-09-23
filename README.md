@@ -189,42 +189,42 @@ graph TB
         A3["Vector Data<br/>GeoJSON, Shapefile, GeoPackage, KML"]
         A4["Tabular Data<br/>CSV, Parquet, Arrow, HDF5"]
     end
-    
+
     subgraph "Core Framework"
         B1[Pipeline Orchestrator]
         B2[Capability Registry]
         B3[Model Zoo Manager]
         B4["Inference Engine<br/>ONNX Runtime"]
     end
-    
+
     subgraph "Processing Modules"
         C1[Tiling Engine]
         C2[Preprocessing]
         C3[Postprocessing]
         C4[Georeferencing]
     end
-    
+
     subgraph "Output Layer"
         D1[GeoTIFF Rasters]
         D2[Vector Features]
         D3[Analysis Reports]
         D4[Metrics JSON]
     end
-    
+
     A1 --> B1
     A2 --> B1
     A3 --> B1
     A4 --> B1
-    
+
     B1 --> B2
     B2 --> B3
     B3 --> B4
-    
+
     B4 --> C1
     C1 --> C2
     C2 --> C3
     C3 --> C4
-    
+
     C4 --> D1
     C4 --> D2
     C4 --> D3
@@ -245,7 +245,7 @@ sequenceDiagram
     participant ModelZoo
     participant Inference
     participant Output
-    
+
     User->>Orchestrator: submit_pipeline(config)
     Orchestrator->>Registry: resolve_capabilities()
     Registry->>ModelZoo: get_models(capability_ids)
@@ -278,25 +278,25 @@ flowchart LR
         I2[JPEG2000]
         I3[NetCDF]
     end
-    
+
     subgraph Preprocessing
         P1[Normalization]
         P2[Tiling]
         P3[Augmentation]
     end
-    
+
     subgraph Inference
         M1[Model Loading]
         M2[Batch Processing]
         M3[GPU Acceleration]
     end
-    
+
     subgraph Postprocessing
         O1[Stitching]
         O2[Georeferencing]
         O3[Vectorization]
     end
-    
+
     I1 --> P1
     I2 --> P1
     I3 --> P1

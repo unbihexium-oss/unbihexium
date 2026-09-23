@@ -272,13 +272,13 @@ graph TB
         I1[Image T1] --> C[Concatenate 6ch]
         I2[Image T2] --> C
     end
-    
+
     subgraph "Encoder"
         C --> E1[Conv Block 1]
         E1 --> E2[Conv Block 2]
         E2 --> E3[Conv Block 3]
     end
-    
+
     subgraph "Decoder"
         E3 --> D1[UpConv Block 1]
         D1 --> D2[UpConv Block 2]
