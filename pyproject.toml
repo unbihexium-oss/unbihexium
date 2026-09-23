@@ -46,7 +46,7 @@ requires-python = ">=3.10"
 license = "MPL-2.0"
 license-files = ["LICENSE.txt", "NOTICE", "NOTICE.md"]
 authors = [
-    {name = "Unbihexium OSS Foundation", email = "opensource@unbihexium.org"},
+    {name = "Unbihexium OSS Foundation", email = "yunus.z.imanov@helsinki.fi"},
 ]
 maintainers = [
     {name = "Olaf Yunus Laitinen Imanov", email = "yunus.z.imanov@helsinki.fi"},

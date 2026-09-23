@@ -34,7 +34,7 @@ type: software
 # contributors are listed in AUTHORS.md and in the version history.
 authors:
   - name: Unbihexium OSS Foundation
-    email: opensource@unbihexium.org
+    email: yunus.z.imanov@helsinki.fi
     website: "https://github.com/unbihexium-oss"
   - given-names: Olaf Yunus
     family-names: Laitinen Imanov
