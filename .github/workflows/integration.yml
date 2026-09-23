@@ -51,10 +51,10 @@ jobs:  # Jobs of the workflow.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
     steps:  # Steps of the integration job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: ${{ matrix.python-version }}  # Version from the matrix.
           cache: "pip"  # Cache downloaded wheels between runs.
@@ -68,12 +68,12 @@ jobs:  # Jobs of the workflow.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run integration tests  # Run the integration test tier.
         run: |  # Shell script run by bash.
@@ -85,22 +85,22 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     needs: integration  # Start only after all integration jobs passed.
     steps:  # Steps of the end-to-end job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for the tests.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
           cache: "pip"  # Cache downloaded wheels between runs.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run E2E tests  # Run the end-to-end test tier.
         run: |  # Shell script run by bash.
@@ -112,22 +112,22 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     needs: integration  # Start only after all integration jobs passed.
     steps:  # Steps of the API job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for the server.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
           cache: "pip"  # Cache downloaded wheels between runs.
 
       - name: Install dependencies  # Install the package with the serving extra only.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with FastAPI and uvicorn.
-          python -m pip install -e ".[serving]"
+          # Install the locked, hashed runtime environment, which includes FastAPI and uvicorn.
+          python -m pip install --require-hashes -r requirements.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Start API server  # Launch the server in the background.
         run: |  # Shell script run by bash.

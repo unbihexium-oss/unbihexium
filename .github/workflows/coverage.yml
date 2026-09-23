@@ -39,22 +39,22 @@ jobs:  # Jobs of the workflow.
     name: Code Coverage  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the coverage job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for the tests.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
           cache: "pip"  # Cache downloaded wheels between runs.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run tests with coverage  # Run the suite under pytest-cov.
         run: |  # Shell script run by bash.
@@ -62,7 +62,7 @@ jobs:  # Jobs of the workflow.
           pytest tests/ --cov=src/unbihexium --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov  # Send the report to Codecov.
-        uses: codecov/codecov-action@v5  # Official Codecov upload action.
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac  # v5.5.5; Official Codecov upload action.
         with:  # Inputs of the upload action.
           files: ./coverage.xml  # Report written by the previous step.
           flags: unittests  # Flag that groups these results in Codecov.

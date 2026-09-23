@@ -43,7 +43,7 @@ jobs:  # Jobs of the workflow.
       issues: write  # Comment on issues.
       pull-requests: write  # Comment on pull requests.
     steps:  # Steps of the welcome job.
-      - uses: actions/first-interaction@v3  # Official first interaction action.
+      - uses: actions/first-interaction@1c4688942c71f71d4f5502a26ea67c331730fa4d  # v3.1.0; Official first interaction action.
         with:  # Inputs of the action.
           issue_message: |  # Comment on the first issue of a person, in Markdown.
             Thank you for opening your first issue in Unbihexium.

@@ -47,19 +47,19 @@ jobs:  # Jobs of the workflow.
 
     steps:  # Steps of the analysis job.
       - name: Checkout  # Check out the default branch.
-        uses: actions/checkout@v6  # Official checkout action.
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Official checkout action.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Run Scorecard  # Evaluate the repository.
-        uses: ossf/scorecard-action@v2.4.3  # Official Scorecard action.
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a  # v2.4.3; Official Scorecard action.
         with:  # Inputs of the Scorecard action.
           results_file: results.sarif  # Where the report is written.
           results_format: sarif  # Format understood by code scanning.
           publish_results: true  # Publish to the Scorecard API for the badge.
 
       - name: Upload SARIF  # Show the findings in the Security tab.
-        uses: github/codeql-action/upload-sarif@v4  # CodeQL SARIF upload action.
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd  # v4.38.1; CodeQL SARIF upload action.
         with:  # Inputs of the upload action.
           sarif_file: results.sarif  # Report written by the Scorecard step.
 

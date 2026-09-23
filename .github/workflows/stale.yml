@@ -48,7 +48,7 @@ jobs:  # Jobs of the workflow.
       issues: write  # Label, comment on and close issues.
       pull-requests: write  # Label, comment on and close pull requests.
     steps:  # Steps of the stale job.
-      - uses: actions/stale@v11  # Official stale action.
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93  # v11.0.0; Official stale action.
         with:  # Inputs of the stale action.
           days-before-issue-stale: 60  # Days of inactivity before an issue is marked.
           days-before-issue-close: 14  # Days after marking before an issue is closed.

@@ -1,0 +1,115 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/fuzz.yml
+# Title       : Coverage-guided fuzzing of the input parsers
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs the atheris fuzz targets in fuzz/ (libFuzzer for Python) against the
+# parsers that read untrusted input: GeoJSON validation, bounds and
+# orientation (fuzz_geojson.py) and STAC item and time parsing
+# (fuzz_stac.py). Each target starts from its seed corpus in fuzz/corpus/
+# and runs for a fixed time:
+#
+#   pull requests and pushes  two minutes per target, when the parsers, the
+#                             targets or this workflow change
+#   weekly and on demand      twenty minutes per target
+#
+# A crash fails the job and uploads the crashing input as an artifact. Add
+# it to fuzz/corpus/<target>/ as regression_<name> together with the fix;
+# tests/unit/test_fuzz_targets.py then replays it on every test run.
+#
+# atheris and NumPy come from the hashed lock file
+# .github/requirements/requirements-ci-fuzz.txt; the package is installed
+# without dependencies.
+# =============================================================================
+
+name: Fuzzing  # Name shown in the Actions tab and in the status checks.
+
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when the fuzzed code or the targets change.
+      - "src/unbihexium/io/**"  # Parsers under test.
+      - "fuzz/**"  # Targets and corpus.
+      - ".github/requirements/requirements-ci-fuzz.txt"  # Fuzzing environment.
+      - ".github/workflows/fuzz.yml"  # This workflow.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "src/unbihexium/io/**"  # Parsers under test.
+      - "fuzz/**"  # Targets and corpus.
+      - ".github/requirements/requirements-ci-fuzz.txt"  # Fuzzing environment.
+      - ".github/workflows/fuzz.yml"  # This workflow.
+  schedule:  # Longer weekly run.
+    - cron: "0 2 * * 3"  # Every Wednesday at 02:00 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
+
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only needs to read the repository.
+
+concurrency:  # One run per workflow and branch at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
+
+jobs:  # Jobs of the workflow.
+  fuzz:  # One matrix job per fuzz target.
+    name: Fuzz (${{ matrix.target }})  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 30  # Longest run plus installation.
+    strategy:  # Matrix of the targets.
+      fail-fast: false  # Finish every target even if one crashes.
+      matrix:  # Values of the matrix.
+        target: [geojson, stac]  # Targets in fuzz/fuzz_<target>.py.
+    steps:  # Steps of the fuzzing job.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Set up Python  # Install an interpreter that atheris supports.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.12"  # atheris publishes wheels for this release.
+
+      - name: Install atheris and the package  # Hashed fuzzing environment, then the package.
+        run: |  # Shell script run by bash.
+          # Install the locked, hashed fuzzing environment.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-fuzz.txt
+          # Install the package itself in editable mode without dependencies.
+          python -m pip install --no-deps -e .
+
+      - name: Fuzz  # Run the target from its seed corpus for a fixed time.
+        env:  # Inputs of the run.
+          TARGET: ${{ matrix.target }}  # Fuzz target of this matrix job.
+          SECONDS_TO_RUN: ${{ github.event_name == 'schedule' && '1200' || '120' }}  # Twenty minutes weekly, two otherwise.
+        run: |  # Shell script run by bash.
+          # Working copy of the corpus, so that new inputs do not touch the checkout.
+          cp -r "fuzz/corpus/${TARGET}" corpus
+          # Directory for crashing inputs.
+          mkdir -p crashes
+          # Run the target; a crash exits with a non-zero status.
+          python "fuzz/fuzz_${TARGET}.py" corpus -max_total_time="${SECONDS_TO_RUN}" -artifact_prefix=crashes/
+
+      - name: Upload crashing inputs  # Keep the inputs that crashed the target.
+        if: failure()  # Only when the fuzzer found a crash.
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1; Official artifact upload action.
+        with:  # Inputs of the upload action.
+          name: crashes-${{ matrix.target }}  # One artifact per target.
+          path: crashes/  # Inputs written by libFuzzer.
+          retention-days: 30  # Keep the inputs for a month.
+
+# =============================================================================
+# End of file .github/workflows/fuzz.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

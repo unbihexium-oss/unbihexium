@@ -1,0 +1,86 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/codeql.yml
+# Title       : CodeQL static application security testing
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Static application security testing (SAST) with GitHub CodeQL on every
+# pull request to main, every push to main and weekly, so that each merged
+# change is analysed (OpenSSF Scorecard, SAST check). Two languages are
+# analysed without a build step:
+#
+#   python   the package, the tests, the scripts and the examples
+#   actions  the GitHub Actions workflows, for example script injection
+#            through untrusted event data and excessive token permissions
+#
+# The security-extended query suite adds queries with a lower precision
+# than the default suite. Results appear under Security, Code scanning,
+# one category per language.
+#
+# This is the advanced CodeQL setup. The default setup (Settings, Code
+# security, CodeQL analysis) must stay disabled: GitHub rejects the
+# uploads of an advanced workflow while the default setup is enabled.
+# =============================================================================
+
+name: CodeQL  # Name shown in the Actions tab and in the status checks.
+
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+  schedule:  # Weekly run with the newest queries.
+    - cron: "0 3 * * 2"  # Every Tuesday at 03:00 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
+
+permissions:  # Least-privilege default token; the job widens only what it needs.
+  contents: read  # Read the repository.
+
+concurrency:  # One analysis per workflow and branch at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
+
+jobs:  # Jobs of the workflow.
+  analyze:  # CodeQL analysis, one matrix job per language.
+    name: CodeQL (${{ matrix.language }})  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 30  # Cancel a hung analysis after half an hour.
+    permissions:  # Token permissions of the analysis job.
+      contents: read  # Read the sources.
+      actions: read  # Read workflow run metadata, needed by the upload.
+      security-events: write  # Upload the results to code scanning.
+    strategy:  # Matrix of the languages.
+      fail-fast: false  # Finish every language even if one fails.
+      matrix:  # Values of the matrix.
+        language: [python, actions]  # Interpreted languages, no build needed.
+    steps:  # Steps of the analysis job.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under analysis.
+
+      - name: Initialise CodeQL  # Download CodeQL and create the database.
+        uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd  # v4.38.1; Official CodeQL action.
+        with:  # Inputs of the init step.
+          languages: ${{ matrix.language }}  # Language of this matrix job.
+          build-mode: none  # Python and workflows are analysed from source.
+          queries: security-extended  # Default queries plus lower-precision security queries.
+
+      - name: Analyse  # Run the queries and upload the SARIF results.
+        uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd  # v4.38.1; Official CodeQL action.
+        with:  # Inputs of the analyze step.
+          category: /language:${{ matrix.language }}  # One code scanning category per language.
+
+# =============================================================================
+# End of file .github/workflows/codeql.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

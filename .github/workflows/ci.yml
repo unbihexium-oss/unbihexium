@@ -44,15 +44,15 @@ jobs:  # Jobs of the workflow; they run in parallel.
     name: Lint  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the lint job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter used by ruff.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install ruff  # Install the linter and formatter.
-        run: pip install ruff  # Latest ruff release from PyPI.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including ruff.
 
       - name: Run ruff check  # Lint the package sources.
         run: ruff check src/ --config pyproject.toml  # Use the rule set from pyproject.toml.
@@ -64,21 +64,21 @@ jobs:  # Jobs of the workflow; they run in parallel.
     name: Type Check  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the type check job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter that pyright resolves imports against.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install dependencies  # Install pyright and the package so imports resolve.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
-          # Install the pyright command line wrapper.
-          pip install pyright
-          # Install the package; fall back to the core dependencies if that fails.
-          pip install -e . || pip install numpy onnxruntime rasterio
+          # Install the locked, hashed CI tools, including the pyright wrapper.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
+          # Install the locked, hashed runtime dependencies so that imports resolve.
+          python -m pip install --require-hashes -r requirements.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run pyright  # Report type errors in src/.
         run: pyright src/ --level basic || true  # Informational only: type errors do not fail the job.
@@ -92,10 +92,10 @@ jobs:  # Jobs of the workflow; they run in parallel.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
     steps:  # Steps of the test job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: ${{ matrix.python-version }}  # Version from the matrix.
 
@@ -103,12 +103,12 @@ jobs:  # Jobs of the workflow; they run in parallel.
       # optional backends that the tests exercise.
       - name: Install dependencies
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
           # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-          # Install the package in editable mode with the test and backend extras.
-          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
 
       - name: Run tests  # Run the whole test suite.
         run: pytest tests/ --tb=short  # Short tracebacks keep the log readable.

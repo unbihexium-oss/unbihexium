@@ -1,0 +1,32 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/requirements/requirements-ci-fuzz.in
+# Title       : Input of the lock file of the fuzzing job
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : pip requirements, compiled by uv into requirements-ci-fuzz.txt
+# =============================================================================
+#
+# Abstract
+# --------
+# Fuzzing engine and the one runtime dependency that the fuzz targets in
+# fuzz/ import. `make lock` compiles this file into requirements-ci-fuzz.txt
+# with a SHA-256 hash for every distribution, and the fuzzing workflow
+# installs it with `pip install --require-hashes` (OpenSSF Scorecard,
+# Pinned-Dependencies). The package itself is installed with --no-deps.
+# =============================================================================
+
+atheris  # Coverage-guided fuzzing engine for Python (libFuzzer).
+numpy  # Arrays, used by the GeoJSON functions under test.
+
+# =============================================================================
+# End of file .github/requirements/requirements-ci-fuzz.in
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

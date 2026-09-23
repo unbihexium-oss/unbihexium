@@ -51,17 +51,17 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 15  # Cancel a hung build after 15 minutes.
     steps:  # Steps of the build job.
-      - uses: actions/checkout@v6  # Check out the commit to package.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit to package.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the build.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install build tools  # Install the PEP 517 frontend and the checker.
-        run: python -m pip install build twine  # build creates, twine checks the distributions.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools: build creates, twine checks.
 
       - name: Build sdist and wheel  # Create both distributions in dist/.
         run: python -m build  # Builds in an isolated environment.
@@ -104,7 +104,7 @@ jobs:  # Jobs of the workflow.
           PY
 
       - name: Upload distributions  # Hand the files to the smoke test job.
-        uses: actions/upload-artifact@v7  # Official artifact upload action.
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1; Official artifact upload action.
         with:  # Inputs of the upload action.
           name: dist  # Artifact name read by the smoke test.
           path: dist/  # Upload the whole distribution directory.
@@ -121,12 +121,12 @@ jobs:  # Jobs of the workflow.
         python-version: ["3.10", "3.14"]  # Oldest and newest supported CPython.
     steps:  # Steps of the smoke test job.
       - name: Set up Python  # Install the matrix Python.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: ${{ matrix.python-version }}  # Version from the matrix.
 
       - name: Download distributions  # Fetch the files built by the build job.
-        uses: actions/download-artifact@v8  # Official artifact download action.
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1; Official artifact download action.
         with:  # Inputs of the download action.
           name: dist  # Artifact uploaded by the build job.
           path: dist/  # Restore into dist/.
@@ -135,8 +135,6 @@ jobs:  # Jobs of the workflow.
         run: |  # Shell script run by bash.
           # Create an isolated virtual environment.
           python -m venv /tmp/venv
-          # Upgrade pip in the environment so that current wheels are found.
-          /tmp/venv/bin/python -m pip install --upgrade pip
           # Install the wheel with its runtime dependencies.
           /tmp/venv/bin/python -m pip install dist/*.whl
 

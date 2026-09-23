@@ -21,10 +21,11 @@
 #                 MPL-2.0 notice at the top of every source file
 #   reuse         reuse lint checks that every file carries copyright and
 #                 licence information (REUSE specification)
-#   dependencies  installs the package, lists the licences of all installed
-#                 distributions with pip-licenses and rejects strong
-#                 copyleft and source-available licences with
-#                 check_dependency_licenses.py
+#   dependencies  installs the locked runtime dependencies and the package
+#                 into a separate environment, lists their licences with
+#                 pip-licenses (installed outside that environment, so the
+#                 CI tools are not audited) and rejects strong copyleft and
+#                 source-available licences with check_dependency_licenses.py
 #
 # Runs on pushes to main, on pull requests, weekly on Monday at 04:00 UTC
 # (dependencies may change licence between releases) and on demand.
@@ -54,12 +55,12 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 5  # The check takes seconds; cancel a hung job early.
     steps:  # Steps of the headers job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the check script.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
@@ -71,17 +72,17 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 10  # Cancel a hung job after ten minutes.
     steps:  # Steps of the REUSE job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the reuse tool.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install reuse  # Install the REUSE command line tool.
-        run: python -m pip install reuse  # Latest release from PyPI.
+        run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including reuse.
 
       # The repository keeps a single licence text, LICENSE.txt. REUSE
       # expects it under LICENSES/, so the check works on a copy.
@@ -100,24 +101,28 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     timeout-minutes: 20  # Installing the dependencies takes a few minutes.
     steps:  # Steps of the dependency job.
-      - uses: actions/checkout@v6  # Check out the commit under test.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Set up Python  # Install the interpreter for the package.
-        uses: actions/setup-python@v6  # Official Python setup action.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
 
       - name: Install the package and pip-licenses  # Install what is to be audited.
         run: |  # Shell script run by bash.
-          # Upgrade pip first so that current wheels are found.
-          python -m pip install --upgrade pip
-          # Install the package with its runtime dependencies and the licence lister.
-          python -m pip install . pip-licenses
+          # Separate environment that holds only what is audited.
+          python -m venv /tmp/audit
+          # Install the locked, hashed runtime dependencies into it.
+          /tmp/audit/bin/python -m pip install --require-hashes -r requirements.txt
+          # Install the package itself without resolving dependencies again.
+          /tmp/audit/bin/python -m pip install --no-deps -e .
+          # Install the licence lister outside the audited environment.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
 
       - name: Collect licences of installed dependencies  # Write the licence inventory.
-        run: pip-licenses --from=mixed --format=json --with-urls --output-file licenses.json  # Read classifiers and licence metadata, write JSON.
+        run: pip-licenses --python /tmp/audit/bin/python --from=mixed --format=json --with-urls --output-file licenses.json  # Audit the separate environment only.
 
       - name: Check licences against the project policy  # Apply the licence policy of the project.
         run: python .github/scripts/check_dependency_licenses.py licenses.json  # Fails on GPL, AGPL, SSPL or Commons Clause licences.

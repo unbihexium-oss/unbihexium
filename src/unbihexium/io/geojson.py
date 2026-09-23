@@ -119,8 +119,20 @@ def _is_position(value: Any) -> bool:
         return False
     # Numbers only; booleans are a subclass of int but not coordinates.
     numbers = all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in value)
-    # Every element must be a finite number.
-    return numbers and all(math.isfinite(v) for v in value)
+    # Every element must be a finite number that fits in a float.
+    return numbers and all(_is_finite(v) for v in value)
+
+
+# Whether a number is finite as a float; integers too large for a float are not.
+def _is_finite(value: float) -> bool:
+    # Convert and test.
+    try:
+        # Finite double precision value.
+        return math.isfinite(float(value))
+    # Integers beyond the float range.
+    except OverflowError:
+        # Not representable.
+        return False
 
 
 # Problems of a coordinate array of the given nesting depth.
@@ -167,8 +179,8 @@ def _geometry_problems(geometry: Any, where: str) -> list[str]:
     if not isinstance(geometry, dict):
         # Report the type.
         return [f"{where}: geometry must be an object"]
-    # Geometry type.
-    kind = geometry.get("type")
+    # Geometry type; only strings name a type.
+    kind = geometry.get("type") if isinstance(geometry.get("type"), str) else None
     # Collections hold geometries.
     if kind == "GeometryCollection":
         # Member list.
@@ -243,8 +255,8 @@ def geojson_problems(obj: Any) -> list[str]:
     if not isinstance(obj, dict):
         # Report it.
         return ["document must be a JSON object"]
-    # Type of the document.
-    kind = obj.get("type")
+    # Type of the document; only strings name a type.
+    kind = obj.get("type") if isinstance(obj.get("type"), str) else None
     # Collections of features.
     if kind == "FeatureCollection":
         # Feature list.
@@ -444,8 +456,8 @@ def geojson_bounds(obj: dict[str, Any]) -> tuple[float, float, float, float]:
 
 # Signed area of a ring with the shoelace formula; positive when counterclockwise.
 def ring_area(ring: Any) -> float:
-    # Horizontal coordinates.
-    xy = np.asarray(ring, dtype=np.float64)[:, :2]
+    # Horizontal coordinates; positions may mix two and three dimensions.
+    xy = np.asarray([p[:2] for p in ring], dtype=np.float64).reshape(-1, 2)
     # Next vertex of every vertex (closed rings repeat the first vertex).
     nxt = np.roll(xy, -1, axis=0)
     # Half the sum of the cross products.
@@ -460,8 +472,10 @@ def _rewind_polygon(rings: list[Any]) -> list[Any]:
     for i, ring in enumerate(rings):
         # The exterior ring is the first one.
         want_ccw = i == 0
-        # Reverse rings with the wrong orientation.
-        out.append(list(ring)[::-1] if (ring_area(ring) > 0) != want_ccw else list(ring))
+        # Signed area; zero for degenerate rings, which have no orientation.
+        area = ring_area(ring)
+        # Reverse rings with the wrong orientation and keep degenerate rings.
+        out.append(list(ring)[::-1] if area != 0 and (area > 0) != want_ccw else list(ring))
     # Return the rings.
     return out
 

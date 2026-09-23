@@ -46,7 +46,7 @@ jobs:  # Jobs of the workflow.
       pull-requests: read  # Read the pull request title.
     steps:  # Steps of the title job.
       - name: Validate the pull request title  # Parse the title as a conventional commit header.
-        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50  # v6.1.1
         env:  # Environment of the check step.
           GITHUB_TOKEN: ${{ github.token }}  # Token used to read the pull request.
         with:  # Inputs of the check action.

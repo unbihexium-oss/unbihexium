@@ -62,6 +62,13 @@ LOCK_PYTHON := 3.10
 # Resolve for every platform and interpreter from LOCK_PYTHON upwards.
 LOCK_FLAGS := --universal --python-version $(LOCK_PYTHON)
 
+# Directory of the hashed lock files used by the GitHub Actions workflows.
+CI_REQ := .github/requirements
+
+# Every lock file that `make lock` writes and `make lock-check` compares.
+LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-test.txt \
+	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt
+
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
         lint format format-check type-check security licence text-policy \
@@ -92,34 +99,47 @@ install-dev: ## Install the locked development environment and pre-commit hooks
 # Register the Git hooks of .pre-commit-config.yaml.
 	pre-commit install
 
-lock: ## Regenerate requirements.txt and requirements-dev.txt from pyproject.toml
-# Compile the runtime lock with the onnx and serving extras into a temporary file.
-	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --extra onnx --extra serving \
-		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --extra onnx --extra serving -o requirements.txt" \
+lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI lock files
+# Compile the runtime lock with the onnx and serving extras and hashes into a temporary file.
+	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
+		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving -o requirements.txt" \
 		-o .requirements.lock.tmp
 # Compile the development lock with every extra into a temporary file.
 	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --extra all \
 		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --extra all -o requirements-dev.txt" \
 		-o .requirements-dev.lock.tmp
+# Compile the hashed lock of the CI test environment (no PyTorch) into a temporary file.
+	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
+		--custom-compile-command "make lock" \
+		-o .requirements-ci-test.lock.tmp
+# Compile the hashed lock of the CI tools into a temporary file.
+	$(UV) pip compile $(CI_REQ)/requirements-ci-tools.in $(LOCK_FLAGS) --generate-hashes \
+		--custom-compile-command "make lock" \
+		-o .requirements-ci-tools.lock.tmp
+# Compile the hashed lock of the fuzzing job into a temporary file.
+	$(UV) pip compile $(CI_REQ)/requirements-ci-fuzz.in $(LOCK_FLAGS) --generate-hashes \
+		--custom-compile-command "make lock" \
+		-o .requirements-ci-fuzz.lock.tmp
 # Replace the uv output, keeping the header and the footer of each lock file.
 	@$(PYTHON) scripts/merge_lock.py \
 		requirements.txt .requirements.lock.tmp \
-		requirements-dev.txt .requirements-dev.lock.tmp
+		requirements-dev.txt .requirements-dev.lock.tmp \
+		$(CI_REQ)/requirements-ci-test.txt .requirements-ci-test.lock.tmp \
+		$(CI_REQ)/requirements-ci-tools.txt .requirements-ci-tools.lock.tmp \
+		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp
 # Remove the temporary files.
-	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp
+	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp
 # Remind the maintainer to review the new pins.
 	@echo "Lock files regenerated. Review the diff before committing."
 
-lock-check: ## Fail if the lock files are out of date with pyproject.toml
+lock-check: ## Fail if a lock file is out of date with its input
 # Keep copies of the committed lock files.
-	@cp requirements.txt .requirements.orig && cp requirements-dev.txt .requirements-dev.orig
+	@for f in $(LOCK_FILES); do cp "$$f" "$$f.orig"; done
 # Regenerate the lock files in place.
 	@$(MAKE) --no-print-directory lock > /dev/null
 # Compare with the copies, restore the committed files and report the result.
 	@status=0; \
-	cmp -s requirements.txt .requirements.orig || status=1; \
-	cmp -s requirements-dev.txt .requirements-dev.orig || status=1; \
-	mv .requirements.orig requirements.txt; mv .requirements-dev.orig requirements-dev.txt; \
+	for f in $(LOCK_FILES); do cmp -s "$$f" "$$f.orig" || { echo "Outdated: $$f"; status=1; }; mv "$$f.orig" "$$f"; done; \
 	if [ $$status -ne 0 ]; then echo "Lock files are outdated: run make lock"; exit 1; fi; \
 	echo "Lock files are up to date."
 
