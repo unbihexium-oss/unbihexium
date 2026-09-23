@@ -46,6 +46,13 @@ Where:
 
 - Official support for Python 3.13 and 3.14; Python 3.10 through 3.14 are now supported and tested in CI
 - Python version support policy in VERSIONING.md
+- Issue forms for bug reports, feature requests, documentation, model zoo, performance, compliance, build and questions, each with about 95 mandatory questions, an AI usage declaration and regulatory confirmations
+- Pull request template with the same declarations, AI usage declaration and regulatory confirmations
+- CODEOWNERS, label definitions with a label sync workflow, and release notes categories
+
+### Fixed (Unreleased)
+
+- Invalid YAML in `.github/FUNDING.yml`
 
 ### Changed (Unreleased)
 

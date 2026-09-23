@@ -25,6 +25,7 @@ updates:
       interval: "weekly"
     labels:
       - "ci"
+      - "dependencies"
     commit-message:
       prefix: "ci"
 
@@ -34,3 +35,6 @@ updates:
       interval: "monthly"
     labels:
       - "docker"
+      - "dependencies"
+    commit-message:
+      prefix: "build"

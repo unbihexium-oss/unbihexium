@@ -1,0 +1,2135 @@
+name: "Model zoo"
+description: "Report a model defect, integrity problem or request a new model."
+title: "[Model]: "
+labels: ["model-zoo", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## About this model zoo issue
+
+        Use this form for anything concerning the models in the model zoo: quality, integrity, runtime, model cards and new model requests.
+
+        **How to complete this form**
+
+        - Every question is mandatory. Answer each one as precisely as you can; write `N/A` in a text field only when the question genuinely does not apply.
+        - Closed questions list every expected answer. If none fits, choose "Other (specify in the next field)" and describe your answer in the field that follows the question.
+        - The declarations and regulatory confirmations near the end are required for every submission. Each confirmation links to the exact article or section it refers to.
+        - Do not include secrets, access tokens, personal data or confidential data. Report security vulnerabilities privately through a [security advisory](https://github.com/unbihexium-oss/unbihexium/security/advisories/new) as described in [SECURITY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md), never in a public issue.
+        - By submitting you agree to follow the [Code of Conduct](https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md).
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Model identification
+
+        Identify the model concerned or the model you request.
+
+  - type: dropdown
+    id: mz-kind
+    attributes:
+      label: "Kind of model issue"
+      description: |
+        Select the kind of issue.
+      options:
+        - "Defect in an existing model"
+        - "Accuracy or quality problem"
+        - "Request for a new model"
+        - "Request for a new variant"
+        - "Model card correction"
+        - "Checksum or integrity mismatch"
+        - "Download or Git LFS problem"
+        - "ONNX export or runtime problem"
+        - "Licence or provenance question"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-kind-other
+    attributes:
+      label: "Kind of model issue: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Kind of model issue". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: mz-model-id
+    attributes:
+      label: "Model identifier"
+      description: |
+        Give the model identifier from the model zoo. Write `N/A` for a new model request.
+      placeholder: |
+        ship_detector_base
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mz-variant
+    attributes:
+      label: "Variant concerned"
+      description: |
+        Select every variant concerned.
+      multiple: true
+      options:
+        - "tiny"
+        - "base"
+        - "large"
+        - "mega"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-variant-other
+    attributes:
+      label: "Variant concerned: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Variant concerned". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-task
+    attributes:
+      label: "Model task"
+      description: |
+        Select the task of the model.
+      options:
+        - "Object detection"
+        - "Semantic segmentation"
+        - "Instance segmentation"
+        - "Scene classification"
+        - "Regression"
+        - "Change detection"
+        - "Super-resolution"
+        - "Anomaly detection"
+        - "Index or heuristic pack"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-task-other
+    attributes:
+      label: "Model task: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Model task". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-domain
+    attributes:
+      label: "Model capability domain"
+      description: |
+        Select the capability domain of the model.
+      options:
+        - "01 AI products (detection, segmentation, super-resolution)"
+        - "02 Tourism and data processing"
+        - "03 Indices, flood and water"
+        - "04 Environment, forestry and image processing"
+        - "05 Asset management and energy"
+        - "06 Urban planning and agriculture"
+        - "07 Risk and defense (neutral analytics)"
+        - "08 Value-added imagery (DEM, orthorectification, mosaicking)"
+        - "09 Benefits narrative and reporting"
+        - "10 Satellite imagery features"
+        - "11 Resolution, metadata and quality assurance"
+        - "12 Radar and SAR"
+        - "Cross-cutting or not domain specific"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-domain-other
+    attributes:
+      label: "Model capability domain: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Model capability domain". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-sensor
+    attributes:
+      label: "Input sensor"
+      description: |
+        Select every sensor type used as model input.
+      multiple: true
+      options:
+        - "Optical multispectral (for example Sentinel-2, Landsat)"
+        - "Very high resolution optical (sub-metre)"
+        - "Hyperspectral"
+        - "SAR (for example Sentinel-1)"
+        - "Thermal infrared"
+        - "LiDAR or photogrammetric point clouds"
+        - "Elevation models (DEM, DSM, DTM)"
+        - "Vector data (points, lines, polygons)"
+        - "Tabular or time series data"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-sensor-other
+    attributes:
+      label: "Input sensor: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Input sensor". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-gsd
+    attributes:
+      label: "Ground sampling distance"
+      description: |
+        Select the ground sampling distance of the input imagery.
+      options:
+        - "Below 0.5 m"
+        - "0.5 m to 2 m"
+        - "2 m to 10 m"
+        - "10 m to 30 m"
+        - "Above 30 m"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-gsd-other
+    attributes:
+      label: "Ground sampling distance: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Ground sampling distance". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-bands
+    attributes:
+      label: "Input bands"
+      description: |
+        Select the band configuration used.
+      options:
+        - "RGB"
+        - "RGB and near infrared"
+        - "All Sentinel-2 bands"
+        - "SAR VV and VH"
+        - "Single band"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-bands-other
+    attributes:
+      label: "Input bands: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Input bands". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Observation
+
+        Describe the model behaviour.
+
+  - type: textarea
+    id: mz-observed
+    attributes:
+      label: "Observed behaviour"
+      description: |
+        Describe what the model produced, including example outputs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: mz-expected
+    attributes:
+      label: "Expected behaviour"
+      description: |
+        Describe what the model should have produced and on what basis.
+    validations:
+      required: true
+
+  - type: textarea
+    id: mz-metrics
+    attributes:
+      label: "Measured metrics"
+      description: |
+        Give the metrics you measured (for example IoU, F1, mAP, RMSE) with the evaluation protocol. Write `N/A` if you did not measure.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mz-eval-data
+    attributes:
+      label: "Evaluation data"
+      description: |
+        Select the kind of data used for evaluation.
+      options:
+        - "No evaluation performed"
+        - "Public benchmark dataset"
+        - "Own annotated data"
+        - "Synthetic data"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-eval-data-other
+    attributes:
+      label: "Evaluation data: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Evaluation data". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: mz-eval-dataset
+    attributes:
+      label: "Evaluation dataset name and licence"
+      description: |
+        Give the dataset name, version and licence. Write `N/A` if no evaluation was performed.
+      placeholder: |
+        SpaceNet 7 (CC BY-SA 4.0)
+    validations:
+      required: true
+
+  - type: textarea
+    id: mz-inference-code
+    attributes:
+      label: "Inference code"
+      description: |
+        Paste the code used to run the model.
+      render: python
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Integrity and runtime
+
+        Declare how the model was obtained and executed.
+
+  - type: dropdown
+    id: mz-checksum
+    attributes:
+      label: "Checksum status"
+      description: |
+        Compare the SHA256 of the model file with `model_zoo/checksums.txt`.
+      options:
+        - "Checksum matches"
+        - "Checksum does not match"
+        - "Not checked"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-checksum-other
+    attributes:
+      label: "Checksum status: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Checksum status". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: mz-sha256
+    attributes:
+      label: "Computed SHA256"
+      description: |
+        Paste the SHA256 you computed. Write `N/A` if not applicable.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mz-lfs
+    attributes:
+      label: "Git LFS status"
+      description: |
+        Declare how the model files were obtained.
+      options:
+        - "Git LFS installed and files pulled"
+        - "Git LFS not installed (pointer files only)"
+        - "Downloaded from a release asset"
+        - "Downloaded by unbihexium.zoo"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-lfs-other
+    attributes:
+      label: "Git LFS status: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Git LFS status". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-provider
+    attributes:
+      label: "ONNX Runtime execution provider"
+      description: |
+        Select the execution provider used.
+      options:
+        - "CPUExecutionProvider"
+        - "CUDAExecutionProvider"
+        - "TensorRTExecutionProvider"
+        - "CoreMLExecutionProvider"
+        - "DirectMLExecutionProvider"
+        - "PyTorch instead of ONNX Runtime"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-provider-other
+    attributes:
+      label: "ONNX Runtime execution provider: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "ONNX Runtime execution provider". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Responsible use
+
+        Assess bias, oversight and decision impact.
+
+  - type: dropdown
+    id: mz-bias
+    attributes:
+      label: "Observed bias"
+      description: |
+        Declare whether performance differs systematically across regions, seasons, sensors or land cover.
+      multiple: true
+      options:
+        - "No bias observed"
+        - "Geographic bias"
+        - "Seasonal bias"
+        - "Sensor bias"
+        - "Land cover bias"
+        - "Not assessed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-bias-other
+    attributes:
+      label: "Observed bias: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Observed bias". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: mz-bias-details
+    attributes:
+      label: "Bias details"
+      description: |
+        Describe the observed bias with evidence. Write `N/A` if none was observed.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mz-oversight
+    attributes:
+      label: "Human oversight"
+      description: |
+        Describe the human oversight of model outputs in your deployment ([EU AI Act Article 14](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14)).
+      options:
+        - "Every output reviewed by a human"
+        - "Sampled human review"
+        - "Human review of alerts only"
+        - "No human review"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-oversight-other
+    attributes:
+      label: "Human oversight: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Human oversight". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-decisions
+    attributes:
+      label: "Automated decisions about people"
+      description: |
+        Declare whether model outputs feed automated decisions with legal or similar effects on people ([GDPR Article 22](https://gdpr-info.eu/art-22-gdpr/)).
+      options:
+        - "No decisions about people"
+        - "Decisions with human involvement"
+        - "Solely automated decisions"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-decisions-other
+    attributes:
+      label: "Automated decisions about people: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Automated decisions about people". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-dual-use
+    attributes:
+      label: "Dual-use potential of the model"
+      description: |
+        Assess the dual-use potential of the model or of the requested model.
+      options:
+        - "Civil use only"
+        - "Could support surveillance"
+        - "Could support military use"
+        - "Not assessed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-dual-use-other
+    attributes:
+      label: "Dual-use potential of the model: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Dual-use potential of the model". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## New model requests
+
+        Complete these for new model or variant requests; otherwise write `N/A`.
+
+  - type: textarea
+    id: mz-new-spec
+    attributes:
+      label: "Requested model specification"
+      description: |
+        Describe the requested task, classes, input bands, resolution and output format. Write `N/A` if this is not a new model request.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mz-training-data
+    attributes:
+      label: "Available training data"
+      description: |
+        Declare the training data available for a new model.
+      options:
+        - "Not a new model request"
+        - "Openly licensed data"
+        - "Commercial data with training rights"
+        - "No training data available"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-training-data-other
+    attributes:
+      label: "Available training data: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Available training data". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-labels
+    attributes:
+      label: "Annotation source"
+      description: |
+        Declare the source of annotations for a new model.
+      options:
+        - "Not a new model request"
+        - "Expert annotation"
+        - "Crowd annotation"
+        - "Derived from vector data"
+        - "No annotations available"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-labels-other
+    attributes:
+      label: "Annotation source: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Annotation source". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mz-size
+    attributes:
+      label: "Size constraint"
+      description: |
+        Select the maximum acceptable model size.
+      options:
+        - "Under 10 MB"
+        - "10 MB to 100 MB"
+        - "100 MB to 1 GB"
+        - "No constraint"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: mz-size-other
+    attributes:
+      label: "Size constraint: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Size constraint". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: mz-card-correction
+    attributes:
+      label: "Model card correction"
+      description: |
+        If a model card is wrong, quote the field and give the corrected value. Write `N/A` otherwise.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Submitter and context
+
+        These questions help maintainers understand who is affected and how to prioritise the model zoo issue. The answers are used for triage only.
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: "Your role"
+      description: |
+        Select the role that best describes how you interact with Unbihexium in the context of this model zoo issue.
+      options:
+        - "End user of the library or CLI"
+        - "Application developer integrating the library"
+        - "Researcher or academic"
+        - "Data scientist or machine learning engineer"
+        - "GIS or remote sensing analyst"
+        - "Maintainer or regular contributor"
+        - "Representative of an organisation (company, public body or NGO)"
+        - "Student"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: role-other
+    attributes:
+      label: "Your role: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Your role". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: org-type
+    attributes:
+      label: "Organisation type"
+      description: |
+        Select the type of organisation on whose behalf you are submitting. Choose the individual option if you act in a private capacity.
+      options:
+        - "Individual, no organisation"
+        - "Academic or research institution"
+        - "Public sector body in the EU or EEA"
+        - "Public sector body outside the EU or EEA"
+        - "Private company, small or medium-sized enterprise"
+        - "Private company, large enterprise"
+        - "Non-profit organisation or NGO"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: org-type-other
+    attributes:
+      label: "Organisation type: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Organisation type". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: jurisdiction
+    attributes:
+      label: "Primary jurisdiction of use"
+      description: |
+        Select the jurisdiction in which you mainly use or distribute Unbihexium. This determines which of the regulatory questions below apply to you.
+      options:
+        - "EU or EEA member state"
+        - "United Kingdom"
+        - "Switzerland"
+        - "United States"
+        - "Canada"
+        - "Other European country"
+        - "Asia-Pacific"
+        - "Middle East and North Africa"
+        - "Sub-Saharan Africa"
+        - "Latin America and the Caribbean"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: jurisdiction-other
+    attributes:
+      label: "Primary jurisdiction of use: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Primary jurisdiction of use". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: duplicates
+    attributes:
+      label: "Search for existing reports"
+      description: |
+        Confirm that you searched open and closed issues, pull requests and the documentation before creating this model zoo issue.
+      options:
+        - "I searched and found no existing issue or pull request"
+        - "I found related issues or pull requests and link them in the next question"
+        - "I found a closed issue or pull request, but the subject is still open"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: duplicates-other
+    attributes:
+      label: "Search for existing reports: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Search for existing reports". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: related
+    attributes:
+      label: "Related issues, pull requests and discussions"
+      description: |
+        List related issues, pull requests, discussions or external tickets as links or `#number` references, separated by commas. Write `N/A` if there are none.
+      placeholder: |
+        #123, #456, https://example.org/ticket/1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: "Impact on your work"
+      description: |
+        Select how strongly the subject of this model zoo issue affects your work today.
+      options:
+        - "Blocking: I cannot continue without a resolution"
+        - "Major: significant workaround or delay"
+        - "Moderate: inconvenient but manageable"
+        - "Minor: small inconvenience"
+        - "Cosmetic or informational only"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: impact-other
+    attributes:
+      label: "Impact on your work: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Impact on your work". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Environment
+
+        Describe the exact environment. Precise versions allow maintainers to reproduce the situation without additional round trips.
+
+  - type: dropdown
+    id: ubx-version
+    attributes:
+      label: "Unbihexium version"
+      description: |
+        Select the Unbihexium version you are using. Run `python -c "import unbihexium; print(unbihexium.__version__)"` if you are unsure.
+      options:
+        - "1.0.1 (latest release)"
+        - "1.0.0"
+        - "main branch (unreleased)"
+        - "0.9.x"
+        - "0.8.x or earlier"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ubx-version-other
+    attributes:
+      label: "Unbihexium version: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Unbihexium version". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: version-string
+    attributes:
+      label: "Exact version string or commit SHA"
+      description: |
+        Paste the exact version string, and for source installations also the output of `git rev-parse HEAD`.
+      placeholder: |
+        1.0.1 / 3430ec9
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: "Installation method"
+      description: |
+        Select how Unbihexium was installed in the environment described here.
+      options:
+        - "PyPI with pip"
+        - "PyPI with uv, pipx, poetry or pdm"
+        - "conda or mamba (conda-forge)"
+        - "Source checkout, editable install"
+        - "Official Docker image"
+        - "Custom container image"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: install-method-other
+    attributes:
+      label: "Installation method: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Installation method". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: python-version
+    attributes:
+      label: "Python version"
+      description: |
+        Select the Python version. Unbihexium supports CPython 3.10 to 3.14 as documented in [VERSIONING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md).
+      options:
+        - "3.14"
+        - "3.13"
+        - "3.12"
+        - "3.11"
+        - "3.10"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: python-version-other
+    attributes:
+      label: "Python version: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Python version". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: python-impl
+    attributes:
+      label: "Python implementation"
+      description: |
+        Select the Python implementation and build.
+      options:
+        - "CPython, standard build"
+        - "CPython, free-threaded build"
+        - "PyPy"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: python-impl-other
+    attributes:
+      label: "Python implementation: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Python implementation". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating system family"
+      description: |
+        Select the operating system family on which you observed the behaviour or tested the change.
+      options:
+        - "Linux"
+        - "Windows"
+        - "macOS"
+        - "Windows Subsystem for Linux (WSL2)"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: os-other
+    attributes:
+      label: "Operating system family: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Operating system family". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: os-version
+    attributes:
+      label: "Operating system distribution and version"
+      description: |
+        Give the distribution and version, for example `Ubuntu 24.04`, `Windows 11 24H2` or `macOS 15.5`.
+      placeholder: |
+        Ubuntu 24.04
+    validations:
+      required: true
+
+  - type: dropdown
+    id: cpu-arch
+    attributes:
+      label: "CPU architecture"
+      description: |
+        Select the processor architecture of the machine.
+      options:
+        - "x86_64 or AMD64"
+        - "arm64 or aarch64 (including Apple silicon)"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: cpu-arch-other
+    attributes:
+      label: "CPU architecture: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "CPU architecture". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: accelerator
+    attributes:
+      label: "Hardware accelerator"
+      description: |
+        Select the accelerator used for inference or processing.
+      options:
+        - "No accelerator, CPU only"
+        - "NVIDIA GPU (CUDA)"
+        - "AMD GPU (ROCm)"
+        - "Apple GPU (Metal or MPS)"
+        - "Intel GPU or NPU"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: accelerator-other
+    attributes:
+      label: "Hardware accelerator: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Hardware accelerator". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: accelerator-details
+    attributes:
+      label: "Accelerator details"
+      description: |
+        Give the accelerator model, driver version, CUDA or ROCm version and available memory. Write `N/A` if you use the CPU only.
+      placeholder: |
+        NVIDIA RTX 4090, driver 560.35, CUDA 12.6, 24 GB
+    validations:
+      required: true
+
+  - type: dropdown
+    id: backend
+    attributes:
+      label: "Inference backend"
+      description: |
+        Select the backend used to execute models, if any.
+      options:
+        - "ONNX Runtime, CPU execution provider"
+        - "ONNX Runtime, CUDA or TensorRT execution provider"
+        - "PyTorch"
+        - "Both ONNX Runtime and PyTorch"
+        - "No model inference involved"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: backend-other
+    attributes:
+      label: "Inference backend: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Inference backend". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: deployment
+    attributes:
+      label: "Deployment context"
+      description: |
+        Select where the code runs.
+      options:
+        - "Local workstation or laptop"
+        - "On-premises server"
+        - "Public cloud virtual machine"
+        - "Kubernetes or container orchestration"
+        - "HPC cluster or batch scheduler"
+        - "Edge device"
+        - "CI pipeline"
+        - "Notebook service (JupyterHub, Colab-like environment)"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: deployment-other
+    attributes:
+      label: "Deployment context: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Deployment context". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: packages
+    attributes:
+      label: "Relevant package versions"
+      description: |
+        Paste the output of `pip freeze` or `conda list`, or at least the versions of numpy, rasterio, GDAL, shapely, pyproj, onnxruntime and torch.
+      placeholder: |
+        numpy==2.3.2
+        rasterio==1.4.3
+        onnxruntime==1.22.0
+      render: text
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Declarations: repository, libraries, models and data
+
+        Declare the provenance of everything involved: the Unbihexium source, third-party libraries, models and datasets. These declarations are required for licence compliance under the [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/) and the notices in [THIRD_PARTY_NOTICES.md](https://github.com/unbihexium-oss/unbihexium/blob/main/THIRD_PARTY_NOTICES.md).
+
+  - type: dropdown
+    id: repo-source
+    attributes:
+      label: "Source of the Unbihexium code"
+      description: |
+        Select where the Unbihexium code you use comes from.
+      options:
+        - "Official repository unbihexium-oss/unbihexium"
+        - "Fork of the official repository without modifications"
+        - "Fork of the official repository with modifications"
+        - "Official PyPI distribution"
+        - "Mirror or vendored copy"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: repo-source-other
+    attributes:
+      label: "Source of the Unbihexium code: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Source of the Unbihexium code". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: local-mods
+    attributes:
+      label: "Local modifications"
+      description: |
+        Declare whether your copy differs from the official release or branch.
+      options:
+        - "No modifications"
+        - "Configuration changes only"
+        - "Source code modifications"
+        - "Model weights replaced, retrained or fine-tuned"
+        - "Source code and model modifications"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: local-mods-other
+    attributes:
+      label: "Local modifications: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Local modifications". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: mods-description
+    attributes:
+      label: "Description of local modifications"
+      description: |
+        Describe every modification, including files changed and why. Modified MPL-2.0 files remain under the MPL-2.0 ([Section 3.1](https://www.mozilla.org/en-US/MPL/2.0/)). Write `N/A` if there are none.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dep-source
+    attributes:
+      label: "Source of third-party libraries"
+      description: |
+        Select every source from which third-party Python or system libraries were obtained.
+      multiple: true
+      options:
+        - "PyPI wheels"
+        - "conda-forge"
+        - "Operating system packages"
+        - "Built from source"
+        - "Private or internal package index mirror"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: dep-source-other
+    attributes:
+      label: "Source of third-party libraries: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Source of third-party libraries". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: dep-licences
+    attributes:
+      label: "Licences of additional libraries"
+      description: |
+        Declare the licence categories of any libraries beyond those declared in `pyproject.toml` that are involved.
+      multiple: true
+      options:
+        - "Only the dependencies declared in pyproject.toml"
+        - "Additional permissive dependencies (MIT, BSD, Apache-2.0, MPL-2.0)"
+        - "Additional weak copyleft dependencies (LGPL, EPL)"
+        - "Additional strong copyleft dependencies (GPL, AGPL)"
+        - "Additional proprietary or unknown-licence dependencies"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: dep-licences-other
+    attributes:
+      label: "Licences of additional libraries: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Licences of additional libraries". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: dep-vulns
+    attributes:
+      label: "Known vulnerabilities in dependencies"
+      description: |
+        Run `pip-audit` or an equivalent scanner and declare the result.
+      options:
+        - "Scanned, no known vulnerabilities"
+        - "Scanned, known vulnerabilities unrelated to this submission"
+        - "Scanned, known vulnerabilities possibly related to this submission"
+        - "Not scanned"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: dep-vulns-other
+    attributes:
+      label: "Known vulnerabilities in dependencies: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Known vulnerabilities in dependencies". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: models-involved
+    attributes:
+      label: "Models involved"
+      description: |
+        Declare which models are involved. Select every option that applies.
+      multiple: true
+      options:
+        - "No models involved"
+        - "Unbihexium model zoo models (Git LFS)"
+        - "Unbihexium models downloaded from a release asset"
+        - "Custom models trained by me or my organisation"
+        - "Unbihexium models fine-tuned by me or my organisation"
+        - "Third-party models"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: models-involved-other
+    attributes:
+      label: "Models involved: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Models involved". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: model-ids
+    attributes:
+      label: "Model identifiers"
+      description: |
+        List every model identifier and variant, for example `ship_detector_base` or `ubx-det-multiclass-1.0.0`. For third-party models give the name, version and source. Write `N/A` if no models are involved.
+      placeholder: |
+        ship_detector_base, ubx-det-multiclass-1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: model-variants
+    attributes:
+      label: "Model variants"
+      description: |
+        Select every model variant involved.
+      multiple: true
+      options:
+        - "tiny"
+        - "base"
+        - "large"
+        - "mega"
+        - "Not applicable"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: model-variants-other
+    attributes:
+      label: "Model variants: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Model variants". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: model-integrity
+    attributes:
+      label: "Model integrity verification"
+      description: |
+        Declare whether the model files were verified against the published SHA256 checksums.
+      options:
+        - "Verified against model_zoo/checksums.txt"
+        - "Verified against the sha256 field of the model manifest"
+        - "Not verified"
+        - "Not applicable, no models involved"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: model-integrity-other
+    attributes:
+      label: "Model integrity verification: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Model integrity verification". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: model-card
+    attributes:
+      label: "Model card and licence review"
+      description: |
+        Declare whether you read the model card, including intended use, limitations and licence.
+      options:
+        - "Read in full, including limitations and licence"
+        - "Read partially"
+        - "Not read"
+        - "Not applicable, no models involved"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: model-card-other
+    attributes:
+      label: "Model card and licence review: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Model card and licence review". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: model-training-data
+    attributes:
+      label: "Training data of any model you trained or fine-tuned"
+      description: |
+        Declare the provenance of the training data for any model you trained or fine-tuned.
+      multiple: true
+      options:
+        - "No training or fine-tuning performed"
+        - "Synthetic data only"
+        - "Openly licensed data (for example Copernicus, Landsat, CC-BY datasets)"
+        - "Commercially licensed data with a licence that permits training"
+        - "Data that contains personal data"
+        - "Data of unknown licence or provenance"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: model-training-data-other
+    attributes:
+      label: "Training data of any model you trained or fine-tuned: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Training data of any model you trained or fine-tuned". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: data-types
+    attributes:
+      label: "Data involved"
+      description: |
+        Select every type of data involved.
+      multiple: true
+      options:
+        - "No data involved"
+        - "Sentinel-2 optical"
+        - "Sentinel-1 SAR"
+        - "Landsat"
+        - "Other Copernicus services data"
+        - "Commercial very high resolution optical imagery"
+        - "Commercial SAR imagery"
+        - "Aerial or drone imagery"
+        - "Elevation models (DEM, DSM, DTM)"
+        - "Vector data (for example OpenStreetMap)"
+        - "Street-level imagery"
+        - "Synthetic data"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: data-types-other
+    attributes:
+      label: "Data involved: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Data involved". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: data-licences
+    attributes:
+      label: "Data licences"
+      description: |
+        Declare the licences under which the data involved is available to you.
+      multiple: true
+      options:
+        - "Copernicus full, free and open data policy"
+        - "Open licences (CC0, CC-BY, ODbL or equivalent)"
+        - "Commercial licence that permits this use"
+        - "Internal or proprietary data of my organisation"
+        - "Unknown licence"
+        - "Not applicable, no data involved"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: data-licences-other
+    attributes:
+      label: "Data licences: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Data licences". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: personal-data
+    attributes:
+      label: "Personal data"
+      description: |
+        Declare whether any data involved in or attached to this model zoo issue is personal data as defined in [GDPR Article 4(1)](https://gdpr-info.eu/art-4-gdpr/). High resolution imagery and location data can be personal data.
+      multiple: true
+      options:
+        - "No personal data"
+        - "Imagery that could identify people, vehicles or private property"
+        - "Location data linked to individuals"
+        - "Direct identifiers such as names or e-mail addresses"
+        - "Special categories of data under GDPR Article 9"
+        - "Not sure"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: personal-data-other
+    attributes:
+      label: "Personal data: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Personal data". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: geo-sensitivity
+    attributes:
+      label: "Geographic sensitivity"
+      description: |
+        Declare whether the area of interest is sensitive.
+      multiple: true
+      options:
+        - "Not sensitive"
+        - "Critical infrastructure"
+        - "Military or defence sites"
+        - "Locations of protected species or habitats"
+        - "Areas of armed conflict or humanitarian crisis"
+        - "Not applicable, no geographic data involved"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: geo-sensitivity-other
+    attributes:
+      label: "Geographic sensitivity: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Geographic sensitivity". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: declarations
+    attributes:
+      label: "Declarations"
+      description: |
+        Confirm each declaration. They cover the repository, libraries, models and data.
+      options:
+        - label: "I declare that the repository and version information above is complete and accurate."
+          required: true
+        - label: "I declare that every third-party library involved is listed above or in `pyproject.toml`, and that its licence is compatible with the [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)."
+          required: true
+        - label: "I declare that every model involved is listed above together with its provenance, licence and [model card](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md) status."
+          required: true
+        - label: "I declare that I have the right to use every dataset involved and that any data I attach may be published in this public repository."
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## AI usage declaration
+
+        Declare whether AI systems, as defined in [EU AI Act Article 3(1)](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3), were used to prepare this model zoo issue. AI assistance is allowed, but it must be disclosed so reviewers can calibrate their review and so the project can meet the transparency expectations of [EU AI Act Article 50](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50).
+
+  - type: dropdown
+    id: ai-used
+    attributes:
+      label: "Use of AI"
+      description: |
+        Select how much of this model zoo issue, including code, text, logs and analysis, was produced with the help of an AI system.
+      options:
+        - "No AI system was used"
+        - "Minor: spelling, grammar or translation only"
+        - "Partial: some sections or code were drafted with AI"
+        - "Substantial: most of the content was drafted with AI"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-used-other
+    attributes:
+      label: "Use of AI: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Use of AI". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ai-tool-types
+    attributes:
+      label: "Types of AI tools used"
+      description: |
+        Select every type of AI tool used.
+      multiple: true
+      options:
+        - "Not applicable, no AI used"
+        - "Code completion in an editor"
+        - "Chat-based general-purpose language model assistant"
+        - "Agentic coding assistant that edits files or runs commands"
+        - "Machine translation"
+        - "Image or diagram generation"
+        - "Log, trace or data analysis tool"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-tool-types-other
+    attributes:
+      label: "Types of AI tools used: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Types of AI tools used". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: input
+    id: ai-tool-names
+    attributes:
+      label: "AI tool names, versions and providers"
+      description: |
+        Name each AI tool, its model or version and its provider. Write `N/A` if no AI was used.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai-parts
+    attributes:
+      label: "Parts produced with AI assistance"
+      description: |
+        Select every part that was produced or substantially changed with AI assistance.
+      multiple: true
+      options:
+        - "Not applicable, no AI used"
+        - "Problem description or summary"
+        - "Reproduction steps or example code"
+        - "Analysis of logs or errors"
+        - "Source code"
+        - "Tests"
+        - "Documentation text"
+        - "Translation"
+        - "Diagrams or images"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-parts-other
+    attributes:
+      label: "Parts produced with AI assistance: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Parts produced with AI assistance". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ai-review
+    attributes:
+      label: "Human review of AI output"
+      description: |
+        Describe the human review applied to AI generated content before submission.
+      options:
+        - "Not applicable, no AI used"
+        - "Every line reviewed, understood and verified by me"
+        - "Reviewed and verified by running tests or reproductions"
+        - "Partially reviewed"
+        - "Not reviewed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-review-other
+    attributes:
+      label: "Human review of AI output: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Human review of AI output". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ai-input-data
+    attributes:
+      label: "Data provided to AI tools"
+      description: |
+        Declare what data you entered into AI tools. Entering personal data into a third-party AI service is processing under [GDPR Article 4(2)](https://gdpr-info.eu/art-4-gdpr/) and may be a transfer under [GDPR Article 44](https://gdpr-info.eu/art-44-gdpr/).
+      multiple: true
+      options:
+        - "Not applicable, no AI used"
+        - "Only public information"
+        - "Proprietary code or data, with permission of the owner"
+        - "Personal data"
+        - "Confidential data without explicit permission"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-input-data-other
+    attributes:
+      label: "Data provided to AI tools: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Data provided to AI tools". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ai-rights
+    attributes:
+      label: "Rights to AI generated output"
+      description: |
+        Declare whether the terms of the AI tools allow you to submit their output under the [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/) and whether the output may reproduce third-party code.
+      options:
+        - "Not applicable, no AI used"
+        - "Tool terms grant me the rights needed and I checked the output for copied third-party code"
+        - "Tool terms grant me the rights needed, but I did not check for copied code"
+        - "Not sure"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-rights-other
+    attributes:
+      label: "Rights to AI generated output: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Rights to AI generated output". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: ai-verification
+    attributes:
+      label: "Verification of AI generated claims"
+      description: |
+        Declare how factual and technical claims produced with AI (for example API behaviour, benchmark numbers, legal statements) were verified.
+      options:
+        - "Not applicable, no AI used"
+        - "Verified against source code, documentation or primary sources"
+        - "Verified by running the code"
+        - "Not verified"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: ai-verification-other
+    attributes:
+      label: "Verification of AI generated claims: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Verification of AI generated claims". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: ai-details
+    attributes:
+      label: "Additional AI disclosure details"
+      description: |
+        Describe anything reviewers should know about AI assistance, for example prompts that shaped the design or content that was AI generated and not modified. Write `N/A` if no AI was used.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: ai-attestation
+    attributes:
+      label: "AI usage attestation"
+      description: |
+        Confirm each statement.
+      options:
+        - label: "The AI usage answers above are complete and accurate."
+          required: true
+        - label: "I did not use AI to fabricate logs, stack traces, benchmark results, test results or citations."
+          required: true
+        - label: "I take full responsibility for the content, whether or not AI assisted in producing it."
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Regulatory classification
+
+        Unbihexium is distributed as free and open-source software. Obligations under the regulations below mostly fall on those who deploy it or place products built with it on the market. Answer for your own use. The full texts are the [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng) and the [EU AI Act](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng); every answer links to the relevant article.
+
+  - type: dropdown
+    id: gdpr-role
+    attributes:
+      label: "Role under the GDPR"
+      description: |
+        Select your role for any personal data processing involved, as defined in [GDPR Article 4(7) and 4(8)](https://gdpr-info.eu/art-4-gdpr/) and [Article 26](https://gdpr-info.eu/art-26-gdpr/).
+      options:
+        - "No personal data processed"
+        - "Controller"
+        - "Processor"
+        - "Joint controller"
+        - "Data subject"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: gdpr-role-other
+    attributes:
+      label: "Role under the GDPR: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Role under the GDPR". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: gdpr-basis
+    attributes:
+      label: "Lawful basis for processing"
+      description: |
+        Select the lawful basis under [GDPR Article 6(1)](https://gdpr-info.eu/art-6-gdpr/) for any processing of personal data in your use of Unbihexium.
+      options:
+        - "Not applicable, no personal data processed"
+        - "Article 6(1)(a) consent"
+        - "Article 6(1)(b) performance of a contract"
+        - "Article 6(1)(c) legal obligation"
+        - "Article 6(1)(d) vital interests"
+        - "Article 6(1)(e) public interest or official authority"
+        - "Article 6(1)(f) legitimate interests"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: gdpr-basis-other
+    attributes:
+      label: "Lawful basis for processing: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Lawful basis for processing". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: gdpr-dpia
+    attributes:
+      label: "Data protection impact assessment"
+      description: |
+        Declare the status of a DPIA under [GDPR Article 35](https://gdpr-info.eu/art-35-gdpr/). A DPIA is typically required for systematic monitoring of publicly accessible areas on a large scale.
+      options:
+        - "Not required, no high-risk processing"
+        - "Completed"
+        - "Planned"
+        - "Not assessed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: gdpr-dpia-other
+    attributes:
+      label: "Data protection impact assessment: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Data protection impact assessment". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: aia-role
+    attributes:
+      label: "Role under the EU AI Act"
+      description: |
+        Select your role as defined in [EU AI Act Article 3](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3) and [Article 25](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-25).
+      options:
+        - "Not placing on the market or putting into service any AI system"
+        - "Provider (Article 3(3))"
+        - "Deployer (Article 3(4))"
+        - "Importer (Article 3(6))"
+        - "Distributor (Article 3(7))"
+        - "Product manufacturer integrating an AI system (Article 25(3))"
+        - "Authorised representative (Article 3(5))"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: aia-role-other
+    attributes:
+      label: "Role under the EU AI Act: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Role under the EU AI Act". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: aia-risk
+    attributes:
+      label: "EU AI Act classification of your use"
+      description: |
+        Classify the AI system in which you use Unbihexium. See [Article 2](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2) for the exclusions, [Article 5](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5) for prohibited practices, [Article 6](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6) and [Annex III](https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3) for high-risk systems and [Article 50](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50) for transparency obligations.
+      options:
+        - "No AI system involved"
+        - "Excluded: exclusively military, defence or national security (Article 2(3))"
+        - "Excluded: scientific research and development only (Article 2(6))"
+        - "Excluded: research, testing or development before market placement (Article 2(8))"
+        - "Minimal risk"
+        - "Transparency obligations apply (Article 50)"
+        - "High-risk under Article 6(2) and Annex III"
+        - "High-risk under Article 6(1) as a safety component"
+        - "Not yet assessed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: aia-risk-other
+    attributes:
+      label: "EU AI Act classification of your use: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "EU AI Act classification of your use". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: aia-annex3
+    attributes:
+      label: "Annex III area"
+      description: |
+        If your system is high-risk, select the area listed in [Annex III](https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3).
+      options:
+        - "Not high-risk"
+        - "Point 1: biometrics"
+        - "Point 2: critical infrastructure"
+        - "Point 3: education and vocational training"
+        - "Point 4: employment and workers management"
+        - "Point 5: access to essential private and public services"
+        - "Point 6: law enforcement"
+        - "Point 7: migration, asylum and border control management"
+        - "Point 8: administration of justice and democratic processes"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: aia-annex3-other
+    attributes:
+      label: "Annex III area: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Annex III area". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: end-use
+    attributes:
+      label: "Intended end use"
+      description: |
+        Select every intended end use of your work with Unbihexium.
+      multiple: true
+      options:
+        - "Civil research"
+        - "Commercial civil use"
+        - "Public sector civil use"
+        - "Environmental monitoring"
+        - "Humanitarian or disaster response"
+        - "Defence or military"
+        - "Law enforcement"
+        - "Border surveillance"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: end-use-other
+    attributes:
+      label: "Intended end use: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Intended end use". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: export-status
+    attributes:
+      label: "Export control assessment"
+      description: |
+        Declare the export control status of your use. Most published open-source code is not subject to the EAR under [15 CFR 734.7](https://www.ecfr.gov/current/title-15/section-734.7), but end-use controls in [Regulation (EU) 2021/821 Article 4](https://eur-lex.europa.eu/eli/reg/2021/821/oj/eng#art_4) and [EAR Part 744](https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-744) still apply.
+      options:
+        - "No export involved"
+        - "Assessed, no licence required"
+        - "Assessed, licence obtained"
+        - "Not assessed"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: export-status-other
+    attributes:
+      label: "Export control assessment: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Export control assessment". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: frameworks
+    attributes:
+      label: "Frameworks and standards applied"
+      description: |
+        Select every AI governance or security framework applied in your use.
+      multiple: true
+      options:
+        - "No framework applied"
+        - "NIST AI Risk Management Framework 1.0"
+        - "ISO/IEC 42001 AI management system"
+        - "ISO/IEC 23894 AI risk management"
+        - "ISO/IEC 27001 information security"
+        - "OECD AI Principles"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: frameworks-other
+    attributes:
+      label: "Frameworks and standards applied: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Frameworks and standards applied". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Regulatory confirmations
+
+        Confirm every statement. Each link opens the exact article or section it refers to.
+
+  - type: checkboxes
+    id: confirm-gdpr
+    attributes:
+      label: "GDPR confirmations (Regulation (EU) 2016/679)"
+      description: |
+        Applies to any processing of personal data. Full text: [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng).
+      options:
+        - label: "My processing follows the principles in [Article 5](https://gdpr-info.eu/art-5-gdpr/), including data minimisation and purpose limitation."
+          required: true
+        - label: "Any processing has a lawful basis under [Article 6](https://gdpr-info.eu/art-6-gdpr/) and, for special categories, a condition under [Article 9](https://gdpr-info.eu/art-9-gdpr/)."
+          required: true
+        - label: "Data subjects are informed as required by [Articles 13 and 14](https://gdpr-info.eu/art-13-gdpr/) and automated decisions follow [Article 22](https://gdpr-info.eu/art-22-gdpr/)."
+          required: true
+        - label: "I apply data protection by design and by default under [Article 25](https://gdpr-info.eu/art-25-gdpr/) and security measures under [Article 32](https://gdpr-info.eu/art-32-gdpr/)."
+          required: true
+        - label: "I carry out a DPIA where required by [Article 35](https://gdpr-info.eu/art-35-gdpr/)."
+          required: true
+        - label: "International transfers of personal data comply with [Chapter V, Articles 44 to 49](https://gdpr-info.eu/art-44-gdpr/)."
+          required: true
+        - label: "This model zoo issue contains no personal data of third parties."
+          required: true
+
+  - type: checkboxes
+    id: confirm-aia
+    attributes:
+      label: "EU AI Act confirmations (Regulation (EU) 2024/1689)"
+      description: |
+        Applies to AI systems placed on the market, put into service or used in the EU. Full text: [EU AI Act](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng).
+      options:
+        - label: "I do not use Unbihexium for any prohibited practice listed in [Article 5](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5), including untargeted scraping for facial recognition databases and real-time remote biometric identification."
+          required: true
+        - label: "If my system is high-risk under [Article 6](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-6) and [Annex III](https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3), I meet the requirements of [Articles 9 to 15](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-9)."
+          required: true
+        - label: "As a deployer I follow [Article 26](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26), including human oversight, and carry out a fundamental rights impact assessment under [Article 27](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27) where required."
+          required: true
+        - label: "I meet the transparency obligations of [Article 50](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50) where they apply."
+          required: true
+        - label: "Staff dealing with the AI system have sufficient AI literacy as required by [Article 4](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4)."
+          required: true
+        - label: "I understand that the free and open-source exemptions in [Article 2(12)](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-2) and [Article 53(2)](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-53) do not cover high-risk or prohibited uses."
+          required: true
+
+  - type: checkboxes
+    id: confirm-security
+    attributes:
+      label: "Cyber security and product liability confirmations"
+      description: |
+        Covers the [Cyber Resilience Act](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng), the [NIS2 Directive](https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng) and the [Product Liability Directive](https://eur-lex.europa.eu/eli/dir/2024/2853/oj/eng).
+      options:
+        - label: "I report vulnerabilities privately through a [security advisory](https://github.com/unbihexium-oss/unbihexium/security/advisories/new) following [SECURITY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md), consistent with the coordinated vulnerability handling of [CRA Article 13](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng#art_13) and [Article 14](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng#art_14)."
+          required: true
+        - label: "If I place a product with digital elements that includes Unbihexium on the EU market, I meet the manufacturer obligations of [CRA Article 13](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng#art_13) and the essential requirements of CRA Annex I."
+          required: true
+        - label: "I understand the role of open-source software stewards under [CRA Article 24](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng#art_24)."
+          required: true
+        - label: "If my organisation is an essential or important entity, I apply the risk management measures of [NIS2 Article 21](https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng#art_21) and the reporting obligations of [NIS2 Article 23](https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng#art_23)."
+          required: true
+        - label: "I understand that free and open-source software supplied outside a commercial activity is excluded by [Product Liability Directive Article 2(2)](https://eur-lex.europa.eu/eli/dir/2024/2853/oj/eng#art_2) and that the software is provided without warranty under [MPL-2.0 Sections 6 and 7](https://www.mozilla.org/en-US/MPL/2.0/)."
+          required: true
+
+  - type: checkboxes
+    id: confirm-export
+    attributes:
+      label: "Export control and sanctions confirmations"
+      description: |
+        Geospatial analytics and object detection can be dual-use.
+      options:
+        - label: "I comply with [Regulation (EU) 2021/821](https://eur-lex.europa.eu/eli/reg/2021/821/oj/eng), including authorisation requirements in [Article 3](https://eur-lex.europa.eu/eli/reg/2021/821/oj/eng#art_3), end-use controls in [Article 4](https://eur-lex.europa.eu/eli/reg/2021/821/oj/eng#art_4) and cyber-surveillance controls in [Article 5](https://eur-lex.europa.eu/eli/reg/2021/821/oj/eng#art_5)."
+          required: true
+        - label: "I comply with EU restrictive measures, including [Regulation (EU) No 833/2014](https://eur-lex.europa.eu/eli/reg/2014/833/oj/eng), [Article 2](https://eur-lex.europa.eu/eli/reg/2014/833/oj/eng#art_2) on dual-use goods and technology."
+          required: true
+        - label: "I comply with the US Export Administration Regulations, including [15 CFR 734.7](https://www.ecfr.gov/current/title-15/section-734.7) on published information and the end-use and end-user controls in [15 CFR Part 744](https://www.ecfr.gov/current/title-15/subtitle-B/chapter-VII/subchapter-C/part-744)."
+          required: true
+        - label: "I comply with US sanctions administered under [31 CFR Chapter V](https://www.ecfr.gov/current/title-31/subtitle-B/chapter-V)."
+          required: true
+
+  - type: checkboxes
+    id: confirm-data
+    attributes:
+      label: "Geospatial data, open data and copyright confirmations"
+      description: |
+        Covers the terms under which Earth observation and geospatial data may be used.
+      options:
+        - label: "I use Copernicus data in line with [Regulation (EU) 2021/696 Article 55](https://eur-lex.europa.eu/eli/reg/2021/696/oj/eng#art_55) and [Delegated Regulation (EU) No 1159/2013](https://eur-lex.europa.eu/eli/reg_del/2013/1159/oj/eng), including attribution."
+          required: true
+        - label: "I respect access limitations on spatial data sets under [INSPIRE Directive Article 13](https://eur-lex.europa.eu/eli/dir/2007/2/oj/eng#art_13)."
+          required: true
+        - label: "I respect the conditions for re-use of public sector data under [Open Data Directive Article 14](https://eur-lex.europa.eu/eli/dir/2019/1024/oj/eng#art_14) and [Implementing Regulation (EU) 2023/138](https://eur-lex.europa.eu/eli/reg_impl/2023/138/oj/eng) on high-value datasets."
+          required: true
+        - label: "Any text and data mining for model training respects [DSM Directive Articles 3 and 4](https://eur-lex.europa.eu/eli/dir/2019/790/oj/eng#art_4), including rights reservations under Article 4(3)."
+          required: true
+
+  - type: checkboxes
+    id: confirm-privacy-other
+    attributes:
+      label: "Other privacy law confirmations"
+      description: |
+        Covers telemetry and privacy regimes outside the GDPR.
+      options:
+        - label: "Any telemetry or storage of information on user devices complies with [ePrivacy Directive Article 5(3)](https://eur-lex.europa.eu/eli/dir/2002/58/oj/eng#art_5); Unbihexium telemetry is opt-in as described in [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md)."
+          required: true
+        - label: "For processing subject to UK law I comply with the [UK GDPR](https://www.legislation.gov.uk/eur/2016/679/article/5) and the [Data Protection Act 2018](https://www.legislation.gov.uk/ukpga/2018/12/contents)."
+          required: true
+        - label: "For consumers in California I comply with the CCPA as amended by the CPRA, including [Civil Code 1798.100](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100), [1798.105](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.105) and [1798.120](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.120)."
+          required: true
+
+  - type: checkboxes
+    id: confirm-licence
+    attributes:
+      label: "Licence confirmations (MPL-2.0)"
+      description: |
+        Unbihexium is licensed under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). The project copy is [LICENSE.txt](https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt).
+      options:
+        - label: "I have read the licence grants in [MPL-2.0 Section 2](https://www.mozilla.org/en-US/MPL/2.0/)."
+          required: true
+        - label: "When I distribute Covered Software in source or executable form I meet [MPL-2.0 Sections 3.1 and 3.2](https://www.mozilla.org/en-US/MPL/2.0/), and for Larger Works [Section 3.3](https://www.mozilla.org/en-US/MPL/2.0/)."
+          required: true
+        - label: "I keep the licence notices and the third-party notices in [NOTICE](https://github.com/unbihexium-oss/unbihexium/blob/main/NOTICE) and [THIRD_PARTY_NOTICES.md](https://github.com/unbihexium-oss/unbihexium/blob/main/THIRD_PARTY_NOTICES.md)."
+          required: true
+        - label: "I understand the disclaimer of warranty and limitation of liability in [MPL-2.0 Sections 6 and 7](https://www.mozilla.org/en-US/MPL/2.0/)."
+          required: true
+
+  - type: checkboxes
+    id: confirm-project
+    attributes:
+      label: "Project policy confirmations"
+      description: |
+        Covers the policies of this repository and of GitHub.
+      options:
+        - label: "I follow the [Code of Conduct](https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md)."
+          required: true
+        - label: "I have read [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md), [COMPLIANCE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/COMPLIANCE.md) and [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md)."
+          required: true
+        - label: "This model zoo issue complies with the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)."
+          required: true
+
+  - type: textarea
+    id: compliance-notes
+    attributes:
+      label: "Compliance notes"
+      description: |
+        Add anything relevant to the declarations and confirmations above, for example jurisdiction-specific constraints or pending assessments. Write `N/A` if there is nothing to add.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Closing
+
+        Final details before you submit.
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: "Willingness to contribute"
+      description: |
+        Select how you can help resolve this model zoo issue.
+      options:
+        - "I will submit a pull request"
+        - "I can submit a pull request with guidance"
+        - "I can test a proposed fix or change"
+        - "I can provide additional data or information"
+        - "I cannot contribute further"
+        - "Other (specify in the next field)"
+    validations:
+      required: true
+
+  - type: input
+    id: contribute-other
+    attributes:
+      label: "Willingness to contribute: Other, please specify"
+      description: |
+        Complete this field only if you selected "Other (specify in the next field)" in "Willingness to contribute". Describe your answer precisely so maintainers do not need to ask a follow-up question.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional context"
+      description: |
+        Add any other context, screenshots or links that help maintainers handle this model zoo issue. Write `N/A` if there is nothing to add.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: final
+    attributes:
+      label: "Final confirmation"
+      description: |
+        Confirm each statement before submitting.
+      options:
+        - label: "The information in this model zoo issue is accurate and complete to the best of my knowledge."
+          required: true
+        - label: "I removed secrets, access tokens, credentials and internal host names."
+          required: true
+        - label: "I removed personal data and confidential information."
+          required: true
+        - label: "I wrote this submission in English."
+          required: true

@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/unbihexium-oss/unbihexium/security/advisories/new
+    about: Report vulnerabilities privately. Never open a public issue for a security problem.
+  - name: Support policy
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md
+    about: Support channels and response times.
+  - name: Documentation
+    url: https://github.com/unbihexium-oss/unbihexium/tree/main/docs
+    about: Guides, API reference, model zoo documentation and tutorials.
+  - name: Code of Conduct
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md
+    about: Rules for participating in this project.
