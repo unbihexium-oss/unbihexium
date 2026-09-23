@@ -108,8 +108,9 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --extra all \
 		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --extra all -o requirements-dev.txt" \
 		-o .requirements-dev.lock.tmp
-# Compile the hashed lock of the CI test environment (no PyTorch) into a temporary file.
-	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
+# Compile the hashed lock of the CI test environment (the dependencies of PyTorch, not
+# PyTorch itself) into a temporary file.
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
 		--custom-compile-command "make lock" \
 		-o .requirements-ci-test.lock.tmp
 # Compile the hashed lock of the CI tools into a temporary file.

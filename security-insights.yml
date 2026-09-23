@@ -132,8 +132,8 @@ repository:  # This repository.
     expression: MPL-2.0  # SPDX licence expression.
 
   # Releases are built by the Release workflow when a version tag is pushed,
-  # uploaded to PyPI, and attested with GitHub artifact attestations
-  # and SLSA provenance.
+  # uploaded to PyPI, signed with Sigstore and attested with GitHub artifact
+  # attestations, whose SLSA provenance is attached to the release.
   release:  # How releases are produced.
     changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md  # Release history.
     automated-pipeline: true  # Releases are built by a workflow, not by hand.
@@ -142,21 +142,22 @@ repository:  # This repository.
         predicate-uri: https://slsa.dev/provenance/v1  # In-toto predicate type of the attestation.
         location: https://github.com/unbihexium-oss/unbihexium/attestations  # Where the attestations are published.
         comment: |  # How the attestation is made and verified.
-          Created by actions/attest-build-provenance in the Release and SLSA
-          Provenance workflows for every file in dist/. Verify with
+          Created by actions/attest-build-provenance in the Release
+          workflow for every file in dist/. Verify with
           `gh attestation verify <file> --repo unbihexium-oss/unbihexium`.
-      - name: SLSA level 3 provenance  # Attestation name.
+      - name: SLSA provenance release asset  # Attestation name.
         predicate-uri: https://slsa.dev/provenance/v1  # In-toto predicate type of the attestation.
         location: https://github.com/unbihexium-oss/unbihexium/releases  # Where the attestations are published.
         comment: |  # How the attestation is made and verified.
-          Created by the slsa-framework/slsa-github-generator generic
-          generator and attached to each GitHub release as a .intoto.jsonl
-          file. Verify with slsa-verifier.
+          The DSSE envelope of the GitHub build provenance attestation,
+          attached to each GitHub release as unbihexium-<tag>.intoto.jsonl
+          next to the Sigstore bundles (.sigstore.json) of the
+          distributions.
     distribution-points:  # Where released artefacts can be obtained.
       - uri: pkg:pypi/unbihexium  # Package URL or web address.
         comment: Python Package Index, uploaded by the Release workflow  # What is published there.
       - uri: https://github.com/unbihexium-oss/unbihexium/releases  # Package URL or web address.
-        comment: GitHub releases with SHA256SUMS.txt and SLSA provenance  # What is published there.
+        comment: GitHub releases with SHA256SUMS.txt, Sigstore signatures and SLSA provenance  # What is published there.
       - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium  # Package URL or web address.
         comment: Container image on the GitHub Container Registry; the Docker workflow stores an SPDX SBOM of each pushed image as a workflow artifact  # What is published there.
     license:  # Licence of the released artefacts.

@@ -19,7 +19,8 @@
 # writes SHA256SUMS.txt, creates GitHub build provenance attestations for the
 # distributions, signs them with Sigstore (keyless, bound to this workflow
 # through its OIDC identity), creates the GitHub release with the
-# distributions, their .sigstore.json signature bundles, the checksum file
+# distributions, their .sigstore.json signature bundles, the signed SLSA
+# provenance as unbihexium-<tag>.intoto.jsonl, the checksum file
 # and generated release notes (categories in .github/release.yml), and
 # finally uploads the distributions to PyPI with the PYPI_API_TOKEN
 # repository secret. The distribution version is the static version in
@@ -31,9 +32,12 @@
 #     https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag> \
 #     <file>
 #
-# slsa.yml does not start for a release created here, because events caused
-# by the GITHUB_TOKEN do not start other workflows; the signature bundles are
-# the signed release artifacts (OpenSSF Scorecard, Signed-Releases).
+# The provenance comes from the GitHub artifact attestation of this job
+# (SLSA provenance v1, signed with Sigstore), so no separate provenance
+# workflow is needed; a workflow started by the release event would not run
+# anyway, because events caused by the GITHUB_TOKEN do not start other
+# workflows. The signature bundles and the provenance are the signed release
+# artifacts that OpenSSF Scorecard looks for (Signed-Releases).
 # =============================================================================
 
 name: Release  # Name shown in the Actions tab.
@@ -78,6 +82,7 @@ jobs:  # Jobs of the workflow.
           sha256sum -- * > ../checksums/SHA256SUMS.txt
 
       - name: Generate attestations  # Sign build provenance for the distributions.
+        id: provenance  # Identifier for reading the bundle path.
         uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f  # v3.2.0; Official attestation action.
         with:  # Inputs of the attestation action.
           subject-path: dist/*  # Attest every distribution file.
@@ -94,12 +99,23 @@ jobs:  # Jobs of the workflow.
         with:  # Inputs of the signing action.
           inputs: ./signed/*.tar.gz ./signed/*.whl  # Writes <file>.sigstore.json next to each distribution.
 
+      - name: Export the SLSA provenance  # Release asset in the in-toto JSON Lines format.
+        env:  # Inputs of the export.
+          BUNDLE: ${{ steps.provenance.outputs.bundle-path }}  # Sigstore bundle of the attestation.
+        run: |  # Shell script run by bash.
+          # The DSSE envelope of the bundle holds the signed SLSA provenance
+          # statement for every distribution, one envelope per line as in
+          # the .intoto.jsonl layout; verify the distributions themselves
+          # with gh attestation verify.
+          jq -c '.dsseEnvelope' "$BUNDLE" > "signed/unbihexium-${GITHUB_REF_NAME}.intoto.jsonl"
+
       - name: Create GitHub Release  # Publish the release page with its assets.
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2; Release creation action.
         with:  # Inputs of the release action.
           files: |  # Assets attached to the release, one pattern per line.
             dist/*
             signed/*.sigstore.json
+            signed/*.intoto.jsonl
             checksums/SHA256SUMS.txt
           generate_release_notes: true  # Build the notes from merged pull requests.
 
