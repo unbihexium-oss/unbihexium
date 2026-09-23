@@ -1,0 +1,22 @@
+# Codecov configuration for the coverage uploaded by .github/workflows/coverage.yml.
+coverage:
+  precision: 2
+  round: down
+  range: "60...90"
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+
+comment:
+  layout: "condensed_header, diff, flags, files"
+  require_changes: true
+
+ignore:
+  - "tests/**"
+  - "examples/**"
+  - "scripts/**"
+  - ".github/**"
