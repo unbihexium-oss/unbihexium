@@ -80,6 +80,7 @@ Where:
 
 ### Changed (Unreleased)
 
+- Contact address in package metadata, citation files, the container image, the Helm chart and the security, privacy, conduct and support policies changed to `yunus.z.imanov@helsinki.fi`
 - Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)
 - Added MPL-2.0 license headers to source files
 - Updated package metadata, model manifests, model cards, and notebooks to reference MPL-2.0
