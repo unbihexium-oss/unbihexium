@@ -849,7 +849,7 @@ uvicorn==0.53.0
     # via unbihexium (pyproject.toml)
 uvloop==0.22.1 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
     # via uvicorn
-virtualenv==21.11.0
+virtualenv==21.11.1
     # via
     #   pre-commit
     #   tox
