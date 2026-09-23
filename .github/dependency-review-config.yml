@@ -1,0 +1,30 @@
+# Configuration for actions/dependency-review-action in .github/workflows/security.yml.
+# Pull requests that add dependencies with known vulnerabilities of high or
+# critical severity, or with licences incompatible with the project licence
+# policy, fail the Dependency Review check.
+
+fail-on-severity: high
+fail-on-scopes:
+  - runtime
+  - development
+
+license-check: true
+deny-licenses:
+  - AGPL-1.0-only
+  - AGPL-1.0-or-later
+  - AGPL-3.0-only
+  - AGPL-3.0-or-later
+  - GPL-1.0-only
+  - GPL-1.0-or-later
+  - GPL-2.0-only
+  - GPL-2.0-or-later
+  - GPL-3.0-only
+  - GPL-3.0-or-later
+  - SSPL-1.0
+  - BUSL-1.1
+  - CC-BY-NC-4.0
+  - CC-BY-NC-SA-4.0
+  - CC-BY-NC-ND-4.0
+
+vulnerability-check: true
+warn-only: false
