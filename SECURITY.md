@@ -63,7 +63,7 @@ $$
 ## Reporting Vulnerabilities
 
 1. Do NOT create public issues for security vulnerabilities
-2. Email: <security@unbihexium.dev>
+2. Email: <yunus.z.imanov@helsinki.fi>
 3. Include: description, reproduction steps, impact assessment
 4. Response within 48 hours
 
