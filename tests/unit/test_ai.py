@@ -37,7 +37,6 @@ from unbihexium.ai.segmentation import (
 from unbihexium.ai.super_resolution import SuperResolution, SuperResolutionResult
 from unbihexium.core.raster import Raster
 
-
 # Fixtures
 
 

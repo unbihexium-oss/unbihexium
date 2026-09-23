@@ -34,7 +34,7 @@ RULES: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 # Files whose content is defined by a third party and must stay verbatim.
-EXCLUDED = {"LICENSE.txt", "LICENSES/MPL-2.0.txt"}
+EXCLUDED = {"LICENSE.txt"}
 
 
 def tracked_files() -> list[Path]:

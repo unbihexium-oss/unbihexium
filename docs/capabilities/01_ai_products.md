@@ -176,13 +176,13 @@ graph TB
         E2 --> E3[MaxPool + Conv Block 2: 2*base ch]
         E3 --> E4[MaxPool + Conv Block 3: 4*base ch]
     end
-    
+
     subgraph "Decoder Path"
         E4 --> D1[UpConv Block 1: 2*base ch]
         D1 --> D2[UpConv Block 2: base ch]
         D2 --> D3[Output Conv: C_out ch]
     end
-    
+
     E2 -.->| Skip Connection | D2
     E3 -.->| Skip Connection | D1
 ```
@@ -232,13 +232,13 @@ graph TB
         I2[Image T2: 3ch] --> C1
         C1 --> I3[Combined: 6ch]
     end
-    
+
     subgraph "Shared Encoder"
         I3 --> SE1[Conv Block 1: base ch]
         SE1 --> SE2[Conv Block 2: 2*base ch]
         SE2 --> SE3[Conv Block 3: 4*base ch]
     end
-    
+
     subgraph "Decoder"
         SE3 --> D1[UpConv Block 1: 2*base ch]
         D1 --> D2[UpConv Block 2: base ch]

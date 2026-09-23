@@ -1,10 +1,32 @@
-# Git and version control
+# =============================================================================
+# .dockerignore: files excluded from the Docker build context
+# =============================================================================
+#
+# The Dockerfile copies only these paths into the image:
+#   requirements.txt, pyproject.toml, README.md, LICENSE.txt, NOTICE,
+#   NOTICE.md and src/
+#
+# Everything else is excluded to keep the build context small, the layer cache
+# stable and secrets, credentials and data out of the image. Do not exclude
+# any of the paths listed above: the build fails without them.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Version control and repository automation
+# -----------------------------------------------------------------------------
 .git
 .gitignore
 .gitattributes
+.mailmap
+.github/
+.gitlab-ci.yml
+.pre-commit-config.yaml
 
-# Python artifacts
-__pycache__
+# -----------------------------------------------------------------------------
+# Python bytecode, build output and packaging artefacts
+# -----------------------------------------------------------------------------
+__pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -24,15 +46,39 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual environments
-.env
+# -----------------------------------------------------------------------------
+# Virtual environments and local environment files
+# -----------------------------------------------------------------------------
 .venv/
-env/
 venv/
+env/
 ENV/
+.env
+.env.*
+!.env.example
 
-# IDE and editors
+# -----------------------------------------------------------------------------
+# Tool caches and reports
+# -----------------------------------------------------------------------------
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.lycheecache
+.cache/
+
+# -----------------------------------------------------------------------------
+# Editors, IDEs and operating system files
+# -----------------------------------------------------------------------------
 .idea/
 .vscode/
 *.swp
@@ -41,68 +87,83 @@ ENV/
 .project
 .pydevproject
 .settings/
-
-# Testing and coverage
-.tox/
-.nox/
-.coverage
-.coverage.*
-htmlcov/
-.pytest_cache/
-.hypothesis/
-
-# Documentation build
-docs/_build/
-site/
-
-# Jupyter notebooks checkpoints
-.ipynb_checkpoints/
-
-# OS files
 .DS_Store
 Thumbs.db
 
-# Large files
+# -----------------------------------------------------------------------------
+# Documentation sources (not needed at runtime)
+# -----------------------------------------------------------------------------
+docs/
+site/
+*.md
+# README.md and NOTICE.md are package metadata (readme and licence file
+# in pyproject.toml), so the build needs them.
+!README.md
+!NOTICE.md
+
+# -----------------------------------------------------------------------------
+# Development, test and example content
+# -----------------------------------------------------------------------------
+tests/
+examples/
+scripts/
+benchmarks/
+artifacts/
+deploy/
+Makefile
+tox.ini
+requirements-dev.txt
+codecov.yml
+.yamllint.yml
+.markdownlint.yaml
+.editorconfig
+
+# -----------------------------------------------------------------------------
+# Model zoo and data. Model weights are downloaded into the cache at runtime
+# and verified with SHA256; they are never baked into the image.
+# -----------------------------------------------------------------------------
+model_zoo/
 *.pt
 *.pth
 *.onnx
+*.onnx.data
+*.safetensors
 *.weights
 *.h5
+*.hdf5
 *.pkl
 *.joblib
-
-# Data files
+*.npy
 *.tif
 *.tiff
+*.nc
+*.zarr/
 *.geojson
 *.shp
 *.gpkg
-*.zarr/
+*.parquet
 
-# Logs
-*.log
-logs/
-
-# Secrets
-.env.local
-.env.*.local
+# -----------------------------------------------------------------------------
+# Secrets and credentials. Never send these to the Docker daemon.
+# -----------------------------------------------------------------------------
 secrets/
 *.pem
 *.key
+*.p12
+*.pfx
+*.crt
+.netrc
+.pypirc
+.aws/
+.azure/
+.config/gcloud/
 
-# Temporary files
+# -----------------------------------------------------------------------------
+# Logs and temporary files
+# -----------------------------------------------------------------------------
+*.log
+logs/
 tmp/
 temp/
 *.tmp
-
-# CI/CD
-.github/
-.gitlab-ci.yml
-
-# Development files
-Makefile
-scripts/
-tests/
-examples/
-benchmarks/
-artifacts/
+*.bak

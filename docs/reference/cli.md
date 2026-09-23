@@ -12,11 +12,11 @@ graph TB
     A --> C[infer]
     A --> D[pipeline]
     A --> E[data]
-    
+
     B --> B1[list]
     B --> B2[download]
     B --> B3[info]
-    
+
     D --> D1[run]
     D --> D2[validate]
 ```

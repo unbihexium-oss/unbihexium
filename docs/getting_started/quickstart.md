@@ -16,7 +16,7 @@ sequenceDiagram
     participant CLI
     participant Pipeline
     participant Model
-    
+
     User->>CLI: unbihexium infer
     CLI->>Pipeline: Load config
     Pipeline->>Model: Load ONNX

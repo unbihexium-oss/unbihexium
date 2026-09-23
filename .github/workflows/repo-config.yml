@@ -58,9 +58,6 @@ jobs:
       - name: Dependabot
         run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
 
-      - name: Read the Docs
-        run: check-jsonschema --builtin-schema vendor.readthedocs .readthedocs.yaml
-
       - name: Citation File Format
         run: check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff
 

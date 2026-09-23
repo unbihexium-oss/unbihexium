@@ -328,7 +328,7 @@ dtm = dtm_pipeline.run("dsm.tif")
 # Calculate Canopy Height Model
 with rasterio.open("dsm.tif") as dsm_src:
     dsm_data = dsm_src.read(1)
-    
+
 with rasterio.open("dtm.tif") as dtm_src:
     dtm_data = dtm_src.read(1)
 

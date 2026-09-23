@@ -7,8 +7,6 @@ documentation:
           - "docs/**"
           - "examples/**"
           - "**/*.md"
-          - "mkdocs.yml"
-          - ".readthedocs.yaml"
 
 model-zoo:
   - changed-files:
@@ -64,7 +62,6 @@ compliance:
           - "CITATION.md"
           - "codemeta.json"
           - "REUSE.toml"
-          - "LICENSES/**"
           - "RESPONSIBLE_USE.md"
 
 security:

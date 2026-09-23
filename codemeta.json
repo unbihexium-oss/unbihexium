@@ -1,20 +1,55 @@
 {
   "@context": "https://w3id.org/codemeta/3.0",
   "@type": "SoftwareSourceCode",
+  "@id": "https://github.com/unbihexium-oss/unbihexium",
+  "identifier": "https://github.com/unbihexium-oss/unbihexium",
   "name": "Unbihexium",
-  "description": "Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library",
+  "alternateName": "unbihexium",
+  "description": "Python library for Earth observation, geospatial analysis, remote sensing and synthetic aperture radar (SAR), with raster and vector input and output, spectral indices, SAR processing, terrain analysis, geostatistics, tiled inference pipelines, a command line interface, a REST service and a model zoo of 130 capabilities in four size variants.",
   "version": "1.0.1",
+  "softwareVersion": "1.0.1",
   "license": "https://spdx.org/licenses/MPL-2.0",
+  "isAccessibleForFree": true,
+  "url": "https://unbihexium.org",
   "codeRepository": "https://github.com/unbihexium-oss/unbihexium",
   "issueTracker": "https://github.com/unbihexium-oss/unbihexium/issues",
-  "readme": "https://github.com/unbihexium-oss/unbihexium/blob/main/README.md",
   "continuousIntegration": "https://github.com/unbihexium-oss/unbihexium/actions",
+  "readme": "https://github.com/unbihexium-oss/unbihexium/blob/main/README.md",
+  "releaseNotes": "https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md",
+  "buildInstructions": "https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md",
+  "softwareHelp": [
+    {
+      "@type": "WebSite",
+      "name": "Documentation",
+      "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/docs"
+    },
+    {
+      "@type": "WebSite",
+      "name": "Support policy",
+      "url": "https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md"
+    },
+    {
+      "@type": "WebSite",
+      "name": "Example notebooks",
+      "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks"
+    }
+  ],
+  "downloadUrl": "https://pypi.org/project/unbihexium/#files",
+  "installUrl": "https://pypi.org/project/unbihexium/",
+  "relatedLink": [
+    "https://pypi.org/project/unbihexium/",
+    "https://github.com/unbihexium-oss/unbihexium/releases",
+    "https://github.com/unbihexium-oss/unbihexium/pkgs/container/unbihexium",
+    "https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md",
+    "https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml"
+  ],
   "developmentStatus": "https://www.repostatus.org/#active",
   "datePublished": "2025-12-18",
   "dateModified": "2026-09-23",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "Python",
+    "version": "3.10, 3.11, 3.12, 3.13, 3.14",
     "url": "https://www.python.org/"
   },
   "runtimePlatform": [
@@ -30,11 +65,18 @@
     "Windows"
   ],
   "applicationCategory": "Earth observation, geospatial analysis and remote sensing",
+  "applicationSubCategory": [
+    "Raster and vector input and output",
+    "Synthetic aperture radar processing",
+    "Terrain analysis and geostatistics",
+    "Machine learning inference for satellite imagery"
+  ],
   "keywords": [
     "earth-observation",
     "geospatial",
     "remote-sensing",
     "sar",
+    "synthetic-aperture-radar",
     "satellite-imagery",
     "gis",
     "machine-learning",
@@ -45,35 +87,77 @@
     "flood-mapping",
     "agriculture",
     "urban-planning",
-    "environmental-monitoring"
+    "environmental-monitoring",
+    "spectral-indices",
+    "geostatistics",
+    "onnx"
   ],
   "softwareRequirements": [
-    "numpy>=1.24.0",
-    "scipy>=1.11.0",
-    "rasterio>=1.3.0",
-    "shapely>=2.0.0",
-    "geopandas>=0.14.0",
-    "pyproj>=3.6.0",
-    "click>=8.1.0",
-    "rich>=13.0.0",
-    "pydantic>=2.5.0",
-    "pyyaml>=6.0.0",
-    "requests>=2.31.0",
-    "tqdm>=4.66.0",
-    "pillow>=10.0.0",
-    "scikit-learn>=1.3.0",
-    "scikit-image>=0.22.0"
+    "numpy>=2.2.6; python_version < '3.11'",
+    "numpy>=2.3.3; python_version >= '3.11'",
+    "scipy>=1.15.3; python_version < '3.11'",
+    "scipy>=1.16.2; python_version >= '3.11'",
+    "rasterio>=1.4.4",
+    "shapely>=2.1.2",
+    "geopandas>=1.1.2",
+    "pyproj>=3.7.1; python_version < '3.11'",
+    "pyproj>=3.7.2; python_version >= '3.11'",
+    "click>=8.3.3",
+    "rich>=14.1.0",
+    "pydantic>=2.12.0",
+    "pyyaml>=6.0.3",
+    "requests>=2.33.0",
+    "tqdm>=4.67.1",
+    "pillow>=12.3.0",
+    "scikit-learn>=1.7.2",
+    "scikit-image>=0.25.2; python_version < '3.11'",
+    "scikit-image>=0.26.0; python_version >= '3.11'"
+  ],
+  "softwareSuggestions": [
+    "onnxruntime>=1.23.2,<1.24; python_version < '3.11'",
+    "onnxruntime>=1.24.1; python_version >= '3.11'",
+    "torch>=2.13.0",
+    "torchvision>=0.28.0",
+    "fastapi>=0.133.0",
+    "starlette>=1.3.1",
+    "uvicorn[standard]>=0.37.0",
+    "python-multipart>=0.0.31",
+    "dask[complete]>=2025.9.1",
+    "ray>=2.56.0",
+    "zarr>=2.18.3; python_version < '3.11'",
+    "zarr>=3.1.4; python_version >= '3.11'",
+    "numcodecs>=0.13.1; python_version < '3.11'",
+    "numcodecs>=0.16.4; python_version >= '3.11'",
+    "netCDF4>=1.7.2",
+    "h5py>=3.15.0",
+    "pystac>=1.14.1",
+    "pystac-client>=0.9.0",
+    "pyarrow>=23.0.1",
+    "cupy-cuda12x>=14.0.0"
   ],
   "author": [
     {
       "@type": "Organization",
+      "@id": "https://github.com/unbihexium-oss",
       "name": "Unbihexium OSS Foundation",
       "email": "opensource@unbihexium.org"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://github.com/olaflaitinen",
+      "givenName": "Olaf Yunus",
+      "familyName": "Laitinen Imanov",
+      "email": "yunus.z.imanov@helsinki.fi",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "University of Helsinki"
+      }
     }
   ],
   "maintainer": [
     {
       "@type": "Person",
+      "@id": "https://github.com/olaflaitinen",
       "givenName": "Olaf Yunus",
       "familyName": "Laitinen Imanov",
       "email": "yunus.z.imanov@helsinki.fi",

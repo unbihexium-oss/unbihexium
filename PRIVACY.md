@@ -20,7 +20,7 @@ flowchart LR
     A[User Data] --> B[Local Processing]
     B --> C[Model Inference]
     C --> D[Results]
-    
+
     E[Telemetry] -.-> F[Optional Analytics]
 ```
 

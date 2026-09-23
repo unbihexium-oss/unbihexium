@@ -11,7 +11,7 @@ flowchart TB
     A[Unbihexium] --> B[Open Source]
     A --> C[Export Control]
     A --> D[Data Protection]
-    
+
     B --> E[MPL-2.0]
     C --> F[EAR Review]
     D --> G[GDPR Alignment]

@@ -23,7 +23,6 @@ from unbihexium.analysis.network import AccessibilityResult, NetworkAnalyzer, Ro
 from unbihexium.analysis.suitability import AHP, WeightedOverlay
 from unbihexium.analysis.zonal import ZonalStatistics
 
-
 # Network Analysis Tests
 
 

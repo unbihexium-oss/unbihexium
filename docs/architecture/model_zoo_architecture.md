@@ -13,19 +13,19 @@ graph TB
         A2[Remote Registry]
         A3[GitHub Releases]
     end
-    
+
     subgraph "Model Manager"
         B1[Discovery]
         B2[Download]
         B3[Verification]
         B4[Loading]
     end
-    
+
     subgraph "Runtime"
         C1[ONNX Session]
         C2[Inference]
     end
-    
+
     A2 --> B1
     B1 --> B2
     B2 --> A1
@@ -70,7 +70,7 @@ sequenceDiagram
     participant Manager
     participant Cache
     participant Hash
-    
+
     User->>Manager: Load model
     Manager->>Cache: Check cache
     Cache-->>Manager: Model found

@@ -8,7 +8,7 @@ body:
       value: |
         ## About this documentation issue
 
-        Use this form for problems in the documentation website, README, notebooks, docstrings or model cards.
+        Use this form for problems in the documentation under docs/, the README, notebooks, docstrings or model cards.
 
         **How to complete this form**
 
@@ -93,7 +93,7 @@ body:
       description: |
         Give the URL of the page. Write `N/A` for missing documentation.
       placeholder: |
-        https://unbihexium.org/docs/getting_started/installation/
+        https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/installation.md
     validations:
       required: true
 
@@ -264,7 +264,6 @@ body:
       description: |
         Select where you read the documentation.
       options:
-        - "Documentation website"
         - "GitHub web interface"
         - "Notebook"
         - "IDE tooltip or help()"

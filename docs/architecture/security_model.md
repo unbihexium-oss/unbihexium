@@ -13,19 +13,19 @@ graph TB
         A2[Output Sanitization]
         A3[Error Handling]
     end
-    
+
     subgraph "Supply Chain"
         B1[Dependency Scanning]
         B2[SBOM Generation]
         B3[Signature Verification]
     end
-    
+
     subgraph "Model Security"
         C1[SHA256 Integrity]
         C2[Provenance Tracking]
         C3[Access Control]
     end
-    
+
     A1 --> A2 --> A3
     B1 --> B2 --> B3
     C1 --> C2 --> C3

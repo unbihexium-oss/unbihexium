@@ -1,29 +1,141 @@
+# =============================================================================
+# pre-commit configuration
+# https://pre-commit.com/
+# =============================================================================
+#
+# Setup (once per clone):
+#   python -m pip install pre-commit
+#   pre-commit install
+#
+# The hooks then run on the staged files at every commit. To run them on the
+# whole repository, as CI does:
+#   pre-commit run --all-files
+#
+# Update the pinned hook versions:
+#   pre-commit autoupdate
+#
+# The hooks mirror the checks in .github/workflows/, so a commit that passes
+# them locally passes the corresponding CI jobs. Hook versions reviewed in
+# September 2026.
+# =============================================================================
+
+minimum_pre_commit_version: "4.3.0"
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+
+# Generated model zoo artefacts (weights, configs, manifests and checksums
+# written by scripts/), licence texts and generated lock files are not
+# modified by any hook. Regenerate them with their scripts instead.
+exclude: |
+  (?x)^(
+    model_zoo/assets/.*|
+    model_zoo/manifests/.*|
+    model_zoo/checksums\.txt|
+    LICENSE\.txt|
+    requirements(-dev)?\.txt
+  )$
+
 repos:
+  # ---------------------------------------------------------------------------
+  # Generic file hygiene
+  # ---------------------------------------------------------------------------
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      # Kubernetes manifests hold several documents per file. Helm templates
+      # are Go templates, not YAML, until they are rendered.
       - id: check-yaml
-      - id: check-added-large-files
-        args: ['--maxkb=500']
-      - id: check-merge-conflict
+        args: [--allow-multiple-documents]
+        exclude: ^deploy/helm/.*/templates/
       - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+      - id: debug-statements
 
+  # ---------------------------------------------------------------------------
+  # Python: lint and format with ruff (settings in pyproject.toml)
+  # ---------------------------------------------------------------------------
+  # Scoped to the package and its tests, as in the CI lint job. Example
+  # notebooks and code blocks in Markdown are illustrative and keep their
+  # hand-written layout.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.9
+    rev: v0.16.8
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--fix]
+        files: ^(src|tests)/
+        types_or: [python, pyi]
       - id: ruff-format
+        files: ^(src|tests)/
+        types_or: [python, pyi]
 
+  # ---------------------------------------------------------------------------
+  # Python: security linting with bandit (settings in pyproject.toml)
+  # ---------------------------------------------------------------------------
+  # The hook blocks on high severity findings. The Security workflow and
+  # `make security` report every severity level.
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.6
+    rev: 1.9.4
     hooks:
       - id: bandit
-        args: ["-c", "pyproject.toml", "-r", "src/"]
+        args: ["-c", "pyproject.toml", "-r", "src/", "--severity-level", "high"]
         additional_dependencies: ["bandit[toml]"]
+        pass_filenames: false
 
+  # ---------------------------------------------------------------------------
+  # YAML, Markdown and GitHub Actions
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict, --config-file, .yamllint.yml]
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.49.1
+    hooks:
+      - id: markdownlint
+        args: [--config, .markdownlint.yaml]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.38.1
+    hooks:
+      - id: check-github-workflows
+      - id: check-dependabot
+      - id: check-compose-spec
+
+  # ---------------------------------------------------------------------------
+  # Licensing: REUSE compliance (REUSE.toml)
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v6.2.0
+    hooks:
+      # REUSE expects the licence text in LICENSES/; the repository keeps it
+      # only in LICENSE.txt, so the hook lints against a git-ignored copy.
+      - id: reuse-lint-file
+        entry: >-
+          sh -c 'mkdir -p LICENSES && cp LICENSE.txt LICENSES/MPL-2.0.txt &&
+          reuse "$@"' --
+
+  # ---------------------------------------------------------------------------
+  # Repository policies (.github/scripts/)
+  # ---------------------------------------------------------------------------
   - repo: local
     hooks:
       - id: text-policy
@@ -32,3 +144,16 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: license-headers
+        name: MPL-2.0 notice in source files
+        entry: python .github/scripts/check_license_headers.py
+        language: system
+        pass_filenames: false
+        types_or: [python, shell]
+
+# Settings for the pre-commit.ci service, if it is enabled for the repository.
+ci:
+  autoupdate_schedule: monthly
+  autoupdate_commit_msg: "chore(pre-commit): update hook versions"
+  autofix_commit_msg: "style: apply pre-commit fixes"
+  skip: [text-policy, license-headers, actionlint]

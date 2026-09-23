@@ -1,37 +1,102 @@
-version: "3.9"
+# =============================================================================
+# Docker Compose: local deployment of the Unbihexium REST API
+# =============================================================================
+#
+# Usage
+#   docker compose up --build            start the API on http://localhost:8000
+#   docker compose up --build -d         start in the background
+#   docker compose logs -f api           follow the logs
+#   docker compose down                  stop and remove the containers
+#   docker compose down --volumes        also delete the model cache volume
+#
+#   OpenAPI documentation: http://localhost:8000/docs
+#   Health endpoint:       http://localhost:8000/health
+#
+# GPU
+#   The `gpu` profile adds a service with an NVIDIA GPU reservation. It needs
+#   the NVIDIA Container Toolkit on the host and an image that contains a CUDA
+#   build of the inference backend:
+#     docker compose --profile gpu up --build api-gpu
+#
+# Configuration
+#   Variables are read from an optional .env file next to this file; see
+#   .env.example for every supported variable. The top-level `version` key is
+#   obsolete in the Compose Specification and is therefore not set.
+#
+# Reference: https://docs.docker.com/reference/compose-file/
+# =============================================================================
+
+name: unbihexium
+
+x-api-common: &api-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: ghcr.io/unbihexium-oss/unbihexium:local
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    PYTHONUNBUFFERED: "1"
+    UNBIHEXIUM_HOME: /home/unbihexium
+    UNBIHEXIUM_CACHE: /home/unbihexium/.cache/unbihexium
+  command:
+    - uvicorn
+    - unbihexium.serving.app:app
+    - --host
+    - 0.0.0.0
+    - --port
+    - "8000"
+    - --proxy-headers
+  volumes:
+    - unbihexium-cache:/home/unbihexium/.cache/unbihexium
+  healthcheck:
+    test:
+      - CMD
+      - python
+      - -c
+      - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"
+    interval: 30s
+    timeout: 10s
+    start_period: 20s
+    retries: 3
+  restart: unless-stopped
+  # Hardening: no privilege escalation, no Linux capabilities and a read-only
+  # root file system. Only the model cache volume and /tmp are writable.
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  read_only: true
+  tmpfs:
+    - /tmp
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 services:
-  unbihexium-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: unbihexium-oss/unbihexium:latest
+  api:
+    <<: *api-common
     container_name: unbihexium-api
     ports:
       - "8000:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
-      - UNBIHEXIUM_HOME=/home/unbihexium
-    volumes:
-      - unbihexium-cache:/home/unbihexium/.cache/unbihexium
-    healthcheck:
-      test: ["CMD", "python", "-c", "import unbihexium"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-    command: uvicorn examples.serving.api:app --host 0.0.0.0 --port 8000
-  # Optional: Add GPU support
-  # unbihexium-gpu:
-  #   extends:
-  #     service: unbihexium-api
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
+
+  api-gpu:
+    <<: *api-common
+    container_name: unbihexium-api-gpu
+    profiles:
+      - gpu
+    ports:
+      - "8001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 volumes:
   unbihexium-cache:

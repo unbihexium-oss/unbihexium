@@ -354,7 +354,7 @@ validator = MetadataValidator(standard="iso19115")
 
 with rasterio.open("imagery.tif") as src:
     metadata = src.tags()
-    
+
 validation_result = validator.validate(metadata)
 
 print(f"Metadata completeness: {validation_result['completeness']:.1f}%")

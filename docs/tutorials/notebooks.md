@@ -30,25 +30,25 @@ graph TB
         D3[Vehicle Detector]
         D4[Aircraft Detector]
     end
-    
+
     subgraph "Segmentation (12 notebooks)"
         S1[Water Surface Detector]
         S2[Road Network Analyzer]
         S3[Cloud Mask]
     end
-    
+
     subgraph "Change Detection (12 notebooks)"
         C1[Change Detector]
         C2[Deforestation Detector]
         C3[Urban Growth Assessor]
     end
-    
+
     subgraph "Classification (17 notebooks)"
         CL1[LULC Classifier]
         CL2[Crop Classifier]
         CL3[Site Suitability]
     end
-    
+
     subgraph "Regression (66 notebooks)"
         R1[NDVI Calculator]
         R2[DEM Generator]

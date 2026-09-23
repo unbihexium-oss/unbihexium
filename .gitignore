@@ -1,12 +1,25 @@
-# Byte-compiled / optimized / DLL files
+# =============================================================================
+# .gitignore: files that must never be committed
+# =============================================================================
+#
+# Organised by origin. Patterns follow gitignore(5):
+#   https://git-scm.com/docs/gitignore
+#
+# Notes
+#   - Model weights (*.onnx, *.pt) under model_zoo/ are committed through Git
+#     LFS and are therefore NOT ignored (see .gitattributes).
+#   - .env.example is committed on purpose; real .env files are ignored.
+#   - Test fixtures under tests/fixtures/ are committed even when their file
+#     type is ignored elsewhere.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Python: bytecode, extensions and packaging
+# -----------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -25,132 +38,104 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
-# PyInstaller
 *.manifest
 *.spec
-
-# Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+# -----------------------------------------------------------------------------
+# Virtual environments and environment files
+# -----------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+__pypackages__/
+.env
+.env.*
+!.env.example
+*.local.yaml
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
+# pyenv and uv interpreter pins are local choices; the supported versions are
+# defined in pyproject.toml.
 .python-version
 
-# pipenv
+# Other package managers. The project lock files are requirements*.txt.
 Pipfile.lock
-
-# poetry
 poetry.lock
-
-# pdm
+uv.lock
+pdm.lock
 .pdm.toml
 .pdm-python
 .pdm-build/
 
-# PEP 582
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
+# -----------------------------------------------------------------------------
+# Tests, coverage and tool caches
+# -----------------------------------------------------------------------------
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+htmlcov/
+nosetests.xml
+.hypothesis/
+.pytest_cache/
+cover/
+.cache/
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Pyre type checker
 .pyre/
-
-# pytype static type analyzer
 .pytype/
-
-# Cython debug symbols
+.ruff_cache/
+.pyright/
+.lycheecache
 cython_debug/
+.requirements*.tmp
+.requirements*.orig
 
-# VS Code
+# Copy of LICENSE.txt that `make licence`, `tox -e licence` and the License
+# Compliance workflow create for `reuse lint`. The repository keeps a single
+# licence text, LICENSE.txt, at the root.
+/LICENSES/
+
+# -----------------------------------------------------------------------------
+# Documentation build output
+# -----------------------------------------------------------------------------
+/site/
+docs/_build/
+
+# -----------------------------------------------------------------------------
+# Jupyter and IPython
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# -----------------------------------------------------------------------------
+# Editors, IDEs and operating systems
+# -----------------------------------------------------------------------------
 .vscode/
-
-# PyCharm
 .idea/
+.spyderproject
+.spyproject
+.ropeproject
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Model weights - allow model_zoo assets
-# Large model files are tracked via Git LFS
-# *.pt
-# *.pth
-# *.onnx
-# *.safetensors
-
-# Large data files
+# -----------------------------------------------------------------------------
+# Geospatial and scientific data. Large inputs and outputs are kept out of
+# Git; small test fixtures are allowed explicitly.
+# -----------------------------------------------------------------------------
 *.tif
 *.tiff
 *.nc
@@ -159,24 +144,35 @@ cython_debug/
 *.zarr/
 !tests/fixtures/**/*.tif
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Local configuration
-.env.local
-*.local.yaml
-
-# Model zoo cache
+# Model zoo download cache used by unbihexium.zoo during development.
 .unbihexium_cache/
 
-# Temporary files
+# -----------------------------------------------------------------------------
+# Secrets and credentials
+# -----------------------------------------------------------------------------
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+.netrc
+.pypirc
+
+# -----------------------------------------------------------------------------
+# Logs and temporary files
+# -----------------------------------------------------------------------------
+*.log
+logs/
 *.tmp
 *.temp
 *.bak
-
-# Ruff cache
-.ruff_cache/
-
-# Pre-commit
 .pre-commit-config.yaml.bak
+
+# -----------------------------------------------------------------------------
+# Web framework defaults that some examples may create
+# -----------------------------------------------------------------------------
+instance/
+.webassets-cache
+local_settings.py
+db.sqlite3
+db.sqlite3-journal

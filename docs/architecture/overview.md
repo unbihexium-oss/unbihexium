@@ -15,47 +15,47 @@ graph TB
         A2[Python API]
         A3[REST API]
     end
-    
+
     subgraph "Orchestration Layer"
         B1[Pipeline Orchestrator]
         B2[Task Scheduler]
         B3[Resource Manager]
     end
-    
+
     subgraph "Core Services"
         C1[Capability Registry]
         C2[Model Zoo Manager]
         C3[Data Loader]
         C4[Inference Engine]
     end
-    
+
     subgraph "Processing Layer"
         D1[Tiling Engine]
         D2[Preprocessing]
         D3[Postprocessing]
         D4[Georeferencing]
     end
-    
+
     subgraph "Storage Layer"
         E1[Model Cache]
         E2[Result Store]
         E3[Config Store]
     end
-    
+
     A1 --> B1
     A2 --> B1
     A3 --> B1
-    
+
     B1 --> C1
     B1 --> C2
     B2 --> C3
     B3 --> C4
-    
+
     C4 --> D1
     D1 --> D2
     D2 --> D3
     D3 --> D4
-    
+
     C2 --> E1
     D4 --> E2
     B1 --> E3
@@ -116,7 +116,7 @@ sequenceDiagram
     participant R as Registry
     participant M as Model Zoo
     participant I as Inference
-    
+
     U->>P: run(config)
     P->>R: resolve_capability()
     R->>M: get_model(id, variant)

@@ -1,17 +1,43 @@
-# yamllint configuration used by the Repository Config workflow.
+# =============================================================================
+# yamllint configuration
+# https://yamllint.readthedocs.io/en/stable/configuration.html
+# =============================================================================
+#
+# Used by the Repository Config workflow (.github/workflows/repo-config.yml),
+# the pre-commit hook and `make yaml-lint`, always in strict mode, so warnings
+# fail as well as errors.
+# =============================================================================
+
 extends: default
 
+# Helm templates contain Go template expressions and are not valid YAML
+# before rendering.
 ignore: |
   deploy/helm/*/templates/
 
 rules:
+  # Long URLs, descriptions and shell commands in workflows cannot be wrapped
+  # without changing their meaning.
   line-length: disable
+
+  # A leading "---" document marker is optional and not used in this
+  # repository.
   document-start: disable
+
+  # GitHub Actions uses the key "on", which YAML 1.1 treats as a boolean.
+  # Only values are checked.
   truthy:
     check-keys: false
+
+  # Allow a single space between code and an inline comment, as written by
+  # most editors and by Dependabot.
   comments:
     min-spaces-from-content: 1
+
+  # Comments may be indented to explain the following block.
   comments-indentation: disable
+
+  # Sequences may be indented or not, but consistently within a file.
   indentation:
     spaces: consistent
     indent-sequences: whatever

@@ -39,7 +39,6 @@ from unbihexium.sar.polarimetry import (
     pauli_decomposition,
 )
 
-
 # Fixtures
 
 

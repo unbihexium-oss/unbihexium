@@ -90,6 +90,12 @@ def write_zarr(
     else:
         comp = Blosc(cname="lz4", clevel=5)
 
+    open_kwargs: dict[str, Any] = {}
+    if int(zarr.__version__.split(".")[0]) >= 3:
+        # zarr 3 accepts numcodecs compressors only for the version 2 storage
+        # format, which zarr 2 can read as well.
+        open_kwargs["zarr_format"] = 2
+
     z = zarr.open(
         str(path),
         mode="w",
@@ -97,6 +103,7 @@ def write_zarr(
         chunks=chunks,
         dtype=data.dtype,
         compressor=comp,
+        **open_kwargs,
     )
     z[:] = data
 

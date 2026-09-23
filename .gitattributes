@@ -1,21 +1,62 @@
-# Normalise line endings of all text files to LF in the repository.
+# =============================================================================
+# .gitattributes: line endings, binary files, Git LFS and GitHub linguist
+# https://git-scm.com/docs/gitattributes
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Line endings
+# Store every text file with LF line endings in the repository, whatever the
+# platform of the contributor. Git detects binary files automatically.
+# -----------------------------------------------------------------------------
 * text=auto eol=lf
 
-# Model weights are stored with Git LFS.
+# -----------------------------------------------------------------------------
+# Diff drivers: show the enclosing function or heading in diff hunks.
+# -----------------------------------------------------------------------------
+*.py diff=python
+*.md diff=markdown
+*.bash diff=bash
+*.sh diff=bash
+
+# -----------------------------------------------------------------------------
+# Git LFS: model weights
+# Every model variant under model_zoo/assets/ stores its ONNX and PyTorch
+# weights in Git LFS. Run `git lfs install` before cloning to download them;
+# without Git LFS the files are small pointer files whose oid is verified
+# against model.sha256 by .github/scripts/check_model_zoo.py.
+# -----------------------------------------------------------------------------
 *.onnx filter=lfs diff=lfs merge=lfs -text
 *.pt filter=lfs diff=lfs merge=lfs -text
 *.pth filter=lfs diff=lfs merge=lfs -text
 *.safetensors filter=lfs diff=lfs merge=lfs -text
 
-# Other binary files tracked directly.
+# -----------------------------------------------------------------------------
+# Binary files tracked directly in Git
+# -----------------------------------------------------------------------------
 *.onnx.data binary
 *.npy binary
+*.npz binary
 *.png binary
 *.jpg binary
+*.jpeg binary
+*.gif binary
 *.tif binary
+*.tiff binary
+*.ico binary
+*.pdf binary
 
-# Keep generated and documentation content out of the language statistics.
+# -----------------------------------------------------------------------------
+# GitHub linguist
+# Keep documentation, notebooks, model cards and licence texts out of the
+# language statistics so that the repository is classified as Python.
+# -----------------------------------------------------------------------------
 examples/notebooks/*.ipynb linguist-documentation
 model_zoo/cards/** linguist-documentation
 docs/** linguist-documentation
-LICENSES/** linguist-vendored
+requirements*.txt linguist-generated
+
+# -----------------------------------------------------------------------------
+# git archive: exclude repository automation from source archives
+# -----------------------------------------------------------------------------
+.github/ export-ignore
+.pre-commit-config.yaml export-ignore

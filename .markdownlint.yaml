@@ -1,0 +1,39 @@
+# =============================================================================
+# markdownlint configuration
+# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+# =============================================================================
+#
+# Used by the Markdown workflow (.github/workflows/markdown.yml), the
+# pre-commit hook and `make md-lint`. Every rule is enabled by default; the
+# rules below are disabled because they conflict with how the documentation is
+# written. Each exception states the reason.
+# =============================================================================
+
+# Enable every rule that is not listed below.
+default: true
+
+# MD012 no-multiple-blanks: generated documents and model cards separate
+# sections with more than one blank line.
+MD012: false
+
+# MD013 line-length: prose is not hard-wrapped; editors wrap long lines.
+MD013: false
+
+# MD024 no-duplicate-heading: model cards and capability documents repeat the
+# same sub-headings (for example "Inputs" and "Outputs") in every section.
+MD024: false
+
+# MD033 no-inline-html: the README uses HTML for centred badges and images.
+MD033: false
+
+# MD037 no-space-in-emphasis: LaTeX formulas such as $a * b * c$ look like
+# emphasis with spaces to the parser.
+MD037: false
+
+# MD041 first-line-heading: the pull request template and some generated files
+# start with an HTML comment instead of a heading.
+MD041: false
+
+# MD060 table-column-style: tables are aligned for readability in the source,
+# not to a single column style.
+MD060: false

@@ -51,6 +51,13 @@ jobs:
       - name: Install reuse
         run: python -m pip install reuse
 
+      # The repository keeps a single licence text, LICENSE.txt. REUSE
+      # expects it under LICENSES/, so the check works on a copy.
+      - name: Provide the licence text where REUSE expects it
+        run: |
+          mkdir -p LICENSES
+          cp LICENSE.txt LICENSES/MPL-2.0.txt
+
       - name: Check that every file has copyright and licence information
         run: reuse lint
 
