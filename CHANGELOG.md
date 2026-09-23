@@ -44,6 +44,13 @@ Where:
 
 ### Added (Unreleased)
 
+- Model zoo rebuilt around a single catalogue (`src/unbihexium/zoo/catalog.yaml`) of 130 model families in four variants (520 models), with inputs, outputs, units, required training labels and suitable data for every family
+- Trainable architectures for every task: CenterNet detector, U-Net for segmentation, change detection, dense regression and enhancement, a pooled encoder for scene regression, an EDSR-style super-resolution network, and exact spectral index modules
+- Deterministic, platform-independent starter weights generated from the model id, with published SHA-256 digests of all 520 models and verification on load
+- Safe checkpoints loaded with `torch.load(weights_only=True)`, ONNX export verified against ONNX Runtime, and a local model store under `$UNBIHEXIUM_CACHE`
+- `python -m unbihexium.zoo.sync` to generate the digests, manifests, model cards and inventory from the catalogue, and a JSON Schema for the manifests
+- Model Zoo workflow that checks the generated files and rebuilds the models to prove that their digests are reproducible
+- Python documentation style check (`.github/scripts/check_python_style.py`) for the converted directories
 - Official support for Python 3.13 and 3.14; Python 3.10 through 3.14 are now supported and tested in CI
 - Python version support policy in VERSIONING.md
 - Issue forms for bug reports, feature requests, documentation, model zoo, performance, compliance, build and questions, each with about 95 mandatory questions, an AI usage declaration and regulatory confirmations
@@ -60,12 +67,16 @@ Where:
 
 ### Removed (Unreleased)
 
+- Model weights stored in Git LFS under `model_zoo/assets/`, the 520 per-variant model cards and their metrics, which were not the result of training or evaluation on real data
+- Placeholder model classes in `unbihexium.ai.models`, `unbihexium.ai.change_detection`, `unbihexium.ai.super_resolution` and `unbihexium.ai.synthesis`, and the model zoo `cache` and `downloader` modules
 - MkDocs site configuration (`mkdocs.yml`), the Read the Docs configuration and the documentation deployment workflow; the documentation is maintained as Markdown under `docs/`
 - The `docs` extra from `pyproject.toml`
 - `yamllint` and `reuse` from the `dev` extra, because their GPL-3.0-or-later licence is denied by the dependency licence policy; they run in isolated pre-commit and tox environments
 
 ### Fixed (Unreleased)
 
+- `unbihexium.ai` could not be imported because the `super_resolution` module and package had the same name
+- The model zoo registry referenced a task that does not exist and failed on import
 - Invalid YAML in `.github/FUNDING.yml`
 - SLSA provenance workflow, which called the reusable generator as a step and could not run
 - Release workflow wrote `SHA256SUMS.txt` into `dist/`, which would have made the PyPI upload fail
