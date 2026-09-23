@@ -61,6 +61,22 @@ model_name_variant_vX.Y.Z
 
 ---
 
+## Python Version Support
+
+Unbihexium supports every CPython release that is still maintained upstream. Support for a Python version is dropped in the first minor release after that version reaches its upstream end of life.
+
+| Version | Release Date | Support Status | Bug-Fix Support Ends | End of Life (EOL) |
+| --------- | -------------- | ---------------- | ---------------------- | ------------------- |
+| 3.14 | 2025-10-07 | Bug-fix support | 2027-10-01 | 2030-10-31 |
+| 3.13 | 2024-10-07 | Bug-fix support | 2026-10-01 | 2029-10-31 |
+| 3.12 | 2023-10-02 | Security-only | 2025-04-02 | 2028-10-31 |
+| 3.11 | 2022-10-24 | Security-only | 2024-04-01 | 2027-10-31 |
+| 3.10 | 2021-10-04 | Security-only | 2023-04-05 | 2026-10-31 |
+
+Every supported version is tested in CI on each pull request.
+
+---
+
 ## Deprecation Policy
 
 1. Features are marked deprecated in MINOR releases
