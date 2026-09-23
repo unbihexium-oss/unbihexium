@@ -61,7 +61,7 @@ $$
 
 ## Reporting
 
-Email: <conduct@unbihexium.dev>
+Email: <yunus.z.imanov@helsinki.fi>
 
 Reports handled confidentially within 72 hours.
 

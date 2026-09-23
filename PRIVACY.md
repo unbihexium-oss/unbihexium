@@ -52,7 +52,7 @@ $$
 
 ## Contact
 
-Privacy inquiries: <privacy@unbihexium.dev>
+Privacy inquiries: <yunus.z.imanov@helsinki.fi>
 
 ## Updates
 

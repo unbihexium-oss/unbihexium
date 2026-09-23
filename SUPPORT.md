@@ -49,7 +49,7 @@ Use provided templates for:
 
 ## Commercial Support
 
-Enterprise support available. Contact: <enterprise@unbihexium.dev>
+Enterprise support available. Contact: <yunus.z.imanov@helsinki.fi>
 
 ## Community Guidelines
 
