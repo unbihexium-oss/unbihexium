@@ -1,0 +1,147 @@
+# OpenSSF Security Insights, specification 2.0.0
+# https://github.com/ossf/security-insights
+header:
+  schema-version: 2.0.0
+  last-updated: '2026-09-23'
+  last-reviewed: '2026-09-23'
+  url: https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml
+  comment: |
+    Security posture of the Unbihexium repository. Update last-updated and
+    last-reviewed whenever the security process or tooling changes.
+
+project:
+  name: Unbihexium
+  homepage: https://github.com/unbihexium-oss/unbihexium
+  funding: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/FUNDING.yml
+  roadmap: https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md
+  administrators:
+    - name: Olaf Yunus Laitinen Imanov
+      affiliation: Unbihexium OSS Foundation
+      email: yunus.z.imanov@helsinki.fi
+      social: https://github.com/olaflaitinen
+      primary: true
+  documentation:
+    quickstart-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/quickstart.md
+    detailed-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/index.md
+    code-of-conduct: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md
+    release-process: https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md
+    support-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md
+  repositories:
+    - name: unbihexium
+      url: https://github.com/unbihexium-oss/unbihexium
+      comment: |
+        Library, command line interface, REST service, model zoo and documentation.
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    contact:
+      name: Unbihexium maintainers
+      email: yunus.z.imanov@helsinki.fi
+      primary: true
+    policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md
+    comment: |
+      Report vulnerabilities privately through GitHub private vulnerability
+      reporting at https://github.com/unbihexium-oss/unbihexium/security/advisories/new.
+
+repository:
+  url: https://github.com/unbihexium-oss/unbihexium
+  status: active
+  bug-fixes-only: false
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  no-third-party-packages: false
+  core-team:
+    - name: Olaf Yunus Laitinen Imanov
+      affiliation: Unbihexium OSS Foundation
+      email: yunus.z.imanov@helsinki.fi
+      social: https://github.com/olaflaitinen
+      primary: true
+  documentation:
+    contributing-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md
+    review-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md
+    security-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md
+    governance: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md
+    dependency-management-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/dependency-review-config.yml
+  license:
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
+    expression: MPL-2.0
+  release:
+    changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md
+    automated-pipeline: true
+    attestations:
+      - name: Build provenance
+        predicate-uri: https://slsa.dev/provenance/v1
+        location: https://github.com/unbihexium-oss/unbihexium/attestations
+        comment: GitHub artifact attestations created by the Release and SLSA Provenance workflows.
+    distribution-points:
+      - uri: pkg:pypi/unbihexium
+        comment: Python Package Index
+      - uri: https://github.com/unbihexium-oss/unbihexium/releases
+        comment: GitHub releases with SHA256SUMS.txt and SLSA provenance
+      - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium
+        comment: Container image on the GitHub Container Registry
+    license:
+      url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
+      expression: MPL-2.0
+  security:
+    assessments:
+      self:
+        comment: |
+          No formal security self-assessment has been published yet.
+    tools:
+      - name: Dependabot
+        type: SCA
+        rulesets:
+          - built-in
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+      - name: Bandit
+        type: SAST
+        rulesets:
+          - built-in
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+      - name: pip-audit
+        type: SCA
+        rulesets:
+          - built-in
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+      - name: Dependency Review
+        type: SCA
+        rulesets:
+          - .github/dependency-review-config.yml
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+      - name: TruffleHog
+        type: secret
+        rulesets:
+          - built-in
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+      - name: Grype
+        type: container
+        rulesets:
+          - built-in
+        integration:
+          adhoc: true
+          ci: true
+          release: false
+      - name: OpenSSF Scorecard
+        type: other
+        rulesets:
+          - built-in
+        integration:
+          adhoc: true
+          ci: true
+          release: false
