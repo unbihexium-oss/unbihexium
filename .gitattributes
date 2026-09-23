@@ -1,21 +1,50 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# .gitattributes: line endings, binary files, Git LFS and GitHub linguist
-# https://git-scm.com/docs/gitattributes
+# Project     : Unbihexium
+# File        : .gitattributes
+# Title       : Line endings, binary files, Git LFS and GitHub linguist
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Git attributes, read by Git, Git LFS and GitHub linguist
+# =============================================================================
+#
+# Abstract
+# --------
+# Assigns Git attributes to paths (https://git-scm.com/docs/gitattributes):
+# the line ending normalisation, the diff drivers, the files stored in Git
+# LFS, the files treated as binary, the linguist classification used for the
+# GitHub language statistics and the paths left out of `git archive`.
+#
+# When several patterns match a path, the later line wins for each attribute.
+# Git reads a `#` only at the start of a line as a comment, so every comment
+# stands on its own line above the pattern it explains. Check the effect of a
+# change with `git check-attr -a -- <path>`.
 # =============================================================================
 
 # -----------------------------------------------------------------------------
 # Line endings
+# -----------------------------------------------------------------------------
+
 # Store every text file with LF line endings in the repository, whatever the
 # platform of the contributor. Git detects binary files automatically.
-# -----------------------------------------------------------------------------
 * text=auto eol=lf
 
 # -----------------------------------------------------------------------------
 # Diff drivers: show the enclosing function or heading in diff hunks.
 # -----------------------------------------------------------------------------
+
+# Show the enclosing Python function or class in hunk headers.
 *.py diff=python
+# Show the enclosing Markdown heading in hunk headers.
 *.md diff=markdown
+# Show the enclosing shell function in hunk headers for Bash scripts.
 *.bash diff=bash
+# Show the enclosing shell function in hunk headers for POSIX scripts.
 *.sh diff=bash
 
 # -----------------------------------------------------------------------------
@@ -25,24 +54,41 @@
 # that are committed anyway, for example fine-tuned checkpoints, are stored
 # in Git LFS instead of the Git history.
 # -----------------------------------------------------------------------------
+
+# Store ONNX models in Git LFS and never merge or diff them as text.
 *.onnx filter=lfs diff=lfs merge=lfs -text
+# Store PyTorch checkpoints in Git LFS.
 *.pt filter=lfs diff=lfs merge=lfs -text
+# Store PyTorch state dictionaries in Git LFS.
 *.pth filter=lfs diff=lfs merge=lfs -text
+# Store safetensors weight files in Git LFS.
 *.safetensors filter=lfs diff=lfs merge=lfs -text
 
 # -----------------------------------------------------------------------------
 # Binary files tracked directly in Git
 # -----------------------------------------------------------------------------
+
+# External tensor data of large ONNX models.
 *.onnx.data binary
+# NumPy arrays saved with numpy.save.
 *.npy binary
+# Compressed NumPy archives saved with numpy.savez.
 *.npz binary
+# PNG images in the documentation and tests.
 *.png binary
+# JPEG images with the .jpg extension.
 *.jpg binary
+# JPEG images with the .jpeg extension.
 *.jpeg binary
+# GIF images.
 *.gif binary
+# GeoTIFF rasters with the .tif extension.
 *.tif binary
+# GeoTIFF rasters with the .tiff extension.
 *.tiff binary
+# Icons, for example the documentation favicon.
 *.ico binary
+# PDF documents.
 *.pdf binary
 
 # -----------------------------------------------------------------------------
@@ -50,13 +96,27 @@
 # Keep documentation, notebooks, model cards and licence texts out of the
 # language statistics so that the repository is classified as Python.
 # -----------------------------------------------------------------------------
+
+# Example notebooks count as documentation, not as Jupyter code.
 examples/notebooks/*.ipynb linguist-documentation
+# Model cards describe the model zoo and count as documentation.
 model_zoo/cards/** linguist-documentation
+# The documentation sources.
 docs/** linguist-documentation
+# Lock files written by `make lock` are generated and collapsed in diffs.
 requirements*.txt linguist-generated
 
 # -----------------------------------------------------------------------------
 # git archive: exclude repository automation from source archives
 # -----------------------------------------------------------------------------
+
+# Workflows and CI scripts are not needed to build or use the package.
 .github/ export-ignore
+# The pre-commit configuration is only used during development.
 .pre-commit-config.yaml export-ignore
+
+# =============================================================================
+# End of file .gitattributes
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
