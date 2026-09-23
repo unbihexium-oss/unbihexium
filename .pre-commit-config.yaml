@@ -46,7 +46,8 @@ exclude: |
     src/unbihexium/zoo/digests\.json|
     LICENSE\.txt|
     fuzz/corpus/.*|
-    requirements(-dev)?\.txt
+    requirements(-dev)?\.txt|
+    \.github/requirements/requirements-ci-.*\.txt
   )$
 
 repos:  # Hook repositories, each pinned to a released version.

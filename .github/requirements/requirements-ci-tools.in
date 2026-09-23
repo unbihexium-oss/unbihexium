@@ -1,0 +1,46 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/requirements/requirements-ci-tools.in
+# Title       : Input of the lock file of the CI tools
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : pip requirements, compiled by uv into requirements-ci-tools.txt
+# =============================================================================
+#
+# Abstract
+# --------
+# Linters, security scanners, build and licence tools that the GitHub
+# Actions workflows install. `make lock` compiles this file into
+# requirements-ci-tools.txt with a SHA-256 hash for every distribution, and
+# the workflows install it with `pip install --require-hashes`, so a job
+# only ever runs the reviewed files (OpenSSF Scorecard, Pinned-Dependencies).
+#
+# Versions that also appear in .pre-commit-config.yaml are pinned here to
+# the same release, so that CI and the local hooks agree.
+# =============================================================================
+
+ruff==0.16.8  # Linter and formatter; same release as the pre-commit hook.
+pyright  # Static type checker.
+bandit[toml]==1.9.4  # Security linter; same release as the pre-commit hook.
+pip-audit  # Known vulnerabilities in dependencies.
+build  # PEP 517 build frontend for the sdist and the wheel.
+twine  # Metadata check of the distributions.
+reuse==6.2.0  # REUSE licensing lint; same release as the pre-commit hook.
+pip-licenses  # Licences of the installed dependencies.
+check-jsonschema==0.38.1  # JSON Schema validation; same release as the pre-commit hook.
+yamllint==1.38.0  # YAML lint; same release as the pre-commit hook.
+pyyaml  # YAML parser for the repository scripts.
+jsonschema  # JSON Schema validation of the model manifests.
+nbformat  # Notebook format validation.
+
+# =============================================================================
+# End of file .github/requirements/requirements-ci-tools.in
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
