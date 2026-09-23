@@ -6,16 +6,23 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  id-token: write
-  attestations: write
+  contents: read
 
 jobs:
-  provenance:
-    name: Generate SLSA Provenance
+  build:
+    name: Build distributions
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -24,19 +31,36 @@ jobs:
 
       - name: Build package
         run: |
-          pip install build
+          python -m pip install build
           python -m build
 
-      - name: Generate SLSA Provenance
-        uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
-        with:
-          base64-subjects: |
-            $(sha256sum dist/* | base64 -w0)
-          upload-assets: true
-        continue-on-error: true
+      - name: Compute subject hashes
+        id: hash
+        run: |
+          cd dist
+          echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
-      - name: Generate attestation
+      - name: Generate GitHub build provenance attestation
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: dist/*
-        continue-on-error: true
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  provenance:
+    name: Generate SLSA Level 3 provenance
+    needs: build
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    # The SLSA generator must be referenced by its release tag, not by a commit SHA.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.build.outputs.hashes }}
+      upload-assets: ${{ github.event_name == 'release' }}
