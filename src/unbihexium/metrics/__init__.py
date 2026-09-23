@@ -1,225 +1,140 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/metrics/__init__.py
+# Title       : Accuracy assessment toolbox for map products
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy and SciPy
+# =============================================================================
+#
+# Abstract
+# --------
+# Accuracy and quality measures of Earth observation map products:
+#
+#   classification   error matrix, overall, producer's and user's accuracy,
+#                    kappa, F1, IoU, quantity and allocation disagreement
+#   area             unbiased area estimates and accuracies with confidence
+#                    intervals under stratified sampling (Olofsson et al.,
+#                    2014), sample allocation
+#   regression       bias, MAE, RMSE, unbiased RMSE, R^2 and correlation
+#   image_quality    PSNR, SSIM, SAM, ERGAS and the Q index
+#   change           change detection rates and class transition analysis
+#
+# Streaming metrics used during model training live in
+# unbihexium.ai.evaluation; PSNR and SSIM are shared with it.
+# Every error matrix has reference classes in rows and map classes in
+# columns.
+#
+# Usage
+# -----
+#   from unbihexium.metrics import confusion_matrix, stratified_area_estimate
+#   counts = confusion_matrix(reference_labels, map_labels, labels=[1, 2, 3])
+#   estimate = stratified_area_estimate(counts, mapped_area_ha)
+#   print(estimate.area, estimate.area_ci)
+# =============================================================================
 
-"""Evaluation metrics module.
+# Area estimation.
+from unbihexium.metrics.area import (
+    AreaEstimate,  # Result record.
+    estimated_error_matrix,  # Population proportions.
+    sample_allocation,  # Stratum sample sizes.
+    stratified_area_estimate,  # Olofsson et al. (2014) estimator.
+)  # End of the area imports.
 
-This module provides functions for computing common evaluation
-metrics for geospatial AI models.
-"""
+# Change detection.
+from unbihexium.metrics.change import (
+    change_detection_metrics,  # Binary change accuracy.
+    change_map,  # Changed pixels.
+    transition_matrix,  # From-to counts.
+    transition_summary,  # Gain, loss, net change and swap.
+)  # End of the change imports.
 
-from __future__ import annotations
+# Thematic accuracy.
+from unbihexium.metrics.classification import (
+    AccuracyAssessment,  # Result record.
+    accuracy,  # Fraction of equal labels.
+    accuracy_assessment,  # Measures of an error matrix.
+    cohen_kappa,  # Kappa.
+    confusion_matrix,  # Error matrix.
+    dice,  # Dice coefficient.
+    f1_score,  # Binary F1.
+    iou,  # Binary IoU.
+    mean_iou,  # Mean IoU over classes.
+    precision,  # Binary precision.
+    recall,  # Binary recall.
+)  # End of the classification imports.
 
-import numpy as np
-from numpy.typing import NDArray
+# Image quality.
+from unbihexium.metrics.image_quality import (
+    calculate_ergas,  # Alias of ergas.
+    calculate_qindex,  # Alias of q_index.
+    calculate_sam,  # Alias of sam.
+    ergas,  # Relative global error.
+    psnr,  # Peak signal-to-noise ratio.
+    q_index,  # Universal image quality index.
+    sam,  # Mean spectral angle.
+    spectral_angle,  # Per-pixel spectral angle.
+    ssim,  # Structural similarity.
+)  # End of the image quality imports.
 
+# Continuous errors.
+from unbihexium.metrics.regression import (
+    bias,  # Mean error.
+    mae,  # Mean absolute error.
+    pearson_r,  # Correlation.
+    r_squared,  # Coefficient of determination.
+    regression_report,  # All statistics.
+    rmse,  # Root mean square error.
+    ubrmse,  # Unbiased RMSE.
+)  # End of the regression imports.
 
-def iou(pred: NDArray, target: NDArray, smooth: float = 1e-6) -> float:
-    """Compute Intersection over Union.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-        smooth: Smoothing factor
-
-    Returns:
-        IoU score
-    """
-    intersection = np.sum(pred * target)
-    union = np.sum(pred) + np.sum(target) - intersection
-    return (intersection + smooth) / (union + smooth)
-
-
-def dice(pred: NDArray, target: NDArray, smooth: float = 1e-6) -> float:
-    """Compute Dice coefficient.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-        smooth: Smoothing factor
-
-    Returns:
-        Dice score
-    """
-    intersection = np.sum(pred * target)
-    return (2 * intersection + smooth) / (np.sum(pred) + np.sum(target) + smooth)
-
-
-def precision(pred: NDArray, target: NDArray) -> float:
-    """Compute precision.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        Precision score
-    """
-    tp = np.sum(pred * target)
-    fp = np.sum(pred * (1 - target))
-    return tp / (tp + fp + 1e-8)
-
-
-def recall(pred: NDArray, target: NDArray) -> float:
-    """Compute recall.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        Recall score
-    """
-    tp = np.sum(pred * target)
-    fn = np.sum((1 - pred) * target)
-    return tp / (tp + fn + 1e-8)
-
-
-def f1_score(pred: NDArray, target: NDArray) -> float:
-    """Compute F1 score.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        F1 score
-    """
-    p = precision(pred, target)
-    r = recall(pred, target)
-    return 2 * p * r / (p + r + 1e-8)
-
-
-def accuracy(pred: NDArray, target: NDArray) -> float:
-    """Compute accuracy.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        Accuracy score
-    """
-    return np.mean(pred == target)
-
-
-def mean_iou(pred: NDArray, target: NDArray, num_classes: int) -> float:
-    """Compute mean IoU over classes.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-        num_classes: Number of classes
-
-    Returns:
-        Mean IoU score
-    """
-    ious = []
-    for c in range(num_classes):
-        pred_c = pred == c
-        target_c = target == c
-        if np.sum(target_c) > 0:
-            ious.append(iou(pred_c, target_c))
-    return np.mean(ious) if ious else 0.0
-
-
-def rmse(pred: NDArray, target: NDArray) -> float:
-    """Compute Root Mean Square Error.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        RMSE value
-    """
-    return np.sqrt(np.mean((pred - target) ** 2))
-
-
-def mae(pred: NDArray, target: NDArray) -> float:
-    """Compute Mean Absolute Error.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        MAE value
-    """
-    return np.mean(np.abs(pred - target))
-
-
-def r_squared(pred: NDArray, target: NDArray) -> float:
-    """Compute R-squared (coefficient of determination).
-
-    Args:
-        pred: Prediction array
-        target: Target array
-
-    Returns:
-        R-squared value
-    """
-    ss_res = np.sum((target - pred) ** 2)
-    ss_tot = np.sum((target - np.mean(target)) ** 2)
-    return 1 - (ss_res / (ss_tot + 1e-8))
-
-
-def psnr(pred: NDArray, target: NDArray, max_val: float = 1.0) -> float:
-    """Compute Peak Signal-to-Noise Ratio.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-        max_val: Maximum pixel value
-
-    Returns:
-        PSNR in dB
-    """
-    mse = np.mean((pred - target) ** 2)
-    return 10 * np.log10(max_val**2 / (mse + 1e-8))
-
-
-def ssim(pred: NDArray, target: NDArray, window_size: int = 11) -> float:
-    """Compute Structural Similarity Index.
-
-    Args:
-        pred: Prediction array
-        target: Target array
-        window_size: Window size for local statistics
-
-    Returns:
-        SSIM value
-    """
-    from scipy.ndimage import uniform_filter
-
-    c1 = 0.01**2
-    c2 = 0.03**2
-
-    mu_x = uniform_filter(pred, window_size)
-    mu_y = uniform_filter(target, window_size)
-
-    sigma_x = uniform_filter(pred**2, window_size) - mu_x**2
-    sigma_y = uniform_filter(target**2, window_size) - mu_y**2
-    sigma_xy = uniform_filter(pred * target, window_size) - mu_x * mu_y
-
-    ssim_map = ((2 * mu_x * mu_y + c1) * (2 * sigma_xy + c2)) / (
-        (mu_x**2 + mu_y**2 + c1) * (sigma_x + sigma_y + c2)
-    )
-
-    return np.mean(ssim_map)
-
-
+# Public names of the package.
 __all__ = [
-    "iou",
-    "dice",
-    "precision",
-    "recall",
-    "f1_score",
-    "accuracy",
-    "mean_iou",
-    "rmse",
-    "mae",
-    "r_squared",
-    "psnr",
-    "ssim",
-]
+    "AccuracyAssessment",  # Result record.
+    "AreaEstimate",  # Result record.
+    "accuracy",  # Fraction of equal labels.
+    "accuracy_assessment",  # Measures of an error matrix.
+    "bias",  # Mean error.
+    "calculate_ergas",  # Alias of ergas.
+    "calculate_qindex",  # Alias of q_index.
+    "calculate_sam",  # Alias of sam.
+    "change_detection_metrics",  # Binary change accuracy.
+    "change_map",  # Changed pixels.
+    "cohen_kappa",  # Kappa.
+    "confusion_matrix",  # Error matrix.
+    "dice",  # Dice coefficient.
+    "ergas",  # Relative global error.
+    "estimated_error_matrix",  # Population proportions.
+    "f1_score",  # Binary F1.
+    "iou",  # Binary IoU.
+    "mae",  # Mean absolute error.
+    "mean_iou",  # Mean IoU over classes.
+    "pearson_r",  # Correlation.
+    "precision",  # Binary precision.
+    "psnr",  # Peak signal-to-noise ratio.
+    "q_index",  # Universal image quality index.
+    "r_squared",  # Coefficient of determination.
+    "recall",  # Binary recall.
+    "regression_report",  # All statistics.
+    "rmse",  # Root mean square error.
+    "sam",  # Mean spectral angle.
+    "sample_allocation",  # Stratum sample sizes.
+    "spectral_angle",  # Per-pixel spectral angle.
+    "ssim",  # Structural similarity.
+    "stratified_area_estimate",  # Olofsson et al. (2014) estimator.
+    "transition_matrix",  # From-to counts.
+    "transition_summary",  # Gain, loss, net change and swap.
+    "ubrmse",  # Unbiased RMSE.
+]  # End of the public names.
+
+# =============================================================================
+# End of module src/unbihexium/metrics/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

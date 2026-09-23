@@ -1,123 +1,125 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/utils/__init__.py
+# Title       : Common utilities: hashing, logging, timing, seeding, tiling
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy; count_parameters
+#               needs a PyTorch module
+# =============================================================================
+#
+# Abstract
+# --------
+# Small helpers shared by the rest of the library:
+#
+#   hashing   compute_sha256, sha256_bytes, array_digest, json_digest
+#   log       get_logger, configure_logging
+#   timing    Timer, timed
+#   seeding   set_seed, derive_seed, spawn_generators
+#   tiling    tile_starts, tile_windows, tile_image, merge_tiles
+#   files     ensure_dir, atomic_write_bytes, atomic_write_text,
+#             bytes_to_human
+#
+# count_parameters counts the parameters of a PyTorch module without
+# importing PyTorch itself.
+# =============================================================================
 
-"""Common utilities module.
-
-This module provides common utility functions used throughout
-the library.
-"""
-
+# Postpone the evaluation of annotations so that modern type syntax works on
+# every supported Python version.
 from __future__ import annotations
 
-import hashlib
-from pathlib import Path
-from typing import Generator
+# Type of loosely structured values.
+from typing import Any
 
-import numpy as np
-from numpy.typing import NDArray
+# File system helpers.
+from unbihexium.utils.files import (
+    atomic_write_bytes,  # Atomic binary write.
+    atomic_write_text,  # Atomic text write.
+    bytes_to_human,  # Byte counts as text.
+    ensure_dir,  # Create directories.
+)  # End of the file helper imports.
 
+# Digests.
+from unbihexium.utils.hashing import (
+    array_digest,  # Digest of an array.
+    canonical_json,  # Canonical JSON text.
+    compute_sha256,  # Digest of a file.
+    json_digest,  # Digest of a JSON document.
+    sha256_bytes,  # Digest of bytes.
+)  # End of the digest imports.
 
-def compute_sha256(path: str | Path) -> str:
-    """Compute SHA256 hash of file.
+# Logging.
+from unbihexium.utils.log import (
+    configure_logging,  # Install a handler.
+    get_logger,  # Library logger.
+    parse_level,  # Level names to numbers.
+)  # End of the logging imports.
 
-    Args:
-        path: Path to file
+# Random number generation.
+from unbihexium.utils.seeding import (
+    derive_seed,  # Child seeds.
+    set_seed,  # Seed every generator.
+    spawn_generators,  # Independent generators.
+)  # End of the seeding imports.
 
-    Returns:
-        Hex digest of SHA256 hash
-    """
-    sha256_hash = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(chunk)
-    return sha256_hash.hexdigest()
+# Tiling.
+from unbihexium.utils.tiling import (
+    merge_tiles,  # Mosaic of tiles.
+    tile_image,  # Tile generator.
+    tile_starts,  # Starts along one axis.
+    tile_windows,  # Tile windows.
+)  # End of the tiling imports.
 
-
-def tile_image(
-    image: NDArray,
-    tile_size: int = 512,
-    overlap: int = 64,
-) -> Generator[tuple[NDArray, int, int], None, None]:
-    """Tile image into overlapping patches.
-
-    Args:
-        image: Input image array (CHW or HW)
-        tile_size: Size of each tile
-        overlap: Overlap between tiles
-
-    Yields:
-        Tuple of (tile, row, col)
-    """
-    if image.ndim == 3:
-        _, h, w = image.shape
-    else:
-        h, w = image.shape
-
-    stride = tile_size - overlap
-
-    for i in range(0, h - overlap, stride):
-        for j in range(0, w - overlap, stride):
-            # Handle edge cases
-            end_i = min(i + tile_size, h)
-            end_j = min(j + tile_size, w)
-            start_i = max(0, end_i - tile_size)
-            start_j = max(0, end_j - tile_size)
-
-            if image.ndim == 3:
-                tile = image[:, start_i:end_i, start_j:end_j]
-            else:
-                tile = image[start_i:end_i, start_j:end_j]
-
-            yield tile, start_i, start_j
+# Timing.
+from unbihexium.utils.timing import (
+    Timer,  # Elapsed-time measurement.
+    timed,  # Timing decorator.
+)  # End of the timing imports.
 
 
-def ensure_dir(path: str | Path) -> Path:
-    """Ensure directory exists.
-
-    Args:
-        path: Directory path
-
-    Returns:
-        Resolved path
-    """
-    path = Path(path)
-    path.mkdir(parents=True, exist_ok=True)
-    return path
+# Number of parameters of a PyTorch module.
+def count_parameters(model: Any, trainable_only: bool = True) -> int:
+    # Parameters to count: trainable ones, or all of them.
+    params = [p for p in model.parameters() if p.requires_grad or not trainable_only]
+    # Sum of their element counts.
+    return int(sum(p.numel() for p in params))
 
 
-def bytes_to_human(size: int) -> str:
-    """Convert bytes to human-readable string.
-
-    Args:
-        size: Size in bytes
-
-    Returns:
-        Human-readable string
-    """
-    for unit in ["B", "KB", "MB", "GB", "TB"]:
-        if size < 1024:
-            return f"{size:.1f} {unit}"
-        size /= 1024
-    return f"{size:.1f} PB"
-
-
-def count_parameters(model) -> int:
-    """Count trainable parameters in model.
-
-    Args:
-        model: PyTorch model
-
-    Returns:
-        Number of trainable parameters
-    """
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
+# Public names of the package.
 __all__ = [
-    "compute_sha256",
-    "tile_image",
-    "ensure_dir",
-    "bytes_to_human",
-    "count_parameters",
-]
+    "Timer",  # Elapsed-time measurement.
+    "array_digest",  # Digest of an array.
+    "atomic_write_bytes",  # Atomic binary write.
+    "atomic_write_text",  # Atomic text write.
+    "bytes_to_human",  # Byte counts as text.
+    "canonical_json",  # Canonical JSON text.
+    "compute_sha256",  # Digest of a file.
+    "configure_logging",  # Install a handler.
+    "count_parameters",  # Parameters of a PyTorch module.
+    "derive_seed",  # Child seeds.
+    "ensure_dir",  # Create directories.
+    "get_logger",  # Library logger.
+    "json_digest",  # Digest of a JSON document.
+    "merge_tiles",  # Mosaic of tiles.
+    "parse_level",  # Level names to numbers.
+    "set_seed",  # Seed every generator.
+    "sha256_bytes",  # Digest of bytes.
+    "spawn_generators",  # Independent generators.
+    "tile_image",  # Tile generator.
+    "tile_starts",  # Starts along one axis.
+    "tile_windows",  # Tile windows.
+    "timed",  # Timing decorator.
+]  # End of the export list.
+
+
+# =============================================================================
+# End of module src/unbihexium/utils/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

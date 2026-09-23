@@ -37,14 +37,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-asyncio httpx
-          pip install numpy onnxruntime rasterio || true
-          pip install -e . || pip install numpy
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
       - name: Run integration tests
         run: |
-          pytest tests/integration/ -v --tb=short || echo "Integration tests completed"
-        continue-on-error: true
+          pytest tests/integration/ --tb=short
 
   e2e:
     name: End-to-End Tests
@@ -62,13 +60,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest httpx
-          pip install -e . || pip install numpy
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
       - name: Run E2E tests
         run: |
-          pytest tests/e2e/ -v --tb=short || echo "E2E tests completed"
-        continue-on-error: true
+          pytest tests/e2e/ --tb=short
 
   api-test:
     name: API Integration
@@ -86,8 +83,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install fastapi uvicorn httpx pytest
-          pip install -e . || pip install numpy fastapi
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[serving]"
 
       - name: Start API server
         run: |
@@ -99,7 +96,8 @@ jobs:
           " &
           sleep 5
 
+      # Wait up to 30 seconds for the server, then require a healthy answer.
       - name: Test API endpoints
         run: |
-          curl -f http://127.0.0.1:8000/health || echo "Health endpoint test completed"
-        continue-on-error: true
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && exit 0; sleep 1; done
+          exit 1

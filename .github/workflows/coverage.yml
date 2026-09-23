@@ -25,14 +25,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov
-          pip install numpy onnxruntime rasterio || true
-          pip install -e . || pip install numpy
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
       - name: Run tests with coverage
         run: |
-          pytest tests/ --cov=src/unbihexium --cov-report=xml --cov-report=term -v || echo "Tests completed"
-        continue-on-error: true
+          pytest tests/ --cov=src/unbihexium --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

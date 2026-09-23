@@ -58,6 +58,16 @@ Where:
 - Task APIs backed by the model zoo: detectors (ships, SAR ships, buildings, aircraft, vehicles, greenhouses, crop fields, pivots, fires), segmenters (land cover, water, clouds, crops, SAR floods and oil spills), change detection, dense and scene regression, enhancement and super-resolution, with georeferenced results, GeoJSON and GeoTIFF output
 - Commands `unbihexium train`, `evaluate`, `predict`, `zoo build`, `zoo export`, `zoo info` and `zoo clear`; `unbihexium index` now computes and writes the index
 - Guides `docs/model_zoo/training.md` and `docs/model_zoo/inference.md`
+- Core: raster windows, clipping, masks, reprojection and resampling through GDAL, band math, statistics and COG output; 27 spectral indices with Sentinel-2 and Landsat band aliases; Sentinel-1, Sentinel-2 and Landsat 8/9 band tables with radiometric helpers; tiling with blended mosaics and XYZ tile maths; geodesic vector operations; scene harmonisation; products with checksums and STAC items; pipelines with step records, seeding, provenance and SHA-256 evidence
+- Input and output: RFC 7946 GeoJSON validation and reprojection, GeoTIFF windows, overviews and COG, GeoParquet with bounding box filters, offline STAC catalogues and a paging STAC API client, Zarr v3
+- Registries: 147 capabilities (one per model family and 17 library features), a model registry view over the zoo with band checks, and pipeline search
+- REST service: `POST /predict/{model_id}` for every zoo model with band, size and value limits, JSON or base64 NumPy input, API keys and rate limiting
+- SAR: calibration to sigma0, beta0 and gamma0, Lee, Kuan, enhanced Lee, Frost, Gamma MAP and refined Lee filters, Goldstein filtering, least-squares and quality-guided phase unwrapping, and Pauli, Freeman-Durden, Yamaguchi and H/A/alpha decompositions
+- Terrain: slope, aspect, hillshade, curvature, TPI, TRI, roughness and VRM, depression filling, D8 flow direction and accumulation, watersheds, streams, TWI and viewsheds
+- Geostatistics: Matheron and Cressie-Hawkins variograms, ordinary and universal kriging with variance and cross-validation, IDW, global and local Moran's I, Geary's C and Getis-Ord Gi*
+- Analysis: network routing with Dijkstra and A*, origin-destination matrices, cost distance and least-cost paths, AHP and weighted overlay suitability, zonal statistics tables
+- Preprocessing, postprocessing, accuracy assessment with Olofsson et al. (2014) area estimates, and visualisation packages
+- Settings loaded from defaults, YAML files and environment variables, and utilities for hashing, logging, timing, seeding and atomic file writes
 - Official support for Python 3.13 and 3.14; Python 3.10 through 3.14 are now supported and tested in CI
 - Python version support policy in VERSIONING.md
 - Issue forms for bug reports, feature requests, documentation, model zoo, performance, compliance, build and questions, each with about 95 mandatory questions, an AI usage declaration and regulatory confirmations
@@ -85,6 +95,9 @@ Where:
 - `unbihexium.ai` could not be imported because the `super_resolution` module and package had the same name
 - The detection, segmentation and super-resolution classes returned empty or interpolated placeholder results instead of running a model
 - `unbihexium index` read the input but did not compute or write the index, and `from unbihexium.cli import cli` failed
+- Every pre-existing unit test failure: GeoJSON, GeoTIFF and GeoParquet writers, pipeline runs, evidence and provenance records, sigma0 and gamma0 with angles in degrees, polarimetric decompositions, and `unbihexium.analysis.network`, which could not be imported because a module and a package had the same name
+- The version tuple did not match the version string
+- The CI test, coverage, integration and end-to-end jobs ignored test failures; they now install the optional backends and fail on any failing test
 - The model zoo registry referenced a task that does not exist and failed on import
 - Invalid YAML in `.github/FUNDING.yml`
 - SLSA provenance workflow, which called the reusable generator as a step and could not run
@@ -102,6 +115,8 @@ Where:
 
 - Task APIs take a catalogue model, a trained checkpoint or an ONNX file (`weights=`) and default to the base variant; `SuperResolution` uses the catalogue factor 4 unless `scale_factor` is given; `CropDetector` and `GreenhouseDetector` are detectors, as in the catalogue, and remain importable from `unbihexium.ai.segmentation`
 - `unbihexium zoo download` and `unbihexium infer` are kept as hidden aliases of `zoo build` and `predict`
+- Every Python module of the package and the tests use `#` comments with an academic header and footer, checked in CI
+- Breaking changes of the rewritten modules: writers take the data before the path (the old order still works); `read_geotiff` returns the transform as six coefficients and the CRS as a string; SAR angles are in degrees by default; zero denominators of spectral indices give NaN instead of a small epsilon; `aspect` gives compass degrees and `hillshade` floats; `Evidence` and `ProvenanceRecord` have new fields; pipeline steps must return a mapping; `ssim` uses a Gaussian window; model configuration defaults to the base variant on the CPU
 - Python files outside the package (`.github/scripts/`, `scripts/` and `examples/`) use `#` comments instead of docstrings, carry an academic header and footer with project, module, author, affiliation, copyright and licence, and have a comment for every line of code; behaviour is unchanged and the example API keeps its OpenAPI descriptions
 - Contact address in package metadata, citation files, the container image, the Helm chart and the security, privacy, conduct and support policies changed to `yunus.z.imanov@helsinki.fi`
 - Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)

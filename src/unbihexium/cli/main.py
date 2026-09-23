@@ -604,6 +604,11 @@ def pipeline_run(
 @click.option("--nir", default=8, show_default=True, help="1-based band number of near infrared.")
 @click.option("--swir1", default=12, show_default=True, help="1-based band number of SWIR 1.6 um.")
 @click.option("--swir2", default=13, show_default=True, help="1-based band number of SWIR 2.2 um.")
+@click.option("--coastal", default=1, show_default=True, help="1-based band number of coastal.")
+@click.option("--rededge1", default=5, show_default=True, help="1-based band number of red edge 1.")
+@click.option("--rededge2", default=6, show_default=True, help="1-based band number of red edge 2.")
+@click.option("--rededge3", default=7, show_default=True, help="1-based band number of red edge 3.")
+@click.option("--nir08", default=9, show_default=True, help="1-based band number of narrow NIR.")
 def index(index_name: str, input_path: str, output_path: str, **bands: int) -> None:
     # Imported lazily.
     import numpy as np  # Arrays.
@@ -629,6 +634,10 @@ def index(index_name: str, input_path: str, output_path: str, **bands: int) -> N
     arrays = {}
     # Collect the required bands.
     for name in idx.bands_required:
+        # Bands without an option cannot be mapped.
+        if name.lower() not in bands:
+            # Explain the problem.
+            fail(f"{idx.name} needs band {name}, which has no command line option")
         # 1-based band number of the name.
         number = bands[name.lower()]
         # The band must exist.

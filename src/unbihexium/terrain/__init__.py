@@ -1,149 +1,82 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/terrain/__init__.py
+# Title       : Terrain analysis of digital elevation models
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy and SciPy
+# =============================================================================
+#
+# Abstract
+# --------
+# Array functions for gridded digital elevation models (north-up, NaN for
+# nodata):
+#
+#   derivatives  gradient, slope, aspect, hillshade, curvatures, TPI, TRI,
+#                roughness and vector ruggedness
+#   hydrology    depression filling, D8 flow direction and accumulation,
+#                watersheds, streams and the topographic wetness index
+#   visibility   line-of-sight viewshed
+# =============================================================================
 
-"""Terrain analysis module.
+# Local surface derivatives.
+from unbihexium.terrain.derivatives import (
+    aspect,  # Downslope direction.
+    curvature,  # Profile and plan curvature.
+    gradient,  # Horn gradient.
+    hillshade,  # Shaded relief.
+    roughness,  # Elevation range of the window.
+    slope,  # Slope angle or percent.
+    total_curvature,  # Sum of the curvatures.
+    tpi,  # Topographic position index.
+    tri,  # Terrain ruggedness index.
+    vrm,  # Vector ruggedness measure.
+)  # End of the derivative imports.
 
-This module provides functions for computing terrain derivatives
-from Digital Elevation Models (DEMs).
-"""
+# Flow routing.
+from unbihexium.terrain.hydrology import (
+    D8_NEIGHBOURS,  # D8 offsets and codes.
+    extract_streams,  # Stream mask.
+    fill_depressions,  # Priority-flood filling.
+    flow_accumulation,  # Upstream cells.
+    flow_direction_d8,  # D8 codes.
+    twi,  # Topographic wetness index.
+    watershed,  # Cells upstream of an outlet.
+)  # End of the hydrology imports.
 
-from __future__ import annotations
+# Visibility.
+from unbihexium.terrain.visibility import viewshed
 
-import numpy as np
-from numpy.typing import NDArray
-
-
-def slope(dem: NDArray, resolution: float) -> NDArray:
-    """Compute slope from DEM.
-
-    Args:
-        dem: Digital Elevation Model array
-        resolution: Cell size in meters
-
-    Returns:
-        Slope array in degrees
-    """
-    dy, dx = np.gradient(dem, resolution)
-    slope_rad = np.arctan(np.sqrt(dx**2 + dy**2))
-    return np.degrees(slope_rad)
-
-
-def aspect(dem: NDArray, resolution: float) -> NDArray:
-    """Compute aspect from DEM.
-
-    Args:
-        dem: Digital Elevation Model array
-        resolution: Cell size in meters
-
-    Returns:
-        Aspect array in degrees (0-360, north=0)
-    """
-    dy, dx = np.gradient(dem, resolution)
-    aspect_rad = np.arctan2(-dy, dx)
-    aspect_deg = np.degrees(aspect_rad)
-    aspect_deg = np.where(aspect_deg < 0, 360 + aspect_deg, aspect_deg)
-    return aspect_deg
-
-
-def hillshade(
-    dem: NDArray,
-    resolution: float,
-    azimuth: float = 315,
-    altitude: float = 45,
-) -> NDArray:
-    """Compute hillshade from DEM.
-
-    Args:
-        dem: Digital Elevation Model array
-        resolution: Cell size in meters
-        azimuth: Sun azimuth in degrees
-        altitude: Sun altitude in degrees
-
-    Returns:
-        Hillshade array (0-255)
-    """
-    az_rad = np.radians(azimuth)
-    alt_rad = np.radians(altitude)
-
-    dy, dx = np.gradient(dem, resolution)
-    slope_rad = np.arctan(np.sqrt(dx**2 + dy**2))
-    aspect_rad = np.arctan2(-dy, dx)
-
-    hillshade = np.sin(alt_rad) * np.cos(slope_rad) + np.cos(alt_rad) * np.sin(slope_rad) * np.cos(
-        az_rad - aspect_rad
-    )
-
-    return np.clip(hillshade * 255, 0, 255).astype(np.uint8)
-
-
-def curvature(dem: NDArray, resolution: float) -> tuple[NDArray, NDArray]:
-    """Compute profile and plan curvature from DEM.
-
-    Args:
-        dem: Digital Elevation Model array
-        resolution: Cell size in meters
-
-    Returns:
-        Tuple of (profile_curvature, plan_curvature)
-    """
-    dy, dx = np.gradient(dem, resolution)
-    dyy, dyx = np.gradient(dy, resolution)
-    dxy, dxx = np.gradient(dx, resolution)
-
-    p = dx**2 + dy**2
-    q = p + 1
-
-    profile = -(dxx * dx**2 + 2 * dxy * dx * dy + dyy * dy**2) / (p * np.sqrt(q**3) + 1e-8)
-    plan = -(dxx * dy**2 - 2 * dxy * dx * dy + dyy * dx**2) / (p**1.5 + 1e-8)
-
-    return profile, plan
-
-
-def twi(dem: NDArray, resolution: float) -> NDArray:
-    """Compute Topographic Wetness Index.
-
-    TWI = ln(A / tan(slope))
-
-    Args:
-        dem: Digital Elevation Model array
-        resolution: Cell size in meters
-
-    Returns:
-        TWI array
-    """
-    slope_arr = slope(dem, resolution)
-    slope_rad = np.radians(slope_arr)
-
-    # Simplified flow accumulation (D8)
-    flow_acc = np.ones_like(dem)
-
-    return np.log(flow_acc / (np.tan(slope_rad) + 0.001))
-
-
-def roughness(dem: NDArray) -> NDArray:
-    """Compute Terrain Ruggedness Index.
-
-    Args:
-        dem: Digital Elevation Model array
-
-    Returns:
-        TRI array
-    """
-    from scipy.ndimage import generic_filter
-
-    def tri_kernel(values):
-        center = values[4]
-        return np.sqrt(np.mean((values - center) ** 2))
-
-    return generic_filter(dem, tri_kernel, size=3)
-
-
+# Public names of the package.
 __all__ = [
-    "slope",
-    "aspect",
-    "hillshade",
-    "curvature",
-    "twi",
-    "roughness",
-]
+    "D8_NEIGHBOURS",  # D8 offsets and codes.
+    "aspect",  # Downslope direction.
+    "curvature",  # Profile and plan curvature.
+    "extract_streams",  # Stream mask.
+    "fill_depressions",  # Priority-flood filling.
+    "flow_accumulation",  # Upstream cells.
+    "flow_direction_d8",  # D8 codes.
+    "gradient",  # Horn gradient.
+    "hillshade",  # Shaded relief.
+    "roughness",  # Elevation range of the window.
+    "slope",  # Slope angle or percent.
+    "total_curvature",  # Sum of the curvatures.
+    "tpi",  # Topographic position index.
+    "tri",  # Terrain ruggedness index.
+    "twi",  # Topographic wetness index.
+    "viewshed",  # Line-of-sight visibility.
+    "vrm",  # Vector ruggedness measure.
+    "watershed",  # Cells upstream of an outlet.
+]  # End of the public names.
+
+# =============================================================================
+# End of module src/unbihexium/terrain/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
