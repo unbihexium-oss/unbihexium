@@ -204,7 +204,6 @@ _Select all that apply._
 - [ ] ruff format --check
 - [ ] pyright
 - [ ] pytest
-- [ ] mkdocs build
 - [ ] pre-commit run --all-files
 - [ ] Other:
 
@@ -266,7 +265,7 @@ Select every documentation artefact updated.
 _Select all that apply._
 
 - [ ] README
-- [ ] Documentation website
+- [ ] Documentation in docs/
 - [ ] Docstrings
 - [ ] Example notebooks
 - [ ] Model cards

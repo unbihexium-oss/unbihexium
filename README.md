@@ -45,7 +45,7 @@
 </p>
 
 <p align="center">
-  <a href="https://unbihexium-oss.github.io/unbihexium/"><img src="https://img.shields.io/badge/Docs-MkDocs-526CFE?style=flat-square&logo=materialformkdocs&logoColor=white" alt="Docs"></a>
+  <a href="docs/"><img src="https://img.shields.io/badge/Docs-Markdown-526CFE?style=flat-square&logo=markdown&logoColor=white" alt="Docs"></a>
   <a href="examples/notebooks/"><img src="https://img.shields.io/badge/Notebooks-130+-F37626?style=flat-square&logo=jupyter&logoColor=white" alt="Notebooks"></a>
   <a href="docs/tutorials/"><img src="https://img.shields.io/badge/Tutorials-available-FF7043?style=flat-square&logo=readthedocs&logoColor=white" alt="Tutorials"></a>
   <a href="docs/"><img src="https://img.shields.io/badge/API-reference-00897B?style=flat-square&logo=swagger&logoColor=white" alt="API"></a>
@@ -465,7 +465,6 @@ pip install unbihexium
 # With optional dependencies
 pip install unbihexium[gpu]      # GPU acceleration
 pip install unbihexium[dev]      # Development tools
-pip install unbihexium[docs]     # Documentation
 pip install unbihexium[test]     # Testing utilities
 pip install unbihexium[all]      # All optional dependencies
 ```

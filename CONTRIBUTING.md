@@ -97,7 +97,7 @@ Every pull request runs the workflows in `.github/workflows/`. The most importan
 | Markdown | markdownlint with `.markdownlint.json` |
 | Model Zoo | Model zoo structure, SHA256 checksums, model cards and manifests |
 | Notebooks | Valid notebook format and no committed outputs |
-| Repository Config | Issue forms, workflows, Dependabot, Read the Docs, CITATION.cff and Compose files against their schemas |
+| Repository Config | Issue forms, workflows, Dependabot, CITATION.cff, Codecov, Security Insights and Compose files against their schemas, and YAML style |
 | Workflow Lint | actionlint and shellcheck on all workflows |
 | Security, Secret Scan, Container Scan | Bandit, pip-audit, dependency review, TruffleHog and Grype |
 | PR Title | Conventional commit format of the pull request title |

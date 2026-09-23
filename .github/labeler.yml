@@ -7,8 +7,6 @@ documentation:
           - "docs/**"
           - "examples/**"
           - "**/*.md"
-          - "mkdocs.yml"
-          - ".readthedocs.yaml"
 
 model-zoo:
   - changed-files:
