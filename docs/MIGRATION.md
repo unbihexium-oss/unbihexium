@@ -16,7 +16,7 @@ This document provides guidance for migrating between major versions of the Unbi
 
 | Unbihexium Version | Python | ONNX Runtime | PyTorch | NumPy |
 |-------------------|--------|--------------|---------|-------|
-| 1.0.x | 3.10-3.12 | 1.15+ | 2.0+ | 1.24+ |
+| 1.0.x | 3.10-3.14 | 1.15+ | 2.0+ | 1.24+ |
 | 0.9.x | 3.9-3.11 | 1.14+ | 1.13+ | 1.23+ |
 | 0.8.x | 3.8-3.10 | 1.12+ | 1.12+ | 1.22+ |
 

@@ -35,7 +35,7 @@ $$
 
 ### Q: What Python versions are supported?
 
-A: Python 3.10, 3.11, 3.12, and 3.13.
+A: Python 3.10, 3.11, 3.12, 3.13, and 3.14.
 
 ### Q: How do I install GPU support?
 

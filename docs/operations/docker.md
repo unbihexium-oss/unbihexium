@@ -8,7 +8,7 @@ Container deployment and operations guide.
 
 ```mermaid
 graph TB
-    A[Base Image] --> B[Python 3.12]
+    A[Base Image] --> B[Python 3.14]
     B --> C[Dependencies]
     C --> D[Unbihexium]
     D --> E[Models tiny]

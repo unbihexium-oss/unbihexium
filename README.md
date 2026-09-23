@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/pypi/v/unbihexium?style=flat-square&logo=pypi&logoColor=white&label=PyPI" alt="PyPI"></a>
   <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/pypi/dm/unbihexium?style=flat-square&logo=pypi&logoColor=white&label=Downloads" alt="Downloads"></a>
-  <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
+  <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
   <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/unbihexium-oss/unbihexium?style=flat-square&logo=open-source-initiative&logoColor=white" alt="License"></a>
   <a href="https://codecov.io/gh/unbihexium-oss/unbihexium"><img src="https://img.shields.io/codecov/c/github/unbihexium-oss/unbihexium?style=flat-square&logo=codecov&logoColor=white" alt="Coverage"></a>
   <a href="https://securityscorecards.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium"><img src="https://img.shields.io/ossf-scorecard/github.com/unbihexium-oss/unbihexium?style=flat-square&label=OpenSSF" alt="OpenSSF Scorecard"></a>
@@ -447,7 +447,7 @@ xychart-beta
 
 | Component | Minimum | Recommended | Optimal | Notes |
 | ----------- | --------- | ------------- | --------- | ------- |
-| Python | 3.10 | 3.12 | 3.12 | 3.13 supported |
+| Python | 3.10 | 3.14 | 3.14 | 3.10 to 3.14 supported |
 | RAM | 8 GB | 16 GB | 32 GB | Per concurrent pipeline |
 | Disk | 5 GB | 50 GB | 200 GB | Model cache space |
 | GPU | None | RTX 3060 | A100 | 10-50x inference speedup |
@@ -474,7 +474,7 @@ pip install unbihexium[all]      # All optional dependencies
 
 ```bash
 # Create environment
-conda create -n unbihexium python=3.12
+conda create -n unbihexium python=3.14
 conda activate unbihexium
 
 # Install package
