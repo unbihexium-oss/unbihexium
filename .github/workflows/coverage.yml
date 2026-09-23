@@ -49,8 +49,9 @@ jobs:  # Jobs of the workflow.
 
       - name: Install dependencies  # Install the package with its test extras.
         run: |  # Shell script run by bash.
-          # Install the locked, hashed CPU-only PyTorch build from the PyTorch index.
-          python -m pip install --require-hashes -r .github/requirements/requirements-ci-torch.txt
+          # Install the locked, hashed CPU-only PyTorch build from the PyTorch index;
+          # its dependencies come from the hashed test lock.
+          python -m pip install --require-hashes --no-deps -r .github/requirements/requirements-ci-torch.txt
           # Install the locked, hashed test environment (runtime, test and backend extras).
           python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
           # Install the package itself in editable mode without resolving dependencies again.

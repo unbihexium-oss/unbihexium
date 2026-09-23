@@ -16,8 +16,9 @@
 # Abstract
 # --------
 # Compiles .github/requirements/requirements-ci-torch.txt, the hashed lock
-# file of the CPU build of PyTorch, from requirements-ci-torch.in against
-# https://download.pytorch.org/whl/cpu. That index is not reachable from
+# file of the CPU build of PyTorch (without its dependencies, which are locked
+# from PyPI in requirements-ci-test.txt), from requirements-ci-torch.in
+# against https://download.pytorch.org/whl/cpu. That index is not reachable from
 # every environment that runs `make lock`, so the lock is compiled here: the
 # job prints the complete file in its log, uploads it as an artifact and
 # fails when it differs from the committed file, so that an outdated lock is
@@ -63,9 +64,10 @@ jobs:  # Jobs of the workflow.
 
       - name: Compile the lock  # Resolve against the PyTorch CPU index with hashes.
         run: |  # Shell script run by bash.
-          # Universal resolution for CPython 3.10 and newer with one hash per
+          # PyTorch alone (its dependencies are locked from PyPI in the test
+          # lock), universal for CPython 3.10 and newer with one hash per
           # file; the header of the committed file names the index for pip.
-          uv pip compile .github/requirements/requirements-ci-torch.in --universal --python-version 3.10 --generate-hashes --index-url https://download.pytorch.org/whl/cpu --custom-compile-command "Torch Lock workflow (.github/workflows/torch-lock.yml)" -o torch-lock.tmp
+          uv pip compile .github/requirements/requirements-ci-torch.in --universal --python-version 3.10 --no-deps --generate-hashes --index-url https://download.pytorch.org/whl/cpu --custom-compile-command "Torch Lock workflow (.github/workflows/torch-lock.yml)" -o torch-lock.tmp
           # Keep the header and the footer of the committed file.
           python scripts/merge_lock.py .github/requirements/requirements-ci-torch.txt torch-lock.tmp
           # Print the complete lock file for copying.

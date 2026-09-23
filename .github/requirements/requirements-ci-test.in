@@ -1,0 +1,40 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/requirements/requirements-ci-test.in
+# Title       : Additional input of the lock file of the CI test environment
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : pip requirements, compiled by uv into requirements-ci-test.txt
+# =============================================================================
+#
+# Abstract
+# --------
+# The runtime dependencies of PyTorch. The test, coverage, integration and
+# model zoo workflows install PyTorch itself with --no-deps from
+# requirements-ci-torch.txt, because the PyTorch index does not publish the
+# hashes of most other files and serves outdated releases of some of them.
+# `make lock` compiles these requirements from PyPI together with the extras
+# of pyproject.toml into requirements-ci-test.txt, with a SHA-256 hash for
+# every distribution. Keep the list in step with the requirements of the
+# PyTorch release in requirements-ci-torch.txt.
+# =============================================================================
+
+filelock  # Locks for the PyTorch caches.
+fsspec>=0.8.5  # File system abstraction used by PyTorch.
+jinja2  # Templates of the PyTorch code generators.
+networkx>=2.5.1  # Graphs of torch.fx and the compiler.
+setuptools>=77.0.3  # Build helpers that PyTorch imports.
+sympy>=1.13.3  # Symbolic shapes of the PyTorch compiler.
+typing-extensions>=4.10.0  # Typing backports used by PyTorch.
+
+# =============================================================================
+# End of file .github/requirements/requirements-ci-test.in
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
