@@ -1,34 +1,181 @@
+<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : ROADMAP.md
+Title       : Roadmap
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
+=============================================================================
+-->
+
 # Roadmap
 
-This roadmap lists planned work. It is a statement of intent, not a commitment to dates or features. Proposals and discussion happen in [issues](https://github.com/unbihexium-oss/unbihexium/issues) opened with the feature request form.
+| Field | Value |
+| --- | --- |
+| Document | UBX-DOC-ROADMAP |
+| Version | 2.0 |
+| Status | Active |
+| Last reviewed | 2026-09-23 |
+| Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
+| Applies to | Planned work on the main branch after Unbihexium 1.0.1 |
 
-## Near Term
+## Abstract
 
-### Python Support
+This document lists the work the Unbihexium project intends to do next, and why. Every item addresses a gap that can be verified in the repository as of the review date; the evidence is named with each item. The roadmap is written for users deciding whether the library fits their needs, for contributors looking for work that the maintainer will welcome, and for funders and auditors assessing the state of the project. It is a statement of intent, not a commitment: the project has not committed to dates for any item, and none are given, except where a date is fixed by an external schedule such as the Python release calendar.
 
-- Drop Python 3.10 in the first minor release after its upstream end of life on 2026-10-31, as defined in the [Python version support policy](VERSIONING.md).
+## Contents
 
-### Quality
+- [1. Scope and conventions](#1-scope-and-conventions)
+- [2. Current state](#2-current-state)
+- [3. Release and supply chain](#3-release-and-supply-chain)
+- [4. Model zoo](#4-model-zoo)
+- [5. Examples and documentation](#5-examples-and-documentation)
+- [6. Project sustainability and governance](#6-project-sustainability-and-governance)
+- [7. Platform support](#7-platform-support)
+- [8. Quality assurance](#8-quality-assurance)
+- [9. Proposing changes to the roadmap](#9-proposing-changes-to-the-roadmap)
+- [References](#references)
 
-- Make the unit and integration test jobs fail on test failures and fix the tests that currently fail.
-- Enforce the documented coverage threshold in CI.
+## 1. Scope and conventions
 
-### Model Zoo
+### 1.1 Scope
 
-- Align the model manifests with `model_zoo/manifest.schema.json` and validate them in CI.
-- Regenerate `model_zoo/checksums.txt` so that it matches `model.sha256` for every variant, including the mega tier.
-- Extend model cards with the information providers must give deployers under [EU AI Act Article 13](https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13).
+The roadmap covers the library, the command line interface, the REST service, the model zoo, the examples and documentation, the release pipeline and the governance of the project. Work that is already merged is recorded in [CHANGELOG.md](CHANGELOG.md) and is not repeated here.
 
-### Security and Supply Chain
+### 1.2 Conventions
 
-- Publish a security self-assessment and reference it in [security-insights.yml](security-insights.yml).
-- Keep vulnerability handling aligned with the [Cyber Resilience Act](https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng) obligations for open-source software stewards.
+Items are grouped by area, not by priority. Each item states the gap, the evidence in the repository, and the intended outcome. The words "planned" and "under consideration" distinguish work the maintainer intends to do from ideas that still need a decision. The key words MUST and SHOULD, where they appear, are used as in RFC 2119 [1] and RFC 8174 [2] and refer to requirements stated in other project policies.
 
-## Longer Term
+## 2. Current state
 
-- Train and publish models on openly licensed Earth observation data with documented provenance.
-- Publish reproducible benchmarks for every model family.
+As of 2026-09-23:
 
-## Completed
+- The latest release is 1.0.1 (2025-12-21), the only version on the Python Package Index. It predates the rewrite of the library, the model zoo and the release pipeline.
+- The main branch contains a large set of unreleased changes, including breaking changes, listed under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+- The model zoo defines 520 untrained starter models (130 families in four variants); only the 28 models of the 7 spectral index families compute results without training.
+- The project has one maintainer, listed in [MAINTAINERS.md](MAINTAINERS.md).
 
-See [CHANGELOG.md](CHANGELOG.md).
+## 3. Release and supply chain
+
+### 3.1 Release the unreleased changes (planned)
+
+- Gap: users who install from the Python Package Index receive 1.0.1, which does not contain the rewritten packages, the trainable models or the security fixes on `main`.
+- Evidence: `version = "1.0.1"` in `pyproject.toml`; the `[Unreleased]` section of [CHANGELOG.md](CHANGELOG.md); the PyPI release history.
+- Outcome: a new release. Because the unreleased changes break compatibility, [VERSIONING.md](VERSIONING.md) requires it to be a new major version (2.0.0). A migration guide from 1.0.x SHOULD accompany it; `docs/MIGRATION.md` does not yet describe these changes.
+
+### 3.2 First signed release (planned)
+
+- Gap: the release workflow signs distributions with Sigstore, attests their build provenance and attaches SLSA provenance (`unbihexium-<tag>.intoto.jsonl`), but no release has been published since these steps were added. The GitHub releases v1.0.0 and v1.0.1 have no signatures or provenance.
+- Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
+- Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
+
+### 3.3 Trusted publishing to PyPI (under consideration)
+
+- Gap: the release workflow uploads to the Python Package Index with a long-lived API token (`secrets.PYPI_API_TOKEN`).
+- Evidence: the "Publish to PyPI" step of `.github/workflows/release.yml`.
+- Outcome: replace the token with PyPI trusted publishing through OpenID Connect [3], so that no upload credential is stored in the repository settings.
+
+### 3.4 Security self-assessment (planned)
+
+- Gap: no security self-assessment has been published.
+- Evidence: the `security.assessments.self` entry of [security-insights.yml](security-insights.yml).
+- Outcome: a self-assessment based on the threat model in `docs/architecture/security_model.md`, referenced from `security-insights.yml`.
+
+## 4. Model zoo
+
+### 4.1 Trained weights (planned)
+
+- Gap: none of the learned models has been trained. Every manifest records `"trained": false` and every model card states that the starter weights produce meaningless predictions.
+- Evidence: `model_zoo/manifests/*.json`, `model_zoo/cards/*.md`, `src/unbihexium/zoo/catalog.yaml`.
+- Outcome: trained weights for selected families, beginning with families for which openly licensed training data exist. Each trained model is to be published with the licence and citation of its training data, the training configuration, and an evaluation on independent test data with the metrics that `unbihexium evaluate` computes. Until then, the model cards remain the authoritative statement that the models are untrained.
+
+### 4.2 Benchmarks backed by measurements (planned)
+
+- Gap: `docs/benchmarks/BENCHMARKS.md` reports latencies, throughputs and accuracy figures (for example mIoU, PSNR and SSIM) that are not produced by any script in the repository, and accuracy figures cannot exist for untrained models.
+- Evidence: `docs/benchmarks/BENCHMARKS.md`; the throughput and memory measurements in `tests/benchmarks/`.
+- Outcome: replace the document with results that a published script reproduces, stating hardware, software versions and inputs, and report accuracy only for trained models.
+
+## 5. Examples and documentation
+
+### 5.1 Notebooks on the current API (planned)
+
+- Gap: the 130 notebooks under `examples/notebooks/` load ONNX and TorchScript files from `model_zoo/assets/` and instruct users to run `git lfs pull`. Those files were removed from the repository, so the notebooks cannot run as written.
+- Evidence: the code cells of `examples/notebooks/*.ipynb`; the "Removed" entries in [CHANGELOG.md](CHANGELOG.md).
+- Outcome: notebooks that build models with `unbihexium.zoo`, train them on small synthetic or openly licensed data, and run them through the task APIs or `unbihexium.ai.inference.Predictor`, executed in CI. The Notebooks workflow currently validates the notebook format only and does not execute the notebooks.
+
+### 5.2 Documentation that predates the rewrite (planned)
+
+- Gap: parts of `docs/` describe earlier states of the project. For example, `docs/operations/releasing.md` refers to Poetry, which the project does not use; `docs/MIGRATION.md` lists versions 0.8.x and 0.9.x, which were never released; and `docs/model_zoo/model_catalog.md`, `docs/model_zoo/how_to_add_models.md` and `docs/architecture/model_zoo_architecture.md` refer to the removed `model_zoo/assets/` directory.
+- Evidence: the files named above.
+- Outcome: documentation that matches the code, with its commands executed in CI where practical.
+
+## 6. Project sustainability and governance
+
+### 6.1 A second maintainer (planned)
+
+- Gap: one person holds all maintainer roles, including releases and security response. Reviews, releases and the handling of vulnerability reports stop when that person is unavailable.
+- Evidence: [MAINTAINERS.md](MAINTAINERS.md); `core-team` in [security-insights.yml](security-insights.yml).
+- Outcome: at least one further maintainer with write access and a share of the security response, appointed under the rules in [GOVERNANCE.md](GOVERNANCE.md). Contributors interested in the role are invited to start with reviewed pull requests.
+
+### 6.2 Persistent identifiers for citation (under consideration)
+
+- Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author.
+- Evidence: [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json).
+- Outcome: archive each release in a repository that assigns DOIs, for example through the GitHub integration of Zenodo, and add the DOI and ORCID to the citation metadata and [CITATION.md](CITATION.md).
+
+## 7. Platform support
+
+### 7.1 Python 3.10 end of life (planned)
+
+- Gap: Python 3.10 reaches its upstream end of life in October 2026 [4].
+- Evidence: the Python version support policy in [VERSIONING.md](VERSIONING.md).
+- Outcome: under that policy, support for Python 3.10 is removed in the first minor release after its end of life, together with the Python 3.10 specific dependency bounds and lock entries.
+
+### 7.2 Python 3.15 (planned)
+
+- Gap: Python 3.15 is scheduled for release in October 2026 [4] and is not yet tested.
+- Evidence: the CI test matrix and the classifiers in `pyproject.toml`.
+- Outcome: support for Python 3.15 once the runtime dependencies publish wheels for it, following the dependency policy in `pyproject.toml`.
+
+## 8. Quality assurance
+
+### 8.1 Coverage threshold (under consideration)
+
+- Gap: coverage is measured and reported, but no threshold fails a build: the Codecov statuses are informational and no `fail_under` setting exists.
+- Evidence: `codecov.yml`; the coverage configuration in `pyproject.toml`.
+- Outcome: an enforced minimum for project and patch coverage once the current coverage is known to be stable.
+
+### 8.2 Wider fuzzing (under consideration)
+
+- Gap: the atheris fuzz targets cover the GeoJSON and STAC parsers only; other parsers of untrusted input, such as the request handling of the REST service, are not fuzzed.
+- Evidence: `fuzz/fuzz_geojson.py`, `fuzz/fuzz_stac.py`.
+- Outcome: further fuzz targets for input parsed from files or network requests.
+
+## 9. Proposing changes to the roadmap
+
+Proposals are made in an issue opened with the feature request form at <https://github.com/unbihexium-oss/unbihexium/issues>. A proposal SHOULD state the gap, the evidence and the intended outcome in the form used above. The maintainer reviews this roadmap when a release is prepared and removes items once they are recorded in [CHANGELOG.md](CHANGELOG.md).
+
+## References
+
+[1] S. Bradner. RFC 2119: Key words for use in RFCs to Indicate Requirement Levels. IETF, 1997. <https://www.rfc-editor.org/rfc/rfc2119>
+
+[2] B. Leiba. RFC 8174: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words. IETF, 2017. <https://www.rfc-editor.org/rfc/rfc8174>
+
+[3] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
+
+[4] Python Software Foundation. Status of Python versions, Python Developer's Guide. 2026. <https://devguide.python.org/versions/>
+
+<!--
+=============================================================================
+End of file ROADMAP.md
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+-->

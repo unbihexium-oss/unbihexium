@@ -1,708 +1,548 @@
-# Unbihexium
-
-<p align="center">
-  <strong>Production-Grade Geospatial AI Library for Earth Observation</strong>
-</p>
-
-<p align="center">
-  <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/pypi/v/unbihexium?style=flat-square&logo=pypi&logoColor=white&label=PyPI" alt="PyPI"></a>
-  <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/pypi/dm/unbihexium?style=flat-square&logo=pypi&logoColor=white&label=Downloads" alt="Downloads"></a>
-  <a href="https://pypi.org/project/unbihexium/"><img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python"></a>
-  <a href="LICENSE.txt"><img src="https://img.shields.io/github/license/unbihexium-oss/unbihexium?style=flat-square&logo=open-source-initiative&logoColor=white" alt="License"></a>
-  <a href="https://codecov.io/gh/unbihexium-oss/unbihexium"><img src="https://img.shields.io/codecov/c/github/unbihexium-oss/unbihexium?style=flat-square&logo=codecov&logoColor=white" alt="Coverage"></a>
-  <a href="https://securityscorecards.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium"><img src="https://img.shields.io/ossf-scorecard/github.com/unbihexium-oss/unbihexium?style=flat-square&label=OpenSSF" alt="OpenSSF Scorecard"></a>
-  <a href="https://github.com/unbihexium-oss/unbihexium/stargazers"><img src="https://img.shields.io/github/stars/unbihexium-oss/unbihexium?style=flat-square&logo=github" alt="Stars"></a>
-  <a href="https://github.com/unbihexium-oss/unbihexium/fork"><img src="https://img.shields.io/github/forks/unbihexium-oss/unbihexium?style=flat-square&logo=github" alt="Forks"></a>
-  <a href="https://github.com/unbihexium-oss/unbihexium/watchers"><img src="https://img.shields.io/github/watchers/unbihexium-oss/unbihexium?style=flat-square&logo=github" alt="Watchers"></a>
-  <a href="https://github.com/unbihexium-oss/unbihexium/issues"><img src="https://img.shields.io/github/issues/unbihexium-oss/unbihexium?style=flat-square&logo=github" alt="Issues"></a>
-  <a href="https://github.com/unbihexium-oss/unbihexium/commits/main"><img src="https://img.shields.io/github/last-commit/unbihexium-oss/unbihexium?style=flat-square&logo=github" alt="Last Commit"></a>
-</p>
-
-<p align="center">
-  <a href="model_zoo/"><img src="https://img.shields.io/badge/Models-520-FF6B35?style=flat-square&logo=huggingface&logoColor=white" alt="Models"></a>
-  <a href="model_zoo/MODEL_CARDS.md"><img src="https://img.shields.io/badge/Model_families-130-9C27B0?style=flat-square" alt="Model families"></a>
-  <a href="model_zoo/"><img src="https://img.shields.io/badge/Architectures-130-E91E63?style=flat-square" alt="Architectures"></a>
-  <a href="https://onnx.ai/"><img src="https://img.shields.io/badge/ONNX-supported-005CFF?style=flat-square&logo=onnx&logoColor=white" alt="ONNX"></a>
-  <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" alt="PyTorch"></a>
-  <a href="https://numpy.org/"><img src="https://img.shields.io/badge/NumPy-1.24+-013243?style=flat-square&logo=numpy&logoColor=white" alt="NumPy"></a>
-  <a href="https://rasterio.readthedocs.io/"><img src="https://img.shields.io/badge/Rasterio-GeoTIFF-228B22?style=flat-square" alt="Rasterio"></a>
-  <a href="https://gdal.org/"><img src="https://img.shields.io/badge/GDAL-compatible-2E7D32?style=flat-square&logo=gdal&logoColor=white" alt="GDAL"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/Sentinel--2-supported-1976D2?style=flat-square" alt="Sentinel"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/Landsat--8/9-supported-0288D1?style=flat-square&logo=nasa&logoColor=white" alt="Landsat"></a>
-</p>
-
-<p align="center">
-  <a href="docs/capabilities/"><img src="https://img.shields.io/badge/Detection-76_models-FF5722?style=flat-square&logo=opencv&logoColor=white" alt="Detection"></a>
-  <a href="docs/capabilities/"><img src="https://img.shields.io/badge/Segmentation-128_models-4CAF50?style=flat-square&logo=keras&logoColor=white" alt="Segmentation"></a>
-  <a href="docs/capabilities/"><img src="https://img.shields.io/badge/Regression-188_models-673AB7?style=flat-square&logo=scikitlearn&logoColor=white" alt="Regression"></a>
-  <a href="docs/capabilities/"><img src="https://img.shields.io/badge/Terrain-52_models-795548?style=flat-square&logo=googleearth&logoColor=white" alt="Terrain"></a>
-  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/badge/Linter-Ruff-261230?style=flat-square&logo=ruff&logoColor=D7FF64" alt="Ruff"></a>
-  <a href="https://github.com/microsoft/pyright"><img src="https://img.shields.io/badge/Types-Pyright-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="Pyright"></a>
-  <a href="https://github.com/PyCQA/bandit"><img src="https://img.shields.io/badge/Security-Bandit-FFC107?style=flat-square&logo=shieldsdotio&logoColor=black" alt="Bandit"></a>
-  <a href="https://pytest.org/"><img src="https://img.shields.io/badge/Tests-Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white" alt="Pytest"></a>
-  <a href="https://pre-commit.com/"><img src="https://img.shields.io/badge/Pre--commit-enabled-brightgreen?style=flat-square&logo=pre-commit&logoColor=white" alt="Pre-commit"></a>
-  <a href="https://conventionalcommits.org/"><img src="https://img.shields.io/badge/Commits-conventional-FE5196?style=flat-square&logo=conventionalcommits&logoColor=white" alt="Conventional"></a>
-</p>
-
-<p align="center">
-  <a href="docs/"><img src="https://img.shields.io/badge/Docs-Markdown-526CFE?style=flat-square&logo=markdown&logoColor=white" alt="Docs"></a>
-  <a href="examples/notebooks/"><img src="https://img.shields.io/badge/Notebooks-130+-F37626?style=flat-square&logo=jupyter&logoColor=white" alt="Notebooks"></a>
-  <a href="docs/tutorials/"><img src="https://img.shields.io/badge/Tutorials-available-FF7043?style=flat-square&logo=readthedocs&logoColor=white" alt="Tutorials"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/API-reference-00897B?style=flat-square&logo=swagger&logoColor=white" alt="API"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/GeoTIFF-native-43A047?style=flat-square" alt="GeoTIFF"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/COG-cloud-26A69A?style=flat-square&logo=amazonaws&logoColor=white" alt="COG"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/Zarr-supported-7B1FA2?style=flat-square" alt="Zarr"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/NetCDF-supported-5C6BC0?style=flat-square" alt="NetCDF"></a>
-  <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Covenant-2.1-4BAAAA?style=flat-square&logo=contributorcovenant&logoColor=white" alt="Covenant"></a>
-  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square&logo=github&logoColor=white" alt="PRs"></a>
-</p>
-
-<p align="center">
-  <a href="docs/"><img src="https://img.shields.io/badge/WorldView-supported-7B1FA2?style=flat-square" alt="WorldView"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/Planet-supported-00ACC1?style=flat-square" alt="Planet"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/Shapefile-vector-8D6E63?style=flat-square" alt="Shapefile"></a>
-  <a href="docs/"><img src="https://img.shields.io/badge/GeoJSON-vector-FFB300?style=flat-square&logo=json&logoColor=black" alt="GeoJSON"></a>
-  <a href="https://scipy.org/"><img src="https://img.shields.io/badge/SciPy-1.11+-8CAAE6?style=flat-square&logo=scipy&logoColor=white" alt="SciPy"></a>
-  <a href="https://pandas.pydata.org/"><img src="https://img.shields.io/badge/Pandas-2.0+-150458?style=flat-square&logo=pandas&logoColor=white" alt="Pandas"></a>
-  <a href="https://xarray.dev/"><img src="https://img.shields.io/badge/Xarray-supported-F37626?style=flat-square" alt="Xarray"></a>
-  <a href="https://dask.org/"><img src="https://img.shields.io/badge/Dask-parallel-FDA061?style=flat-square&logo=dask&logoColor=white" alt="Dask"></a>
-  <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/FastAPI-serving-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"></a>
-  <a href="https://docker.com/"><img src="https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"></a>
-</p>
-
----
-
-## Executive Summary
-
-**Unbihexium** is a production-grade, enterprise-ready Python library for geospatial artificial intelligence, Earth observation analytics, and remote sensing workflows. The library provides a unified, extensible framework encompassing **520 trainable starter models** (130 model families in 4 variant tiers: tiny, base, large, mega) with deterministic, verifiable starter weights, 12 capability domains, and comprehensive tooling for end-to-end geospatial analysis pipelines.
-
-The library is named after the theoretical chemical element with atomic number 126, symbolizing the comprehensive and foundational nature of this framework in bridging Earth observation data with artificial intelligence capabilities.
-
-### Key Differentiators
-
-| Feature | Unbihexium | Traditional GIS | Cloud AI Services |
-| --------- | ------------ | ----------------- | ------------------- |
-| Offline Capable | Yes | Yes | No |
-| Model Count | 520 | 0 | 10-50 |
-| Open Source | MPL-2.0 | Varies | No |
-| Self-Hosted | Yes | Yes | No |
-| GPU Acceleration | Yes | Limited | Yes |
-| Edge Deployment | Yes | No | No |
-| Custom Training | Yes | No | Limited |
-
----
-
-## Table of Contents
-
-1. [Model Zoo Overview](#model-zoo-overview)
-2. [System Architecture](#system-architecture)
-3. [Capability Matrix](#capability-matrix)
-4. [Mathematical Foundations](#mathematical-foundations)
-5. [Installation](#installation)
-6. [Quick Start](#quick-start)
-7. [Performance Metrics](#performance-metrics)
-8. [Documentation](#documentation)
-9. [Security and Compliance](#security-and-compliance)
-10. [Contributing](#contributing)
-11. [Citation](#citation)
-12. [License](#license)
-
----
-
-## Model Zoo Overview
-
-The model zoo offers **130 model families in four size variants (520 models, 10,655,126,116 parameters in total)**. Every learned model is a **starter model**: a complete, trainable architecture for its task with deterministic starter weights, generated locally and verifiable against the published SHA-256 digest in [`src/unbihexium/zoo/digests.json`](src/unbihexium/zoo/digests.json). The starter models are **not trained on Earth observation data**; train or fine-tune them on labelled data for your area and sensor before using their predictions. The seven spectral index models implement published formulas exactly and need no training.
-
-```python
-from unbihexium.zoo import list_models, load_model
-
-model = load_model("ship_detector_base")  # built locally, digest verified
-print(model.summary())
-```
-
-The catalogue of all families, with their inputs, outputs, required training labels and suitable data sources, is [`src/unbihexium/zoo/catalog.yaml`](src/unbihexium/zoo/catalog.yaml); the per-family model cards are listed in [`model_zoo/MODEL_CARDS.md`](model_zoo/MODEL_CARDS.md).
-
-### Variants
-
-| Variant | Base channels | Encoder levels | Blocks per level | Tile size | Parameters per model (learned models) | Total parameters |
-| --- | --- | --- | --- | --- | --- | --- |
-| **tiny** | 16 | 3 | 1 | 256 px | 134,992 to 735,428 | 86,951,209 |
-| **base** | 32 | 4 | 1 | 256 px | 657,264 to 7,063,428 | 825,294,793 |
-| **large** | 48 | 4 | 2 | 512 px | 2,784,528 to 22,066,564 | 2,611,810,665 |
-| **mega** | 64 | 5 | 2 | 512 px | 6,109,872 to 60,460,548 | 7,131,069,449 |
-
-### Tasks and architectures
-
-| Task | Families | Models | Architecture |
-| --- | --- | --- | --- |
-| detection | 19 | 76 | CenterNet (anchor-free, stride 4) |
-| segmentation | 26 | 104 | U-Net |
-| change detection | 6 | 24 | U-Net on two stacked acquisitions |
-| dense regression | 49 | 196 | U-Net with regression output |
-| scene regression | 11 | 44 | Residual encoder with pooled regression head |
-| enhancement | 11 | 44 | Residual U-Net (image to image) |
-| super resolution | 1 | 4 | EDSR-style residual network with sub-pixel convolution |
-| spectral index | 7 | 28 | Exact formula (no weights) |
-
-## System Architecture
-
-### High-Level Architecture Diagram
-
-```mermaid
-graph TB
-    subgraph "Input Layer"
-        A1["Satellite Imagery<br/>Sentinel-1/2, Landsat-8/9, WorldView, Pleiades"]
-        A2["Aerial Photography<br/>UAV, Aircraft, Balloon"]
-        A3["Vector Data<br/>GeoJSON, Shapefile, GeoPackage, KML"]
-        A4["Tabular Data<br/>CSV, Parquet, Arrow, HDF5"]
-    end
-
-    subgraph "Core Framework"
-        B1[Pipeline Orchestrator]
-        B2[Capability Registry]
-        B3[Model Zoo Manager]
-        B4["Inference Engine<br/>ONNX Runtime"]
-    end
-
-    subgraph "Processing Modules"
-        C1[Tiling Engine]
-        C2[Preprocessing]
-        C3[Postprocessing]
-        C4[Georeferencing]
-    end
-
-    subgraph "Output Layer"
-        D1[GeoTIFF Rasters]
-        D2[Vector Features]
-        D3[Analysis Reports]
-        D4[Metrics JSON]
-    end
-
-    A1 --> B1
-    A2 --> B1
-    A3 --> B1
-    A4 --> B1
-
-    B1 --> B2
-    B2 --> B3
-    B3 --> B4
-
-    B4 --> C1
-    C1 --> C2
-    C2 --> C3
-    C3 --> C4
-
-    C4 --> D1
-    C4 --> D2
-    C4 --> D3
-    C4 --> D4
-```
-
-### Component Architecture
-
-#### Pipeline Orchestrator
-
-The Pipeline Orchestrator serves as the central coordination component, managing workflow execution, resource allocation, and stage sequencing.
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Orchestrator
-    participant Registry
-    participant ModelZoo
-    participant Inference
-    participant Output
-
-    User->>Orchestrator: submit_pipeline(config)
-    Orchestrator->>Registry: resolve_capabilities()
-    Registry->>ModelZoo: get_models(capability_ids)
-    ModelZoo->>ModelZoo: verify_checksums()
-    ModelZoo->>Inference: load_models()
-    Inference->>Inference: warm_up()
-    loop For each tile
-        Orchestrator->>Inference: process_tile(data)
-        Inference->>Output: write_result(prediction)
-    end
-    Output->>User: return results
-```
-
-#### Model Architecture Details
-
-| Architecture | Task Types | Layer Configuration | Parameters (mega) | Receptive Field |
-| -------------- | ------------ | --------------------- | ------------------- | ----------------- |
-| UNet | Detection, Segmentation | 3-level encoder-decoder with skip connections | 2.3M | 256 px |
-| Siamese | Change Detection | Dual-stream encoder with shared weights | 4.1M | 256 px |
-| MLP | Regression, Risk Assessment | 6-layer fully-connected with BatchNorm | 1.0M | N/A |
-| CNN | Enhancement, Index | 6-layer convolutional with residual connections | 3.0M | 128 px |
-| SRCNN | Super Resolution | Feature extraction + PixelShuffle upsampling | 752K | 64 px |
-
-### Data Flow Architecture
-
-```mermaid
-flowchart LR
-    subgraph Input
-        I1[GeoTIFF]
-        I2[JPEG2000]
-        I3[NetCDF]
-    end
-
-    subgraph Preprocessing
-        P1[Normalization]
-        P2[Tiling]
-        P3[Augmentation]
-    end
-
-    subgraph Inference
-        M1[Model Loading]
-        M2[Batch Processing]
-        M3[GPU Acceleration]
-    end
-
-    subgraph Postprocessing
-        O1[Stitching]
-        O2[Georeferencing]
-        O3[Vectorization]
-    end
-
-    I1 --> P1
-    I2 --> P1
-    I3 --> P1
-    P1 --> P2
-    P2 --> P3
-    P3 --> M1
-    M1 --> M2
-    M2 --> M3
-    M3 --> O1
-    O1 --> O2
-    O2 --> O3
-```
-
----
-
-## Mathematical Foundations
-
-### Convolutional Neural Network Theory
-
-The fundamental operation in our convolutional architectures is the 2D convolution:
-
-$$
-(f * g)(x, y) = \sum_{i=-k}^{k} \sum_{j=-k}^{k} f(i, j) \cdot g(x-i, y-j)
-$$
-
-Where $f$ is the input feature map, $g$ is the convolutional kernel, and $k$ is the kernel radius.
-
-### Batch Normalization
-
-All architectures employ batch normalization for training stability:
-
-$$
-\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}
-$$
-
-$$
-y_i = \gamma \hat{x}_i + \beta
-$$
-
-Where $\mu_B$ and $\sigma_B^2$ are the batch mean and variance, and $\gamma$, $\beta$ are learned parameters.
-
-### Activation Functions
-
-The primary activation function is ReLU:
-
-$$
-\text{ReLU}(x) = \max(0, x)
-$$
-
-For certain layers, we employ GELU for smoother gradients:
-
-$$
-\text{GELU}(x) = x \cdot \Phi(x) = x \cdot \frac{1}{2}\left[1 + \text{erf}\left(\frac{x}{\sqrt{2}}\right)\right]
-$$
-
-### Loss Functions
-
-#### Cross-Entropy Loss (Segmentation)
-
-$$
-\mathcal{L}_{CE} = -\frac{1}{N} \sum_{i=1}^{N} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c})
-$$
-
-#### Dice Loss (Segmentation)
-
-$$
-\mathcal{L}_{Dice} = 1 - \frac{2 \sum_{i} p_i g_i + \epsilon}{\sum_{i} p_i + \sum_{i} g_i + \epsilon}
-$$
-
-#### Mean Squared Error (Regression)
-
-$$
-\mathcal{L}_{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2
-$$
-
-#### Focal Loss (Detection)
-
-$$
-\mathcal{L}_{FL} = -\alpha_t (1 - p_t)^\gamma \log(p_t)
-$$
-
-Where $\gamma$ is the focusing parameter (typically 2.0) and $\alpha_t$ is the class balancing weight.
-
-### Evaluation Metrics
-
-#### Intersection over Union (IoU)
-
-$$
-\text{IoU} = \frac{| A \cap B | }{ | A \cup B |} = \frac{\text{TP}}{\text{TP} + \text{FP} + \text{FN}}
-$$
-
-#### Mean Average Precision (mAP)
-
-$$
-\text{mAP} = \frac{1}{| C | } \sum_{c \in C} \text{AP}(c) = \frac{1}{ | C |} \sum_{c \in C} \int_0^1 P(R) \, dR
-$$
-
-#### Peak Signal-to-Noise Ratio (PSNR)
-
-$$
-\text{PSNR} = 10 \cdot \log_{10}\left(\frac{\text{MAX}_I^2}{\text{MSE}}\right) = 20 \cdot \log_{10}\left(\frac{\text{MAX}_I}{\sqrt{\text{MSE}}}\right)
-$$
-
-#### Structural Similarity Index (SSIM)
-
-$$
-\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + c_1)(2\sigma_{xy} + c_2)}{(\mu_x^2 + \mu_y^2 + c_1)(\sigma_x^2 + \sigma_y^2 + c_2)}
-$$
-
----
-
-## Capability Matrix
-
-### Domain Coverage Summary
-
-The library implements 12 primary capability domains with 130 individual base models:
-
-| ID | Domain | Models | Primary Tasks | Production Status |
-| ---- | -------- | -------- | --------------- | ------------------- |
-| 01 | AI Products | 13 | Super-resolution, Detection, Segmentation | Production |
-| 02 | Tourism and Data Processing | 10 | Route planning, Spatial analysis | Production |
-| 03 | Vegetation Indices and Flood/Water | 12 | NDVI, NDWI, NBR, Flood risk | Production |
-| 04 | Environment and Forestry | 14 | Deforestation, Forest density | Production |
-| 05 | Asset Management and Energy | 12 | Pipeline monitoring, Site selection | Production |
-| 06 | Urban and Agriculture | 18 | Urban planning, Crop classification | Production |
-| 07 | Risk and Defense (Neutral) | 15 | Hazard analysis, Maritime awareness | Production |
-| 08 | Value-Added Imagery | 4 | DSM, DEM, Orthorectification | Production |
-| 09 | Benefits Narrative | 0 | Documentation only | N/A |
-| 10 | Satellite Imagery Features | 6 | Stereo, Pansharpening | Production |
-| 11 | Resolution and Metadata QA | 4 | Quality assurance | Production |
-| 12 | Radar and SAR | 8 | Amplitude, Phase, InSAR | Production |
-
-### Capability Distribution Visualization
-
-```mermaid
-xychart-beta
-    title "Models per Capability Domain"
-    x-axis [D01, D02, D03, D04, D05, D06, D07, D08, D09, D10, D11, D12]
-    y-axis "Model Count" 0 --> 20
-    bar [13, 10, 12, 14, 12, 18, 15, 4, 0, 6, 4, 8]
-```
-
----
-
-## Installation
-
-### System Requirements
-
-| Component | Minimum | Recommended | Optimal | Notes |
-| ----------- | --------- | ------------- | --------- | ------- |
-| Python | 3.10 | 3.14 | 3.14 | 3.10 to 3.14 supported |
-| RAM | 8 GB | 16 GB | 32 GB | Per concurrent pipeline |
-| Disk | 5 GB | 50 GB | 200 GB | Model cache space |
-| GPU | None | RTX 3060 | A100 | 10-50x inference speedup |
-| CPU Cores | 4 | 8 | 16+ | Parallel preprocessing |
-| OS | Linux, Windows, macOS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS | Best tested |
-
-### Installation Methods
-
-#### Standard Installation (PyPI)
-
-```bash
-# Basic installation
-pip install unbihexium
-
-# With optional dependencies
-pip install unbihexium[gpu]      # GPU acceleration
-pip install unbihexium[dev]      # Development tools
-pip install unbihexium[test]     # Testing utilities
-pip install unbihexium[all]      # All optional dependencies
-```
-
-#### Conda Installation
-
-```bash
-# Create environment
-conda create -n unbihexium python=3.14
-conda activate unbihexium
-
-# Install package
-conda install -c conda-forge unbihexium
-
-# With GPU support
-conda install -c conda-forge unbihexium cudatoolkit=11.8
-```
-
-#### Development Installation
-
-```bash
-# Clone repository
-git clone https://github.com/unbihexium-oss/unbihexium.git
-cd unbihexium
-
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate     # Windows
-
-# Install in development mode
-pip install -e ".[dev,test,docs]"
-
-# Run tests
-pytest tests/
-```
-
-**Note:** The model zoo needs no large downloads. Starter weights are generated locally from the model id and verified against the published digests; install `unbihexium[torch]` to build, train and export models.
-
-#### Docker Installation
-
-```bash
-# Pull official image
-docker pull ghcr.io/unbihexium-oss/unbihexium:latest
-
-# Run container
-docker run -it --gpus all \
-    -v $(pwd)/data:/data \
-    -v $(pwd)/output:/output \
-    ghcr.io/unbihexium-oss/unbihexium:latest
-
-# Docker Compose
-docker-compose up -d
-```
-
-### Verification
-
-```bash
-# Verify installation
-unbihexium --version
-
-# Run self-test
-unbihexium self-test
-
-# List available models
-unbihexium zoo list --count
-
-# Check GPU availability
-unbihexium device status
-```
-
----
-
-## Quick Start
-
-The learned models of the zoo are untrained starter models: train them on labelled data before relying on their output. The spectral index models are exact formulas and work immediately.
-
-### CLI Usage
-
-```bash
-# Browse the catalogue
-unbihexium zoo list --task detection --variant tiny
-unbihexium zoo info ship_detector_base
-
-# Check a training setup on synthetic data, then train on your own dataset
-unbihexium train ship_detector_tiny --synthetic 64 --epochs 5 --chip-size 64
-unbihexium train ship_detector_base --data path/to/dataset --epochs 50
-
-# Evaluate the trained model and run it on a scene
-unbihexium evaluate runs/ship_detector_base/best.pt --data path/to/dataset --split test
-unbihexium predict runs/ship_detector_base/best.pt scene.tif ships.geojson
-
-# Export to ONNX and run without PyTorch
-unbihexium zoo export runs/ship_detector_base/best.pt ship_detector.onnx
-unbihexium predict ship_detector.onnx scene.tif ships.geojson
-
-# Exact spectral indices need no training
-unbihexium index ndvi -i sentinel2.tif -o ndvi.tif
-```
-
-### Python API
-
-```python
-from unbihexium.ai import LandCoverClassifier, ShipDetector
-from unbihexium.ai.training import TrainConfig, train
-
-# Train a detector on a dataset folder (see docs/model_zoo/training.md)
-result = train("ship_detector_base", "path/to/dataset", TrainConfig(epochs=50))
-print(result.best_metrics["map50"], result.best_checkpoint)
-
-# Detect ships in a GeoTIFF with the trained weights
-detections = ShipDetector(weights=result.best_checkpoint, threshold=0.4).predict("scene.tif")
-print(detections.count, detections.counts_by_class())
-geojson = detections.to_geojson()
-
-# Land cover with class areas in square metres
-land_cover = LandCoverClassifier(weights="runs/lulc/best.pt").predict("sentinel2.tif")
-print(land_cover.class_areas())
-```
-
-See [docs/model_zoo/training.md](docs/model_zoo/training.md) for the dataset layout and [docs/model_zoo/inference.md](docs/model_zoo/inference.md) for tiling, backends and output formats.
-
----
-
-## Performance Metrics
-
-### Throughput Analysis
-
-Processing throughput depends on hardware configuration and model variant:
-
-$$
-T = \frac{N_{tiles} \times S_{tile}^2}{t_{total}} \quad [\text{pixels/second}]
-$$
-
-Where $N_{tiles}$ is the number of tiles, $S_{tile}$ is the tile dimension, and $t_{total}$ is total processing time.
-
-```mermaid
-xychart-beta
-    title "Inference Throughput by Hardware (tiles/sec)"
-    x-axis [tiny, base, large, mega]
-    y-axis "Tiles per Second" 0 --> 600
-    bar "CPU (8 cores)" [100, 25, 6, 2]
-    bar "GPU (RTX 3080)" [400, 100, 25, 6]
-    bar "GPU (A100)" [600, 200, 50, 12]
-```
-
-### Memory Requirements
-
-Total memory consumption follows:
-
-$$
-M_{total} = M_{base} + M_{model} + N_{batch} \times M_{tile}
-$$
-
-| Variant | Model Size | Runtime Memory | Batch Size 1 | Batch Size 8 | Batch Size 16 |
-| --------- | ------------ | ---------------- | -------------- | -------------- | --------------- |
-| tiny | 500 KB | 50 MB | 100 MB | 200 MB | 350 MB |
-| base | 2 MB | 100 MB | 200 MB | 500 MB | 900 MB |
-| large | 5 MB | 200 MB | 500 MB | 1.5 GB | 2.8 GB |
-| mega | 15 MB | 500 MB | 1.5 GB | 4 GB | 7.5 GB |
-
-### Latency Analysis
-
-| Operation | tiny | base | large | mega |
-| ----------- | ------ | ------ | ------- | ------ |
-| Model Load (cold) | 50 ms | 100 ms | 200 ms | 500 ms |
-| Model Load (warm) | 5 ms | 10 ms | 20 ms | 50 ms |
-| Single Tile (CPU) | 10 ms | 40 ms | 160 ms | 500 ms |
-| Single Tile (GPU) | 2 ms | 8 ms | 30 ms | 100 ms |
-| Batch 8 Tiles (GPU) | 8 ms | 32 ms | 120 ms | 400 ms |
-
----
-
-## Documentation
-
-| Section | Description | Link |
-| --------- | ------------- | ------ |
-| Getting Started | Installation, quickstart, configuration | [docs/getting_started/](docs/getting_started/) |
-| Tutorials | Step-by-step guides and examples | [docs/tutorials/](docs/tutorials/) |
-| API Reference | Complete Python API documentation | [docs/reference/api.md](docs/reference/api.md) |
-| CLI Reference | Command-line interface documentation | [docs/reference/cli.md](docs/reference/cli.md) |
-| Architecture | System design and internals | [docs/architecture/](docs/architecture/) |
-| Capabilities | Domain encyclopedia (12 documents) | [docs/capabilities/](docs/capabilities/) |
-| Model Zoo | Model catalog and usage guides | [docs/model_zoo/](docs/model_zoo/) |
-| Security | Security practices and compliance | [docs/security/](docs/security/) |
-| Operations | Deployment and operations | [docs/operations/](docs/operations/) |
-
----
-
-## Security and Compliance
-
-### Security Controls
-
-| Control | Implementation | Status | Verification |
-| --------- | --------------- | -------- | -------------- |
-| Dependency Scanning | Dependabot, pip-audit, Dependency Review | Active | Every PR and weekly |
-| Static Analysis | Bandit, Ruff | Active | Every PR |
-| Secret Scanning | TruffleHog | Active | Every PR and push |
-| Model Integrity | SHA256 checksums of every model variant | Active | Every model zoo change and on download |
-| Supply Chain | Container SBOM, build provenance attestations, SLSA Level 3 provenance | Active | Every release |
-| Container Scanning | Grype | Active | Image changes and weekly |
-| Licence Compliance | REUSE, MPL-2.0 notices, dependency licences | Active | Every PR |
-| Repository Security | OpenSSF Scorecard, [security-insights.yml](security-insights.yml) | Active | Weekly |
-
-### Compliance Certifications
-
-| Standard | Status | Scope |
-| ---------- | -------- | ------- |
-| MPL-2.0 License | Compliant | Full codebase |
-| GDPR | Compliant | No PII collection |
-| CCPA | Compliant | No PII collection |
-| EAR | Reviewed | Non-controlled items |
-| SOC 2 Type II | In Progress | Enterprise deployment |
-
----
-
-## Contributing
-
-We welcome contributions from the community. Please review:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Community standards
-- [GOVERNANCE.md](GOVERNANCE.md) - Project governance
-- [MAINTAINERS.md](MAINTAINERS.md) - Maintainers and responsibilities
-- [AUTHORS.md](AUTHORS.md) - Authors and contributors
-- [ROADMAP.md](ROADMAP.md) - Planned work
-- [RESPONSIBLE_USE.md](RESPONSIBLE_USE.md) - Intended use, limitations and deployer obligations
-- [SECURITY.md](SECURITY.md) - Security reporting
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes with tests
-4. Run linting and tests locally
-5. Submit a pull request
-6. Address review feedback
-7. Merge after approval
-
----
-
-## Citation
-
-```bibtex
-@software{unbihexium2025,
-  author       = {Unbihexium OSS Foundation},
-  title        = {Unbihexium: Production-Grade Geospatial AI Library},
-  year         = {2025},
-  version      = {1.0.0},
-  publisher    = {GitHub},
-  url          = {https://github.com/unbihexium-oss/unbihexium},
-  doi          = {10.5281/zenodo.0000000},
-  license      = {MPL-2.0},
-  note         = {130 model families in 4 variants, 12 capability domains}
-}
-```
-
----
-
-## License
-
-Copyright 2025 Unbihexium OSS Foundation
-
-Licensed under the Mozilla Public License, Version 2.0 (MPL-2.0). See [LICENSE.txt](LICENSE.txt) for the full license text.
-
-```text
+<!--
 This Source Code Form is subject to the terms of the Mozilla Public
 License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : README.md
+Title       : Unbihexium
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
+=============================================================================
+-->
+
+# Unbihexium
+
+[![CI](https://github.com/unbihexium-oss/unbihexium/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/unbihexium-oss/unbihexium/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/codeql.yml)
+[![Package](https://github.com/unbihexium-oss/unbihexium/actions/workflows/package.yml/badge.svg?branch=main)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/package.yml)
+[![Fuzzing](https://github.com/unbihexium-oss/unbihexium/actions/workflows/fuzz.yml/badge.svg?branch=main)](https://github.com/unbihexium-oss/unbihexium/actions/workflows/fuzz.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/unbihexium-oss/unbihexium/badge)](https://scorecard.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium)
+[![PyPI](https://img.shields.io/pypi/v/unbihexium?label=PyPI)](https://pypi.org/project/unbihexium/)
+[![Python 3.10 to 3.14](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-3776AB)](https://github.com/unbihexium-oss/unbihexium/blob/main/pyproject.toml)
+[![Licence: MPL-2.0](https://img.shields.io/github/license/unbihexium-oss/unbihexium?label=Licence)](https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt)
+
+| Field | Value |
+| --- | --- |
+| Document | UBX-DOC-README |
+| Version | 2.0 |
+| Status | Active |
+| Last reviewed | 2026-09-23 |
+| Owner | Unbihexium maintainers (see [MAINTAINERS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/MAINTAINERS.md)) |
+| Applies to | Unbihexium 1.0.x and the main branch |
+
+## Abstract
+
+Unbihexium is an open source Python library for Earth observation, geospatial analysis, remote sensing and synthetic aperture radar (SAR). This document is the front page of the project and its description on the Python Package Index. It is written for users who want to install the library and run a first analysis, for researchers who need to know what the software does and how to cite it, and for contributors, security researchers and auditors who need an entry point into the governance, security and supply-chain documents of the repository. It covers the scope and status of the project, including the fact that the learned models of the model zoo are untrained starter models, the installation options, tested examples for the Python API and the command line, an overview of every subpackage, the model zoo, the REST service, reproducibility and supply-chain security, the repository layout, and the contribution, security, citation and licensing arrangements.
+
+## Contents
+
+1. [Overview](#1-overview)
+2. [Status and scope](#2-status-and-scope)
+3. [Installation](#3-installation)
+4. [Quick start in Python](#4-quick-start-in-python)
+5. [Quick start on the command line](#5-quick-start-on-the-command-line)
+6. [Feature overview by package](#6-feature-overview-by-package)
+7. [Model zoo](#7-model-zoo)
+8. [REST service](#8-rest-service)
+9. [Configuration](#9-configuration)
+10. [Reproducibility and supply-chain security](#10-reproducibility-and-supply-chain-security)
+11. [Project layout](#11-project-layout)
+12. [Documentation](#12-documentation)
+13. [Contributing](#13-contributing)
+14. [Security](#14-security)
+15. [Citation](#15-citation)
+16. [Licence and acknowledgements](#16-licence-and-acknowledgements)
+17. [References](#references)
+
+## 1. Overview
+
+Unbihexium brings together, in one typed Python package, the building blocks of a typical Earth observation workflow:
+
+- reading and writing rasters and vectors (GeoTIFF, Cloud Optimized GeoTIFF, Zarr, GeoJSON, GeoParquet) and searching SpatioTemporal Asset Catalogs (STAC);
+- radiometric preprocessing for Sentinel-2 and Landsat, cloud and quality masks, pansharpening and resampling;
+- 28 spectral indices, SAR calibration, speckle filtering, polarimetric decomposition and interferometry;
+- terrain derivatives and hydrology, geostatistics (variograms, kriging, spatial autocorrelation) and spatial analysis (zonal statistics, suitability, least-cost paths, network analysis);
+- accuracy assessment and image-quality metrics, and visualisation helpers;
+- a model zoo of 130 model families in four size variants (520 models) with training, evaluation, tiled inference, ONNX export and task-level Python APIs;
+- a command line interface (`unbihexium`) and a FastAPI-based REST service.
+
+The name refers to the hypothetical chemical element with atomic number 126. The project is maintained by Olaf Yunus Laitinen Imanov (University of Helsinki) on behalf of the Unbihexium OSS Foundation, and it is distributed under the Mozilla Public License 2.0 [1].
+
+## 2. Status and scope
+
+### 2.1 What is ready to use
+
+The classical processing functions (input and output, preprocessing, spectral indices, SAR, terrain, geostatistics, analysis, metrics and visualisation) are deterministic implementations of published methods. They are covered by the tests in `tests/`: the unit and integration tests run in CI on CPython 3.10, 3.11, 3.12, 3.13 and 3.14, and the end-to-end tests on the newest supported version.
+
+### 2.2 The models are starter models
+
+The model zoo contains 520 models: 130 families, each in the variants tiny, base, large and mega. **Apart from the 7 spectral index families (28 models), which compute exact formulas and need no training, every model is an untrained starter model.** A starter model is a complete, trainable network architecture for its task with deterministic initial weights that anyone can rebuild and verify against a published SHA-256 digest. Starter models have not been trained on Earth observation data, so their predictions are not meaningful until you train or fine-tune them on labelled data for your sensor and area of interest. The library provides the tools for this (`unbihexium train`, `unbihexium evaluate`, `unbihexium.ai.training`). No accuracy figures are published for the zoo, because there are no trained weights to measure.
+
+### 2.3 Release status
+
+The version declared in `pyproject.toml` is 1.0.1. The distribution published on PyPI as version 1.0.1 was built from the tag `v1.0.1` (21 December 2025). The main branch has changed substantially since that tag (among other things: model training and evaluation, the `predict` and `zoo build` commands, the REST prediction route, the licence change from Apache-2.0 to MPL-2.0 and the classifiers for Python 3.13 and 3.14) and has not yet been released under a new version number. **The examples in this document are tested against the main branch.** Until the next release, install from source (Section 3.4) to use them. Release notes are kept in [CHANGELOG.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md), and the versioning and support policy in [VERSIONING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md).
+
+### 2.4 Out of scope
+
+Unbihexium does not ship trained weights, labelled training data or imagery, does not provide a hosted service, and makes no claim of fitness for any operational, safety-critical or legal purpose. Read [RESPONSIBLE_USE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/RESPONSIBLE_USE.md) before deploying models whose output affects people, property or the environment.
+
+## 3. Installation
+
+### 3.1 Requirements
+
+- CPython 3.10, 3.11, 3.12, 3.13 or 3.14 on Linux, macOS or Windows.
+- No compiler and no system GDAL: the binary wheels of rasterio, pyproj, shapely and onnxruntime bundle GDAL, PROJ, GEOS and their native libraries.
+- PyTorch only for building, training and exporting models (extra `torch`); inference on exported ONNX models needs only the extra `onnx`.
+
+### 3.2 From PyPI
+
+```bash
+python -m pip install unbihexium
 ```
 
----
+The core installation covers input and output, preprocessing, indices, SAR, terrain, geostatistics, analysis, metrics, visualisation, the catalogue of the model zoo and the command line. Optional features are grouped in extras:
 
-Unbihexium - Element 126 - Bridging Earth Observation and Artificial Intelligence
+| Extra | Adds | Needed for |
+| --- | --- | --- |
+| `onnx` | onnxruntime, onnx | Inference on ONNX exports without PyTorch |
+| `torch` | torch, torchvision, onnx | Building, training, evaluating and exporting zoo models |
+| `gpu` | `torch` extra, cupy-cuda12x | CUDA 12 acceleration (install the matching PyTorch CUDA build first) |
+| `serving` | fastapi, starlette, uvicorn, python-multipart | The REST service in `unbihexium.serving` |
+| `dask` | dask[complete] | Chunked and distributed processing |
+| `ray` | ray | Cluster computing |
+| `zarr` | zarr, numcodecs | Zarr input and output |
+| `netcdf` | netCDF4, h5py | NetCDF and HDF5 files |
+| `stac` | pystac, pystac-client | STAC search and metadata |
+| `parquet` | pyarrow | GeoParquet input and output |
+| `test` | pytest and plugins, httpx | Running the test suite |
+| `dev` | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development |
+| `all` | every extra except `gpu` | A complete environment |
+
+```bash
+python -m pip install "unbihexium[torch,onnx,serving]"
+```
+
+### 3.3 Container image
+
+The workflow `.github/workflows/docker.yml` builds the image from the [Dockerfile](https://github.com/unbihexium-oss/unbihexium/blob/main/Dockerfile) and pushes it to the GitHub Container Registry as `ghcr.io/unbihexium-oss/unbihexium`. Pushes to `main` are tagged `main`, version tags are tagged `<major>.<minor>.<patch>` and `<major>.<minor>`, and every image is also tagged with its commit (`sha-<short sha>`); there is no `latest` tag. The image contains the ONNX Runtime backend and the REST service, installed from the hashed lock file `requirements.txt`, runs as the unprivileged user `unbihexium` and does not contain model weights or PyTorch.
+
+```bash
+docker pull ghcr.io/unbihexium-oss/unbihexium:main
+docker run --rm ghcr.io/unbihexium-oss/unbihexium:main unbihexium info
+docker run --rm -p 8000:8000 ghcr.io/unbihexium-oss/unbihexium:main \
+    uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+```
+
+To build the image locally, run `docker build -t unbihexium:local .` in the repository root. [docker-compose.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/docker-compose.yml) and the manifests under [deploy/](https://github.com/unbihexium-oss/unbihexium/tree/main/deploy) (a Helm chart and a Kubernetes deployment) start the REST service; see [docs/operations/docker.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/operations/docker.md).
+
+### 3.4 From source
+
+```bash
+git clone https://github.com/unbihexium-oss/unbihexium.git
+cd unbihexium
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+python -m pip install -e ".[torch,onnx,serving]"
+unbihexium --version
+```
+
+For a reproducible development environment, install the hashed lock file of all extras and then the package without resolving dependencies again:
+
+```bash
+python -m pip install --require-hashes -r requirements-dev.txt
+python -m pip install --no-deps -e .
+pre-commit install
+```
+
+`requirements.txt` is the corresponding lock file of the runtime dependencies with the `onnx` and `serving` extras. Both lock files cover CPython 3.10 to 3.14 and are regenerated with `make lock`.
+
+## 4. Quick start in Python
+
+The examples below run in the given order in an empty working directory. They create small synthetic rasters, so no data download is needed. Examples 4.1 and 4.2 need only the core installation; 4.3 needs the `torch` extra. Models are built into the directory named by `UNBIHEXIUM_CACHE` (default `~/.cache/unbihexium`).
+
+### 4.1 Spectral index from a GeoTIFF
+
+```python
+import numpy as np
+from rasterio.transform import from_origin
+
+from unbihexium.indices import ndvi
+from unbihexium.io import is_cog, read_geotiff, write_geotiff
+
+# A synthetic 4-band reflectance scene (blue, green, red, near infrared), 10 m pixels.
+rng = np.random.default_rng(0)
+stack = rng.uniform(0.02, 0.5, size=(4, 64, 64)).astype("float32")
+write_geotiff(stack, "scene.tif", crs="EPSG:32635", transform=from_origin(500000, 6700000, 10, 10))
+
+# Read it back with its georeferencing and compute NDVI.
+data, meta = read_geotiff("scene.tif")
+vegetation = ndvi(nir=data[3], red=data[2])
+
+# Write the result as a Cloud Optimized GeoTIFF.
+path = write_geotiff(vegetation.astype("float32"), "ndvi.tif", crs=meta["crs"], transform=meta["transform"], cog=True)
+print(path, is_cog(path))
+```
+
+### 4.2 SAR, terrain, geostatistics and accuracy assessment
+
+```python
+import numpy as np
+
+from unbihexium.geostat import OrdinaryKriging
+from unbihexium.metrics import cohen_kappa, confusion_matrix
+from unbihexium.sar import lee_filter, power_to_db
+from unbihexium.terrain import hillshade, slope
+
+rng = np.random.default_rng(1)
+
+# Speckle filtering of a single-look backscatter image, then conversion to decibels.
+sigma0 = rng.gamma(shape=1.0, scale=0.05, size=(128, 128))
+sigma0_db = power_to_db(lee_filter(sigma0, window_size=7, looks=1.0))
+
+# Slope in degrees and hillshade of a synthetic 30 m elevation model.
+y, x = np.mgrid[0:100, 0:100]
+dem = 200.0 + 0.5 * x + 20.0 * np.sin(y / 15.0)
+slope_deg = slope(dem, resolution=30.0)
+shade = hillshade(dem, resolution=30.0)
+
+# Ordinary kriging of 50 scattered observations.
+coords = rng.uniform(0, 1000, size=(50, 2))
+values = 0.01 * coords[:, 0] + rng.normal(0, 0.5, size=50)
+kriged = OrdinaryKriging().fit(coords, values).predict(np.array([[500.0, 500.0], [100.0, 900.0]]))
+print(kriged.predictions, kriged.variance)
+
+# Confusion matrix and Cohen's kappa of a classification against a reference.
+reference = rng.integers(0, 3, size=(64, 64))
+predicted = np.where(rng.random((64, 64)) < 0.9, reference, (reference + 1) % 3)
+print(cohen_kappa(confusion_matrix(reference, predicted)))
+```
+
+### 4.3 Model zoo: build, train and predict
+
+The detector trained here learns from 32 synthetic chips for two epochs. This only checks that the training setup works; for real use, train on a labelled dataset as described in [docs/model_zoo/training.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/model_zoo/training.md).
+
+```python
+import numpy as np
+from rasterio.transform import from_origin
+
+from unbihexium.ai import NDVICalculator, ShipDetector
+from unbihexium.ai.training import TrainConfig, train
+from unbihexium.io import write_geotiff
+from unbihexium.zoo import list_models, load_model
+
+# Browse the catalogue (works without PyTorch).
+for entry in list_models(task="detection", variant="tiny")[:3]:
+    print(entry.model_id, entry.spec.bands, entry.num_parameters)
+
+# Build a starter model locally; its weights are verified against the published digest.
+model = load_model("ship_detector_tiny")
+print(model.summary())
+
+# Train it briefly on synthetic data to check the setup.
+config = TrainConfig(epochs=2, batch_size=4, chip_size=64, output_dir="runs", verbose=False)
+result = train("ship_detector_tiny", synthetic=32, config=config)
+print(result.best_checkpoint, result.best_metrics["map50"])
+
+# Run the trained checkpoint on an RGB GeoTIFF and export the detections as GeoJSON.
+rgb = np.random.default_rng(2).uniform(0, 0.3, size=(3, 128, 128)).astype("float32")
+write_geotiff(rgb, "harbour.tif", crs="EPSG:32635", transform=from_origin(500000, 6700000, 1, 1))
+detections = ShipDetector(weights=result.best_checkpoint, threshold=0.4).predict("harbour.tif")
+print(detections.count, detections.counts_by_class())
+geojson = detections.to_geojson()
+
+# Spectral index models are exact formulas and need no training (bands: red, nir).
+red_nir = np.stack([rgb[0], rgb[0] + 0.2])
+write_geotiff(red_nir, "red_nir.tif", crs="EPSG:32635", transform=from_origin(500000, 6700000, 1, 1))
+print(NDVICalculator().predict("red_nir.tif").summary())
+```
+
+## 5. Quick start on the command line
+
+The commands below are tested in the same working directory as the Python examples (they use `scene.tif` and `harbour.tif`). Training, prediction with checkpoints and export need the `torch` extra; prediction on the exported ONNX file needs the `onnx` extra.
+
+```bash
+# Library and catalogue information
+unbihexium info
+unbihexium zoo list --task detection --variant tiny
+unbihexium zoo info ship_detector_base
+
+# Exact spectral index of a GeoTIFF (1-based band numbers of the input file)
+unbihexium index ndvi -i scene.tif -o ndvi_cli.tif --blue 1 --green 2 --red 3 --nir 4
+
+# Build a starter model into the local store, verify it and print its path
+unbihexium zoo build ship_detector_tiny
+unbihexium zoo verify ship_detector_tiny
+unbihexium zoo where ship_detector_tiny
+
+# Check the training setup on synthetic data, then predict with the checkpoint
+unbihexium train ship_detector_tiny --synthetic 32 --epochs 2 --chip-size 64
+unbihexium predict runs/ship_detector_tiny/best.pt harbour.tif ships.geojson
+
+# Export to ONNX (verified against PyTorch) and predict without PyTorch
+unbihexium zoo export runs/ship_detector_tiny/best.pt ship_detector.onnx
+unbihexium predict ship_detector.onnx harbour.tif ships_onnx.geojson --backend onnx
+
+# Registered processing pipelines
+unbihexium pipeline list
+```
+
+The complete command set is:
+
+| Command | Purpose |
+| --- | --- |
+| `unbihexium info` | Version, number of registered capabilities, models and pipelines |
+| `unbihexium index` | Compute a spectral index of a raster and write it as GeoTIFF |
+| `unbihexium zoo list`, `info` | Browse the model catalogue |
+| `unbihexium zoo build`, `verify`, `where`, `clear` | Manage the local model store |
+| `unbihexium zoo export` | Export a model or checkpoint to ONNX and verify it |
+| `unbihexium train` | Train or fine-tune a zoo model on a dataset folder or synthetic data |
+| `unbihexium evaluate` | Evaluate a model on a dataset split |
+| `unbihexium predict` | Run a model on a raster and write the result |
+| `unbihexium pipeline list`, `run` | List and run registered processing pipelines |
+
+Every command documents its options with `--help`; the full reference is [docs/reference/cli.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/cli.md). Bash completion is provided in [scripts/unbihexium-completion.bash](https://github.com/unbihexium-oss/unbihexium/blob/main/scripts/unbihexium-completion.bash).
+
+## 6. Feature overview by package
+
+Importing `unbihexium` loads only the version; each subpackage is imported when needed, and importing `unbihexium.ai` does not import PyTorch.
+
+| Package | Contents |
+| --- | --- |
+| `unbihexium.core` | Data model: `Raster`, `Vector`, `Tile` and `TileGrid`, `Scene`, `SensorModel` and spectral band definitions, `Product`, `ModelWrapper`, `Pipeline` and `PipelineRun`, `Evidence` and `ProvenanceRecord`, the spectral `IndexRegistry` |
+| `unbihexium.io` | GeoTIFF and Cloud Optimized GeoTIFF read and write with windows, overviews and compression; Zarr; GeoJSON validation, reprojection and ring orientation; GeoParquet; STAC items, catalogue traversal and search |
+| `unbihexium.preprocessing` | Sentinel-2 L2A and Landsat Collection 2 scaling, TOA reflectance, radiance and brightness temperature; SCL and QA cloud masks; dark object subtraction; stretches, histogram equalisation and matching; pansharpening (Brovey, IHS, Gram-Schmidt); resampling and aggregation; tensor transforms |
+| `unbihexium.indices` | NDVI [7], EVI, EVI2, SAVI, MSAVI, OSAVI, ARVI, GNDVI, kNDVI, VARI, NDRE, CI green and red edge, NDWI, MNDWI, AWEI, NDMI, MSI, NBR, NBR2, dNBR, RdNBR and burn severity classes, NDBI, BSI, NDSI, the radar vegetation index and the cross-polarisation ratio; `compute_index` by name |
+| `unbihexium.sar` | Radiometric calibration (sigma0, beta0, gamma0), decibel conversion, multilooking, Lee, refined and enhanced Lee, Frost, Kuan and Gamma MAP filters; covariance and coherency matrices, Pauli, Freeman-Durden, Yamaguchi and H/A/alpha decompositions; interferograms, coherence, Goldstein filtering, phase unwrapping, displacement and height of ambiguity |
+| `unbihexium.terrain` | Slope, aspect, curvature, hillshade, TPI, TRI, VRM and roughness; depression filling, D8 flow direction and accumulation, stream extraction, watersheds and TWI; viewshed |
+| `unbihexium.geostat` | Empirical and model variograms, ordinary and universal kriging, inverse distance weighting, spatial weights, global and local Moran's I, Geary's C, Getis-Ord Gi* |
+| `unbihexium.analysis` | Zonal statistics, weighted overlay, AHP, fuzzy membership and reclassification for suitability analysis, cost distance and least-cost paths, A* path finding and network accessibility |
+| `unbihexium.postprocessing` | Activations, thresholds and confidence masks, morphology, sieving and majority filters, connected components, tile blending and stitching, raster to polygon vectorisation and simplification |
+| `unbihexium.metrics` | Confusion matrix, overall accuracy, kappa, precision, recall, F1, IoU and Dice; good-practice accuracy assessment and stratified area estimation; change and transition matrices; regression metrics; PSNR, SSIM, SAM, ERGAS and Q index |
+| `unbihexium.visualization` | Colour maps and look-up tables, Sentinel-2 and Landsat 8/9 composites, class colouring and legends, hillshade and relief shading, quicklooks and PNG output with world files |
+| `unbihexium.ai` | Task APIs (for example `ShipDetector`, `BuildingDetector`, `LandCoverClassifier`, `FloodMapper`, `ChangeDetector`, `TreeHeightEstimator`, `SuperResolution`), the tiled `Predictor` for PyTorch and ONNX Runtime, result objects with GeoJSON and GeoTIFF output, datasets, training and evaluation |
+| `unbihexium.zoo` | The model catalogue, variants, local model store, weight digests and verification, checkpoints and ONNX export |
+| `unbihexium.serving` | `create_app()`, the FastAPI REST service with request limits, optional API key and rate limiting |
+| `unbihexium.cli` | The `unbihexium` command |
+
+Supporting packages are `unbihexium.registry` (capability, model and pipeline registries), `unbihexium.config` (layered settings) and `unbihexium.utils` (logging, hashing, seeding, tiling, atomic file writes). The public names of each package are listed in its `__all__` and described in [docs/reference/api.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/api.md).
+
+## 7. Model zoo
+
+### 7.1 Families, tasks and architectures
+
+The catalogue [src/unbihexium/zoo/catalog.yaml](https://github.com/unbihexium-oss/unbihexium/blob/main/src/unbihexium/zoo/catalog.yaml) (version 2.0.0) defines 130 families. For each family it records the input bands, the number of acquisitions, the outputs and their units, the labels needed for training and suitable data sources.
+
+| Task | Families | Models | Architecture |
+| --- | --- | --- | --- |
+| Detection | 19 | 76 | CenterNet, anchor-free, output stride 4 [8] |
+| Segmentation | 26 | 104 | U-Net [9] |
+| Change detection | 6 | 24 | U-Net on two stacked acquisitions |
+| Dense regression | 49 | 196 | U-Net with a regression output |
+| Scene regression | 11 | 44 | Residual encoder with a pooled regression head |
+| Enhancement | 11 | 44 | Residual U-Net, image to image |
+| Super-resolution | 1 | 4 | EDSR-style residual network with sub-pixel convolution [10] |
+| Spectral index | 7 | 28 | Exact formula, no weights |
+| **Total** | **130** | **520** | |
+
+### 7.2 Variants
+
+| Variant | Base channels | Encoder levels | Blocks per level | Tile size | Parameters per learned model | Parameters of the variant |
+| --- | --- | --- | --- | --- | --- | --- |
+| tiny | 16 | 3 | 1 | 256 px | 134,992 to 735,428 | 86,951,209 |
+| base | 32 | 4 | 1 | 256 px | 657,264 to 7,063,428 | 825,294,793 |
+| large | 48 | 4 | 2 | 512 px | 2,784,528 to 22,066,564 | 2,611,810,665 |
+| mega | 64 | 5 | 2 | 512 px | 6,109,872 to 60,460,548 | 7,131,069,449 |
+
+The 520 models have 10,655,126,116 parameters in total.
+
+### 7.3 Starter weights and verification
+
+No weights are downloaded. The starter weights of each model are generated locally and deterministically from its model id, and their digest (SHA-256 over the sorted state dictionary) is compared with the published value in [src/unbihexium/zoo/digests.json](https://github.com/unbihexium-oss/unbihexium/blob/main/src/unbihexium/zoo/digests.json). The workflow `.github/workflows/model-zoo.yml` rebuilds the tiny variants on pull requests and all 520 models weekly to detect platform drift. Checkpoints contain plain data only and are loaded with `torch.load(weights_only=True)`, so loading a checkpoint cannot execute code.
+
+As stated in Section 2.2, only the 28 spectral index models produce meaningful output without training. The per-family model cards are indexed in [model_zoo/MODEL_CARDS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md), and one example notebook per family is in [examples/notebooks/](https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks).
+
+## 8. REST service
+
+`unbihexium.serving` provides a FastAPI application (extra `serving`). Start it with uvicorn; interactive OpenAPI documentation is then available at `/docs`.
+
+```bash
+uvicorn unbihexium.serving.app:app --host 127.0.0.1 --port 8000
+```
+
+| Method and path | Purpose |
+| --- | --- |
+| `GET /health` | Liveness and readiness |
+| `GET /capabilities`, `GET /capabilities/{capability_id}` | Registered capabilities |
+| `GET /models`, `GET /models/{model_id}` | Models with task, domain and variant filters and pagination; bands, outputs and units of one model |
+| `GET /pipelines` | Registered pipelines |
+| `POST /predict/{model_id}` | Run any zoo model on an image sent as a nested JSON array or a base64-encoded NumPy array |
+| `POST /infer/{model_id}`, `/detect/{model_id}`, `/segment/{model_id}` | Earlier task-specific routes |
+
+The following requests were tested against a local server; the NDVI model expects the bands red and near infrared, in that order:
+
+```bash
+curl -s http://127.0.0.1:8000/health
+curl -s "http://127.0.0.1:8000/models?task=detection&variant=tiny&limit=2"
+curl -s -X POST http://127.0.0.1:8000/predict/ndvi_calculator_tiny \
+    -H "Content-Type: application/json" \
+    -d '{"image": [[[0.05, 0.06], [0.04, 0.05]], [[0.40, 0.45], [0.30, 0.35]]]}'
+```
+
+The service rejects request bodies above a size limit (413), images above pixel and value limits, unsupported media types (415), unknown models (404) and invalid input (422). An API key (header `X-API-Key`, compared in constant time and required on every route except `/health`), a per-client rate limit (429) and CORS origins are configured through `unbihexium.config`, for example `UNBIHEXIUM_SERVING__API_KEY` and `UNBIHEXIUM_SERVING__RATE_LIMIT_PER_MINUTE`. By default no API key is set, no rate limit applies and all CORS origins are allowed, so set these before exposing the service beyond a trusted network.
+
+## 9. Configuration
+
+Settings are layered, later layers winning: the built-in defaults, a YAML file (passed to `load_config` or named by `UNBIHEXIUM_CONFIG`), environment variables of the form `UNBIHEXIUM_<SECTION>__<KEY>` for the sections `model`, `processing` and `serving` (for example `UNBIHEXIUM_MODEL__BATCH_SIZE=16`), and explicit overrides. `UNBIHEXIUM_LOG_LEVEL` sets the log level and `UNBIHEXIUM_CACHE` the model store (default `~/.cache/unbihexium`). Unknown keys are errors. See [docs/getting_started/configuration.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/configuration.md) and [.env.example](https://github.com/unbihexium-oss/unbihexium/blob/main/.env.example).
+
+## 10. Reproducibility and supply-chain security
+
+### 10.1 Reproducible environments and results
+
+- **Locked dependencies.** `requirements.txt` (runtime with `onnx` and `serving`), `requirements-dev.txt` (all extras) and the CI lock files in `.github/requirements/` pin every package with SHA-256 hashes; CI installs with `--require-hashes`. The container image installs binary wheels only from `requirements.txt`, and its base image is pinned by digest.
+- **Deterministic models.** Starter weights are derived from the model id and verified by digest (Section 7.3). Training takes a `seed`, and the normalisation statistics estimated from the training data are stored with the checkpoint, so inference and ONNX exports apply exactly the same scaling.
+- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, notebook checks, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
+
+### 10.2 Release integrity
+
+Releases are built by [.github/workflows/release.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/.github/workflows/release.yml) when a version tag is pushed. With the current workflow, each GitHub release contains the sdist and wheel, `SHA256SUMS.txt`, a Sigstore signature bundle (`.sigstore.json`) for each distribution [3], and the signed SLSA provenance of the build as `unbihexium-<tag>.intoto.jsonl` [2]; GitHub artifact attestations are created for the distributions. Earlier releases were produced by earlier versions of the workflow and may not carry every one of these files. A downloaded distribution is verified with:
+
+```bash
+python -m pip install sigstore
+python -m sigstore verify github \
+    --cert-identity https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag> \
+    <file>
+gh attestation verify <file> --repo unbihexium-oss/unbihexium
+```
+
+### 10.3 Security automation
+
+| Control | Implementation |
+| --- | --- |
+| Static analysis | CodeQL for Python and GitHub Actions; Bandit and ruff security rules |
+| Fuzzing | atheris targets for the GeoJSON and STAC parsers in [fuzz/](https://github.com/unbihexium-oss/unbihexium/tree/main/fuzz) |
+| Dependencies | Dependabot (pip, GitHub Actions, Docker), pip-audit, dependency review with a licence policy |
+| Secrets | TruffleHog on pushes and pull requests |
+| Container | Grype scan of the image, SPDX SBOM of every pushed image |
+| Repository posture | OpenSSF Scorecard [4], [security-insights.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml) |
+| Licensing | REUSE compliance [5], licence headers, licence check of all runtime dependencies |
+| Pinning | Every GitHub Action is pinned by commit SHA |
+
+Details are in [docs/security/supply_chain_security.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/security/supply_chain_security.md) and [docs/operations/ci_cd.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/operations/ci_cd.md).
+
+## 11. Project layout
+
+```text
+unbihexium/
+  src/unbihexium/        the package (subpackages listed in Section 6)
+    zoo/catalog.yaml     model catalogue, the single source of truth of the zoo
+    zoo/digests.json     published starter weight digests of all 520 models
+  tests/                 unit, integration, end-to-end and benchmark tests
+  model_zoo/             model cards, manifests, inventory and checksums
+  docs/                  user, architecture, model zoo, security and operations documentation
+  examples/              notebooks (one per model family), scripts and a serving example
+  fuzz/                  atheris fuzz targets and seed corpora
+  deploy/                Helm chart and Kubernetes manifests
+  scripts/               lock merging, model validation and shell completion
+  .github/               workflows, CI lock files, check scripts and templates
+  Dockerfile             container image of the CLI and the REST service
+  pyproject.toml         package metadata, dependencies and tool configuration
+  requirements*.txt      hashed lock files
+  Makefile, tox.ini      developer tasks and test environments
+```
+
+## 12. Documentation
+
+| Topic | Location |
+| --- | --- |
+| Documentation index | [docs/index.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/index.md) |
+| Installation, quick start, configuration | [docs/getting_started/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/getting_started) |
+| Python API and CLI reference | [docs/reference/api.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/api.md), [docs/reference/cli.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/cli.md) |
+| Architecture | [docs/architecture/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/architecture) |
+| Capability domains | [docs/capabilities/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/capabilities) |
+| Model zoo: catalogue, training, inference, distribution | [docs/model_zoo/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/model_zoo) |
+| Security | [docs/security/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/security) |
+| Operations: CI/CD, Docker, releasing | [docs/operations/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/operations) |
+| Tutorials and notebooks | [docs/tutorials/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/tutorials) |
+| Frequently asked questions, glossary | [docs/faq.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/faq.md), [docs/glossary.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/glossary.md) |
+| Migration between versions | [docs/MIGRATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/MIGRATION.md) |
+
+Project policies are kept in the repository root: [GOVERNANCE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md), [MAINTAINERS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/MAINTAINERS.md), [AUTHORS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/AUTHORS.md), [ROADMAP.md](https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md), [SUPPORT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md), [VERSIONING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md), [RESPONSIBLE_USE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/RESPONSIBLE_USE.md), [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md) and [COMPLIANCE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/COMPLIANCE.md).
+
+## 13. Contributing
+
+Contributions are welcome. [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md) describes the development setup, the coding and documentation standards, the tests and checks expected before review, and the pull request process; participants follow the [CODE_OF_CONDUCT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md). Pull request titles follow Conventional Commits, and the local checks mirror CI:
+
+```bash
+make check        # lint, format, types, tests, licences, text policy, YAML, notebooks, model zoo
+pre-commit run --all-files
+```
+
+Bugs and feature requests go to the [issue tracker](https://github.com/unbihexium-oss/unbihexium/issues); questions are answered as described in [SUPPORT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md).
+
+## 14. Security
+
+Do not report vulnerabilities in public issues. Use a [GitHub private security advisory](https://github.com/unbihexium-oss/unbihexium/security/advisories/new) or write to <yunus.z.imanov@helsinki.fi>. The supported versions, the handling process and the scope are defined in [SECURITY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md).
+
+## 15. Citation
+
+If you use Unbihexium in research or in a product, cite the version you used. [CITATION.cff](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.cff), in the Citation File Format [6], is the authoritative metadata; GitHub renders it as "Cite this repository", and [CITATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.md) explains how to cite in text. The project has no DOI at present. The following entry matches CITATION.cff for version 1.0.1:
+
+```bibtex
+@software{unbihexium_1_0_1,
+  author  = {{Unbihexium OSS Foundation} and Laitinen Imanov, Olaf Yunus},
+  title   = {Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python},
+  version = {1.0.1},
+  date    = {2025-12-21},
+  url     = {https://github.com/unbihexium-oss/unbihexium},
+  license = {MPL-2.0}
+}
+```
+
+APA style: Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2025). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Version 1.0.1) [Computer software]. <https://github.com/unbihexium-oss/unbihexium>
+
+Please also cite GDAL, PROJ and ONNX Runtime where your results depend on them directly; their references are listed in CITATION.cff.
+
+## 16. Licence and acknowledgements
+
+### 16.1 Licence
+
+Copyright 2025-2026 Unbihexium OSS Foundation and contributors. Unbihexium is licensed under the Mozilla Public License 2.0 [1]; the full text is in [LICENSE.txt](https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt). The MPL-2.0 is a file-level copyleft licence: modified files of Unbihexium that you distribute must remain under the MPL-2.0, while your own files that use the library may be under any licence. Notices are in [NOTICE.md](https://github.com/unbihexium-oss/unbihexium/blob/main/NOTICE.md), and the licences of third-party material in [THIRD_PARTY_NOTICES.md](https://github.com/unbihexium-oss/unbihexium/blob/main/THIRD_PARTY_NOTICES.md). The per-file licensing information follows the REUSE specification [5] ([REUSE.toml](https://github.com/unbihexium-oss/unbihexium/blob/main/REUSE.toml)). This summary is not legal advice.
+
+### 16.2 Acknowledgements
+
+Unbihexium builds on the work of many open source projects, in particular NumPy, SciPy, rasterio and GDAL, pyproj and PROJ, Shapely and GEOS, GeoPandas, scikit-image, scikit-learn, PyTorch, ONNX and ONNX Runtime, FastAPI, Click and Rich. The model architectures follow the published designs cited in Section 7.1, and the spectral indices, SAR methods and geostatistical estimators follow the publications cited in the source code of each module. The author is affiliated with the University of Helsinki.
+
+## References
+
+[1] Mozilla Foundation. Mozilla Public License, version 2.0. 2012. <https://mozilla.org/MPL/2.0/>
+
+[2] OpenSSF. Supply-chain Levels for Software Artifacts (SLSA), specification version 1.0. 2023. <https://slsa.dev/spec/v1.0/>
+
+[3] Sigstore project. Sigstore documentation. 2026. <https://docs.sigstore.dev/>
+
+[4] OpenSSF. OpenSSF Scorecard. 2026. <https://scorecard.dev/>
+
+[5] Free Software Foundation Europe. REUSE Specification, version 3.3. 2024. <https://reuse.software/spec-3.3/>
+
+[6] Druskat, S., Spaaks, J. H., Chue Hong, N., Haines, R., Baker, J., Bliven, S., Willighagen, E., Perez-Suarez, D. and Konovalov, O. Citation File Format, version 1.2.0. 2021. <https://citation-file-format.github.io/>
+
+[7] Rouse, J. W., Haas, R. H., Schell, J. A. and Deering, D. W. Monitoring vegetation systems in the Great Plains with ERTS. Third Earth Resources Technology Satellite-1 Symposium, NASA SP-351, 309-317. 1974. <https://ntrs.nasa.gov/citations/19740022614>
+
+[8] Zhou, X., Wang, D. and Kraehenbuehl, P. Objects as points. arXiv:1904.07850. 2019. <https://arxiv.org/abs/1904.07850>
+
+[9] Ronneberger, O., Fischer, P. and Brox, T. U-Net: Convolutional networks for biomedical image segmentation. MICCAI 2015, LNCS 9351, 234-241. 2015. <https://arxiv.org/abs/1505.04597>
+
+[10] Lim, B., Son, S., Kim, H., Nah, S. and Lee, K. M. Enhanced deep residual networks for single image super-resolution. CVPR Workshops. 2017. <https://arxiv.org/abs/1707.02921>
+
+<!--
+=============================================================================
+End of file README.md
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+-->
