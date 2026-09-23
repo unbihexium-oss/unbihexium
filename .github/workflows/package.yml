@@ -1,98 +1,155 @@
-name: Package
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/package.yml
+# Title       : Build, check and smoke-test the distributions
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Proves on every change that the project can be packaged and installed:
+#
+#   build       builds the sdist and the wheel with python -m build, checks
+#               their metadata with twine --strict, verifies that
+#               LICENSE.txt and NOTICE are shipped in both, and uploads the
+#               files as the "dist" artifact (kept for seven days)
+#   smoke-test  installs the wheel into a fresh virtual environment on the
+#               oldest and the newest supported Python, imports the package
+#               and runs the command line interface from outside the
+#               checkout
+#
+# Publishing to PyPI is done by release.yml.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+name: Package  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-jobs:
-  build:
-    name: Build distributions
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  build:  # Build and check the distributions.
+    name: Build distributions  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 15  # Cancel a hung build after 15 minutes.
+    steps:  # Steps of the build job.
+      - uses: actions/checkout@v6  # Check out the commit to package.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Install build tools
-        run: python -m pip install build twine
+      - name: Set up Python  # Install the interpreter for the build.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Build sdist and wheel
-        run: python -m build
+      - name: Install build tools  # Install the PEP 517 frontend and the checker.
+        run: python -m pip install build twine  # build creates, twine checks the distributions.
 
-      - name: Check distribution metadata
-        run: python -m twine check --strict dist/*
+      - name: Build sdist and wheel  # Create both distributions in dist/.
+        run: python -m build  # Builds in an isolated environment.
 
-      - name: Check that licence files are shipped
-        run: |
+      - name: Check distribution metadata  # Validate the metadata and the README rendering.
+        run: python -m twine check --strict dist/*  # Warnings count as errors.
+
+      - name: Check that licence files are shipped  # Both archives must contain the legal texts.
+        run: |  # Shell script run by bash.
+          # Run the following Python program from standard input.
           python - <<'PY'
+          # Locate the built archives.
           import pathlib
+          # Read the sdist archive.
           import tarfile
+          # Read the wheel archive.
           import zipfile
 
+          # Legal texts that both distributions must contain.
           required = {"LICENSE.txt", "NOTICE"}
+          # The single wheel built above.
           wheel = next(pathlib.Path("dist").glob("*.whl"))
+          # Base names of the licence files in the .dist-info/licenses directory of the wheel.
           names = {pathlib.PurePosixPath(n).name for n in zipfile.ZipFile(wheel).namelist() if ".dist-info/licenses/" in n}
+          # Required files that the wheel lacks.
           missing = required - names
+          # Fail the step when the wheel lacks a licence file.
           assert not missing, f"wheel is missing {missing}"
+          # The single sdist built above.
           sdist = next(pathlib.Path("dist").glob("*.tar.gz"))
+          # Base names of all files in the sdist.
           names = {pathlib.PurePosixPath(n).name for n in tarfile.open(sdist).getnames()}
+          # Required files that the sdist lacks.
           missing = required - names
+          # Fail the step when the sdist lacks a licence file.
           assert not missing, f"sdist is missing {missing}"
+          # Confirm success in the log.
           print("Licence files present in wheel and sdist")
+          # End of the Python program.
           PY
 
-      - name: Upload distributions
-        uses: actions/upload-artifact@v7
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
+      - name: Upload distributions  # Hand the files to the smoke test job.
+        uses: actions/upload-artifact@v7  # Official artifact upload action.
+        with:  # Inputs of the upload action.
+          name: dist  # Artifact name read by the smoke test.
+          path: dist/  # Upload the whole distribution directory.
+          retention-days: 7  # Keep the artifact for a week.
 
-  smoke-test:
-    name: Install wheel (Python ${{ matrix.python-version }})
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.14"]
-    steps:
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
+  smoke-test:  # Install the built wheel and use it.
+    name: Install wheel (Python ${{ matrix.python-version }})  # Name of the status check.
+    needs: build  # Wait for the distributions.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 20  # Installing the dependencies takes a few minutes.
+    strategy:  # Matrix over the Python versions.
+      fail-fast: false  # Let the other version finish when one fails.
+      matrix:  # Values of the matrix.
+        python-version: ["3.10", "3.14"]  # Oldest and newest supported CPython.
+    steps:  # Steps of the smoke test job.
+      - name: Set up Python  # Install the matrix Python.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: ${{ matrix.python-version }}  # Version from the matrix.
 
-      - name: Download distributions
-        uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: dist/
+      - name: Download distributions  # Fetch the files built by the build job.
+        uses: actions/download-artifact@v8  # Official artifact download action.
+        with:  # Inputs of the download action.
+          name: dist  # Artifact uploaded by the build job.
+          path: dist/  # Restore into dist/.
 
-      - name: Install the wheel in a clean environment
-        run: |
+      - name: Install the wheel in a clean environment  # No checkout, so only the wheel is installed.
+        run: |  # Shell script run by bash.
+          # Create an isolated virtual environment.
           python -m venv /tmp/venv
+          # Upgrade pip in the environment so that current wheels are found.
           /tmp/venv/bin/python -m pip install --upgrade pip
+          # Install the wheel with its runtime dependencies.
           /tmp/venv/bin/python -m pip install dist/*.whl
 
-      - name: Import the package and run the CLI
-        working-directory: /tmp
-        run: |
+      - name: Import the package and run the CLI  # Use the installed package.
+        working-directory: /tmp  # Run outside the workspace so nothing is imported from it.
+        run: |  # Shell script run by bash.
+          # Import the package and print its version.
           /tmp/venv/bin/python -c "import unbihexium; print(unbihexium.__version__)"
+          # Run the console script entry point.
           /tmp/venv/bin/unbihexium --help
+
+# =============================================================================
+# End of file .github/workflows/package.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

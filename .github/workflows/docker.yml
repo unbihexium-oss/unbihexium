@@ -1,63 +1,96 @@
-name: Docker
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/docker.yml
+# Title       : Build and publish the container image to GHCR
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Builds the image from the repository Dockerfile on every push to main, on
+# version tags (v*) and on pull requests. Pull requests only build, to prove
+# that the Dockerfile works; pushes and tags also log in to the GitHub
+# Container Registry (ghcr.io/<owner>/<repo>), push the image with tags
+# derived by docker/metadata-action (branch, pull request, semantic version
+# and commit SHA) and attach an SPDX SBOM of the pushed image as a workflow
+# artifact. Vulnerability scanning of the image is done separately in
+# container-scan.yml.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    tags: ["v*"]
-  pull_request:
-    branches: [main]
+name: Docker  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
-  packages: write
+on:  # Events that start the workflow.
+  push:  # Run on pushes.
+    branches: [main]  # Pushes to the default branch publish the "main" tag.
+    tags: ["v*"]  # Version tags publish semantic version tags.
+  pull_request:  # Run on pull requests (build only).
+    branches: [main]  # Only pull requests that target the default branch.
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+permissions:  # Token permissions for every job.
+  contents: read  # Read the repository.
+  packages: write  # Push the image to the GitHub Container Registry.
 
-jobs:
-  build-and-push:
-    name: Build and Push Docker Image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+env:  # Variables shared by all steps.
+  REGISTRY: ghcr.io  # GitHub Container Registry host.
+  IMAGE_NAME: ${{ github.repository }}  # Image name equals owner/repository.
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+jobs:  # Jobs of the workflow.
+  build-and-push:  # Build the image and publish it outside pull requests.
+    name: Build and Push Docker Image  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Docker.
+    steps:  # Steps of the build job.
+      - uses: actions/checkout@v6  # Check out the commit to build.
 
-      - name: Log in to Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx  # Enable BuildKit and the GitHub Actions cache backend.
+        uses: docker/setup-buildx-action@v3  # Official Buildx setup action.
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
+      - name: Log in to Container Registry  # Authenticate to GHCR for the push.
+        if: github.event_name != 'pull_request'  # Pull requests never push.
+        uses: docker/login-action@v3  # Official registry login action.
+        with:  # Inputs of the login action.
+          registry: ${{ env.REGISTRY }}  # Log in to ghcr.io.
+          username: ${{ github.actor }}  # User that triggered the run.
+          password: ${{ secrets.GITHUB_TOKEN }}  # Workflow token with packages: write.
+
+      - name: Extract metadata  # Compute image tags and OCI labels.
+        id: meta  # Identifier for reading the outputs later.
+        uses: docker/metadata-action@v5  # Official metadata action.
+        with:  # Inputs of the metadata action.
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}  # Full image reference without tag.
+          tags: |  # Tag rules, one per line.
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Build and push  # Build the image and push it outside pull requests.
+        uses: docker/build-push-action@v6  # Official build action.
+        with:  # Inputs of the build action.
+          context: .  # Build from the repository root.
+          push: ${{ github.event_name != 'pull_request' }}  # Push only for pushes and tags.
+          tags: ${{ steps.meta.outputs.tags }}  # Tags computed by the metadata step.
+          labels: ${{ steps.meta.outputs.labels }}  # OCI labels computed by the metadata step.
+          cache-from: type=gha  # Reuse layers from the Actions cache.
+          cache-to: type=gha,mode=max  # Store all layers in the Actions cache.
 
-      - name: Generate SBOM
-        if: github.event_name != 'pull_request'
-        uses: anchore/sbom-action@v0
-        with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          artifact-name: sbom-docker.spdx.json
+      - name: Generate SBOM  # Produce a software bill of materials for the pushed image.
+        if: github.event_name != 'pull_request'  # Only images that were pushed.
+        uses: anchore/sbom-action@v0  # Syft-based SBOM action.
+        with:  # Inputs of the SBOM action.
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}  # Image reference by commit SHA.
+          artifact-name: sbom-docker.spdx.json  # Name of the uploaded SPDX artifact.
+
+# =============================================================================
+# End of file .github/workflows/docker.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

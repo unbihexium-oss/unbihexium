@@ -1,66 +1,103 @@
-name: SLSA Provenance
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/slsa.yml
+# Title       : SLSA Level 3 provenance for released distributions
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# When a GitHub release is published (or on demand), the build job rebuilds
+# the sdist and the wheel, attests them with GitHub build provenance and
+# passes their SHA-256 digests, base64 encoded, to the reusable SLSA
+# generator workflow. The generator runs in isolation and signs an in-toto
+# provenance statement for SLSA Build Level 3. For a release event the
+# provenance file is attached to the release as an asset; manual runs only
+# keep it as a workflow artifact. Verify a download with slsa-verifier
+# against the .intoto.jsonl asset.
+# =============================================================================
 
-on:
-  release:
-    types: [published]
-  workflow_dispatch:
+name: SLSA Provenance  # Name shown in the Actions tab.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  release:  # Run on release events.
+    types: [published]  # Only when a release is published.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-jobs:
-  build:
-    name: Build distributions
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      id-token: write
-      attestations: write
-    outputs:
-      hashes: ${{ steps.hash.outputs.hashes }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  build:  # Build the distributions and compute their digests.
+    name: Build distributions  # Name of the job.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 15  # Cancel a hung build after 15 minutes.
+    permissions:  # Token permissions of this job.
+      contents: read  # Read the repository.
+      id-token: write  # Request the OIDC token for the attestation.
+      attestations: write  # Store the build provenance attestation.
+    outputs:  # Values passed to the provenance job.
+      hashes: ${{ steps.hash.outputs.hashes }}  # Base64 encoded sha256sum output.
+    steps:  # Steps of the build job.
+      - uses: actions/checkout@v6  # Check out the released commit.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Build package
-        run: |
+      - name: Set up Python  # Install the interpreter for the build.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+
+      - name: Build package  # Create the sdist and the wheel in dist/.
+        run: |  # Shell script run by bash.
+          # Install the PEP 517 frontend.
           python -m pip install build
+          # Build both distributions in an isolated environment.
           python -m build
 
-      - name: Compute subject hashes
-        id: hash
-        run: |
+      - name: Compute subject hashes  # Digests that the provenance will cover.
+        id: hash  # Identifier for reading the output.
+        run: |  # Shell script run by bash.
+          # Hash the files by their bare names.
           cd dist
+          # Store the base64 encoded checksum list as the step output.
           echo "hashes=$(sha256sum -- * | base64 -w0)" >> "$GITHUB_OUTPUT"
 
-      - name: Generate GitHub build provenance attestation
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: dist/*
+      - name: Generate GitHub build provenance attestation  # Sign provenance with GitHub attestations.
+        uses: actions/attest-build-provenance@v3  # Official attestation action.
+        with:  # Inputs of the attestation action.
+          subject-path: dist/*  # Attest every distribution file.
 
-      - name: Upload distributions
-        uses: actions/upload-artifact@v7
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
+      - name: Upload distributions  # Keep the built files with the run.
+        uses: actions/upload-artifact@v7  # Official artifact upload action.
+        with:  # Inputs of the upload action.
+          name: dist  # Artifact name.
+          path: dist/  # Upload the whole distribution directory.
+          retention-days: 7  # Keep the artifact for a week.
 
-  provenance:
-    name: Generate SLSA Level 3 provenance
-    needs: build
-    permissions:
-      actions: read
-      id-token: write
-      contents: write
+  provenance:  # Generate and sign the SLSA provenance.
+    name: Generate SLSA Level 3 provenance  # Name of the job.
+    needs: build  # Wait for the digests.
+    permissions:  # Token permissions required by the generator.
+      actions: read  # Read the workflow run to describe the build.
+      id-token: write  # Sign the provenance with Sigstore.
+      contents: write  # Upload the provenance to the release.
     # The SLSA generator must be referenced by its release tag, not by a commit SHA.
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
-    with:
-      base64-subjects: ${{ needs.build.outputs.hashes }}
-      upload-assets: ${{ github.event_name == 'release' }}
+    with:  # Inputs of the reusable generator workflow.
+      base64-subjects: ${{ needs.build.outputs.hashes }}  # Digests computed by the build job.
+      upload-assets: ${{ github.event_name == 'release' }}  # Attach the provenance only to real releases.
+
+# =============================================================================
+# End of file .github/workflows/slsa.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

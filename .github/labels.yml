@@ -1,90 +1,144 @@
-# Label definitions synchronised to the repository by .github/workflows/labels.yml.
-# Issue forms, Dependabot and the release notes configuration rely on these labels.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/labels.yml
+# Title       : Repository label definitions
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Label list for the label synchronisation workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# The list of issue and pull request labels, synchronised to the repository
+# by .github/workflows/labels.yml. Each entry gives the label name, its colour
+# and the description GitHub shows as a tooltip. The issue forms, Dependabot
+# (.github/dependabot.yml), the path labeler (.github/labeler.yml) and the
+# release notes configuration (.github/release.yml) refer to these names, so
+# rename a label in all of them at once. Labels are grouped by purpose.
+# =============================================================================
 
-# Type
+# Type: what kind of work an issue or pull request is.
+# Defect reports; used by the bug report form and the Bug fixes release section.
 - name: bug
-  color: "d73a4a"
-  description: "Something does not work as documented"
+  color: "d73a4a"  # Label colour as a hex code without the leading #.
+  description: "Something does not work as documented"  # Tooltip shown on GitHub.
+# Feature requests; the New features release section.
 - name: enhancement
-  color: "a2eeef"
-  description: "New feature or improvement"
+  color: "a2eeef"  # Label colour as a hex code without the leading #.
+  description: "New feature or improvement"  # Tooltip shown on GitHub.
+# Documentation changes; also applied by the labeler.
 - name: documentation
-  color: "0075ca"
-  description: "Documentation, docstrings, notebooks or model cards"
+  color: "0075ca"  # Label colour as a hex code without the leading #.
+  description: "Documentation, docstrings, notebooks or model cards"  # Tooltip shown on GitHub.
+# Usage questions that are not defects.
 - name: question
-  color: "d876e3"
-  description: "Usage question"
+  color: "d876e3"  # Label colour as a hex code without the leading #.
+  description: "Usage question"  # Tooltip shown on GitHub.
+# Model zoo changes; also applied by the labeler.
 - name: model-zoo
-  color: "5319e7"
-  description: "Model weights, manifests, model cards or checksums"
+  color: "5319e7"  # Label colour as a hex code without the leading #.
+  description: "Model weights, manifests, model cards or checksums"  # Tooltip shown on GitHub.
+# Speed, memory and scaling work.
 - name: performance
-  color: "fbca04"
-  description: "Speed, memory or scaling"
+  color: "fbca04"  # Label colour as a hex code without the leading #.
+  description: "Speed, memory or scaling"  # Tooltip shown on GitHub.
+# Licensing and regulatory topics; also applied by the labeler.
 - name: compliance
-  color: "b60205"
-  description: "Licensing, privacy, AI regulation, export control or ethics"
+  color: "b60205"  # Label colour as a hex code without the leading #.
+  description: "Licensing, privacy, AI regulation, export control or ethics"  # Tooltip shown on GitHub.
+# Packaging and build changes; also applied by the labeler.
 - name: build
-  color: "c5def5"
-  description: "Installation, packaging or container build"
+  color: "c5def5"  # Label colour as a hex code without the leading #.
+  description: "Installation, packaging or container build"  # Tooltip shown on GitHub.
+# Security hardening; vulnerabilities themselves go to a private advisory.
 - name: security
-  color: "ee0701"
-  description: "Security hardening; report vulnerabilities privately"
+  color: "ee0701"  # Label colour as a hex code without the leading #.
+  description: "Security hardening; report vulnerabilities privately"  # Tooltip shown on GitHub.
+# Test changes; also applied by the labeler.
 - name: tests
-  color: "bfdadc"
-  description: "Tests and test configuration"
+  color: "bfdadc"  # Label colour as a hex code without the leading #.
+  description: "Tests and test configuration"  # Tooltip shown on GitHub.
+# Incompatible changes, listed first in the release notes.
 - name: breaking-change
-  color: "e11d21"
-  description: "Changes existing behaviour and requires a major version"
+  color: "e11d21"  # Label colour as a hex code without the leading #.
+  description: "Changes existing behaviour and requires a major version"  # Tooltip shown on GitHub.
 
-# Automation
+# Automation: labels added by Dependabot and the labeler.
+# Added by Dependabot and the labeler to dependency updates.
 - name: dependencies
-  color: "0366d6"
-  description: "Dependency updates"
+  color: "0366d6"  # Label colour as a hex code without the leading #.
+  description: "Dependency updates"  # Tooltip shown on GitHub.
+# Workflow changes; added by Dependabot and the labeler.
 - name: ci
-  color: "ededed"
-  description: "Continuous integration and GitHub Actions"
+  color: "ededed"  # Label colour as a hex code without the leading #.
+  description: "Continuous integration and GitHub Actions"  # Tooltip shown on GitHub.
+# Container changes; added by Dependabot and the labeler.
 - name: docker
-  color: "0db7ed"
-  description: "Dockerfile and container images"
+  color: "0db7ed"  # Label colour as a hex code without the leading #.
+  description: "Dockerfile and container images"  # Tooltip shown on GitHub.
 
-# Status
+# Status: where an issue stands in triage.
+# Set by the issue forms until a maintainer classifies the issue.
 - name: needs-triage
-  color: "ffffff"
-  description: "Awaiting classification by a maintainer"
+  color: "ffffff"  # Label colour as a hex code without the leading #.
+  description: "Awaiting classification by a maintainer"  # Tooltip shown on GitHub.
+# Waiting for the author to answer a question.
 - name: needs-information
-  color: "fef2c0"
-  description: "More information is required from the author"
+  color: "fef2c0"  # Label colour as a hex code without the leading #.
+  description: "More information is required from the author"  # Tooltip shown on GitHub.
+# Reproduced or accepted; exempt from the stale workflow.
 - name: confirmed
-  color: "0e8a16"
-  description: "Reproduced or accepted by a maintainer"
+  color: "0e8a16"  # Label colour as a hex code without the leading #.
+  description: "Reproduced or accepted by a maintainer"  # Tooltip shown on GitHub.
+# Set by the stale workflow on inactive issues and pull requests.
 - name: stale
-  color: "dddddd"
-  description: "No recent activity; closes automatically unless updated"
+  color: "dddddd"  # Label colour as a hex code without the leading #.
+  description: "No recent activity; closes automatically unless updated"  # Tooltip shown on GitHub.
+# Cannot progress until something else is resolved; exempt from the stale workflow.
 - name: blocked
-  color: "000000"
-  description: "Blocked by another issue or an external factor"
+  color: "000000"  # Label colour as a hex code without the leading #.
+  description: "Blocked by another issue or an external factor"  # Tooltip shown on GitHub.
 
-# Resolution
+# Resolution: why an issue was closed without a change.
+# Closed in favour of an existing issue; excluded from release notes.
 - name: duplicate
-  color: "cfd3d7"
-  description: "This issue or pull request already exists"
+  color: "cfd3d7"  # Label colour as a hex code without the leading #.
+  description: "This issue or pull request already exists"  # Tooltip shown on GitHub.
+# Not a valid report; excluded from release notes.
 - name: invalid
-  color: "e4e669"
-  description: "This does not seem right"
+  color: "e4e669"  # Label colour as a hex code without the leading #.
+  description: "This does not seem right"  # Tooltip shown on GitHub.
+# Declined; excluded from release notes.
 - name: wontfix
-  color: "ffffff"
-  description: "This will not be worked on"
+  color: "ffffff"  # Label colour as a hex code without the leading #.
+  description: "This will not be worked on"  # Tooltip shown on GitHub.
 
-# Contribution
+# Contribution: invitations to contributors and release note control.
+# Small, well-described tasks for new contributors.
 - name: good first issue
-  color: "7057ff"
-  description: "Good for newcomers"
+  color: "7057ff"  # Label colour as a hex code without the leading #.
+  description: "Good for newcomers"  # Tooltip shown on GitHub.
+# Maintainers welcome outside help on this item.
 - name: help wanted
-  color: "008672"
-  description: "Extra attention is needed"
+  color: "008672"  # Label colour as a hex code without the leading #.
+  description: "Extra attention is needed"  # Tooltip shown on GitHub.
+# Contribution declared by its author as tool-assisted under CONTRIBUTING.md.
 - name: ai-assisted
-  color: "bfd4f2"
-  description: "Declared as prepared with AI assistance"
+  color: "bfd4f2"  # Label colour as a hex code without the leading #.
+  description: "Declared as prepared with AI assistance"  # Tooltip shown on GitHub.
+# Keeps a change out of the generated release notes.
 - name: ignore-for-release
-  color: "eeeeee"
-  description: "Excluded from generated release notes"
+  color: "eeeeee"  # Label colour as a hex code without the leading #.
+  description: "Excluded from generated release notes"  # Tooltip shown on GitHub.
+
+# =============================================================================
+# End of file .github/labels.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

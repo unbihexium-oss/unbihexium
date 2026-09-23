@@ -1,2 +1,30 @@
-# Enables the Sponsor button on the repository page.
-github: [unbihexium-oss]
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/FUNDING.yml
+# Title       : Sponsorship links for the repository page
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub funding configuration (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# GitHub reads this file to show the Sponsor button on the repository page
+# and to list the funding platforms behind it. Only GitHub Sponsors is used.
+# The OpenSSF Security Insights file (security-insights.yml) links here as
+# the funding reference of the project.
+# =============================================================================
+
+github: [unbihexium-oss]  # GitHub Sponsors account of the organisation.
+
+# =============================================================================
+# End of file .github/FUNDING.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

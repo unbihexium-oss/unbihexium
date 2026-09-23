@@ -3,9 +3,18 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 #
 # =============================================================================
-# Unbihexium model zoo catalogue
+# Project     : Unbihexium
+# File        : src/unbihexium/zoo/catalog.yaml
+# Title       : Model zoo catalogue, the source of truth of the 130 families
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : YAML, read by unbihexium.zoo.catalog (packaged with the wheel)
 # =============================================================================
 #
+# Abstract
+# --------
 # Single source of truth for the 130 model families of the Unbihexium model
 # zoo. Every family is available in four size variants (tiny, base, large and
 # mega), which gives 520 models. unbihexium.zoo.catalog loads this file;
@@ -44,1474 +53,1480 @@
 #   sources      suitable input data
 # =============================================================================
 
-version: "2.0.0"
+version: "2.0.0"  # Catalogue version, recorded in manifests and digests.
 
 # Named input band sets. Band names follow the naming of the data provider.
-band_sets:
-  rgb: [red, green, blue]
-  rgbn: [blue, green, red, nir]
-  pan: [pan]
-  pan_pair: [pan_t1, pan_t2]
-  pan_triplet: [pan_forward, pan_nadir, pan_backward]
-  s2_10: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]
-  s2_13: [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12]
-  s2_swir: [B12, B8A, B04]
-  s1: [VV, VH]
-  s1_vv: [VV]
-  s2_s1: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, VV, VH]
-  landsat_st: [SR_B2, SR_B3, SR_B4, SR_B5, SR_B6, SR_B7, ST_B10]
-  dem: [elevation]
-  dsm: [surface_height]
-  rgb_dsm: [red, green, blue, surface_height]
-  rgbn_dem: [blue, green, red, nir, elevation]
-  s2_dem: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, elevation, slope]
-  insar: [cos_phase, sin_phase, coherence]
-  insar_stack: [los_t1, los_t2, los_t3, los_t4, los_t5, los_t6]
-  ms_pan: [ms_blue, ms_green, ms_red, ms_nir, pan]
-  image_dem: [red, green, blue, elevation]
-  ndvi_stats: [ndvi, ndvi_min, ndvi_max]
-  context: [B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance]
+band_sets:  # Named input band sets, referenced by the bands field.
+  rgb: [red, green, blue]  # True colour imagery, 3 bands.
+  rgbn: [blue, green, red, nir]  # Four-band multispectral imagery with near infrared, 4 bands.
+  pan: [pan]  # Single panchromatic band, 1 band.
+  pan_pair: [pan_t1, pan_t2]  # Panchromatic stereo pair, 2 bands.
+  pan_triplet: [pan_forward, pan_nadir, pan_backward]  # Panchromatic along-track stereo triplet, 3 bands.
+  s2_10: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]  # Sentinel-2 bands at 10 m and 20 m, resampled to 10 m, 10 bands.
+  s2_13: [B01, B02, B03, B04, B05, B06, B07, B08, B8A, B09, B10, B11, B12]  # All thirteen Sentinel-2 bands, 13 bands.
+  s2_swir: [B12, B8A, B04]  # Sentinel-2 false colour composite for burn scars, 3 bands.
+  s1: [VV, VH]  # Sentinel-1 dual polarisation backscatter, 2 bands.
+  s1_vv: [VV]  # Sentinel-1 VV backscatter, 1 band.
+  s2_s1: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, VV, VH]  # Sentinel-2 bands fused with Sentinel-1 backscatter, 12 bands.
+  landsat_st: [SR_B2, SR_B3, SR_B4, SR_B5, SR_B6, SR_B7, ST_B10]  # Landsat 8 and 9 surface reflectance and surface temperature, 7 bands.
+  dem: [elevation]  # Digital elevation model, 1 band.
+  dsm: [surface_height]  # Digital surface model, 1 band.
+  rgb_dsm: [red, green, blue, surface_height]  # True colour imagery with a surface model, 4 bands.
+  rgbn_dem: [blue, green, red, nir, elevation]  # Four-band multispectral imagery with elevation, 5 bands.
+  s2_dem: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, elevation, slope]  # Sentinel-2 bands with elevation and slope, 12 bands.
+  insar: [cos_phase, sin_phase, coherence]  # Interferometric phase as cosine and sine, and coherence, 3 bands.
+  insar_stack: [los_t1, los_t2, los_t3, los_t4, los_t5, los_t6]  # Line-of-sight displacement at six dates, 6 bands.
+  ms_pan: [ms_blue, ms_green, ms_red, ms_nir, pan]  # Multispectral bands with the panchromatic band, 5 bands.
+  image_dem: [red, green, blue, elevation]  # True colour imagery with elevation, 4 bands.
+  ndvi_stats: [ndvi, ndvi_min, ndvi_max]  # NDVI with its multi-year per-pixel minimum and maximum, 3 bands.
+  context: [B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance]  # Sentinel-2 bands with terrain, population and road distance, 10 bands.
 
-models:
+models:  # The model families, grouped by task.
   # ---------------------------------------------------------------------------
   # Object detection (19). Anchor-free CenterNet detector: class heatmaps,
   # box sizes and centre offsets at a quarter of the input resolution.
   # Labels: axis-aligned bounding boxes in pixel coordinates.
   # ---------------------------------------------------------------------------
-  - id: aircraft_detector
-    name: Aircraft Detector
-    task: detection
-    domain: ai
-    description: Detects aircraft on aprons, runways and in flight in very high resolution optical imagery.
-    bands: rgb
-    outputs: [aircraft]
-    labels: Bounding boxes of aircraft.
-    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+  - id: aircraft_detector  # Models aircraft_detector_tiny, _base, _large and _mega.
+    name: Aircraft Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: ai  # Capability domain in the registry.
+    description: Detects aircraft on aprons, runways and in flight in very high resolution optical imagery.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [aircraft]  # 1 output channel.
+    labels: Bounding boxes of aircraft.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]  # Suitable input data.
 
-  - id: border_monitor
-    name: Border Area Monitor
-    task: detection
-    domain: defense
-    description: Detects vehicles, vessels and new structures along borders and coastlines for situational awareness.
-    bands: rgb
-    outputs: [vehicle, vessel, structure]
-    labels: Bounding boxes of vehicles, vessels and structures.
-    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+  - id: border_monitor  # Models border_monitor_tiny, _base, _large and _mega.
+    name: Border Area Monitor  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: defense  # Capability domain in the registry.
+    description: Detects vehicles, vessels and new structures along borders and coastlines for situational awareness.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [vehicle, vessel, structure]  # 3 output channels.
+    labels: Bounding boxes of vehicles, vessels and structures.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]  # Suitable input data.
 
-  - id: building_detector
-    name: Building Detector
-    task: detection
-    domain: urban
-    description: Detects individual buildings as bounding boxes.
-    bands: rgb
-    outputs: [building]
-    labels: Bounding boxes of building footprints.
-    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]
+  - id: building_detector  # Models building_detector_tiny, _base, _large and _mega.
+    name: Building Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: urban  # Capability domain in the registry.
+    description: Detects individual buildings as bounding boxes.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [building]  # 1 output channel.
+    labels: Bounding boxes of building footprints.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery, 0.3 to 1 m]  # Suitable input data.
 
-  - id: builtup_detector
-    name: Built-up Area Detector
-    task: detection
-    domain: urban
-    description: Detects compact built-up areas such as settlements and industrial sites in multispectral imagery.
-    bands: rgbn
-    outputs: [built_up_area]
-    labels: Bounding boxes of built-up areas.
-    sources: [PlanetScope, SPOT, Sentinel-2 10 m bands]
+  - id: builtup_detector  # Models builtup_detector_tiny, _base, _large and _mega.
+    name: Built-up Area Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: urban  # Capability domain in the registry.
+    description: Detects compact built-up areas such as settlements and industrial sites in multispectral imagery.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [built_up_area]  # 1 output channel.
+    labels: Bounding boxes of built-up areas.  # Reference data needed for training.
+    sources: [PlanetScope, SPOT, Sentinel-2 10 m bands]  # Suitable input data.
 
-  - id: crop_detector
-    name: Crop Parcel Detector
-    task: detection
-    domain: agriculture
-    description: Detects cultivated parcels and orchards as bounding boxes.
-    bands: rgbn
-    outputs: [crop_parcel, orchard]
-    labels: Bounding boxes of crop parcels and orchards.
-    sources: [PlanetScope, SPOT, aerial RGBN imagery]
+  - id: crop_detector  # Models crop_detector_tiny, _base, _large and _mega.
+    name: Crop Parcel Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: agriculture  # Capability domain in the registry.
+    description: Detects cultivated parcels and orchards as bounding boxes.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [crop_parcel, orchard]  # 2 output channels.
+    labels: Bounding boxes of crop parcels and orchards.  # Reference data needed for training.
+    sources: [PlanetScope, SPOT, aerial RGBN imagery]  # Suitable input data.
 
-  - id: damage_assessor
-    name: Building Damage Assessor
-    task: detection
-    domain: risk
-    description: Detects damaged and destroyed buildings in post-event imagery for rapid damage assessment.
-    bands: rgb
-    outputs: [damaged_building, destroyed_building]
-    labels: Bounding boxes of buildings graded as damaged or destroyed.
-    sources: [Very high resolution post-event satellite or aerial RGB imagery]
+  - id: damage_assessor  # Models damage_assessor_tiny, _base, _large and _mega.
+    name: Building Damage Assessor  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: risk  # Capability domain in the registry.
+    description: Detects damaged and destroyed buildings in post-event imagery for rapid damage assessment.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [damaged_building, destroyed_building]  # 2 output channels.
+    labels: Bounding boxes of buildings graded as damaged or destroyed.  # Reference data needed for training.
+    sources: [Very high resolution post-event satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: encroachment_detector
-    name: Encroachment Detector
-    task: detection
-    domain: assets
-    description: Detects structures and vehicles inside protected corridors such as pipeline and power line rights of way.
-    bands: rgb
-    outputs: [structure, vehicle, excavation]
-    labels: Bounding boxes of structures, vehicles and excavations.
-    sources: [Very high resolution satellite or aerial RGB imagery]
+  - id: encroachment_detector  # Models encroachment_detector_tiny, _base, _large and _mega.
+    name: Encroachment Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: assets  # Capability domain in the registry.
+    description: Detects structures and vehicles inside protected corridors such as pipeline and power line rights of way.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [structure, vehicle, excavation]  # 3 output channels.
+    labels: Bounding boxes of structures, vehicles and excavations.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: fire_monitor
-    name: Active Fire Detector
-    task: detection
-    domain: environment
-    description: Detects active fire fronts and hotspots in short-wave infrared composites.
-    bands: s2_swir
-    outputs: [active_fire]
-    labels: Bounding boxes of active fire areas.
-    sources: [Sentinel-2 L1C or L2A, Landsat 8/9]
+  - id: fire_monitor  # Models fire_monitor_tiny, _base, _large and _mega.
+    name: Active Fire Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: environment  # Capability domain in the registry.
+    description: Detects active fire fronts and hotspots in short-wave infrared composites.  # What the model does once trained.
+    bands: s2_swir  # Band set s2_swir, 3 inputs.
+    outputs: [active_fire]  # 1 output channel.
+    labels: Bounding boxes of active fire areas.  # Reference data needed for training.
+    sources: [Sentinel-2 L1C or L2A, Landsat 8/9]  # Suitable input data.
 
-  - id: greenhouse_detector
-    name: Greenhouse Detector
-    task: detection
-    domain: agriculture
-    description: Detects greenhouses and plastic-covered crops.
-    bands: rgb
-    outputs: [greenhouse]
-    labels: Bounding boxes of greenhouses.
-    sources: [Very high resolution satellite or aerial RGB imagery]
+  - id: greenhouse_detector  # Models greenhouse_detector_tiny, _base, _large and _mega.
+    name: Greenhouse Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: agriculture  # Capability domain in the registry.
+    description: Detects greenhouses and plastic-covered crops.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [greenhouse]  # 1 output channel.
+    labels: Bounding boxes of greenhouses.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: leakage_detector
-    name: Leakage Detector
-    task: detection
-    domain: assets
-    description: Detects vegetation stress and surface anomalies that indicate pipeline or canal leakage.
-    bands: [blue, green, red, nir, swir1]
-    outputs: [leak_signature]
-    labels: Bounding boxes of confirmed leak locations.
-    sources: [Multispectral satellite or aerial imagery with a short-wave infrared band]
+  - id: leakage_detector  # Models leakage_detector_tiny, _base, _large and _mega.
+    name: Leakage Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: assets  # Capability domain in the registry.
+    description: Detects vegetation stress and surface anomalies that indicate pipeline or canal leakage.  # What the model does once trained.
+    bands: [blue, green, red, nir, swir1]  # 5 input bands.
+    outputs: [leak_signature]  # 1 output channel.
+    labels: Bounding boxes of confirmed leak locations.  # Reference data needed for training.
+    sources: [Multispectral satellite or aerial imagery with a short-wave infrared band]  # Suitable input data.
 
-  - id: maritime_awareness
-    name: Maritime Awareness Detector
-    task: detection
-    domain: defense
-    description: Detects vessels and offshore platforms for maritime domain awareness.
-    bands: rgb
-    outputs: [vessel, offshore_platform]
-    labels: Bounding boxes of vessels and platforms.
-    sources: [Very high resolution satellite RGB imagery]
+  - id: maritime_awareness  # Models maritime_awareness_tiny, _base, _large and _mega.
+    name: Maritime Awareness Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: defense  # Capability domain in the registry.
+    description: Detects vessels and offshore platforms for maritime domain awareness.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [vessel, offshore_platform]  # 2 output channels.
+    labels: Bounding boxes of vessels and platforms.  # Reference data needed for training.
+    sources: [Very high resolution satellite RGB imagery]  # Suitable input data.
 
-  - id: military_objects_detector
-    name: Military Objects Detector
-    task: detection
-    domain: defense
-    description: Detects vehicles, aircraft, vessels and fortified structures for neutral monitoring and verification.
-    bands: rgb
-    outputs: [vehicle, aircraft, vessel, fortified_structure]
-    labels: Bounding boxes of the four object classes.
-    sources: [Very high resolution satellite RGB imagery]
+  - id: military_objects_detector  # Models military_objects_detector_tiny, _base, _large and _mega.
+    name: Military Objects Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: defense  # Capability domain in the registry.
+    description: Detects vehicles, aircraft, vessels and fortified structures for neutral monitoring and verification.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [vehicle, aircraft, vessel, fortified_structure]  # 4 output channels.
+    labels: Bounding boxes of the four object classes.  # Reference data needed for training.
+    sources: [Very high resolution satellite RGB imagery]  # Suitable input data.
 
-  - id: object_detector
-    name: Generic Object Detector
-    task: detection
-    domain: ai
-    description: Multi-class detector for common objects in overhead imagery.
-    bands: rgb
-    outputs: [building, vehicle, ship, aircraft, storage_tank, bridge]
-    labels: Bounding boxes of the six object classes.
-    sources: [Very high resolution satellite or aerial RGB imagery]
+  - id: object_detector  # Models object_detector_tiny, _base, _large and _mega.
+    name: Generic Object Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: ai  # Capability domain in the registry.
+    description: Multi-class detector for common objects in overhead imagery.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [building, vehicle, ship, aircraft, storage_tank, bridge]  # 6 output channels.
+    labels: Bounding boxes of the six object classes.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: pivot_inventory
-    name: Centre Pivot Inventory
-    task: detection
-    domain: agriculture
-    description: Detects centre pivot irrigation fields for irrigation inventories.
-    bands: rgbn
-    outputs: [centre_pivot]
-    labels: Bounding boxes of centre pivot fields.
-    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]
+  - id: pivot_inventory  # Models pivot_inventory_tiny, _base, _large and _mega.
+    name: Centre Pivot Inventory  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: agriculture  # Capability domain in the registry.
+    description: Detects centre pivot irrigation fields for irrigation inventories.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [centre_pivot]  # 1 output channel.
+    labels: Bounding boxes of centre pivot fields.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]  # Suitable input data.
 
-  - id: sar_ship_detector
-    name: SAR Ship Detector
-    task: detection
-    domain: sar
-    description: Detects ships in synthetic aperture radar backscatter, independent of cloud cover and daylight.
-    bands: s1
-    outputs: [ship]
-    labels: Bounding boxes of ships in SAR images.
-    sources: [Sentinel-1 GRD (sigma0 in dB), other C- or X-band SAR]
+  - id: sar_ship_detector  # Models sar_ship_detector_tiny, _base, _large and _mega.
+    name: SAR Ship Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: sar  # Capability domain in the registry.
+    description: Detects ships in synthetic aperture radar backscatter, independent of cloud cover and daylight.  # What the model does once trained.
+    bands: s1  # Band set s1, 2 inputs.
+    outputs: [ship]  # 1 output channel.
+    labels: Bounding boxes of ships in SAR images.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD (sigma0 in dB), other C- or X-band SAR]  # Suitable input data.
 
-  - id: security_monitor
-    name: Security Monitor
-    task: detection
-    domain: defense
-    description: Detects vehicles, vessels and temporary structures around critical sites.
-    bands: rgb
-    outputs: [vehicle, vessel, temporary_structure]
-    labels: Bounding boxes of the three object classes.
-    sources: [Very high resolution satellite or aerial RGB imagery]
+  - id: security_monitor  # Models security_monitor_tiny, _base, _large and _mega.
+    name: Security Monitor  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: defense  # Capability domain in the registry.
+    description: Detects vehicles, vessels and temporary structures around critical sites.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [vehicle, vessel, temporary_structure]  # 3 output channels.
+    labels: Bounding boxes of the three object classes.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: ship_detector
-    name: Ship Detector
-    task: detection
-    domain: ai
-    description: Detects ships in optical imagery.
-    bands: rgb
-    outputs: [ship]
-    labels: Bounding boxes of ships.
-    sources: [Very high resolution satellite RGB imagery, Sentinel-2 10 m RGB for large vessels]
+  - id: ship_detector  # Models ship_detector_tiny, _base, _large and _mega.
+    name: Ship Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: ai  # Capability domain in the registry.
+    description: Detects ships in optical imagery.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [ship]  # 1 output channel.
+    labels: Bounding boxes of ships.  # Reference data needed for training.
+    sources: [Very high resolution satellite RGB imagery, Sentinel-2 10 m RGB for large vessels]  # Suitable input data.
 
-  - id: target_detector
-    name: Target Detector
-    task: detection
-    domain: defense
-    description: Single-class detector for a user-defined object of interest.
-    bands: rgb
-    outputs: [object_of_interest]
-    labels: Bounding boxes of the object of interest.
-    sources: [Very high resolution satellite or aerial RGB imagery]
+  - id: target_detector  # Models target_detector_tiny, _base, _large and _mega.
+    name: Target Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: defense  # Capability domain in the registry.
+    description: Single-class detector for a user-defined object of interest.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [object_of_interest]  # 1 output channel.
+    labels: Bounding boxes of the object of interest.  # Reference data needed for training.
+    sources: [Very high resolution satellite or aerial RGB imagery]  # Suitable input data.
 
-  - id: vehicle_detector
-    name: Vehicle Detector
-    task: detection
-    domain: ai
-    description: Detects cars, trucks and buses.
-    bands: rgb
-    outputs: [car, truck, bus]
-    labels: Bounding boxes of vehicles by type.
-    sources: [Aerial or satellite RGB imagery, 0.1 to 0.5 m]
+  - id: vehicle_detector  # Models vehicle_detector_tiny, _base, _large and _mega.
+    name: Vehicle Detector  # Display name.
+    task: detection  # Anchor-free CenterNet detector.
+    domain: ai  # Capability domain in the registry.
+    description: Detects cars, trucks and buses.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [car, truck, bus]  # 3 output channels.
+    labels: Bounding boxes of vehicles by type.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery, 0.1 to 0.5 m]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Semantic segmentation (26). U-Net with a per-pixel softmax over classes.
   # Labels: raster masks with one class index per pixel.
   # ---------------------------------------------------------------------------
-  - id: cloud_mask
-    name: Cloud and Shadow Mask
-    task: segmentation
-    domain: imaging
-    description: Masks clear sky, thick cloud, thin cloud and cloud shadow in Sentinel-2 imagery.
-    bands: s2_13
-    outputs: [clear, thick_cloud, thin_cloud, cloud_shadow]
-    labels: Cloud and shadow masks.
-    sources: [Sentinel-2 L1C]
+  - id: cloud_mask  # Models cloud_mask_tiny, _base, _large and _mega.
+    name: Cloud and Shadow Mask  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: imaging  # Capability domain in the registry.
+    description: Masks clear sky, thick cloud, thin cloud and cloud shadow in Sentinel-2 imagery.  # What the model does once trained.
+    bands: s2_13  # Band set s2_13, 13 inputs.
+    outputs: [clear, thick_cloud, thin_cloud, cloud_shadow]  # 4 output channels.
+    labels: Cloud and shadow masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L1C]  # Suitable input data.
 
-  - id: corridor_monitor
-    name: Corridor Monitor
-    task: segmentation
-    domain: assets
-    description: Segments vegetation encroachment and structures in infrastructure corridors.
-    bands: rgb
-    outputs: [background, vegetation_encroachment, structure]
-    labels: Masks of vegetation encroachment and structures.
-    sources: [Aerial or satellite RGB imagery, LiDAR-derived orthophotos]
+  - id: corridor_monitor  # Models corridor_monitor_tiny, _base, _large and _mega.
+    name: Corridor Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: assets  # Capability domain in the registry.
+    description: Segments vegetation encroachment and structures in infrastructure corridors.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, vegetation_encroachment, structure]  # 3 output channels.
+    labels: Masks of vegetation encroachment and structures.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery, LiDAR-derived orthophotos]  # Suitable input data.
 
-  - id: crop_boundary_delineation
-    name: Crop Boundary Delineation
-    task: segmentation
-    domain: agriculture
-    description: Delineates agricultural field boundaries by segmenting field interiors and boundary lines.
-    bands: rgbn
-    outputs: [background, field_interior, field_boundary]
-    labels: Field polygons rasterised into interiors and boundaries.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: crop_boundary_delineation  # Models crop_boundary_delineation_tiny, _base, _large and _mega.
+    name: Crop Boundary Delineation  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: agriculture  # Capability domain in the registry.
+    description: Delineates agricultural field boundaries by segmenting field interiors and boundary lines.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [background, field_interior, field_boundary]  # 3 output channels.
+    labels: Field polygons rasterised into interiors and boundaries.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: crop_classifier
-    name: Crop Type Classifier
-    task: segmentation
-    domain: agriculture
-    description: Maps crop types per pixel.
-    bands: s2_10
-    outputs: [background, wheat, maize, rice, soybean, sunflower, other_crop]
-    labels: Crop type masks, for example from farmer declarations.
-    sources: [Sentinel-2 L2A]
+  - id: crop_classifier  # Models crop_classifier_tiny, _base, _large and _mega.
+    name: Crop Type Classifier  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: agriculture  # Capability domain in the registry.
+    description: Maps crop types per pixel.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [background, wheat, maize, rice, soybean, sunflower, other_crop]  # 7 output channels.
+    labels: Crop type masks, for example from farmer declarations.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: desertification_monitor
-    name: Desertification Monitor
-    task: segmentation
-    domain: environment
-    description: Classifies land degradation severity in drylands.
-    bands: s2_10
-    outputs: [not_degraded, low, moderate, severe]
-    labels: Degradation severity masks from field surveys.
-    sources: [Sentinel-2 L2A, Landsat 8/9]
+  - id: desertification_monitor  # Models desertification_monitor_tiny, _base, _large and _mega.
+    name: Desertification Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: environment  # Capability domain in the registry.
+    description: Classifies land degradation severity in drylands.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [not_degraded, low, moderate, severe]  # 4 output channels.
+    labels: Degradation severity masks from field surveys.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Landsat 8/9]  # Suitable input data.
 
-  - id: digitization_2d
-    name: 2D Digitisation
-    task: segmentation
-    domain: imaging
-    description: Segments buildings, roads, water and vegetation for map digitisation.
-    bands: rgb
-    outputs: [background, building, road, water, vegetation]
-    labels: Masks of the four map feature classes.
-    sources: [Aerial or satellite RGB imagery]
+  - id: digitization_2d  # Models digitization_2d_tiny, _base, _large and _mega.
+    name: 2D Digitisation  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: imaging  # Capability domain in the registry.
+    description: Segments buildings, roads, water and vegetation for map digitisation.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, building, road, water, vegetation]  # 5 output channels.
+    labels: Masks of the four map feature classes.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: erosion_detector
-    name: Erosion Detector
-    task: segmentation
-    domain: environment
-    description: Maps eroded soil surfaces and gullies using spectral and terrain inputs.
-    bands: rgbn_dem
-    outputs: [stable, sheet_erosion, gully]
-    labels: Erosion masks.
-    sources: [Multispectral imagery with a co-registered DEM]
+  - id: erosion_detector  # Models erosion_detector_tiny, _base, _large and _mega.
+    name: Erosion Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: environment  # Capability domain in the registry.
+    description: Maps eroded soil surfaces and gullies using spectral and terrain inputs.  # What the model does once trained.
+    bands: rgbn_dem  # Band set rgbn_dem, 5 inputs.
+    outputs: [stable, sheet_erosion, gully]  # 3 output channels.
+    labels: Erosion masks.  # Reference data needed for training.
+    sources: [Multispectral imagery with a co-registered DEM]  # Suitable input data.
 
-  - id: forest_monitor
-    name: Forest Monitor
-    task: segmentation
-    domain: forestry
-    description: Maps forest cover by forest type.
-    bands: s2_10
-    outputs: [non_forest, broadleaf, coniferous, mixed]
-    labels: Forest type masks.
-    sources: [Sentinel-2 L2A]
+  - id: forest_monitor  # Models forest_monitor_tiny, _base, _large and _mega.
+    name: Forest Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: forestry  # Capability domain in the registry.
+    description: Maps forest cover by forest type.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [non_forest, broadleaf, coniferous, mixed]  # 4 output channels.
+    labels: Forest type masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: infrastructure_monitor
-    name: Infrastructure Monitor
-    task: segmentation
-    domain: assets
-    description: Segments roads, railways, buildings and bridges.
-    bands: rgb
-    outputs: [background, road, railway, building, bridge]
-    labels: Infrastructure masks.
-    sources: [Aerial or satellite RGB imagery]
+  - id: infrastructure_monitor  # Models infrastructure_monitor_tiny, _base, _large and _mega.
+    name: Infrastructure Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: assets  # Capability domain in the registry.
+    description: Segments roads, railways, buildings and bridges.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, road, railway, building, bridge]  # 5 output channels.
+    labels: Infrastructure masks.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: land_degradation_detector
-    name: Land Degradation Detector
-    task: segmentation
-    domain: environment
-    description: Separates degraded from non-degraded land.
-    bands: s2_10
-    outputs: [not_degraded, degraded]
-    labels: Degradation masks.
-    sources: [Sentinel-2 L2A]
+  - id: land_degradation_detector  # Models land_degradation_detector_tiny, _base, _large and _mega.
+    name: Land Degradation Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: environment  # Capability domain in the registry.
+    description: Separates degraded from non-degraded land.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [not_degraded, degraded]  # 2 output channels.
+    labels: Degradation masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: lulc_classifier
-    name: Land Use and Land Cover Classifier
-    task: segmentation
-    domain: environment
-    description: Maps land cover in the eleven classes of ESA WorldCover.
-    bands: s2_10
-    outputs: [tree_cover, shrubland, grassland, cropland, built_up, bare_sparse, snow_ice, water, herbaceous_wetland, mangroves, moss_lichen]
-    labels: Land cover masks, for example ESA WorldCover.
-    sources: [Sentinel-2 L2A]
+  - id: lulc_classifier  # Models lulc_classifier_tiny, _base, _large and _mega.
+    name: Land Use and Land Cover Classifier  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: environment  # Capability domain in the registry.
+    description: Maps land cover in the eleven classes of ESA WorldCover.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [tree_cover, shrubland, grassland, cropland, built_up, bare_sparse, snow_ice, water, herbaceous_wetland, mangroves, moss_lichen]  # 11 output channels.
+    labels: Land cover masks, for example ESA WorldCover.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: marine_pollution_detector
-    name: Marine Pollution Detector
-    task: segmentation
-    domain: water
-    description: Segments floating debris and surface pollution at sea.
-    bands: s2_10
-    outputs: [water, floating_debris, oil_sheen]
-    labels: Pollution masks.
-    sources: [Sentinel-2 L2A]
+  - id: marine_pollution_detector  # Models marine_pollution_detector_tiny, _base, _large and _mega.
+    name: Marine Pollution Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: water  # Capability domain in the registry.
+    description: Segments floating debris and surface pollution at sea.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [water, floating_debris, oil_sheen]  # 3 output channels.
+    labels: Pollution masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: multi_solution_segmentation
-    name: General Semantic Segmentation
-    task: segmentation
-    domain: ai
-    description: General-purpose semantic segmentation with six common classes.
-    bands: rgb
-    outputs: [background, building, road, water, vegetation, bare_ground]
-    labels: Masks of the six classes.
-    sources: [Aerial or satellite RGB imagery]
+  - id: multi_solution_segmentation  # Models multi_solution_segmentation_tiny, _base, _large and _mega.
+    name: General Semantic Segmentation  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: ai  # Capability domain in the registry.
+    description: General-purpose semantic segmentation with six common classes.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, building, road, water, vegetation, bare_ground]  # 6 output channels.
+    labels: Masks of the six classes.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: plowed_land_detector
-    name: Ploughed Land Detector
-    task: segmentation
-    domain: agriculture
-    description: Segments freshly ploughed fields.
-    bands: rgbn
-    outputs: [background, ploughed]
-    labels: Masks of ploughed fields.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: plowed_land_detector  # Models plowed_land_detector_tiny, _base, _large and _mega.
+    name: Ploughed Land Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: agriculture  # Capability domain in the registry.
+    description: Segments freshly ploughed fields.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [background, ploughed]  # 2 output channels.
+    labels: Masks of ploughed fields.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: reservoir_monitor
-    name: Reservoir Monitor
-    task: segmentation
-    domain: water
-    description: Segments the water surface of reservoirs to track storage.
-    bands: rgbn
-    outputs: [background, water]
-    labels: Water masks.
-    sources: [Sentinel-2 10 m bands, Landsat 8/9]
+  - id: reservoir_monitor  # Models reservoir_monitor_tiny, _base, _large and _mega.
+    name: Reservoir Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: water  # Capability domain in the registry.
+    description: Segments the water surface of reservoirs to track storage.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [background, water]  # 2 output channels.
+    labels: Water masks.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9]  # Suitable input data.
 
-  - id: road_network_analyzer
-    name: Road Network Extractor
-    task: segmentation
-    domain: urban
-    description: Extracts road surfaces for road network mapping.
-    bands: rgb
-    outputs: [background, road]
-    labels: Road masks.
-    sources: [Aerial or satellite RGB imagery]
+  - id: road_network_analyzer  # Models road_network_analyzer_tiny, _base, _large and _mega.
+    name: Road Network Extractor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: urban  # Capability domain in the registry.
+    description: Extracts road surfaces for road network mapping.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, road]  # 2 output channels.
+    labels: Road masks.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: salinity_detector
-    name: Soil Salinity Detector
-    task: segmentation
-    domain: agriculture
-    description: Classifies soil salinity levels.
-    bands: s2_10
-    outputs: [non_saline, slight, moderate, strong]
-    labels: Salinity class masks from soil sampling.
-    sources: [Sentinel-2 L2A]
+  - id: salinity_detector  # Models salinity_detector_tiny, _base, _large and _mega.
+    name: Soil Salinity Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: agriculture  # Capability domain in the registry.
+    description: Classifies soil salinity levels.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [non_saline, slight, moderate, strong]  # 4 output channels.
+    labels: Salinity class masks from soil sampling.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: sar_flood_detector
-    name: SAR Flood Detector
-    task: segmentation
-    domain: sar
-    description: Maps flooded areas in radar backscatter.
-    bands: s1
-    outputs: [non_flooded, flooded]
-    labels: Flood masks.
-    sources: [Sentinel-1 GRD (sigma0 in dB)]
+  - id: sar_flood_detector  # Models sar_flood_detector_tiny, _base, _large and _mega.
+    name: SAR Flood Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: sar  # Capability domain in the registry.
+    description: Maps flooded areas in radar backscatter.  # What the model does once trained.
+    bands: s1  # Band set s1, 2 inputs.
+    outputs: [non_flooded, flooded]  # 2 output channels.
+    labels: Flood masks.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD (sigma0 in dB)]  # Suitable input data.
 
-  - id: sar_oil_spill_detector
-    name: SAR Oil Spill Detector
-    task: segmentation
-    domain: sar
-    description: Segments oil spills and look-alike dark areas on the sea surface.
-    bands: s1_vv
-    outputs: [sea, oil_spill, look_alike]
-    labels: Oil spill and look-alike masks.
-    sources: [Sentinel-1 GRD VV]
+  - id: sar_oil_spill_detector  # Models sar_oil_spill_detector_tiny, _base, _large and _mega.
+    name: SAR Oil Spill Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: sar  # Capability domain in the registry.
+    description: Segments oil spills and look-alike dark areas on the sea surface.  # What the model does once trained.
+    bands: s1_vv  # Band set s1_vv, 1 inputs.
+    outputs: [sea, oil_spill, look_alike]  # 3 output channels.
+    labels: Oil spill and look-alike masks.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD VV]  # Suitable input data.
 
-  - id: thematic_mapper
-    name: Thematic Mapper
-    task: segmentation
-    domain: imaging
-    description: Eight-class thematic mapping for general land cover mapping projects.
-    bands: s2_10
-    outputs: [artificial, agricultural, forest, grassland, wetland, water, bare, snow_ice]
-    labels: Thematic masks.
-    sources: [Sentinel-2 L2A]
+  - id: thematic_mapper  # Models thematic_mapper_tiny, _base, _large and _mega.
+    name: Thematic Mapper  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: imaging  # Capability domain in the registry.
+    description: Eight-class thematic mapping for general land cover mapping projects.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [artificial, agricultural, forest, grassland, wetland, water, bare, snow_ice]  # 8 output channels.
+    labels: Thematic masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: topography_mapper
-    name: Landform Mapper
-    task: segmentation
-    domain: imaging
-    description: Classifies landforms from a digital elevation model.
-    bands: dem
-    outputs: [flat, slope, ridge, valley, peak, pit]
-    labels: Landform masks, for example geomorphons.
-    sources: [Copernicus DEM GLO-30, national DEMs]
+  - id: topography_mapper  # Models topography_mapper_tiny, _base, _large and _mega.
+    name: Landform Mapper  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: imaging  # Capability domain in the registry.
+    description: Classifies landforms from a digital elevation model.  # What the model does once trained.
+    bands: dem  # Band set dem, 1 inputs.
+    outputs: [flat, slope, ridge, valley, peak, pit]  # 6 output channels.
+    labels: Landform masks, for example geomorphons.  # Reference data needed for training.
+    sources: [Copernicus DEM GLO-30, national DEMs]  # Suitable input data.
 
-  - id: tourist_destination_monitor
-    name: Tourist Destination Monitor
-    task: segmentation
-    domain: tourism
-    description: Maps beaches, built-up areas, vegetation and water around tourist destinations.
-    bands: rgb
-    outputs: [background, beach, built_up, vegetation, water]
-    labels: Masks of the land cover classes.
-    sources: [Aerial or satellite RGB imagery]
+  - id: tourist_destination_monitor  # Models tourist_destination_monitor_tiny, _base, _large and _mega.
+    name: Tourist Destination Monitor  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: tourism  # Capability domain in the registry.
+    description: Maps beaches, built-up areas, vegetation and water around tourist destinations.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, beach, built_up, vegetation, water]  # 5 output channels.
+    labels: Masks of the land cover classes.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: transportation_mapper
-    name: Transportation Mapper
-    task: segmentation
-    domain: urban
-    description: Maps roads, railways, airports and ports.
-    bands: rgb
-    outputs: [background, road, railway, airport, port]
-    labels: Transport infrastructure masks.
-    sources: [Aerial or satellite RGB imagery]
+  - id: transportation_mapper  # Models transportation_mapper_tiny, _base, _large and _mega.
+    name: Transportation Mapper  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: urban  # Capability domain in the registry.
+    description: Maps roads, railways, airports and ports.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, road, railway, airport, port]  # 5 output channels.
+    labels: Transport infrastructure masks.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: urban_planner
-    name: Urban Land Use Mapper
-    task: segmentation
-    domain: urban
-    description: Maps urban land use.
-    bands: rgb
-    outputs: [background, residential, commercial, industrial, green_space]
-    labels: Urban land use masks.
-    sources: [Aerial or satellite RGB imagery]
+  - id: urban_planner  # Models urban_planner_tiny, _base, _large and _mega.
+    name: Urban Land Use Mapper  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: urban  # Capability domain in the registry.
+    description: Maps urban land use.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, residential, commercial, industrial, green_space]  # 5 output channels.
+    labels: Urban land use masks.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: utility_mapper
-    name: Utility Mapper
-    task: segmentation
-    domain: assets
-    description: Segments power lines, pipeline corridors and substations.
-    bands: rgb
-    outputs: [background, power_line, pipeline_corridor, substation]
-    labels: Utility masks.
-    sources: [Aerial RGB imagery]
+  - id: utility_mapper  # Models utility_mapper_tiny, _base, _large and _mega.
+    name: Utility Mapper  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: assets  # Capability domain in the registry.
+    description: Segments power lines, pipeline corridors and substations.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [background, power_line, pipeline_corridor, substation]  # 4 output channels.
+    labels: Utility masks.  # Reference data needed for training.
+    sources: [Aerial RGB imagery]  # Suitable input data.
 
-  - id: water_surface_detector
-    name: Water Surface Detector
-    task: segmentation
-    domain: water
-    description: Segments open water surfaces.
-    bands: rgbn
-    outputs: [background, water]
-    labels: Water masks.
-    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]
+  - id: water_surface_detector  # Models water_surface_detector_tiny, _base, _large and _mega.
+    name: Water Surface Detector  # Display name.
+    task: segmentation  # U-Net class map.
+    domain: water  # Capability domain in the registry.
+    description: Segments open water surfaces.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [background, water]  # 2 output channels.
+    labels: Water masks.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, Landsat 8/9, PlanetScope]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Change detection (6). U-Net on two co-registered acquisitions stacked on
   # the channel axis (early fusion). Labels: change masks.
   # ---------------------------------------------------------------------------
-  - id: asset_condition_change
-    name: Asset Condition Change
-    task: change_detection
-    domain: assets
-    description: Detects changes in the condition of infrastructure assets between two dates.
-    bands: rgb
-    dates: 2
-    outputs: [no_change, deterioration, repair]
-    labels: Change masks.
-    sources: [Co-registered very high resolution RGB image pairs]
+  - id: asset_condition_change  # Models asset_condition_change_tiny, _base, _large and _mega.
+    name: Asset Condition Change  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: assets  # Capability domain in the registry.
+    description: Detects changes in the condition of infrastructure assets between two dates.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, deterioration, repair]  # 3 output channels.
+    labels: Change masks.  # Reference data needed for training.
+    sources: [Co-registered very high resolution RGB image pairs]  # Suitable input data.
 
-  - id: change_detector
-    name: Change Detector
-    task: change_detection
-    domain: ai
-    description: Binary change detection between two dates.
-    bands: rgb
-    dates: 2
-    outputs: [no_change, change]
-    labels: Binary change masks.
-    sources: [Co-registered RGB image pairs]
+  - id: change_detector  # Models change_detector_tiny, _base, _large and _mega.
+    name: Change Detector  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: ai  # Capability domain in the registry.
+    description: Binary change detection between two dates.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, change]  # 2 output channels.
+    labels: Binary change masks.  # Reference data needed for training.
+    sources: [Co-registered RGB image pairs]  # Suitable input data.
 
-  - id: construction_monitor
-    name: Construction Monitor
-    task: change_detection
-    domain: urban
-    description: Detects new construction and demolition between two dates.
-    bands: rgb
-    dates: 2
-    outputs: [no_change, new_construction, demolition]
-    labels: Construction change masks.
-    sources: [Co-registered very high resolution RGB image pairs]
+  - id: construction_monitor  # Models construction_monitor_tiny, _base, _large and _mega.
+    name: Construction Monitor  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: urban  # Capability domain in the registry.
+    description: Detects new construction and demolition between two dates.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, new_construction, demolition]  # 3 output channels.
+    labels: Construction change masks.  # Reference data needed for training.
+    sources: [Co-registered very high resolution RGB image pairs]  # Suitable input data.
 
-  - id: deforestation_detector
-    name: Deforestation Detector
-    task: change_detection
-    domain: forestry
-    description: Detects forest loss between two dates.
-    bands: s2_10
-    dates: 2
-    outputs: [no_change, forest_loss]
-    labels: Forest loss masks.
-    sources: [Sentinel-2 L2A image pairs]
+  - id: deforestation_detector  # Models deforestation_detector_tiny, _base, _large and _mega.
+    name: Deforestation Detector  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: forestry  # Capability domain in the registry.
+    description: Detects forest loss between two dates.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, forest_loss]  # 2 output channels.
+    labels: Forest loss masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A image pairs]  # Suitable input data.
 
-  - id: protected_area_change_detector
-    name: Protected Area Change Detector
-    task: change_detection
-    domain: environment
-    description: Detects land cover change inside protected areas.
-    bands: s2_10
-    dates: 2
-    outputs: [no_change, vegetation_loss, new_structure, other_change]
-    labels: Change masks by change type.
-    sources: [Sentinel-2 L2A image pairs]
+  - id: protected_area_change_detector  # Models protected_area_change_detector_tiny, _base, _large and _mega.
+    name: Protected Area Change Detector  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: environment  # Capability domain in the registry.
+    description: Detects land cover change inside protected areas.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, vegetation_loss, new_structure, other_change]  # 4 output channels.
+    labels: Change masks by change type.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A image pairs]  # Suitable input data.
 
-  - id: urban_growth_assessor
-    name: Urban Growth Assessor
-    task: change_detection
-    domain: urban
-    description: Detects new built-up area between two dates.
-    bands: s2_10
-    dates: 2
-    outputs: [no_change, urban_expansion]
-    labels: Urban expansion masks.
-    sources: [Sentinel-2 L2A image pairs, Landsat 8/9 image pairs]
+  - id: urban_growth_assessor  # Models urban_growth_assessor_tiny, _base, _large and _mega.
+    name: Urban Growth Assessor  # Display name.
+    task: change_detection  # U-Net on the stacked dates.
+    domain: urban  # Capability domain in the registry.
+    description: Detects new built-up area between two dates.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [no_change, urban_expansion]  # 2 output channels.
+    labels: Urban expansion masks.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A image pairs, Landsat 8/9 image pairs]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Dense regression (36). U-Net with a per-pixel regression output.
   # Labels: reference rasters of the target variable.
   # ---------------------------------------------------------------------------
-  - id: accessibility_analyzer
-    name: Accessibility Analyser
-    task: dense_regression
-    domain: tourism
-    description: Estimates travel time to the nearest service centre per pixel.
-    bands: context
-    outputs: [travel_time]
-    units: [min]
-    labels: Travel time rasters from network analysis or surveys.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+  - id: accessibility_analyzer  # Models accessibility_analyzer_tiny, _base, _large and _mega.
+    name: Accessibility Analyser  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: tourism  # Capability domain in the registry.
+    description: Estimates travel time to the nearest service centre per pixel.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [travel_time]  # 1 output channel.
+    units: [min]  # Units of the targets, in output order.
+    labels: Travel time rasters from network analysis or surveys.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]  # Suitable input data.
 
-  - id: beekeeping_suitability
-    name: Beekeeping Suitability
-    task: dense_regression
-    domain: agriculture
-    description: Scores the suitability of land for apiaries.
-    bands: s2_dem
-    outputs: [suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Suitability scores from expert assessment or productivity records.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: beekeeping_suitability  # Models beekeeping_suitability_tiny, _base, _large and _mega.
+    name: Beekeeping Suitability  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Scores the suitability of land for apiaries.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Suitability scores from expert assessment or productivity records.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: crop_growth_monitor
-    name: Crop Growth Monitor
-    task: dense_regression
-    domain: agriculture
-    description: Estimates leaf area index as a measure of crop growth.
-    bands: s2_10
-    outputs: [leaf_area_index]
-    units: [m2 m-2]
-    range: [0, 8]
-    labels: Leaf area index measurements or reference products.
-    sources: [Sentinel-2 L2A]
+  - id: crop_growth_monitor  # Models crop_growth_monitor_tiny, _base, _large and _mega.
+    name: Crop Growth Monitor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Estimates leaf area index as a measure of crop growth.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [leaf_area_index]  # 1 output channel.
+    units: [m2 m-2]  # Units of the targets, in output order.
+    range: [0, 8]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Leaf area index measurements or reference products.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: crop_health_assessor
-    name: Crop Health Assessor
-    task: dense_regression
-    domain: agriculture
-    description: Scores crop health per pixel.
-    bands: s2_10
-    outputs: [health_score]
-    units: ["1"]
-    range: [0, 1]
-    labels: Crop health scores from field inspection.
-    sources: [Sentinel-2 L2A]
+  - id: crop_health_assessor  # Models crop_health_assessor_tiny, _base, _large and _mega.
+    name: Crop Health Assessor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Scores crop health per pixel.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [health_score]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Crop health scores from field inspection.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: drought_monitor
-    name: Drought Monitor
-    task: dense_regression
-    domain: environment
-    description: Estimates a drought severity index.
-    bands: s2_10
-    outputs: [drought_severity]
-    units: ["1"]
-    range: [0, 1]
-    labels: Drought index rasters, for example from soil moisture products.
-    sources: [Sentinel-2 L2A, Landsat 8/9]
+  - id: drought_monitor  # Models drought_monitor_tiny, _base, _large and _mega.
+    name: Drought Monitor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: environment  # Capability domain in the registry.
+    description: Estimates a drought severity index.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [drought_severity]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Drought index rasters, for example from soil moisture products.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Landsat 8/9]  # Suitable input data.
 
-  - id: energy_potential
-    name: Energy Potential
-    task: dense_regression
-    domain: energy
-    description: Estimates annual solar energy potential per pixel.
-    bands: s2_dem
-    outputs: [solar_potential]
-    units: [kWh m-2 a-1]
-    labels: Solar potential rasters from irradiance models.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: energy_potential  # Models energy_potential_tiny, _base, _large and _mega.
+    name: Energy Potential  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: energy  # Capability domain in the registry.
+    description: Estimates annual solar energy potential per pixel.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [solar_potential]  # 1 output channel.
+    units: [kWh m-2 a-1]  # Units of the targets, in output order.
+    labels: Solar potential rasters from irradiance models.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: environmental_risk
-    name: Environmental Risk
-    task: dense_regression
-    domain: risk
-    description: Scores combined environmental risk.
-    bands: context
-    outputs: [risk_score]
-    units: ["1"]
-    range: [0, 1]
-    labels: Environmental risk scores.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+  - id: environmental_risk  # Models environmental_risk_tiny, _base, _large and _mega.
+    name: Environmental Risk  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: risk  # Capability domain in the registry.
+    description: Scores combined environmental risk.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [risk_score]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Environmental risk scores.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]  # Suitable input data.
 
-  - id: flood_risk
-    name: Flood Risk
-    task: dense_regression
-    domain: water
-    description: Estimates flood susceptibility per pixel.
-    bands: s2_dem
-    outputs: [flood_susceptibility]
-    units: ["1"]
-    range: [0, 1]
-    labels: Flood susceptibility from historical flood extents or hydraulic models.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: flood_risk  # Models flood_risk_tiny, _base, _large and _mega.
+    name: Flood Risk  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: water  # Capability domain in the registry.
+    description: Estimates flood susceptibility per pixel.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [flood_susceptibility]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Flood susceptibility from historical flood extents or hydraulic models.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: forest_density_estimator
-    name: Forest Density Estimator
-    task: dense_regression
-    domain: forestry
-    description: Estimates tree canopy cover.
-    bands: s2_10
-    outputs: [canopy_cover]
-    units: ["1"]
-    range: [0, 1]
-    labels: Canopy cover fraction from LiDAR or high resolution imagery.
-    sources: [Sentinel-2 L2A]
+  - id: forest_density_estimator  # Models forest_density_estimator_tiny, _base, _large and _mega.
+    name: Forest Density Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: forestry  # Capability domain in the registry.
+    description: Estimates tree canopy cover.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [canopy_cover]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Canopy cover fraction from LiDAR or high resolution imagery.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: grazing_potential
-    name: Grazing Potential
-    task: dense_regression
-    domain: agriculture
-    description: Estimates forage biomass available for grazing.
-    bands: s2_10
-    outputs: [forage_biomass]
-    units: [kg ha-1]
-    labels: Biomass samples from rangeland surveys.
-    sources: [Sentinel-2 L2A]
+  - id: grazing_potential  # Models grazing_potential_tiny, _base, _large and _mega.
+    name: Grazing Potential  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Estimates forage biomass available for grazing.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [forage_biomass]  # 1 output channel.
+    units: [kg ha-1]  # Units of the targets, in output order.
+    labels: Biomass samples from rangeland surveys.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: hazard_vulnerability
-    name: Hazard Vulnerability
-    task: dense_regression
-    domain: risk
-    description: Scores vulnerability of the built environment to natural hazards.
-    bands: context
-    outputs: [vulnerability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Vulnerability scores from exposure models or loss data.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+  - id: hazard_vulnerability  # Models hazard_vulnerability_tiny, _base, _large and _mega.
+    name: Hazard Vulnerability  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: risk  # Capability domain in the registry.
+    description: Scores vulnerability of the built environment to natural hazards.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [vulnerability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Vulnerability scores from exposure models or loss data.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]  # Suitable input data.
 
-  - id: landslide_risk
-    name: Landslide Susceptibility
-    task: dense_regression
-    domain: risk
-    description: Estimates landslide susceptibility.
-    bands: s2_dem
-    outputs: [susceptibility]
-    units: ["1"]
-    range: [0, 1]
-    labels: Landslide inventories converted to susceptibility targets.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: landslide_risk  # Models landslide_risk_tiny, _base, _large and _mega.
+    name: Landslide Susceptibility  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: risk  # Capability domain in the registry.
+    description: Estimates landslide susceptibility.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [susceptibility]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Landslide inventories converted to susceptibility targets.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: mobility_analyzer
-    name: Mobility Analyser
-    task: dense_regression
-    domain: urban
-    description: Estimates traffic intensity per pixel on the road network.
-    bands: context
-    outputs: [traffic_intensity]
-    units: [vehicles h-1]
-    labels: Traffic counts interpolated along roads.
-    sources: [Sentinel-2 L2A, road distance and population rasters]
+  - id: mobility_analyzer  # Models mobility_analyzer_tiny, _base, _large and _mega.
+    name: Mobility Analyser  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: urban  # Capability domain in the registry.
+    description: Estimates traffic intensity per pixel on the road network.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [traffic_intensity]  # 1 output channel.
+    units: [vehicles h-1]  # Units of the targets, in output order.
+    labels: Traffic counts interpolated along roads.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, road distance and population rasters]  # Suitable input data.
 
-  - id: perennial_garden_suitability
-    name: Perennial Garden Suitability
-    task: dense_regression
-    domain: agriculture
-    description: Scores land suitability for orchards and perennial crops.
-    bands: s2_dem
-    outputs: [suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Suitability scores from land evaluation.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: perennial_garden_suitability  # Models perennial_garden_suitability_tiny, _base, _large and _mega.
+    name: Perennial Garden Suitability  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Scores land suitability for orchards and perennial crops.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Suitability scores from land evaluation.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: pipeline_route_planner
-    name: Pipeline Route Cost Surface
-    task: dense_regression
-    domain: assets
-    description: Estimates a construction cost surface used for least-cost pipeline routing.
-    bands: context
-    outputs: [cost]
-    units: [cost units per metre]
-    labels: Cost rasters from engineering estimates.
-    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+  - id: pipeline_route_planner  # Models pipeline_route_planner_tiny, _base, _large and _mega.
+    name: Pipeline Route Cost Surface  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: assets  # Capability domain in the registry.
+    description: Estimates a construction cost surface used for least-cost pipeline routing.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [cost]  # 1 output channel.
+    units: [cost units per metre]  # Units of the targets, in output order.
+    labels: Cost rasters from engineering estimates.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]  # Suitable input data.
 
-  - id: route_planner
-    name: Route Cost Surface
-    task: dense_regression
-    domain: tourism
-    description: Estimates a travel cost surface for least-cost routing.
-    bands: context
-    outputs: [travel_cost]
-    units: [s m-1]
-    labels: Travel cost rasters from speed models.
-    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+  - id: route_planner  # Models route_planner_tiny, _base, _large and _mega.
+    name: Route Cost Surface  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: tourism  # Capability domain in the registry.
+    description: Estimates a travel cost surface for least-cost routing.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [travel_cost]  # 1 output channel.
+    units: [s m-1]  # Units of the targets, in output order.
+    labels: Travel cost rasters from speed models.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]  # Suitable input data.
 
-  - id: seismic_risk
-    name: Seismic Risk
-    task: dense_regression
-    domain: risk
-    description: Scores seismic risk from exposure and terrain.
-    bands: context
-    outputs: [risk_score]
-    units: ["1"]
-    range: [0, 1]
-    labels: Seismic risk scores from hazard and exposure models.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population rasters]
+  - id: seismic_risk  # Models seismic_risk_tiny, _base, _large and _mega.
+    name: Seismic Risk  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: risk  # Capability domain in the registry.
+    description: Scores seismic risk from exposure and terrain.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [risk_score]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Seismic risk scores from hazard and exposure models.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population rasters]  # Suitable input data.
 
-  - id: site_suitability
-    name: Site Suitability
-    task: dense_regression
-    domain: analysis
-    description: Scores general site suitability for development.
-    bands: context
-    outputs: [suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Suitability scores from multi-criteria analysis.
-    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]
+  - id: site_suitability  # Models site_suitability_tiny, _base, _large and _mega.
+    name: Site Suitability  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Scores general site suitability for development.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Suitability scores from multi-criteria analysis.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, road distance rasters]  # Suitable input data.
 
-  - id: solar_site_selector
-    name: Solar Site Selector
-    task: dense_regression
-    domain: energy
-    description: Scores suitability for ground-mounted photovoltaic plants.
-    bands: s2_dem
-    outputs: [suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Suitability scores or existing plant locations.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: solar_site_selector  # Models solar_site_selector_tiny, _base, _large and _mega.
+    name: Solar Site Selector  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: energy  # Capability domain in the registry.
+    description: Scores suitability for ground-mounted photovoltaic plants.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Suitability scores or existing plant locations.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: spatial_analyzer
-    name: Spatial Density Estimator
-    task: dense_regression
-    domain: analysis
-    description: Estimates the density of a mapped phenomenon, for example buildings per hectare.
-    bands: rgbn
-    outputs: [density]
-    units: [ha-1]
-    labels: Density rasters derived from reference vector data.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: spatial_analyzer  # Models spatial_analyzer_tiny, _base, _large and _mega.
+    name: Spatial Density Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates the density of a mapped phenomenon, for example buildings per hectare.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [density]  # 1 output channel.
+    units: [ha-1]  # Units of the targets, in output order.
+    labels: Density rasters derived from reference vector data.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: viewshed_analyzer
-    name: Visibility Estimator
-    task: dense_regression
-    domain: tourism
-    description: Estimates the fraction of the surrounding area visible from each pixel.
-    bands: dem
-    outputs: [visible_fraction]
-    units: ["1"]
-    range: [0, 1]
-    labels: Visibility rasters from viewshed analysis.
-    sources: [Copernicus DEM GLO-30, national DEMs]
+  - id: viewshed_analyzer  # Models viewshed_analyzer_tiny, _base, _large and _mega.
+    name: Visibility Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: tourism  # Capability domain in the registry.
+    description: Estimates the fraction of the surrounding area visible from each pixel.  # What the model does once trained.
+    bands: dem  # Band set dem, 1 inputs.
+    outputs: [visible_fraction]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Visibility rasters from viewshed analysis.  # Reference data needed for training.
+    sources: [Copernicus DEM GLO-30, national DEMs]  # Suitable input data.
 
-  - id: water_quality_assessor
-    name: Water Quality Assessor
-    task: dense_regression
-    domain: water
-    description: Estimates chlorophyll-a concentration and turbidity in water bodies.
-    bands: s2_10
-    outputs: [chlorophyll_a, turbidity]
-    units: [mg m-3, FNU]
-    labels: In situ water quality samples.
-    sources: [Sentinel-2 L2A]
+  - id: water_quality_assessor  # Models water_quality_assessor_tiny, _base, _large and _mega.
+    name: Water Quality Assessor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: water  # Capability domain in the registry.
+    description: Estimates chlorophyll-a concentration and turbidity in water bodies.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [chlorophyll_a, turbidity]  # 2 output channels.
+    units: [mg m-3, FNU]  # Units of the targets, in output order.
+    labels: In situ water quality samples.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: wildfire_risk
-    name: Wildfire Risk
-    task: dense_regression
-    domain: risk
-    description: Estimates wildfire susceptibility.
-    bands: s2_dem
-    outputs: [susceptibility]
-    units: ["1"]
-    range: [0, 1]
-    labels: Burned area history converted to susceptibility targets.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: wildfire_risk  # Models wildfire_risk_tiny, _base, _large and _mega.
+    name: Wildfire Risk  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: risk  # Capability domain in the registry.
+    description: Estimates wildfire susceptibility.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [susceptibility]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Burned area history converted to susceptibility targets.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: wildlife_habitat_analyzer
-    name: Wildlife Habitat Suitability
-    task: dense_regression
-    domain: environment
-    description: Scores habitat suitability for a target species.
-    bands: s2_dem
-    outputs: [habitat_suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Species occurrence data converted to suitability targets.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: wildlife_habitat_analyzer  # Models wildlife_habitat_analyzer_tiny, _base, _large and _mega.
+    name: Wildlife Habitat Suitability  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: environment  # Capability domain in the registry.
+    description: Scores habitat suitability for a target species.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [habitat_suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Species occurrence data converted to suitability targets.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: wind_site_selector
-    name: Wind Site Selector
-    task: dense_regression
-    domain: energy
-    description: Scores suitability for wind turbines.
-    bands: s2_dem
-    outputs: [suitability]
-    units: ["1"]
-    range: [0, 1]
-    labels: Suitability scores or existing turbine locations.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: wind_site_selector  # Models wind_site_selector_tiny, _base, _large and _mega.
+    name: Wind Site Selector  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: energy  # Capability domain in the registry.
+    description: Scores suitability for wind turbines.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [suitability]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Suitability scores or existing turbine locations.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: flood_risk_assessor
-    name: Flood Depth Estimator
-    task: dense_regression
-    domain: water
-    description: Estimates flood water depth.
-    bands: s2_dem
-    outputs: [water_depth]
-    units: [m]
-    labels: Flood depth rasters from hydraulic models or surveys.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: flood_risk_assessor  # Models flood_risk_assessor_tiny, _base, _large and _mega.
+    name: Flood Depth Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: water  # Capability domain in the registry.
+    description: Estimates flood water depth.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [water_depth]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Flood depth rasters from hydraulic models or surveys.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: geostatistical_analyzer
-    name: Geostatistical Surface Estimator
-    task: dense_regression
-    domain: analysis
-    description: Learns a continuous surface of a sampled variable from covariates, as a learned alternative to kriging.
-    bands: s2_dem
-    outputs: [value]
-    units: [user defined]
-    labels: Point samples rasterised as sparse targets.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: geostatistical_analyzer  # Models geostatistical_analyzer_tiny, _base, _large and _mega.
+    name: Geostatistical Surface Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Learns a continuous surface of a sampled variable from covariates, as a learned alternative to kriging.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [value]  # 1 output channel.
+    units: [user defined]  # Units of the targets, in output order.
+    labels: Point samples rasterised as sparse targets.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: spatial_relationship
-    name: Proximity Estimator
-    task: dense_regression
-    domain: analysis
-    description: Estimates the distance to the nearest mapped feature of interest.
-    bands: rgbn
-    outputs: [distance]
-    units: [m]
-    labels: Distance rasters derived from reference vector data.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: spatial_relationship  # Models spatial_relationship_tiny, _base, _large and _mega.
+    name: Proximity Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates the distance to the nearest mapped feature of interest.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [distance]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Distance rasters derived from reference vector data.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: natural_resources_monitor
-    name: Natural Resources Monitor
-    task: dense_regression
-    domain: environment
-    description: Estimates above-ground biomass.
-    bands: s2_s1
-    outputs: [above_ground_biomass]
-    units: [Mg ha-1]
-    labels: Biomass plots or LiDAR-derived biomass rasters.
-    sources: [Sentinel-2 L2A, Sentinel-1 GRD]
+  - id: natural_resources_monitor  # Models natural_resources_monitor_tiny, _base, _large and _mega.
+    name: Natural Resources Monitor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: environment  # Capability domain in the registry.
+    description: Estimates above-ground biomass.  # What the model does once trained.
+    bands: s2_s1  # Band set s2_s1, 12 inputs.
+    outputs: [above_ground_biomass]  # 1 output channel.
+    units: [Mg ha-1]  # Units of the targets, in output order.
+    labels: Biomass plots or LiDAR-derived biomass rasters.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Sentinel-1 GRD]  # Suitable input data.
 
-  - id: environmental_monitor
-    name: Environmental Condition Monitor
-    task: dense_regression
-    domain: environment
-    description: Scores the ecological condition of land.
-    bands: s2_10
-    outputs: [condition]
-    units: ["1"]
-    range: [0, 1]
-    labels: Ecological condition scores from field assessment.
-    sources: [Sentinel-2 L2A]
+  - id: environmental_monitor  # Models environmental_monitor_tiny, _base, _large and _mega.
+    name: Environmental Condition Monitor  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: environment  # Capability domain in the registry.
+    description: Scores the ecological condition of land.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [condition]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Ecological condition scores from field assessment.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: network_analyzer
-    name: Road Network Density Estimator
-    task: dense_regression
-    domain: urban
-    description: Estimates road network density as road length per square kilometre.
-    bands: rgbn
-    outputs: [road_density]
-    units: [km km-2]
-    labels: Road density rasters derived from road vector data.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: network_analyzer  # Models network_analyzer_tiny, _base, _large and _mega.
+    name: Road Network Density Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: urban  # Capability domain in the registry.
+    description: Estimates road network density as road length per square kilometre.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [road_density]  # 1 output channel.
+    units: [km km-2]  # Units of the targets, in output order.
+    labels: Road density rasters derived from road vector data.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: watershed_manager
-    name: Runoff Estimator
-    task: dense_regression
-    domain: water
-    description: Estimates a runoff coefficient per pixel for watershed management.
-    bands: s2_dem
-    outputs: [runoff_coefficient]
-    units: ["1"]
-    range: [0, 1]
-    labels: Runoff coefficients from hydrological models.
-    sources: [Sentinel-2 L2A, Copernicus DEM]
+  - id: watershed_manager  # Models watershed_manager_tiny, _base, _large and _mega.
+    name: Runoff Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: water  # Capability domain in the registry.
+    description: Estimates a runoff coefficient per pixel for watershed management.  # What the model does once trained.
+    bands: s2_dem  # Band set s2_dem, 12 inputs.
+    outputs: [runoff_coefficient]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Runoff coefficients from hydrological models.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM]  # Suitable input data.
 
-  - id: hydroelectric_monitor
-    name: Hydroelectric Reservoir Level Estimator
-    task: dense_regression
-    domain: energy
-    description: Estimates water surface elevation of reservoirs.
-    bands: rgbn_dem
-    outputs: [water_surface_elevation]
-    units: [m]
-    labels: Reservoir level records.
-    sources: [Sentinel-2 10 m bands, Copernicus DEM]
+  - id: hydroelectric_monitor  # Models hydroelectric_monitor_tiny, _base, _large and _mega.
+    name: Hydroelectric Reservoir Level Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: energy  # Capability domain in the registry.
+    description: Estimates water surface elevation of reservoirs.  # What the model does once trained.
+    bands: rgbn_dem  # Band set rgbn_dem, 5 inputs.
+    outputs: [water_surface_elevation]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Reservoir level records.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, Copernicus DEM]  # Suitable input data.
 
-  - id: offshore_survey
-    name: Bathymetry Estimator
-    task: dense_regression
-    domain: water
-    description: Estimates shallow water depth (satellite-derived bathymetry).
-    bands: s2_10
-    outputs: [depth]
-    units: [m]
-    range: [0, 30]
-    labels: Echo sounding or LiDAR bathymetry.
-    sources: [Sentinel-2 L2A]
+  - id: offshore_survey  # Models offshore_survey_tiny, _base, _large and _mega.
+    name: Bathymetry Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: water  # Capability domain in the registry.
+    description: Estimates shallow water depth (satellite-derived bathymetry).  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [depth]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    range: [0, 30]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Echo sounding or LiDAR bathymetry.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: onshore_monitor
-    name: Surface Temperature Anomaly
-    task: dense_regression
-    domain: energy
-    description: Estimates land surface temperature anomalies around onshore industrial facilities.
-    bands: landsat_st
-    outputs: [temperature_anomaly]
-    units: [K]
-    labels: Surface temperature anomaly rasters.
-    sources: [Landsat 8/9 Collection 2 Level 2]
+  - id: onshore_monitor  # Models onshore_monitor_tiny, _base, _large and _mega.
+    name: Surface Temperature Anomaly  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: energy  # Capability domain in the registry.
+    description: Estimates land surface temperature anomalies around onshore industrial facilities.  # What the model does once trained.
+    bands: landsat_st  # Band set landsat_st, 7 inputs.
+    outputs: [temperature_anomaly]  # 1 output channel.
+    units: [K]  # Units of the targets, in output order.
+    labels: Surface temperature anomaly rasters.  # Reference data needed for training.
+    sources: [Landsat 8/9 Collection 2 Level 2]  # Suitable input data.
 
-  - id: field_surveyor
-    name: Field Productivity Estimator
-    task: dense_regression
-    domain: agriculture
-    description: Estimates within-field productivity zones as relative yield.
-    bands: s2_10
-    outputs: [relative_yield]
-    units: ["1"]
-    range: [0, 2]
-    labels: Yield monitor data normalised by the field mean.
-    sources: [Sentinel-2 L2A]
+  - id: field_surveyor  # Models field_surveyor_tiny, _base, _large and _mega.
+    name: Field Productivity Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Estimates within-field productivity zones as relative yield.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [relative_yield]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 2]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Yield monitor data normalised by the field mean.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Scene regression (11). Encoder with global pooling and a regression head:
   # one value per target for a whole image chip.
   # Labels: one target vector per chip.
   # ---------------------------------------------------------------------------
-  - id: yield_predictor
-    name: Yield Predictor
-    task: scene_regression
-    domain: agriculture
-    description: Predicts crop yield of a field chip.
-    bands: s2_10
-    outputs: [yield]
-    units: [t ha-1]
-    labels: Field-level yield records.
-    sources: [Sentinel-2 L2A]
+  - id: yield_predictor  # Models yield_predictor_tiny, _base, _large and _mega.
+    name: Yield Predictor  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Predicts crop yield of a field chip.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [yield]  # 1 output channel.
+    units: [t ha-1]  # Units of the targets, in output order.
+    labels: Field-level yield records.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: business_valuation
-    name: Economic Activity Estimator
-    task: scene_regression
-    domain: analysis
-    description: Estimates an economic activity index of an area from imagery.
-    bands: rgbn
-    outputs: [activity_index]
-    units: ["1"]
-    labels: Economic indicators aggregated to chips.
-    sources: [Sentinel-2 10 m bands, night lights composites]
+  - id: business_valuation  # Models business_valuation_tiny, _base, _large and _mega.
+    name: Economic Activity Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates an economic activity index of an area from imagery.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [activity_index]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    labels: Economic indicators aggregated to chips.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, night lights composites]  # Suitable input data.
 
-  - id: economic_spatial_assessor
-    name: Property Value Estimator
-    task: scene_regression
-    domain: analysis
-    description: Estimates median property value of an area.
-    bands: rgb
-    outputs: [median_value]
-    units: [currency m-2]
-    labels: Property transaction statistics aggregated to chips.
-    sources: [Aerial or satellite RGB imagery]
+  - id: economic_spatial_assessor  # Models economic_spatial_assessor_tiny, _base, _large and _mega.
+    name: Property Value Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates median property value of an area.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [median_value]  # 1 output channel.
+    units: [currency m-2]  # Units of the targets, in output order.
+    labels: Property transaction statistics aggregated to chips.  # Reference data needed for training.
+    sources: [Aerial or satellite RGB imagery]  # Suitable input data.
 
-  - id: insurance_underwriting
-    name: Insurance Risk Scorer
-    task: scene_regression
-    domain: risk
-    description: Scores the natural hazard risk of an insured site.
-    bands: context
-    outputs: [hazard_score, exposure_score]
-    units: ["1", "1"]
-    range: [0, 1]
-    labels: Claims history or risk model scores per site.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+  - id: insurance_underwriting  # Models insurance_underwriting_tiny, _base, _large and _mega.
+    name: Insurance Risk Scorer  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: risk  # Capability domain in the registry.
+    description: Scores the natural hazard risk of an insured site.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [hazard_score, exposure_score]  # 2 output channels.
+    units: ["1", "1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Claims history or risk model scores per site.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]  # Suitable input data.
 
-  - id: livestock_estimator
-    name: Livestock Estimator
-    task: scene_regression
-    domain: agriculture
-    description: Estimates the number of livestock in a chip.
-    bands: rgb
-    outputs: [head_count]
-    units: [animals]
-    labels: Livestock counts per chip.
-    sources: [Very high resolution RGB imagery]
+  - id: livestock_estimator  # Models livestock_estimator_tiny, _base, _large and _mega.
+    name: Livestock Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Estimates the number of livestock in a chip.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [head_count]  # 1 output channel.
+    units: [animals]  # Units of the targets, in output order.
+    labels: Livestock counts per chip.  # Reference data needed for training.
+    sources: [Very high resolution RGB imagery]  # Suitable input data.
 
-  - id: resource_allocation
-    name: Service Demand Estimator
-    task: scene_regression
-    domain: analysis
-    description: Estimates population and service demand of an area for resource allocation.
-    bands: rgbn
-    outputs: [population, service_demand]
-    units: [persons, "1"]
-    labels: Census population and service statistics per chip.
-    sources: [Sentinel-2 10 m bands, PlanetScope]
+  - id: resource_allocation  # Models resource_allocation_tiny, _base, _large and _mega.
+    name: Service Demand Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates population and service demand of an area for resource allocation.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [population, service_demand]  # 2 output channels.
+    units: [persons, "1"]  # Units of the targets, in output order.
+    labels: Census population and service statistics per chip.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, PlanetScope]  # Suitable input data.
 
-  - id: disaster_management
-    name: Disaster Impact Estimator
-    task: scene_regression
-    domain: risk
-    description: Estimates the fraction of an area affected by a disaster.
-    bands: s2_10
-    outputs: [affected_fraction]
-    units: ["1"]
-    range: [0, 1]
-    labels: Affected area fractions from damage assessments.
-    sources: [Sentinel-2 L2A]
+  - id: disaster_management  # Models disaster_management_tiny, _base, _large and _mega.
+    name: Disaster Impact Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: risk  # Capability domain in the registry.
+    description: Estimates the fraction of an area affected by a disaster.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [affected_fraction]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Affected area fractions from damage assessments.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: emergency_disaster_manager
-    name: Emergency Needs Estimator
-    task: scene_regression
-    domain: risk
-    description: Estimates affected population and shelter needs after a disaster.
-    bands: rgbn
-    outputs: [affected_population, shelter_need]
-    units: [persons, persons]
-    labels: Affected population and shelter statistics per chip.
-    sources: [Sentinel-2 10 m bands, very high resolution imagery]
+  - id: emergency_disaster_manager  # Models emergency_disaster_manager_tiny, _base, _large and _mega.
+    name: Emergency Needs Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: risk  # Capability domain in the registry.
+    description: Estimates affected population and shelter needs after a disaster.  # What the model does once trained.
+    bands: rgbn  # Band set rgbn, 4 inputs.
+    outputs: [affected_population, shelter_need]  # 2 output channels.
+    units: [persons, persons]  # Units of the targets, in output order.
+    labels: Affected population and shelter statistics per chip.  # Reference data needed for training.
+    sources: [Sentinel-2 10 m bands, very high resolution imagery]  # Suitable input data.
 
-  - id: preparedness_manager
-    name: Preparedness Scorer
-    task: scene_regression
-    domain: risk
-    description: Scores the disaster preparedness of a community area.
-    bands: context
-    outputs: [preparedness]
-    units: ["1"]
-    range: [0, 1]
-    labels: Preparedness scores from surveys.
-    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]
+  - id: preparedness_manager  # Models preparedness_manager_tiny, _base, _large and _mega.
+    name: Preparedness Scorer  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: risk  # Capability domain in the registry.
+    description: Scores the disaster preparedness of a community area.  # What the model does once trained.
+    bands: context  # Band set context, 10 inputs.
+    outputs: [preparedness]  # 1 output channel.
+    units: ["1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Preparedness scores from surveys.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Copernicus DEM, population and road distance rasters]  # Suitable input data.
 
-  - id: timeseries_analyzer
-    name: Phenology Estimator
-    task: scene_regression
-    domain: agriculture
-    description: Estimates start, peak and end of season from a stack of six NDVI observations.
-    bands: [ndvi_t1, ndvi_t2, ndvi_t3, ndvi_t4, ndvi_t5, ndvi_t6]
-    outputs: [start_of_season, peak_of_season, end_of_season]
-    units: [day of year, day of year, day of year]
-    labels: Phenology dates from field observation or reference products.
-    sources: [Sentinel-2 L2A time series, Landsat 8/9 time series]
+  - id: timeseries_analyzer  # Models timeseries_analyzer_tiny, _base, _large and _mega.
+    name: Phenology Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: agriculture  # Capability domain in the registry.
+    description: Estimates start, peak and end of season from a stack of six NDVI observations.  # What the model does once trained.
+    bands: [ndvi_t1, ndvi_t2, ndvi_t3, ndvi_t4, ndvi_t5, ndvi_t6]  # 6 input bands.
+    outputs: [start_of_season, peak_of_season, end_of_season]  # 3 output channels.
+    units: [day of year, day of year, day of year]  # Units of the targets, in output order.
+    labels: Phenology dates from field observation or reference products.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A time series, Landsat 8/9 time series]  # Suitable input data.
 
-  - id: zonal_statistics
-    name: Zonal Cover Estimator
-    task: scene_regression
-    domain: analysis
-    description: Estimates the fractional cover of vegetation, water and built-up area in a chip.
-    bands: s2_10
-    outputs: [vegetation_fraction, water_fraction, built_up_fraction]
-    units: ["1", "1", "1"]
-    range: [0, 1]
-    labels: Cover fractions per chip from reference land cover maps.
-    sources: [Sentinel-2 L2A]
+  - id: zonal_statistics  # Models zonal_statistics_tiny, _base, _large and _mega.
+    name: Zonal Cover Estimator  # Display name.
+    task: scene_regression  # Pooled encoder with one value per chip and target.
+    domain: analysis  # Capability domain in the registry.
+    description: Estimates the fractional cover of vegetation, water and built-up area in a chip.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [vegetation_fraction, water_fraction, built_up_fraction]  # 3 output channels.
+    units: ["1", "1", "1"]  # Units of the targets, in output order.
+    range: [0, 1]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Cover fractions per chip from reference land cover maps.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Terrain and geophysical regression (13). U-Net regression of heights,
   # displacements and physical quantities. Labels: reference rasters.
   # ---------------------------------------------------------------------------
-  - id: dem_generator
-    name: DEM from Stereo
-    task: dense_regression
-    domain: imaging
-    description: Estimates terrain elevation from a panchromatic stereo pair.
-    bands: pan_pair
-    outputs: [elevation]
-    units: [m]
-    labels: Reference DEMs, for example LiDAR.
-    sources: [Epipolar-rectified panchromatic stereo pairs]
+  - id: dem_generator  # Models dem_generator_tiny, _base, _large and _mega.
+    name: DEM from Stereo  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates terrain elevation from a panchromatic stereo pair.  # What the model does once trained.
+    bands: pan_pair  # Band set pan_pair, 2 inputs.
+    outputs: [elevation]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Reference DEMs, for example LiDAR.  # Reference data needed for training.
+    sources: [Epipolar-rectified panchromatic stereo pairs]  # Suitable input data.
 
-  - id: digitization_3d
-    name: Building Height Estimator
-    task: dense_regression
-    domain: urban
-    description: Estimates building heights from imagery and a surface model.
-    bands: rgb_dsm
-    outputs: [building_height]
-    units: [m]
-    labels: Building heights from LiDAR or cadastral 3D models.
-    sources: [RGB orthophotos with a DSM]
+  - id: digitization_3d  # Models digitization_3d_tiny, _base, _large and _mega.
+    name: Building Height Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: urban  # Capability domain in the registry.
+    description: Estimates building heights from imagery and a surface model.  # What the model does once trained.
+    bands: rgb_dsm  # Band set rgb_dsm, 4 inputs.
+    outputs: [building_height]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Building heights from LiDAR or cadastral 3D models.  # Reference data needed for training.
+    sources: [RGB orthophotos with a DSM]  # Suitable input data.
 
-  - id: dsm_generator
-    name: DSM from Stereo
-    task: dense_regression
-    domain: imaging
-    description: Estimates surface elevation including buildings and trees from a stereo pair.
-    bands: pan_pair
-    outputs: [surface_elevation]
-    units: [m]
-    labels: Reference DSMs, for example LiDAR.
-    sources: [Epipolar-rectified panchromatic stereo pairs]
+  - id: dsm_generator  # Models dsm_generator_tiny, _base, _large and _mega.
+    name: DSM from Stereo  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates surface elevation including buildings and trees from a stereo pair.  # What the model does once trained.
+    bands: pan_pair  # Band set pan_pair, 2 inputs.
+    outputs: [surface_elevation]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Reference DSMs, for example LiDAR.  # Reference data needed for training.
+    sources: [Epipolar-rectified panchromatic stereo pairs]  # Suitable input data.
 
-  - id: dtm_generator
-    name: DTM from DSM
-    task: dense_regression
-    domain: imaging
-    description: Removes buildings and vegetation from a surface model to estimate bare ground elevation.
-    bands: dsm
-    outputs: [ground_elevation]
-    units: [m]
-    labels: Reference DTMs, for example LiDAR ground returns.
-    sources: [Photogrammetric or radar DSMs]
+  - id: dtm_generator  # Models dtm_generator_tiny, _base, _large and _mega.
+    name: DTM from DSM  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Removes buildings and vegetation from a surface model to estimate bare ground elevation.  # What the model does once trained.
+    bands: dsm  # Band set dsm, 1 inputs.
+    outputs: [ground_elevation]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Reference DTMs, for example LiDAR ground returns.  # Reference data needed for training.
+    sources: [Photogrammetric or radar DSMs]  # Suitable input data.
 
-  - id: ground_displacement
-    name: Ground Displacement Estimator
-    task: dense_regression
-    domain: sar
-    description: Estimates line-of-sight ground displacement from a wrapped interferogram.
-    bands: insar
-    outputs: [los_displacement]
-    units: [mm]
-    labels: Unwrapped displacement from InSAR processing or GNSS.
-    sources: [Sentinel-1 SLC interferograms]
+  - id: ground_displacement  # Models ground_displacement_tiny, _base, _large and _mega.
+    name: Ground Displacement Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: sar  # Capability domain in the registry.
+    description: Estimates line-of-sight ground displacement from a wrapped interferogram.  # What the model does once trained.
+    bands: insar  # Band set insar, 3 inputs.
+    outputs: [los_displacement]  # 1 output channel.
+    units: [mm]  # Units of the targets, in output order.
+    labels: Unwrapped displacement from InSAR processing or GNSS.  # Reference data needed for training.
+    sources: [Sentinel-1 SLC interferograms]  # Suitable input data.
 
-  - id: land_surface_temperature
-    name: Land Surface Temperature
-    task: dense_regression
-    domain: environment
-    description: Estimates land surface temperature from reflective and thermal bands.
-    bands: landsat_st
-    outputs: [surface_temperature]
-    units: [K]
-    labels: Land surface temperature products or in situ radiometry.
-    sources: [Landsat 8/9 Collection 2 Level 2]
+  - id: land_surface_temperature  # Models land_surface_temperature_tiny, _base, _large and _mega.
+    name: Land Surface Temperature  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: environment  # Capability domain in the registry.
+    description: Estimates land surface temperature from reflective and thermal bands.  # What the model does once trained.
+    bands: landsat_st  # Band set landsat_st, 7 inputs.
+    outputs: [surface_temperature]  # 1 output channel.
+    units: [K]  # Units of the targets, in output order.
+    labels: Land surface temperature products or in situ radiometry.  # Reference data needed for training.
+    sources: [Landsat 8/9 Collection 2 Level 2]  # Suitable input data.
 
-  - id: model_3d
-    name: Normalised Surface Model
-    task: dense_regression
-    domain: imaging
-    description: Estimates the height of objects above ground (nDSM) from imagery and a surface model.
-    bands: rgb_dsm
-    outputs: [object_height]
-    units: [m]
-    labels: nDSM from LiDAR.
-    sources: [RGB orthophotos with a DSM]
+  - id: model_3d  # Models model_3d_tiny, _base, _large and _mega.
+    name: Normalised Surface Model  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates the height of objects above ground (nDSM) from imagery and a surface model.  # What the model does once trained.
+    bands: rgb_dsm  # Band set rgb_dsm, 4 inputs.
+    outputs: [object_height]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: nDSM from LiDAR.  # Reference data needed for training.
+    sources: [RGB orthophotos with a DSM]  # Suitable input data.
 
-  - id: sar_amplitude
-    name: SAR Backscatter Normaliser
-    task: dense_regression
-    domain: sar
-    description: Estimates terrain-flattened gamma0 backscatter from sigma0 and elevation.
-    bands: [VV, VH, elevation]
-    outputs: [gamma0_vv, gamma0_vh]
-    units: [dB, dB]
-    labels: Terrain-flattened gamma0 from radiometric terrain correction.
-    sources: [Sentinel-1 GRD, Copernicus DEM]
+  - id: sar_amplitude  # Models sar_amplitude_tiny, _base, _large and _mega.
+    name: SAR Backscatter Normaliser  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: sar  # Capability domain in the registry.
+    description: Estimates terrain-flattened gamma0 backscatter from sigma0 and elevation.  # What the model does once trained.
+    bands: [VV, VH, elevation]  # 3 input bands.
+    outputs: [gamma0_vv, gamma0_vh]  # 2 output channels.
+    units: [dB, dB]  # Units of the targets, in output order.
+    labels: Terrain-flattened gamma0 from radiometric terrain correction.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD, Copernicus DEM]  # Suitable input data.
 
-  - id: sar_phase_displacement
-    name: InSAR Phase Unwrapper
-    task: dense_regression
-    domain: sar
-    description: Estimates unwrapped phase from a wrapped interferogram.
-    bands: insar
-    outputs: [unwrapped_phase]
-    units: [rad]
-    labels: Unwrapped phase from SNAPHU or similar processing.
-    sources: [Sentinel-1 SLC interferograms]
+  - id: sar_phase_displacement  # Models sar_phase_displacement_tiny, _base, _large and _mega.
+    name: InSAR Phase Unwrapper  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: sar  # Capability domain in the registry.
+    description: Estimates unwrapped phase from a wrapped interferogram.  # What the model does once trained.
+    bands: insar  # Band set insar, 3 inputs.
+    outputs: [unwrapped_phase]  # 1 output channel.
+    units: [rad]  # Units of the targets, in output order.
+    labels: Unwrapped phase from SNAPHU or similar processing.  # Reference data needed for training.
+    sources: [Sentinel-1 SLC interferograms]  # Suitable input data.
 
-  - id: sar_subsidence_monitor
-    name: Subsidence Velocity Estimator
-    task: dense_regression
-    domain: sar
-    description: Estimates mean subsidence velocity from a stack of six displacement maps.
-    bands: insar_stack
-    outputs: [velocity]
-    units: [mm a-1]
-    labels: Velocity from persistent scatterer or SBAS processing.
-    sources: [Sentinel-1 InSAR time series]
+  - id: sar_subsidence_monitor  # Models sar_subsidence_monitor_tiny, _base, _large and _mega.
+    name: Subsidence Velocity Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: sar  # Capability domain in the registry.
+    description: Estimates mean subsidence velocity from a stack of six displacement maps.  # What the model does once trained.
+    bands: insar_stack  # Band set insar_stack, 6 inputs.
+    outputs: [velocity]  # 1 output channel.
+    units: [mm a-1]  # Units of the targets, in output order.
+    labels: Velocity from persistent scatterer or SBAS processing.  # Reference data needed for training.
+    sources: [Sentinel-1 InSAR time series]  # Suitable input data.
 
-  - id: stereo_processor
-    name: Stereo Disparity Estimator
-    task: dense_regression
-    domain: imaging
-    description: Estimates disparity between the two images of an epipolar stereo pair.
-    bands: pan_pair
-    outputs: [disparity]
-    units: [px]
-    labels: Reference disparity maps.
-    sources: [Epipolar-rectified stereo pairs]
+  - id: stereo_processor  # Models stereo_processor_tiny, _base, _large and _mega.
+    name: Stereo Disparity Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates disparity between the two images of an epipolar stereo pair.  # What the model does once trained.
+    bands: pan_pair  # Band set pan_pair, 2 inputs.
+    outputs: [disparity]  # 1 output channel.
+    units: [px]  # Units of the targets, in output order.
+    labels: Reference disparity maps.  # Reference data needed for training.
+    sources: [Epipolar-rectified stereo pairs]  # Suitable input data.
 
-  - id: tree_height_estimator
-    name: Canopy Height Estimator
-    task: dense_regression
-    domain: forestry
-    description: Estimates canopy height from optical and radar data.
-    bands: s2_s1
-    outputs: [canopy_height]
-    units: [m]
-    range: [0, 60]
-    labels: Canopy height from airborne or spaceborne LiDAR.
-    sources: [Sentinel-2 L2A, Sentinel-1 GRD]
+  - id: tree_height_estimator  # Models tree_height_estimator_tiny, _base, _large and _mega.
+    name: Canopy Height Estimator  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: forestry  # Capability domain in the registry.
+    description: Estimates canopy height from optical and radar data.  # What the model does once trained.
+    bands: s2_s1  # Band set s2_s1, 12 inputs.
+    outputs: [canopy_height]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    range: [0, 60]  # Target range; [0, 1] targets use a sigmoid.
+    labels: Canopy height from airborne or spaceborne LiDAR.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A, Sentinel-1 GRD]  # Suitable input data.
 
-  - id: tri_stereo_processor
-    name: DSM from Tri-Stereo
-    task: dense_regression
-    domain: imaging
-    description: Estimates surface elevation from a tri-stereo acquisition.
-    bands: pan_triplet
-    outputs: [surface_elevation]
-    units: [m]
-    labels: Reference DSMs.
-    sources: [Epipolar-rectified tri-stereo panchromatic imagery]
+  - id: tri_stereo_processor  # Models tri_stereo_processor_tiny, _base, _large and _mega.
+    name: DSM from Tri-Stereo  # Display name.
+    task: dense_regression  # U-Net with one value per pixel and target.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates surface elevation from a tri-stereo acquisition.  # What the model does once trained.
+    bands: pan_triplet  # Band set pan_triplet, 3 inputs.
+    outputs: [surface_elevation]  # 1 output channel.
+    units: [m]  # Units of the targets, in output order.
+    labels: Reference DSMs.  # Reference data needed for training.
+    sources: [Epipolar-rectified tri-stereo panchromatic imagery]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Enhancement (11). Residual U-Net image-to-image networks.
   # Labels: target images, displacement fields or clean references.
   # ---------------------------------------------------------------------------
-  - id: coregistration
-    name: Co-registration Flow Estimator
-    task: enhancement
-    domain: imaging
-    description: Estimates the pixel displacement field that aligns a moving image to a reference image.
-    bands: rgb
-    dates: 2
-    outputs: [dx, dy]
-    units: [px, px]
-    labels: Displacement fields, for example from synthetic warps of a reference image.
-    sources: [RGB image pairs of the same area]
+  - id: coregistration  # Models coregistration_tiny, _base, _large and _mega.
+    name: Co-registration Flow Estimator  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates the pixel displacement field that aligns a moving image to a reference image.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [dx, dy]  # 2 output channels.
+    units: [px, px]  # Units of the targets, in output order.
+    labels: Displacement fields, for example from synthetic warps of a reference image.  # Reference data needed for training.
+    sources: [RGB image pairs of the same area]  # Suitable input data.
 
-  - id: mosaic_processor
-    name: Mosaic Colour Harmoniser
-    task: enhancement
-    domain: imaging
-    description: Harmonises the radiometry of a scene to a reference for seamless mosaics.
-    bands: rgb
-    outputs: [red, green, blue]
-    labels: Radiometrically harmonised reference scenes.
-    sources: [RGB scenes of overlapping areas]
+  - id: mosaic_processor  # Models mosaic_processor_tiny, _base, _large and _mega.
+    name: Mosaic Colour Harmoniser  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Harmonises the radiometry of a scene to a reference for seamless mosaics.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [red, green, blue]  # 3 output channels.
+    labels: Radiometrically harmonised reference scenes.  # Reference data needed for training.
+    sources: [RGB scenes of overlapping areas]  # Suitable input data.
 
-  - id: mosaicking
-    name: Seamline Blender
-    task: enhancement
-    domain: imaging
-    description: Blends two overlapping scenes into one seamless image.
-    bands: rgb
-    dates: 2
-    outputs: [red, green, blue]
-    labels: Seamlessly blended reference mosaics.
-    sources: [Overlapping RGB scenes]
+  - id: mosaicking  # Models mosaicking_tiny, _base, _large and _mega.
+    name: Seamline Blender  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Blends two overlapping scenes into one seamless image.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    dates: 2  # 2 acquisitions stacked on the channel axis.
+    outputs: [red, green, blue]  # 3 output channels.
+    labels: Seamlessly blended reference mosaics.  # Reference data needed for training.
+    sources: [Overlapping RGB scenes]  # Suitable input data.
 
-  - id: multispectral_processor
-    name: Multispectral Denoiser
-    task: enhancement
-    domain: imaging
-    description: Reduces noise and striping in multispectral imagery.
-    bands: s2_10
-    outputs: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]
-    labels: Clean reference images, for example temporal composites.
-    sources: [Sentinel-2 L2A]
+  - id: multispectral_processor  # Models multispectral_processor_tiny, _base, _large and _mega.
+    name: Multispectral Denoiser  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Reduces noise and striping in multispectral imagery.  # What the model does once trained.
+    bands: s2_10  # Band set s2_10, 10 inputs.
+    outputs: [B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12]  # 10 output channels.
+    labels: Clean reference images, for example temporal composites.  # Reference data needed for training.
+    sources: [Sentinel-2 L2A]  # Suitable input data.
 
-  - id: ortho_processor
-    name: Orthorectification Flow Estimator
-    task: enhancement
-    domain: imaging
-    description: Estimates the displacement field that removes relief displacement using a DEM.
-    bands: image_dem
-    outputs: [dx, dy]
-    units: [px, px]
-    labels: Displacement fields from rigorous orthorectification.
-    sources: [Raw imagery with a co-registered DEM]
+  - id: ortho_processor  # Models ortho_processor_tiny, _base, _large and _mega.
+    name: Orthorectification Flow Estimator  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Estimates the displacement field that removes relief displacement using a DEM.  # What the model does once trained.
+    bands: image_dem  # Band set image_dem, 4 inputs.
+    outputs: [dx, dy]  # 2 output channels.
+    units: [px, px]  # Units of the targets, in output order.
+    labels: Displacement fields from rigorous orthorectification.  # Reference data needed for training.
+    sources: [Raw imagery with a co-registered DEM]  # Suitable input data.
 
-  - id: orthorectification
-    name: Learned Orthorectification
-    task: enhancement
-    domain: imaging
-    description: Produces an orthorectified image from a raw image and a DEM.
-    bands: image_dem
-    outputs: [red, green, blue]
-    labels: Orthorectified reference images.
-    sources: [Raw imagery with a co-registered DEM]
+  - id: orthorectification  # Models orthorectification_tiny, _base, _large and _mega.
+    name: Learned Orthorectification  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Produces an orthorectified image from a raw image and a DEM.  # What the model does once trained.
+    bands: image_dem  # Band set image_dem, 4 inputs.
+    outputs: [red, green, blue]  # 3 output channels.
+    labels: Orthorectified reference images.  # Reference data needed for training.
+    sources: [Raw imagery with a co-registered DEM]  # Suitable input data.
 
-  - id: panchromatic_processor
-    name: Panchromatic Denoiser
-    task: enhancement
-    domain: imaging
-    description: Reduces noise in panchromatic imagery.
-    bands: pan
-    outputs: [pan]
-    labels: Clean panchromatic references.
-    sources: [Panchromatic satellite imagery]
+  - id: panchromatic_processor  # Models panchromatic_processor_tiny, _base, _large and _mega.
+    name: Panchromatic Denoiser  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Reduces noise in panchromatic imagery.  # What the model does once trained.
+    bands: pan  # Band set pan, 1 inputs.
+    outputs: [pan]  # 1 output channel.
+    labels: Clean panchromatic references.  # Reference data needed for training.
+    sources: [Panchromatic satellite imagery]  # Suitable input data.
 
-  - id: pansharpening
-    name: Pansharpening
-    task: enhancement
-    domain: imaging
-    description: Fuses upsampled multispectral bands with the panchromatic band into a sharpened multispectral image.
-    bands: ms_pan
-    outputs: [blue, green, red, nir]
-    labels: Sharpened references, for example by Wald's protocol.
-    sources: [Multispectral and panchromatic bands of the same sensor]
+  - id: pansharpening  # Models pansharpening_tiny, _base, _large and _mega.
+    name: Pansharpening  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Fuses upsampled multispectral bands with the panchromatic band into a sharpened multispectral image.  # What the model does once trained.
+    bands: ms_pan  # Band set ms_pan, 5 inputs.
+    outputs: [blue, green, red, nir]  # 4 output channels.
+    labels: Sharpened references, for example by Wald's protocol.  # Reference data needed for training.
+    sources: [Multispectral and panchromatic bands of the same sensor]  # Suitable input data.
 
-  - id: raster_tiler
-    name: Tile Radiometric Normaliser
-    task: enhancement
-    domain: imaging
-    description: Normalises the radiometry of individual tiles before tiling into a web map.
-    bands: rgb
-    outputs: [red, green, blue]
-    labels: Radiometrically normalised reference tiles.
-    sources: [RGB tiles]
+  - id: raster_tiler  # Models raster_tiler_tiny, _base, _large and _mega.
+    name: Tile Radiometric Normaliser  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: imaging  # Capability domain in the registry.
+    description: Normalises the radiometry of individual tiles before tiling into a web map.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [red, green, blue]  # 3 output channels.
+    labels: Radiometrically normalised reference tiles.  # Reference data needed for training.
+    sources: [RGB tiles]  # Suitable input data.
 
-  - id: sar_mapping_workflow
-    name: SAR Despeckler
-    task: enhancement
-    domain: sar
-    description: Removes speckle from dual-polarisation SAR backscatter.
-    bands: s1
-    outputs: [VV, VH]
-    labels: Multi-temporal averages as speckle-free references.
-    sources: [Sentinel-1 GRD]
+  - id: sar_mapping_workflow  # Models sar_mapping_workflow_tiny, _base, _large and _mega.
+    name: SAR Despeckler  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: sar  # Capability domain in the registry.
+    description: Removes speckle from dual-polarisation SAR backscatter.  # What the model does once trained.
+    bands: s1  # Band set s1, 2 inputs.
+    outputs: [VV, VH]  # 2 output channels.
+    labels: Multi-temporal averages as speckle-free references.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD]  # Suitable input data.
 
-  - id: synthetic_imagery
-    name: SAR to Optical Translator
-    task: enhancement
-    domain: ai
-    description: Synthesises an optical RGB image from SAR backscatter, for example to fill cloud gaps.
-    bands: s1
-    outputs: [red, green, blue]
-    labels: Co-located cloud-free optical images.
-    sources: [Sentinel-1 GRD with co-located Sentinel-2 L2A]
+  - id: synthetic_imagery  # Models synthetic_imagery_tiny, _base, _large and _mega.
+    name: SAR to Optical Translator  # Display name.
+    task: enhancement  # U-Net image to image translation.
+    domain: ai  # Capability domain in the registry.
+    description: Synthesises an optical RGB image from SAR backscatter, for example to fill cloud gaps.  # What the model does once trained.
+    bands: s1  # Band set s1, 2 inputs.
+    outputs: [red, green, blue]  # 3 output channels.
+    labels: Co-located cloud-free optical images.  # Reference data needed for training.
+    sources: [Sentinel-1 GRD with co-located Sentinel-2 L2A]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Super-resolution (1). Residual network with sub-pixel convolution.
   # Labels: high resolution images; inputs are downsampled copies.
   # ---------------------------------------------------------------------------
-  - id: super_resolution
-    name: Super-Resolution
-    task: super_resolution
-    domain: imaging
-    description: Increases the spatial resolution of RGB imagery by a factor of four.
-    bands: rgb
-    outputs: [red, green, blue]
-    scale: 4
-    labels: High resolution reference images.
-    sources: [Pairs of low and high resolution RGB imagery]
+  - id: super_resolution  # Models super_resolution_tiny, _base, _large and _mega.
+    name: Super-Resolution  # Display name.
+    task: super_resolution  # Residual network with sub-pixel upsampling.
+    domain: imaging  # Capability domain in the registry.
+    description: Increases the spatial resolution of RGB imagery by a factor of four.  # What the model does once trained.
+    bands: rgb  # Band set rgb, 3 inputs.
+    outputs: [red, green, blue]  # 3 output channels.
+    scale: 4  # Output resolution is 4 times the input.
+    labels: High resolution reference images.  # Reference data needed for training.
+    sources: [Pairs of low and high resolution RGB imagery]  # Suitable input data.
 
   # ---------------------------------------------------------------------------
   # Spectral indices (7). Exact implementations of published formulas as
   # network modules, so that they run in the same pipelines and export to
   # ONNX. They need no training.
   # ---------------------------------------------------------------------------
-  - id: evi_calculator
-    name: EVI Calculator
-    task: spectral_index
-    domain: indices
-    description: Enhanced Vegetation Index, 2.5 (NIR - RED) / (NIR + 6 RED - 7.5 BLUE + 1) (Huete et al., 2002).
-    bands: [blue, red, nir]
-    outputs: [evi]
-    formula: evi
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: evi_calculator  # Models evi_calculator_tiny, _base, _large and _mega.
+    name: EVI Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Enhanced Vegetation Index, 2.5 (NIR - RED) / (NIR + 6 RED - 7.5 BLUE + 1) (Huete et al., 2002).  # What the model does once trained.
+    bands: [blue, red, nir]  # 3 input bands.
+    outputs: [evi]  # 1 output channel.
+    formula: evi  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: msi_calculator
-    name: MSI Calculator
-    task: spectral_index
-    domain: indices
-    description: Moisture Stress Index, SWIR1 / NIR (Rock et al., 1986).
-    bands: [nir, swir1]
-    outputs: [msi]
-    formula: msi
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: msi_calculator  # Models msi_calculator_tiny, _base, _large and _mega.
+    name: MSI Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Moisture Stress Index, SWIR1 / NIR (Rock et al., 1986).  # What the model does once trained.
+    bands: [nir, swir1]  # 2 input bands.
+    outputs: [msi]  # 1 output channel.
+    formula: msi  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: nbr_calculator
-    name: NBR Calculator
-    task: spectral_index
-    domain: indices
-    description: Normalized Burn Ratio, (NIR - SWIR2) / (NIR + SWIR2) (Key and Benson, 2006).
-    bands: [nir, swir2]
-    outputs: [nbr]
-    formula: nbr
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: nbr_calculator  # Models nbr_calculator_tiny, _base, _large and _mega.
+    name: NBR Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Normalized Burn Ratio, (NIR - SWIR2) / (NIR + SWIR2) (Key and Benson, 2006).  # What the model does once trained.
+    bands: [nir, swir2]  # 2 input bands.
+    outputs: [nbr]  # 1 output channel.
+    formula: nbr  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: ndvi_calculator
-    name: NDVI Calculator
-    task: spectral_index
-    domain: indices
-    description: Normalized Difference Vegetation Index, (NIR - RED) / (NIR + RED) (Rouse et al., 1974).
-    bands: [red, nir]
-    outputs: [ndvi]
-    formula: ndvi
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: ndvi_calculator  # Models ndvi_calculator_tiny, _base, _large and _mega.
+    name: NDVI Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Normalized Difference Vegetation Index, (NIR - RED) / (NIR + RED) (Rouse et al., 1974).  # What the model does once trained.
+    bands: [red, nir]  # 2 input bands.
+    outputs: [ndvi]  # 1 output channel.
+    formula: ndvi  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: ndwi_calculator
-    name: NDWI Calculator
-    task: spectral_index
-    domain: indices
-    description: Normalized Difference Water Index, (GREEN - NIR) / (GREEN + NIR) (McFeeters, 1996).
-    bands: [green, nir]
-    outputs: [ndwi]
-    formula: ndwi
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: ndwi_calculator  # Models ndwi_calculator_tiny, _base, _large and _mega.
+    name: NDWI Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Normalized Difference Water Index, (GREEN - NIR) / (GREEN + NIR) (McFeeters, 1996).  # What the model does once trained.
+    bands: [green, nir]  # 2 input bands.
+    outputs: [ndwi]  # 1 output channel.
+    formula: ndwi  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: savi_calculator
-    name: SAVI Calculator
-    task: spectral_index
-    domain: indices
-    description: Soil Adjusted Vegetation Index, 1.5 (NIR - RED) / (NIR + RED + 0.5) (Huete, 1988).
-    bands: [red, nir]
-    outputs: [savi]
-    formula: savi
-    labels: None, the formula needs no training.
-    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]
+  - id: savi_calculator  # Models savi_calculator_tiny, _base, _large and _mega.
+    name: SAVI Calculator  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Soil Adjusted Vegetation Index, 1.5 (NIR - RED) / (NIR + RED + 0.5) (Huete, 1988).  # What the model does once trained.
+    bands: [red, nir]  # 2 input bands.
+    outputs: [savi]  # 1 output channel.
+    formula: savi  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [Surface reflectance from Sentinel-2, Landsat or similar sensors]  # Suitable input data.
 
-  - id: vegetation_condition
-    name: Vegetation Condition Index
-    task: spectral_index
-    domain: indices
-    description: Vegetation Condition Index, (NDVI - NDVImin) / (NDVImax - NDVImin) (Kogan, 1995).
-    bands: ndvi_stats
-    outputs: [vci]
-    formula: vci
-    labels: None, the formula needs no training.
-    sources: [NDVI with its multi-year per-pixel minimum and maximum]
+  - id: vegetation_condition  # Models vegetation_condition_tiny, _base, _large and _mega.
+    name: Vegetation Condition Index  # Display name.
+    task: spectral_index  # Exact formula, no trainable weights.
+    domain: indices  # Capability domain in the registry.
+    description: Vegetation Condition Index, (NDVI - NDVImin) / (NDVImax - NDVImin) (Kogan, 1995).  # What the model does once trained.
+    bands: ndvi_stats  # Band set ndvi_stats, 3 inputs.
+    outputs: [vci]  # 1 output channel.
+    formula: vci  # Formula identifier of the spectral index.
+    labels: None, the formula needs no training.  # Reference data needed for training.
+    sources: [NDVI with its multi-year per-pixel minimum and maximum]  # Suitable input data.
+
+# =============================================================================
+# End of file src/unbihexium/zoo/catalog.yaml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

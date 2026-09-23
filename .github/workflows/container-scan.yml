@@ -1,70 +1,105 @@
-name: Container Scan
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/container-scan.yml
+# Title       : Vulnerability scan of the container image with Grype
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Builds the Docker image from the repository Dockerfile (without pushing it)
+# and scans it with Anchore Grype. The job fails when a critical
+# vulnerability with an available fix is found. The SARIF report is uploaded
+# to GitHub code scanning, except for pull requests from forks, whose token
+# cannot write security events.
+#
+# The scan runs when the Dockerfile, .dockerignore or the dependency
+# declarations change, weekly on Monday at 03:00 UTC to catch newly published
+# vulnerabilities, and on demand. The scan action is pinned by commit SHA;
+# the trailing version comment is kept up to date by Dependabot.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - "Dockerfile"
-      - ".dockerignore"
-      - "pyproject.toml"
-      - "requirements*.txt"
-  pull_request:
-    branches: [main]
-    paths:
-      - "Dockerfile"
-      - ".dockerignore"
-      - "pyproject.toml"
-      - "requirements*.txt"
-  schedule:
-    - cron: "0 3 * * 1"
-  workflow_dispatch:
+name: Container Scan  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when a file that affects the image changes.
+      - "Dockerfile"  # Image build instructions.
+      - ".dockerignore"  # Files excluded from the build context.
+      - "pyproject.toml"  # Package metadata and dependencies.
+      - "requirements*.txt"  # Pinned dependency lists.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "Dockerfile"  # Image build instructions.
+      - ".dockerignore"  # Files excluded from the build context.
+      - "pyproject.toml"  # Package metadata and dependencies.
+      - "requirements*.txt"  # Pinned dependency lists.
+  schedule:  # Periodic rescan for newly disclosed vulnerabilities.
+    - cron: "0 3 * * 1"  # Every Monday at 03:00 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-jobs:
-  grype:
-    name: Vulnerability scan (Grype)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+jobs:  # Jobs of the workflow.
+  grype:  # Build the image and scan it.
+    name: Vulnerability scan (Grype)  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Docker.
+    timeout-minutes: 45  # Cancel a hung build or scan after 45 minutes.
+    permissions:  # Token permissions of this job.
+      contents: read  # Read the repository.
+      security-events: write  # Upload the SARIF report to code scanning.
+    steps:  # Steps of the scan job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          load: true
-          push: false
-          tags: unbihexium:scan
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Set up Docker Buildx  # Enable BuildKit and the GitHub Actions cache backend.
+        uses: docker/setup-buildx-action@v3  # Official Buildx setup action.
 
-      - name: Scan image
-        id: scan
+      - name: Build image  # Build the image locally for the scanner.
+        uses: docker/build-push-action@v6  # Official build action.
+        with:  # Inputs of the build action.
+          context: .  # Build from the repository root.
+          load: true  # Load the result into the local Docker daemon.
+          push: false  # Never publish the scanned image.
+          tags: unbihexium:scan  # Local tag that the scan step refers to.
+          cache-from: type=gha  # Reuse layers from the Actions cache.
+          cache-to: type=gha,mode=max  # Store all layers in the Actions cache.
+
+      - name: Scan image  # Run Grype against the built image.
+        id: scan  # Identifier for reading the SARIF output later.
         uses: anchore/scan-action@27805bf3b4e84b4a5c980df22ed233c00390a439 # v7.4.2
-        with:
-          image: unbihexium:scan
-          severity-cutoff: critical
-          only-fixed: true
-          fail-build: true
-          output-format: sarif
+        with:  # Inputs of the scan action.
+          image: unbihexium:scan  # Local image built above.
+          severity-cutoff: critical  # Fail only on critical findings.
+          only-fixed: true  # Ignore findings without a released fix.
+          fail-build: true  # Fail the job when a finding passes the cut-off.
+          output-format: sarif  # Produce a report for code scanning.
 
-      - name: Upload results to code scanning
-        if: always() && steps.scan.outputs.sarif != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: ${{ steps.scan.outputs.sarif }}
-          category: grype-container
+      - name: Upload results to code scanning  # Publish the findings in the Security tab.
+        if: always() && steps.scan.outputs.sarif != '' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)  # Upload even after a failed scan, but not for fork pull requests.
+        uses: github/codeql-action/upload-sarif@v4  # CodeQL SARIF upload action.
+        with:  # Inputs of the upload action.
+          sarif_file: ${{ steps.scan.outputs.sarif }}  # Report written by the scan step.
+          category: grype-container  # Keeps these results apart from other analyses.
+
+# =============================================================================
+# End of file .github/workflows/container-scan.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

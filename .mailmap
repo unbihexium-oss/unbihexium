@@ -1,17 +1,38 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# .mailmap: canonical names and e-mail addresses of contributors
-# https://git-scm.com/docs/gitmailmap
+# Project     : Unbihexium
+# File        : .mailmap
+# Title       : Canonical names and e-mail addresses of contributors
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Git mailmap, read by git shortlog, git blame and git log
 # =============================================================================
 #
+# Abstract
+# --------
 # Git uses this file in `git shortlog`, `git blame` and `git log --use-mailmap`
-# to merge commits made under different identities into one contributor.
+# to merge commits made under different identities into one contributor
+# (https://git-scm.com/docs/gitmailmap). Each entry has one of the forms
 #
-# Format
 #   Proper Name <proper@email> <commit@email>
 #   Proper Name <proper@email> Commit Name <commit@email>
 #
-# Check the result with:
+# A `#` after an entry would be read as part of the entry, so every comment
+# stands on its own line above the entry it explains. Check the result with
+#
 #   git shortlog --summary --numbered --email
 # =============================================================================
 
+# Map the personal address used in early commits to the university address.
 Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi> <olaf.laitinen@gmail.com>
+
+# =============================================================================
+# End of file .mailmap
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

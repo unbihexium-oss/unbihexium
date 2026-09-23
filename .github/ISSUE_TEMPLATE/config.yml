@@ -1,14 +1,48 @@
-blank_issues_enabled: false
-contact_links:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/ISSUE_TEMPLATE/config.yml
+# Title       : Issue template chooser configuration
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub issue template chooser configuration (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# GitHub reads this file when someone opens a new issue. It disables blank
+# issues, so every report goes through one of the issue forms in this
+# directory, and adds contact links below the forms that send security
+# reports, support questions and documentation lookups to the right place
+# instead of the issue tracker.
+# =============================================================================
+
+blank_issues_enabled: false  # Require one of the issue forms; no free-form issues.
+contact_links:  # Links shown below the issue forms in the chooser.
+  # Private channel for vulnerabilities, kept out of the public tracker.
   - name: Report a security vulnerability
-    url: https://github.com/unbihexium-oss/unbihexium/security/advisories/new
-    about: Report vulnerabilities privately. Never open a public issue for a security problem.
+    url: https://github.com/unbihexium-oss/unbihexium/security/advisories/new  # Opens a private advisory draft.
+    about: Report vulnerabilities privately. Never open a public issue for a security problem.  # Text shown under the link.
+  # Support policy with channels and expected response times.
   - name: Support policy
-    url: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md
-    about: Support channels and response times.
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md  # Support policy on the default branch.
+    about: Support channels and response times.  # Text shown under the link.
+  # Documentation, so that usage questions can be answered without an issue.
   - name: Documentation
-    url: https://github.com/unbihexium-oss/unbihexium/tree/main/docs
-    about: Guides, API reference, model zoo documentation and tutorials.
+    url: https://github.com/unbihexium-oss/unbihexium/tree/main/docs  # Documentation tree on the default branch.
+    about: Guides, API reference, model zoo documentation and tutorials.  # Text shown under the link.
+  # Rules that apply to every issue and discussion.
   - name: Code of Conduct
-    url: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md
-    about: Rules for participating in this project.
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md  # Code of Conduct on the default branch.
+    about: Rules for participating in this project.  # Text shown under the link.
+
+# =============================================================================
+# End of file .github/ISSUE_TEMPLATE/config.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

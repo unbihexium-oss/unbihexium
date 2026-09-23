@@ -1,30 +1,61 @@
-name: Welcome
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/welcome.yml
+# Title       : Greet first-time contributors
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Posts a welcome comment on the first issue or the first pull request that
+# a person opens in the repository. The messages point to SUPPORT.md,
+# SECURITY.md and CONTRIBUTING.md; update them when those documents move.
+# The workflow uses pull_request_target so that it can comment on pull
+# requests from forks; it never checks out or runs code from the pull
+# request.
+# =============================================================================
 
-on:
-  issues:
-    types: [opened]
-  pull_request_target:
-    types: [opened]
+name: Welcome  # Name shown in the Actions tab.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  issues:  # Run on issue events.
+    types: [opened]  # Only when an issue is opened.
+  pull_request_target:  # Runs in the context of the base branch, also for forks.
+    types: [opened]  # Only when a pull request is opened.
 
-jobs:
-  welcome:
-    name: Welcome first-time contributors
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/first-interaction@v3
-        with:
-          issue_message: |
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
+
+jobs:  # Jobs of the workflow.
+  welcome:  # Post the welcome comment.
+    name: Welcome first-time contributors  # Name of the job.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 5  # Commenting takes seconds; cancel a hung job early.
+    permissions:  # Token permissions of this job.
+      issues: write  # Comment on issues.
+      pull-requests: write  # Comment on pull requests.
+    steps:  # Steps of the welcome job.
+      - uses: actions/first-interaction@v3  # Official first interaction action.
+        with:  # Inputs of the action.
+          issue_message: |  # Comment on the first issue of a person, in Markdown.
             Thank you for opening your first issue in Unbihexium.
 
             A maintainer will triage it according to the response times in [SUPPORT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md). Please keep an eye on this issue in case more information is needed, and remember that security vulnerabilities must be reported privately as described in [SECURITY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md).
-          pr_message: |
+          pr_message: |  # Comment on the first pull request of a person, in Markdown.
             Thank you for your first pull request to Unbihexium.
 
             Please make sure that every question in the pull request template is answered, that the title follows the `type(scope): description` format, that new source files carry the MPL-2.0 notice and that all checks pass. See [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md) for details.
+
+# =============================================================================
+# End of file .github/workflows/welcome.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

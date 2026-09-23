@@ -1,35 +1,76 @@
-# Code owners are requested for review automatically on pull requests that
-# touch the matching paths. Later patterns take precedence over earlier ones.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/CODEOWNERS
+# Title       : Code owners for automatic review requests
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub code owners file (CODEOWNERS pattern syntax)
+# =============================================================================
+#
+# Abstract
+# --------
+# GitHub requests a review from the code owners automatically when a pull
+# request touches a matching path, and branch protection can require their
+# approval before a merge. Each line pairs a gitignore-style pattern with one
+# or more owners. When several patterns match a file, the last matching line
+# in this file wins, so the catch-all pattern comes first and the specific
+# paths follow it. A trailing `#` on a pattern line would be read as part of
+# the owner list, so every comment stands on its own line above the entry.
+# =============================================================================
 
-# Default owner for everything in the repository
+# Default owner for every file not matched by a later, more specific pattern.
 *                           @olaflaitinen
 
-# Library source and tests
+# Library source code of the unbihexium package.
 /src/                       @olaflaitinen
+# Unit, integration and end-to-end tests.
 /tests/                     @olaflaitinen
 
-# Model zoo: weights, manifests, model cards and checksums
+# Model zoo: weights, manifests, model cards and checksums.
 /model_zoo/                 @olaflaitinen
 
-# Documentation and examples
+# User and developer documentation.
 /docs/                      @olaflaitinen
+# Example scripts and notebooks.
 /examples/                  @olaflaitinen
 
-# Repository automation, templates and release configuration
+# Repository automation, templates and release configuration.
 /.github/                   @olaflaitinen
 
-# Packaging and containers
+# Package metadata, build backend and tool settings.
 /pyproject.toml             @olaflaitinen
+# Container image definition.
 /Dockerfile                 @olaflaitinen
+# Local multi-container setup for the REST service.
 /docker-compose.yml         @olaflaitinen
 
-# Licence, legal and policy documents
+# Licence text of the project.
 /LICENSE.txt                @olaflaitinen
+# Plain-text legal notice shipped with the package.
 /NOTICE                     @olaflaitinen
+# Readable version of the legal notice.
 /NOTICE.md                  @olaflaitinen
+# Licences of bundled and third-party components.
 /THIRD_PARTY_NOTICES.md     @olaflaitinen
+# Regulatory and licence compliance statement.
 /COMPLIANCE.md              @olaflaitinen
+# Privacy statement for the library and the REST service.
 /PRIVACY.md                 @olaflaitinen
+# Vulnerability reporting and disclosure policy.
 /SECURITY.md                @olaflaitinen
+# Community rules of behaviour.
 /CODE_OF_CONDUCT.md         @olaflaitinen
+# Decision making and maintainer roles.
 /GOVERNANCE.md              @olaflaitinen
+
+# =============================================================================
+# End of file .github/CODEOWNERS
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

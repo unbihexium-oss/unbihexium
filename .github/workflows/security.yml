@@ -1,62 +1,103 @@
-name: Security
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/security.yml
+# Title       : Static security analysis and dependency audits
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Three security jobs, run on pushes to main, on pull requests and weekly on
+# Sunday at 00:00 UTC:
+#
+#   bandit             static analysis of src/ with the Bandit settings in
+#                      pyproject.toml; informational, never fails
+#   pip-audit          audits the installed dependencies against the PyPI
+#                      advisory database; informational, never fails
+#   dependency-review  pull requests only: blocks new dependencies with
+#                      high or critical vulnerabilities or denied licences,
+#                      as configured in .github/dependency-review-config.yml
+#
+# Bandit and pip-audit report in the job log only; review their output when
+# the weekly run completes.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: "0 0 * * 0"
+name: Security  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+  schedule:  # Weekly run to catch newly disclosed vulnerabilities.
+    - cron: "0 0 * * 0"  # Every Sunday at 00:00 UTC.
 
-jobs:
-  bandit:
-    name: Bandit Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  bandit:  # Static security analysis of the sources.
+    name: Bandit Security Scan  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    steps:  # Steps of the Bandit job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Install bandit
-        run: pip install bandit[toml]
+      - name: Set up Python  # Install the interpreter for Bandit.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Run bandit
-        run: bandit -c pyproject.toml -r src/ || echo "Bandit scan completed"
+      - name: Install bandit  # Install Bandit with TOML support.
+        run: pip install bandit[toml]  # The extra lets Bandit read pyproject.toml.
 
-  pip-audit:
-    name: Dependency Audit
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+      - name: Run bandit  # Scan the package recursively.
+        run: bandit -c pyproject.toml -r src/ || echo "Bandit scan completed"  # Informational: findings do not fail the job.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+  pip-audit:  # Known vulnerabilities in dependencies.
+    name: Dependency Audit  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    steps:  # Steps of the audit job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Install dependencies
-        run: |
+      - name: Set up Python  # Install the interpreter for pip-audit.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+
+      - name: Install dependencies  # Install the auditor and the core dependencies.
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the dependency auditor.
           pip install pip-audit
+          # Install the core runtime dependencies to audit; a failure is tolerated.
           pip install numpy onnxruntime rasterio || true
 
-      - name: Run pip-audit
-        run: pip-audit || echo "Audit completed"
+      - name: Run pip-audit  # Audit the installed environment.
+        run: pip-audit || echo "Audit completed"  # Informational: findings do not fail the job.
 
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v6
+  dependency-review:  # Review dependency changes of a pull request.
+    name: Dependency Review  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    if: github.event_name == 'pull_request'  # Needs a base and head to compare.
+    steps:  # Steps of the review job.
+      - uses: actions/checkout@v6  # Check out the configuration file.
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
-        with:
-          config-file: ./.github/dependency-review-config.yml
+      - name: Dependency Review  # Compare the dependency manifests of base and head.
+        uses: actions/dependency-review-action@v4  # Official dependency review action.
+        with:  # Inputs of the review action.
+          config-file: ./.github/dependency-review-config.yml  # Severity and licence rules.
+
+# =============================================================================
+# End of file .github/workflows/security.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

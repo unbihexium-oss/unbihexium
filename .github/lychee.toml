@@ -1,17 +1,46 @@
-# Link checker configuration used by .github/workflows/links.yml.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/lychee.toml
+# Title       : Link checker settings
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : lychee link checker configuration (TOML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Read by the lychee link checker in .github/workflows/links.yml, which scans
+# the documentation for broken links. The settings keep the run polite to
+# remote servers, treat rate limiting and bot protection as reachable, and
+# skip local addresses, example domains and the placeholder Zenodo DOI,
+# which are not meant to resolve.
+# =============================================================================
 
-max_concurrency = 16
-max_retries = 2
-timeout = 20
-include_mail = false
+max_concurrency = 16  # Limit parallel requests to stay under rate limits.
+max_retries = 2  # Retry a failed request twice before reporting it.
+timeout = 20  # Give up on a request after 20 seconds.
+include_mail = false  # Do not check mailto: addresses.
 
-# Rate limiting and bot protection are not broken links.
+# Rate limiting (429) and bot protection (403) are not broken links.
 accept = ["200..=299", "403", "429"]
 
+# Regular expressions for URLs that are never checked.
 exclude = [
-    "^https?://localhost",
-    "^https?://127\\.0\\.0\\.1",
-    "^https?://0\\.0\\.0\\.0",
-    "^https?://example\\.(com|org)",
-    "^https?://(www\\.)?doi\\.org/10\\.5281/zenodo\\.0000000",
+    "^https?://localhost",  # Local development servers.
+    "^https?://127\\.0\\.0\\.1",  # Loopback address.
+    "^https?://0\\.0\\.0\\.0",  # Bind-all address in service examples.
+    "^https?://example\\.(com|org)",  # Reserved example domains.
+    "^https?://(www\\.)?doi\\.org/10\\.5281/zenodo\\.0000000",  # Placeholder DOI until the archive exists.
 ]
+
+# =============================================================================
+# End of file .github/lychee.toml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

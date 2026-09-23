@@ -1,30 +1,56 @@
-name: PR Title
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/pr-title.yml
+# Title       : Conventional commit format for pull request titles
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Checks that the title of every pull request follows the Conventional
+# Commits format "type(scope): description", because the title becomes the
+# squash commit message and feeds the release notes. The allowed types are
+# listed below; the scope is optional. The workflow uses
+# pull_request_target so that it also works for forks; it never checks out
+# the pull request and only reads its title. The action is pinned by commit
+# SHA; Dependabot keeps the trailing version comment up to date.
+# =============================================================================
 
-on:
-  pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+name: PR Title  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  pull_request_target:  # Runs in the context of the base branch, also for forks.
+    types: [opened, edited, reopened, synchronize]  # Recheck when the title is edited.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-jobs:
-  conventional-title:
-    name: Conventional commit title
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      pull-requests: read
-    steps:
-      - name: Validate the pull request title
+concurrency:  # One run per pull request at a time.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}  # Group by pull request number.
+  cancel-in-progress: true  # A newer edit supersedes the running check.
+
+jobs:  # Jobs of the workflow.
+  conventional-title:  # Validate the title.
+    name: Conventional commit title  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 5  # The check takes seconds; cancel a hung job early.
+    permissions:  # Token permissions of this job.
+      pull-requests: read  # Read the pull request title.
+    steps:  # Steps of the title job.
+      - name: Validate the pull request title  # Parse the title as a conventional commit header.
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          types: |
+        env:  # Environment of the check step.
+          GITHUB_TOKEN: ${{ github.token }}  # Token used to read the pull request.
+        with:  # Inputs of the check action.
+          types: |  # Allowed commit types, one per line.
             feat
             fix
             docs
@@ -37,4 +63,10 @@ jobs:
             chore
             revert
             deps
-          requireScope: false
+          requireScope: false  # The scope in parentheses is optional.
+
+# =============================================================================
+# End of file .github/workflows/pr-title.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,12 +1,26 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# markdownlint configuration
-# https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+# Project     : Unbihexium
+# File        : .markdownlint.yaml
+# Title       : markdownlint rules for the documentation
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : markdownlint configuration (YAML)
 # =============================================================================
 #
+# Abstract
+# --------
+# Rules for markdownlint
+# (https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md).
 # Used by the Markdown workflow (.github/workflows/markdown.yml), the
 # pre-commit hook and `make md-lint`. Every rule is enabled by default; the
-# rules below are disabled because they conflict with how the documentation is
-# written. Each exception states the reason.
+# rules below are disabled because they conflict with how the documentation
+# is written. Each exception states the reason.
 # =============================================================================
 
 # Enable every rule that is not listed below.
@@ -37,3 +51,9 @@ MD041: false
 # MD060 table-column-style: tables are aligned for readability in the source,
 # not to a single column style.
 MD060: false
+
+# =============================================================================
+# End of file .markdownlint.yaml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

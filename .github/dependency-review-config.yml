@@ -1,30 +1,58 @@
-# Configuration for actions/dependency-review-action in .github/workflows/security.yml.
-# Pull requests that add dependencies with known vulnerabilities of high or
-# critical severity, or with licences incompatible with the project licence
-# policy, fail the Dependency Review check.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/dependency-review-config.yml
+# Title       : Dependency Review vulnerability and licence policy
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : actions/dependency-review-action configuration (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Read by actions/dependency-review-action in .github/workflows/security.yml.
+# The Dependency Review check fails on a pull request that adds a dependency
+# with a known vulnerability of high or critical severity, or one whose
+# licence is incompatible with the project licence policy. The denied
+# licences are strong copyleft, source-available and non-commercial licences
+# that cannot be combined with an MPL-2.0 library used in closed products.
+# security-insights.yml publishes this file as the dependency management
+# policy of the project.
+# =============================================================================
 
-fail-on-severity: high
-fail-on-scopes:
-  - runtime
-  - development
+fail-on-severity: high  # Fail on high and critical vulnerabilities.
+fail-on-scopes:  # Dependency scopes that can fail the check.
+  - runtime  # Dependencies installed with the package.
+  - development  # Test, lint and build tools.
 
-license-check: true
-deny-licenses:
-  - AGPL-1.0-only
-  - AGPL-1.0-or-later
-  - AGPL-3.0-only
-  - AGPL-3.0-or-later
-  - GPL-1.0-only
-  - GPL-1.0-or-later
-  - GPL-2.0-only
-  - GPL-2.0-or-later
-  - GPL-3.0-only
-  - GPL-3.0-or-later
-  - SSPL-1.0
-  - BUSL-1.1
-  - CC-BY-NC-4.0
-  - CC-BY-NC-SA-4.0
-  - CC-BY-NC-ND-4.0
+license-check: true  # Compare the licences of new dependencies with the list below.
+deny-licenses:  # SPDX identifiers that fail the check.
+  - AGPL-1.0-only  # Network copyleft.
+  - AGPL-1.0-or-later  # Network copyleft.
+  - AGPL-3.0-only  # Network copyleft.
+  - AGPL-3.0-or-later  # Network copyleft.
+  - GPL-1.0-only  # Strong copyleft.
+  - GPL-1.0-or-later  # Strong copyleft.
+  - GPL-2.0-only  # Strong copyleft.
+  - GPL-2.0-or-later  # Strong copyleft.
+  - GPL-3.0-only  # Strong copyleft.
+  - GPL-3.0-or-later  # Strong copyleft.
+  - SSPL-1.0  # Server Side Public License, not an open source licence.
+  - BUSL-1.1  # Business Source License, restricts production use.
+  - CC-BY-NC-4.0  # Forbids commercial use.
+  - CC-BY-NC-SA-4.0  # Forbids commercial use.
+  - CC-BY-NC-ND-4.0  # Forbids commercial use and derivatives.
 
-vulnerability-check: true
-warn-only: false
+vulnerability-check: true  # Look up new dependencies in the advisory database.
+warn-only: false  # A finding fails the check instead of only warning.
+
+# =============================================================================
+# End of file .github/dependency-review-config.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

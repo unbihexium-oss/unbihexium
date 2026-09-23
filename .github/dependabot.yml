@@ -1,40 +1,77 @@
-version: 2
-updates:
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/dependabot.yml
+# Title       : Dependabot version update schedule
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Dependabot configuration, version 2 (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Dependabot opens pull requests that update the Python dependencies weekly,
+# the pinned GitHub Actions weekly and the Docker base image monthly. Every
+# pull request carries the "dependencies" label (defined in labels.yml) and a
+# Conventional Commits prefix, so the release notes group it correctly.
+# Python updates arrive as one grouped pull request to keep the review load
+# low; major releases of PyTorch are left to a manual upgrade because they
+# can change model behaviour. Security updates for known vulnerabilities are
+# enabled in the repository settings and are not limited by this file. The
+# pre-commit hook check-dependabot validates this file against its schema.
+# =============================================================================
+
+version: 2  # Configuration format version required by Dependabot.
+updates:  # One entry per package ecosystem.
+  # Python dependencies declared in pyproject.toml and the requirements files.
   - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    labels:
-      - "dependencies"
-    commit-message:
-      prefix: "deps"
-    groups:
-      python-packages:
-        patterns:
-          - "*"
-    ignore:
-      - dependency-name: "torch"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "torchvision"
-        update-types: ["version-update:semver-major"]
+    directory: "/"  # Manifests are at the repository root.
+    schedule:  # How often Dependabot looks for new versions.
+      interval: "weekly"  # Check once a week.
+    open-pull-requests-limit: 5  # Cap the number of open update pull requests.
+    labels:  # Labels added to each pull request.
+      - "dependencies"  # Groups the pull request under Dependencies in the release notes.
+    commit-message:  # Commit message convention.
+      prefix: "deps"  # Conventional Commits type for dependency updates.
+    groups:  # Combine updates into fewer pull requests.
+      python-packages:  # Name of the single Python update group.
+        patterns:  # Packages that belong to the group.
+          - "*"  # Every Python package.
+    ignore:  # Updates that Dependabot must not propose.
+      - dependency-name: "torch"  # PyTorch runtime.
+        update-types: ["version-update:semver-major"]  # Major versions are upgraded by hand.
+      - dependency-name: "torchvision"  # PyTorch vision models and transforms.
+        update-types: ["version-update:semver-major"]  # Kept in step with torch.
 
+  # Actions referenced by the workflows in .github/workflows/.
   - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "ci"
-      - "dependencies"
-    commit-message:
-      prefix: "ci"
+    directory: "/"  # Dependabot finds the workflows from the root.
+    schedule:  # How often Dependabot looks for new versions.
+      interval: "weekly"  # Check once a week.
+    labels:  # Labels added to each pull request.
+      - "ci"  # Marks the change as continuous integration.
+      - "dependencies"  # Groups the pull request under Dependencies in the release notes.
+    commit-message:  # Commit message convention.
+      prefix: "ci"  # Conventional Commits type for workflow changes.
 
+  # Base image of the Dockerfile.
   - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    labels:
-      - "docker"
-      - "dependencies"
-    commit-message:
-      prefix: "build"
+    directory: "/"  # The Dockerfile is at the repository root.
+    schedule:  # How often Dependabot looks for new versions.
+      interval: "monthly"  # Base images change less often than packages.
+    labels:  # Labels added to each pull request.
+      - "docker"  # Marks the change as a container change.
+      - "dependencies"  # Groups the pull request under Dependencies in the release notes.
+    commit-message:  # Commit message convention.
+      prefix: "build"  # Conventional Commits type for build changes.
+
+# =============================================================================
+# End of file .github/dependabot.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

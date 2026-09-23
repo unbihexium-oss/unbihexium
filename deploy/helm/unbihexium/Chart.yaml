@@ -1,19 +1,49 @@
-apiVersion: v2
-name: unbihexium
-description: Production-Grade Geospatial AI Library for Earth Observation
-type: application
-version: 1.0.1
-appVersion: "1.0.1"
-keywords:
-  - geospatial
-  - ai
-  - machine-learning
-  - earth-observation
-  - remote-sensing
-  - onnx
-home: https://github.com/unbihexium-oss/unbihexium
-sources:
-  - https://github.com/unbihexium-oss/unbihexium
-maintainers:
-  - name: Unbihexium OSS
-    email: yunus.z.imanov@helsinki.fi
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : deploy/helm/unbihexium/Chart.yaml
+# Title       : Helm chart metadata for the Unbihexium REST API
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Helm chart definition (YAML), read by Helm 3
+# =============================================================================
+#
+# Abstract
+# --------
+# Describes the Helm chart that deploys the Unbihexium REST API on
+# Kubernetes. The default settings of the chart are in values.yaml next to
+# this file. `version` is the version of the chart itself and `appVersion`
+# the version of Unbihexium it deploys; raise both together on a release so
+# that they match pyproject.toml.
+# =============================================================================
+
+apiVersion: v2  # Chart API version of Helm 3.
+name: unbihexium  # Chart name, also the default release name prefix.
+description: Production-Grade Geospatial AI Library for Earth Observation  # Shown by `helm search`.
+type: application  # Deployable chart, not a library chart.
+version: 1.0.1  # Version of the chart (SemVer).
+appVersion: "1.0.1"  # Version of Unbihexium deployed by the chart.
+keywords:  # Search terms for chart repositories.
+  - geospatial  # Geographic data.
+  - ai  # Machine learning inference.
+  - machine-learning  # Model zoo.
+  - earth-observation  # Satellite imagery.
+  - remote-sensing  # Optical and SAR data.
+  - onnx  # Inference backend of the image.
+home: https://github.com/unbihexium-oss/unbihexium  # Project home page.
+sources:  # Source code locations.
+  - https://github.com/unbihexium-oss/unbihexium  # Main repository.
+maintainers:  # Contacts for the chart.
+  - name: Unbihexium OSS  # Maintainer organisation.
+    email: yunus.z.imanov@helsinki.fi  # Contact address.
+
+# =============================================================================
+# End of file deploy/helm/unbihexium/Chart.yaml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,38 +1,70 @@
-name: OpenSSF Scorecard
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/scorecard.yml
+# Title       : OpenSSF Scorecard supply-chain analysis
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs the OpenSSF Scorecard checks (branch protection, pinned dependencies,
+# token permissions, signed releases and more) on pushes to main, weekly on
+# Monday at 06:00 UTC and whenever a branch protection rule changes. The
+# results are published to the public Scorecard API, which feeds the badge
+# in the README, and uploaded as SARIF to GitHub code scanning. Publishing
+# requires the OIDC token and restricts the workflow: it must run on the
+# default branch and may only use approved actions.
+# =============================================================================
 
-on:
-  branch_protection_rule:
-  schedule:
-    - cron: "0 6 * * 1"
-  push:
-    branches: [main]
+name: OpenSSF Scorecard  # Name shown in the Actions tab.
 
-permissions: read-all
+on:  # Events that start the workflow.
+  branch_protection_rule:  # Rescore when the branch protection changes.
+  schedule:  # Periodic rescore.
+    - cron: "0 6 * * 1"  # Every Monday at 06:00 UTC.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch; Scorecard publishes for it alone.
 
-jobs:
-  analysis:
-    name: Scorecard Analysis
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      id-token: write
-      contents: read
-      actions: read
+permissions: read-all  # Read-only default token; the job widens only what it needs.
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+jobs:  # Jobs of the workflow.
+  analysis:  # Run Scorecard and publish the results.
+    name: Scorecard Analysis  # Name of the job.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    permissions:  # Token permissions of this job.
+      security-events: write  # Upload the SARIF report to code scanning.
+      id-token: write  # OIDC token that authenticates the result publication.
+      contents: read  # Read the repository.
+      actions: read  # Read the workflow definitions and runs.
 
-      - name: Run Scorecard
-        uses: ossf/scorecard-action@v2.4.3
-        with:
-          results_file: results.sarif
-          results_format: sarif
-          publish_results: true
+    steps:  # Steps of the analysis job.
+      - name: Checkout  # Check out the default branch.
+        uses: actions/checkout@v6  # Official checkout action.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: results.sarif
+      - name: Run Scorecard  # Evaluate the repository.
+        uses: ossf/scorecard-action@v2.4.3  # Official Scorecard action.
+        with:  # Inputs of the Scorecard action.
+          results_file: results.sarif  # Where the report is written.
+          results_format: sarif  # Format understood by code scanning.
+          publish_results: true  # Publish to the Scorecard API for the badge.
+
+      - name: Upload SARIF  # Show the findings in the Security tab.
+        uses: github/codeql-action/upload-sarif@v4  # CodeQL SARIF upload action.
+        with:  # Inputs of the upload action.
+          sarif_file: results.sarif  # Report written by the Scorecard step.
+
+# =============================================================================
+# End of file .github/workflows/scorecard.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

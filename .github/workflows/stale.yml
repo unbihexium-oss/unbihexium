@@ -1,49 +1,82 @@
-name: Stale
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/stale.yml
+# Title       : Mark and close inactive issues and pull requests
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs daily at 03:30 UTC. Issues without activity for 60 days and pull
+# requests without activity for 45 days receive the "stale" label and a
+# comment; 14 days later they are closed unless someone responds, which
+# removes the label again. Draft pull requests and items with one of the
+# exempt labels (security, confirmed, blocked and others listed below) are
+# never marked. At most 100 API operations are used per run to stay within
+# the rate limit. Keep the day counts in the messages in step with the
+# settings.
+# =============================================================================
 
-on:
-  schedule:
-    - cron: "30 3 * * *"
-  workflow_dispatch:
+name: Stale  # Name shown in the Actions tab.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  schedule:  # Daily housekeeping.
+    - cron: "30 3 * * *"  # Every day at 03:30 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-jobs:
-  stale:
-    name: Mark and close stale issues and pull requests
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/stale@v11
-        with:
-          days-before-issue-stale: 60
-          days-before-issue-close: 14
-          days-before-pr-stale: 45
-          days-before-pr-close: 14
-          stale-issue-label: stale
-          stale-pr-label: stale
-          exempt-issue-labels: security,confirmed,blocked,help wanted,good first issue,breaking-change,compliance
-          exempt-pr-labels: security,blocked,breaking-change,dependencies
-          exempt-draft-pr: true
-          remove-stale-when-updated: true
-          operations-per-run: 100
-          stale-issue-message: >-
+concurrency:  # Never run two stale runs at once.
+  group: ${{ github.workflow }}  # A single group for the whole workflow.
+  cancel-in-progress: false  # Queue a new run instead of cancelling the running one.
+
+jobs:  # Jobs of the workflow.
+  stale:  # Label, comment on and close inactive items.
+    name: Mark and close stale issues and pull requests  # Name of the job.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung run after ten minutes.
+    permissions:  # Token permissions of this job.
+      issues: write  # Label, comment on and close issues.
+      pull-requests: write  # Label, comment on and close pull requests.
+    steps:  # Steps of the stale job.
+      - uses: actions/stale@v11  # Official stale action.
+        with:  # Inputs of the stale action.
+          days-before-issue-stale: 60  # Days of inactivity before an issue is marked.
+          days-before-issue-close: 14  # Days after marking before an issue is closed.
+          days-before-pr-stale: 45  # Days of inactivity before a pull request is marked.
+          days-before-pr-close: 14  # Days after marking before a pull request is closed.
+          stale-issue-label: stale  # Label that marks a stale issue.
+          stale-pr-label: stale  # Label that marks a stale pull request.
+          exempt-issue-labels: security,confirmed,blocked,help wanted,good first issue,breaking-change,compliance  # Issues with any of these labels are never marked.
+          exempt-pr-labels: security,blocked,breaking-change,dependencies  # Pull requests with any of these labels are never marked.
+          exempt-draft-pr: true  # Draft pull requests are never marked.
+          remove-stale-when-updated: true  # New activity removes the stale label.
+          operations-per-run: 100  # Cap on API calls per run, for the rate limit.
+          stale-issue-message: >-  # Comment posted when an issue is marked.
             This issue has had no activity for 60 days and is now marked as stale.
             It will be closed in 14 days unless there is new activity. Comment with
             any new information to keep it open.
-          close-issue-message: >-
+          close-issue-message: >-  # Comment posted when an issue is closed.
             This issue was closed because it had no activity for 14 days after being
             marked as stale. Reopen it or open a new issue if the problem persists.
-          stale-pr-message: >-
+          stale-pr-message: >-  # Comment posted when a pull request is marked.
             This pull request has had no activity for 45 days and is now marked as
             stale. It will be closed in 14 days unless there is new activity.
-          close-pr-message: >-
+          close-pr-message: >-  # Comment posted when a pull request is closed.
             This pull request was closed because it had no activity for 14 days after
             being marked as stale. Reopen it when you resume work.
+
+# =============================================================================
+# End of file .github/workflows/stale.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,9 +1,23 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# Citation metadata for Unbihexium
+# Project     : Unbihexium
+# File        : CITATION.cff
+# Title       : Citation metadata for Unbihexium
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Citation File Format 1.2.0 (YAML)
 # =============================================================================
 #
-# Citation File Format (CFF) 1.2.0: https://citation-file-format.github.io/
-# Schema: https://github.com/citation-file-format/citation-file-format/blob/main/schema.json
+# Abstract
+# --------
+# Citation metadata in the Citation File Format (CFF) 1.2.0
+# (https://citation-file-format.github.io/, schema at
+# https://github.com/citation-file-format/citation-file-format/blob/main/schema.json).
 #
 # GitHub reads this file to show a "Cite this repository" button with APA and
 # BibTeX output, and Zenodo, Zotero and other reference managers import it.
@@ -18,14 +32,14 @@
 #   cffconvert --validate
 # =============================================================================
 
-cff-version: 1.2.0
-title: "Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python"
-message: >-
+cff-version: 1.2.0  # Version of the Citation File Format schema.
+title: "Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python"  # Title used in citations.
+message: >-  # Request shown to users next to the citation.
   If you use Unbihexium in your research or in a product, please cite it
   using the metadata in this file. Cite the exact version you used, and cite
   the libraries listed under references where your work depends on them
   directly.
-type: software
+type: software  # The work cited is software, not a data set.
 
 # -----------------------------------------------------------------------------
 # Authors and contact
@@ -33,47 +47,52 @@ type: software
 # The copyright holder is the Unbihexium OSS Foundation. Individual
 # contributors are listed in AUTHORS.md and in the version history.
 authors:
+  # The foundation, listed first as the copyright holder.
   - name: Unbihexium OSS Foundation
-    email: yunus.z.imanov@helsinki.fi
-    website: "https://github.com/unbihexium-oss"
+    email: yunus.z.imanov@helsinki.fi  # Contact address of the foundation.
+    website: "https://github.com/unbihexium-oss"  # GitHub organisation.
+  # The lead author.
   - given-names: Olaf Yunus
-    family-names: Laitinen Imanov
-    email: yunus.z.imanov@helsinki.fi
-    affiliation: University of Helsinki
-    website: "https://github.com/olaflaitinen"
-contact:
-  - given-names: Olaf Yunus
-    family-names: Laitinen Imanov
-    email: yunus.z.imanov@helsinki.fi
-    affiliation: University of Helsinki
+    family-names: Laitinen Imanov  # Family name as used in citations.
+    email: yunus.z.imanov@helsinki.fi  # Contact address.
+    affiliation: University of Helsinki  # Institution of the author.
+    website: "https://github.com/olaflaitinen"  # GitHub profile.
+contact:  # Person to contact about the software.
+  - given-names: Olaf Yunus  # Given names.
+    family-names: Laitinen Imanov  # Family name.
+    email: yunus.z.imanov@helsinki.fi  # Contact address.
+    affiliation: University of Helsinki  # Institution.
 
 # -----------------------------------------------------------------------------
 # Version
 # -----------------------------------------------------------------------------
-version: 1.0.1
-date-released: "2025-12-21"
+version: 1.0.1  # Released version described by this file.
+date-released: "2025-12-21"  # Release date of that version, quoted so it stays a string.
 
 # -----------------------------------------------------------------------------
 # Locations
 # -----------------------------------------------------------------------------
-url: "https://unbihexium.org"
-repository-code: "https://github.com/unbihexium-oss/unbihexium"
-repository-artifact: "https://pypi.org/project/unbihexium/"
-identifiers:
+url: "https://unbihexium.org"  # Project web site.
+repository-code: "https://github.com/unbihexium-oss/unbihexium"  # Source code repository.
+repository-artifact: "https://pypi.org/project/unbihexium/"  # Built packages on PyPI.
+identifiers:  # Further identifiers of this version.
+  # Tagged source of this version.
   - type: url
-    value: "https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1"
-    description: Source code and release notes of version 1.0.1.
+    value: "https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1"  # Release page.
+    description: Source code and release notes of version 1.0.1.  # What the identifier points to.
+  # Built package of this version.
   - type: url
-    value: "https://pypi.org/project/unbihexium/1.0.1/"
-    description: Python package of version 1.0.1 on the Python Package Index.
+    value: "https://pypi.org/project/unbihexium/1.0.1/"  # Package page.
+    description: Python package of version 1.0.1 on the Python Package Index.  # What the identifier points to.
+  # Container images of the project.
   - type: url
-    value: "https://github.com/unbihexium-oss/unbihexium/pkgs/container/unbihexium"
-    description: Container images on the GitHub Container Registry.
+    value: "https://github.com/unbihexium-oss/unbihexium/pkgs/container/unbihexium"  # Registry page.
+    description: Container images on the GitHub Container Registry.  # What the identifier points to.
 
 # -----------------------------------------------------------------------------
 # Description
 # -----------------------------------------------------------------------------
-abstract: >-
+abstract: >-  # Summary exported with the citation.
   Unbihexium is a Python library for Earth observation, geospatial analysis,
   remote sensing and synthetic aperture radar (SAR). It provides raster and
   vector input and output (GeoTIFF, Cloud Optimized GeoTIFF, Zarr,
@@ -86,29 +105,29 @@ abstract: >-
   segmentation, change detection, classification and regression. Models
   run with ONNX Runtime or PyTorch on CPU or GPU. The library supports
   CPython 3.10 to 3.14 on Linux, macOS and Windows.
-keywords:
-  - earth observation
-  - geospatial
-  - remote sensing
-  - synthetic aperture radar
-  - SAR
-  - satellite imagery
-  - GIS
-  - machine learning
-  - deep learning
-  - object detection
-  - semantic segmentation
-  - change detection
-  - flood mapping
-  - agriculture
-  - urban planning
-  - environmental monitoring
-  - spectral indices
-  - geostatistics
-  - ONNX
-  - Python
-license: MPL-2.0
-license-url: "https://mozilla.org/MPL/2.0/"
+keywords:  # Terms that help reference managers and search engines.
+  - earth observation  # Application domain.
+  - geospatial  # Application domain.
+  - remote sensing  # Application domain.
+  - synthetic aperture radar  # Sensor type.
+  - SAR  # Abbreviation of the sensor type.
+  - satellite imagery  # Data type.
+  - GIS  # Geographic information systems.
+  - machine learning  # Method.
+  - deep learning  # Method.
+  - object detection  # Model task.
+  - semantic segmentation  # Model task.
+  - change detection  # Model task.
+  - flood mapping  # Application.
+  - agriculture  # Application.
+  - urban planning  # Application.
+  - environmental monitoring  # Application.
+  - spectral indices  # Feature of the library.
+  - geostatistics  # Feature of the library.
+  - ONNX  # Model format.
+  - Python  # Programming language.
+license: MPL-2.0  # SPDX identifier of the project licence.
+license-url: "https://mozilla.org/MPL/2.0/"  # Licence text.
 
 # -----------------------------------------------------------------------------
 # Works that Unbihexium builds on
@@ -117,28 +136,37 @@ license-url: "https://mozilla.org/MPL/2.0/"
 # (via pyproj), and model inference through ONNX Runtime. The entries below
 # use the citations recommended by those projects.
 references:
+  # GDAL, used through rasterio for raster input and output.
   - type: software
-    title: "GDAL/OGR Geospatial Data Abstraction software Library"
-    authors:
-      - name: GDAL/OGR contributors
-    publisher:
-      name: Open Source Geospatial Foundation
-    url: "https://gdal.org"
-    doi: 10.5281/zenodo.5884351
-    license: MIT
+    title: "GDAL/OGR Geospatial Data Abstraction software Library"  # Title recommended by GDAL.
+    authors:  # Authors of the reference.
+      - name: GDAL/OGR contributors  # Collective author.
+    publisher:  # Publisher of the reference.
+      name: Open Source Geospatial Foundation  # OSGeo publishes GDAL.
+    url: "https://gdal.org"  # Project web site.
+    doi: 10.5281/zenodo.5884351  # Zenodo DOI given by GDAL for citation.
+    license: MIT  # Licence of GDAL.
+  # PROJ, used through pyproj for coordinate transformations.
   - type: software
-    title: "PROJ coordinate transformation software library"
-    authors:
-      - name: PROJ contributors
-    publisher:
-      name: Open Source Geospatial Foundation
-    url: "https://proj.org"
-    doi: 10.5281/zenodo.5884394
-    license: MIT
+    title: "PROJ coordinate transformation software library"  # Title recommended by PROJ.
+    authors:  # Authors of the reference.
+      - name: PROJ contributors  # Collective author.
+    publisher:  # Publisher of the reference.
+      name: Open Source Geospatial Foundation  # OSGeo publishes PROJ.
+    url: "https://proj.org"  # Project web site.
+    doi: 10.5281/zenodo.5884394  # Zenodo DOI given by PROJ for citation.
+    license: MIT  # Licence of PROJ.
+  # ONNX Runtime, used for model inference.
   - type: software
-    title: "ONNX Runtime"
-    authors:
-      - name: ONNX Runtime developers
-    url: "https://onnxruntime.ai"
-    repository-code: "https://github.com/microsoft/onnxruntime"
-    license: MIT
+    title: "ONNX Runtime"  # Project name.
+    authors:  # Authors of the reference.
+      - name: ONNX Runtime developers  # Collective author.
+    url: "https://onnxruntime.ai"  # Project web site.
+    repository-code: "https://github.com/microsoft/onnxruntime"  # Source code repository.
+    license: MIT  # Licence of ONNX Runtime.
+
+# =============================================================================
+# End of file CITATION.cff
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
