@@ -1,8 +1,0 @@
-{
-  "model_id": "route_planner_base",
-  "task": "regression",
-  "variant": "base",
-  "params": 267521,
-  "resolution": 128,
-  "base_channels": 64
-}

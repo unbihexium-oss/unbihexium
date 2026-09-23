@@ -1,91 +1,84 @@
 {
-  "model_id": "onshore_monitor",
-  "name": "Onshore Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "onshore_monitor",
+  "name": "Surface Temperature Anomaly",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "energy",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Onshore Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates land surface temperature anomalies around onshore industrial facilities.",
+  "inputs": {
+    "bands": [
+      "SR_B2",
+      "SR_B3",
+      "SR_B4",
+      "SR_B5",
+      "SR_B6",
+      "SR_B7",
+      "ST_B10"
+    ],
+    "dates": 1,
+    "channels": [
+      "SR_B2",
+      "SR_B3",
+      "SR_B4",
+      "SR_B5",
+      "SR_B6",
+      "SR_B7",
+      "ST_B10"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "temperature_anomaly"
+    ],
+    "units": [
+      "K"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Surface temperature anomaly rasters.",
+  "data_sources": [
+    "Landsat 8/9 Collection 2 Level 2"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f2baca24298b2e6e3d465ec46bb64844b219784cffc2f7b1374e0855722c4023",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "adbe7e47201dbca2b674bb6195943ecbf703b695c0163b0101d85666cb69de51",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "3deae50078e2d64a74140d08c3b3bfe08cde28353d8b5d17b8170724f029bfea",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "onshore_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733505,
+      "weights_digest": "17b2cf445cc758ecdc173da673dd4d070a1be1dd81b45e6a2857aa1dee269b92"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8ed2f78d30c4d78e7f2d369aef39a23883158072f5a1e12ffe4a0da11382511b",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1f3746539cc7999feda7f9320e2ade4a12140aee92ad40820822f083ae9c0b57",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "9fa17d63f08cefea34676dce91ad215a21de29ab713bfaab6ec0e13c621f551b",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "onshore_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059585,
+      "weights_digest": "d43f55b617fcedd357b641090779aaa9f1836cd65733fe6ca3ca7ccfad2f96b9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "879686220f4ca32902fd755c172a1d5fac423a4e47dc86c7961968ab31edd1c9",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c4f56b95202636fad49284cacdd7edc54cd904925f17ebbdad7ab4746d2ba8a1",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "749c45ed3c58c28f39be646a542e2af8c5c6e1f5617c2f4ddf65ad28cc2d9e27",
-          "size_bytes": 181
-        }
-      ]
+      "model_id": "onshore_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060801,
+      "weights_digest": "ef78cf86f6db730d4ad00ff7d14de4bc4a091d1347a18d308072ea9d04063f93"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "994ea5575b89adb9c68e9b8e3384940de6a1a94c601b89a34ca55fae0f7f2c2d",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b286cfea2e4c195aaae51dfbb1d9412042fb8724f81711674dcbee893fcc0b2f",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "af1a9bc483bc65d4cd6f24e9de9fceae6e8a21048df4a94eb4360839131717e3",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "onshore_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452865,
+      "weights_digest": "67f3ff455ba4b446978d2ef3d0b138e3409f95cf6bf1fa20f78a626e8e6c1f36"
     }
-  },
-  "capabilities": [
-    "onshore_monitor"
-  ]
+  }
 }

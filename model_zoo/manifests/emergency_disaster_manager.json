@@ -1,91 +1,81 @@
 {
-  "model_id": "emergency_disaster_manager",
-  "name": "Emergency Disaster Manager",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "emergency_disaster_manager",
+  "name": "Emergency Needs Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "risk",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Emergency Disaster Manager model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates affected population and shelter needs after a disaster.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "affected_population",
+      "shelter_need"
+    ],
+    "units": [
+      "persons",
+      "persons"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Affected population and shelter statistics per chip.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "very high resolution imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "be8c398259bd3e5d6a0f0e6ee528299f6bef6e4956c34cea293be39f8d30271a",
-          "size_bytes": 1643
-        },
-        {
-          "name": "model.pt",
-          "sha256": "580b435ea52243024e9e0a89803e2d4e53af1fbeb1e994de115890202206625d",
-          "size_bytes": 3709
-        },
-        {
-          "name": "config.json",
-          "sha256": "a336f2fff66e33240a9cd566a5f7d74bf6bc22fd709a055290055fae34e5944d",
-          "size_bytes": 190
-        }
-      ]
+      "model_id": "emergency_disaster_manager_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494658,
+      "weights_digest": "5d2be318a827ce4e4b97726f9a42729f1e2f1eaad97ed1f05c46c0f0a26b1d4b"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8546156a723d5c3228479aa1724bcb8105feed1a56b7505f85de174b4186c2c6",
-          "size_bytes": 5677
-        },
-        {
-          "name": "model.pt",
-          "sha256": "cfe65447a254a03d640911bfee34a9416068a97eb662b2ed898fc81ff286e1dd",
-          "size_bytes": 7613
-        },
-        {
-          "name": "config.json",
-          "sha256": "83f43f103c27541cf85502ab9d7ad6d1b761f1440511e42dcb6f7d28aa2a05d1",
-          "size_bytes": 190
-        }
-      ]
+      "model_id": "emergency_disaster_manager_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3745410,
+      "weights_digest": "59fc3c20ce3756fb213f78d338ae3afd96519cf7f2cd9527a7cdb19e6e1a5009"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "38ea71109c62a56472512676d67e94dcb811071ca28cf88bceeaa85db99f8867",
-          "size_bytes": 14641
-        },
-        {
-          "name": "model.pt",
-          "sha256": "162d3bc38de2cdfcafc6611fc1add5d047f7963e48722f1506b57c625af2bcd9",
-          "size_bytes": 16573
-        },
-        {
-          "name": "config.json",
-          "sha256": "a1490dbf4a5385df06ac5400c48a6cc12864bd1388465cf784f5268242b8fbf9",
-          "size_bytes": 192
-        }
-      ]
+      "model_id": "emergency_disaster_manager_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14606594,
+      "weights_digest": "01790988c32f37e4523d44d7b52d434bcf1e7273e8938819ce8831ee8f0b89f3"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "418c0cb9f8a7eec31de5afa1fc8be701ed90127b2de85b643065c81d72845e85",
-          "size_bytes": 44855
-        },
-        {
-          "name": "model.pt",
-          "sha256": "21db834d6b6d023c1935adecabe1276eaa87c1c6510901c42945af3af9a585a9",
-          "size_bytes": 46781
-        },
-        {
-          "name": "config.json",
-          "sha256": "db1dbaa7a714871e75b1daee3f35cf625a54d3eb9d95a1de34eeeeeaae466409",
-          "size_bytes": 190
-        }
-      ]
+      "model_id": "emergency_disaster_manager_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37763074,
+      "weights_digest": "1d9c9d34ed85ea1b2cd8677302c3235bd5e1cb739791b928fa26aec9172d72bd"
     }
-  },
-  "capabilities": [
-    "emergency_disaster_manager"
-  ]
+  }
 }

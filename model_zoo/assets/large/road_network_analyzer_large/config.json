@@ -1,8 +1,0 @@
-{
-  "model_id": "road_network_analyzer_large",
-  "task": "segmentation",
-  "variant": "large",
-  "params": 1277666,
-  "resolution": 256,
-  "base_channels": 96
-}

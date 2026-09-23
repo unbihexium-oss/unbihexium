@@ -1,8 +1,0 @@
-{
-  "model_id": "land_degradation_detector_tiny",
-  "task": "segmentation",
-  "variant": "tiny",
-  "params": 143266,
-  "resolution": 64,
-  "base_channels": 32
-}

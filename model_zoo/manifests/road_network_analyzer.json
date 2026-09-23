@@ -1,91 +1,75 @@
 {
-  "model_id": "road_network_analyzer",
-  "name": "Road Network Analyzer",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "road_network_analyzer",
+  "name": "Road Network Extractor",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "urban",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Road Network Analyzer model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Extracts road surfaces for road network mapping.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "road"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Road masks.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5c46d7a1e934d15392de276ebe8249ef42a6ec1d11d1b1dc83792616c25e0fe9",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "489b4a0461867d4fbc23da8dc0edab2df66691df830a562583990782b051fbc5",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "66c414e60a4cb0fc6db0790de4255bbec6a3327a4338bcf81d01987a70a6af30",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "road_network_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732946,
+      "weights_digest": "e0dea8276f123cbdc8b76eeb53351c4fe6fc3a97d4e3c461dd3d892dba5ea6d2"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d6df3ed09ca75175d8a247233e2f417d21792c222c1dc3c0104469d7fc33af90",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "326b9df41be111c0c5c390f421449c2e21f50207d9a9c4257d11c27deb46acbd",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "a874b829d453b81ff7c5a17f7f8f2271e03ad9ba1291a58fbe0c9467e4875821",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "road_network_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058466,
+      "weights_digest": "47105799b542f89c7b963864be0843c973b49f8a1591820f4ea6f8bcfcb19483"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2855e8c3095f16c9000063b209f664c949ce71ff3173c61378fca2ea055cb478",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "365b0146060841bd83810f355b2351cf9aa6b71d61c6d645fc329c4d727356ab",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "8947f274b3e976c2509e38ff6681eabd86888eda0e700398a3039bf6dd2c4821",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "road_network_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059122,
+      "weights_digest": "cf1411cd301bd5e46196577d6f56aebbbf1dede12b4bfcde30010539b77acb59"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6bf3dbe88c6743ad77735f1dc6ab29fb64edf970bff591f17506c54ee024a65c",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9a8d6e9291497ce783735cf30fde917e42f5f5fcb65eb5755b12cdac2c02fae9",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "e482ba8d83d49a2771865bbf1080b66989a0efc36a2c2977371f8f4b9cbb605a",
-          "size_bytes": 419
-        }
-      ]
+      "model_id": "road_network_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450626,
+      "weights_digest": "5e520b0cf771820f1828a60abeed320f72bda4713a0d45c2f8d0bbed93988c67"
     }
-  },
-  "capabilities": [
-    "road_network_analyzer"
-  ]
+  }
 }

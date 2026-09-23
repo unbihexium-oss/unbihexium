@@ -1,91 +1,98 @@
 {
-  "model_id": "flood_risk",
+  "$schema": "../manifest.schema.json",
+  "family": "flood_risk",
   "name": "Flood Risk",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "water",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Flood Risk model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates flood susceptibility per pixel.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "flood_susceptibility"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Flood susceptibility from historical flood extents or hydraulic models.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "71be94d67d7af3f118b8b16fa2862b6e16029c1a4b9db3b93c1a09d136d73238",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "569b29bc52d761cc86301f9304d7bdd02f17781017d228f239fca51e67c1869b",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "6a516043e86cf4ec48c646294c9599eb634a0515c40dfeb790b1b42461033f55",
-          "size_bytes": 174
-        }
-      ]
+      "model_id": "flood_risk_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "1edc9f29d897ff06715a8664bb2c140953e00ab719e722ac4c8be580da1e7597"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7e47b239cd93a9646fa7621d39f3c2ee750a7eada215499362d9f836b98ceac9",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "29f710dc8fd92e3c70ded839bf0374922030d6da020937c72bd23dc00b3a79a2",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "523767ed452f0229dfa2af32f479636fe3ca40c38052d1ab2b4fa349e806031f",
-          "size_bytes": 174
-        }
-      ]
+      "model_id": "flood_risk_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "f025cc5f4f287ed1f6dd2a4869631e4b902ef06eda2016db2e47e5e110e80bfe"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0675bc8f13367ab6c5d65fbd0dc3d5281ab85a857ad1a799a46c4c7119f7fdef",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ed41679566ea9bdf7fc50abadb4899be4337b17c418bee96fb0c6e68f1fb5d42",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "cbe8b436bee1bb6521e33432243cbd5643ee74c17c3fdc527bb05341feb1c6b0",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "flood_risk_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "1eb594b502e8301c8815a07d6d975f5fb730cddaa7cdb3b546f9a59fe2f80e3b"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "87f9ed116658c80176bfaeddbd364c57ecbb2d9e118009226011b2aa74be9c4b",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5030da1132e236ad5fec981d1e3c3f6f28f569dd6d7e0f9964847a3cca9ca13d",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "6e98f03ae89c668390f326da071d27f62f759bea73421d63885c3ed2ba79eed1",
-          "size_bytes": 174
-        }
-      ]
+      "model_id": "flood_risk_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "f4d8df784fa66d0de802dc0c68103be5b5ba34adad598fc0724534a7c7655159"
     }
-  },
-  "capabilities": [
-    "flood_risk"
-  ]
+  }
 }

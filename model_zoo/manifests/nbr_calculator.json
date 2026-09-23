@@ -1,91 +1,73 @@
 {
-  "model_id": "nbr_calculator",
-  "name": "Nbr Calculator",
-  "version": "1.0.0",
-  "task": "index",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "nbr_calculator",
+  "name": "NBR Calculator",
+  "version": "2.0.0",
+  "task": "spectral_index",
+  "domain": "indices",
+  "architecture": "spectral_formula",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Nbr Calculator model for index.",
-  "artifacts": {
+  "status": "reference",
+  "trained": false,
+  "description": "Normalized Burn Ratio, (NIR - SWIR2) / (NIR + SWIR2) (Key and Benson, 2006).",
+  "inputs": {
+    "bands": [
+      "nir",
+      "swir2"
+    ],
+    "dates": 1,
+    "channels": [
+      "nir",
+      "swir2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "nbr"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": "nbr",
+    "layout": "Tensor (N, 1, H, W) with the index value; NaN where undefined."
+  },
+  "training_labels": "None, the formula needs no training.",
+  "data_sources": [
+    "Surface reflectance from Sentinel-2",
+    "Landsat or similar sensors"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "73cb8e52c4ae2f5e20cfe19cb80dad15b4191a3186ba26e445e2e6576ec9d0bf",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d77ac9c58076f101305ab90aa70513cf4391527b727ee7bd01e9af28484c257f",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "26debe97fe5d581f0e600687d46d0f3f43933514945655cff513e1ba2e050f52",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "nbr_calculator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c72792ac069252d047177a88860c24a7f916a886086a826e7733edbc8576d66b",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "65c89507d4885666a6a8d00f62c7c55ff54ba6dff66abbf1fa3d34a7987e3797",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "066e6e846f682570f4b9f514f291bd5fdb596e547e3063e324bcb1340738713e",
-          "size_bytes": 349
-        }
-      ]
+      "model_id": "nbr_calculator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c2d18569853a090dad6e3ae9f6db5c1319ff05a7eb5efe446c8a248674a7f034",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4b4ba7bee884ed9dd2d1e503808df10d04ab90b45af8965c4e3b7d1a6d24fe99",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "e99b5830bd34c1c040c98fae07140c826cbb466999177ed74229523523c58375",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "nbr_calculator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4e3a530f8090d09ac92fbb4f45e849f75a75f20adc91a034fc6e0ca69a9d9d96",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4dbf85b5266dd9901a9cc43e492815592fe81cc338a39d6be134ce8227d83a30",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "757b6121b0ff20188f356d592dfdef0b2eaeab146f5b8ef1053f5377888ee996",
-          "size_bytes": 351
-        }
-      ]
+      "model_id": "nbr_calculator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
-  },
-  "capabilities": [
-    "nbr_calculator"
-  ]
+  }
 }

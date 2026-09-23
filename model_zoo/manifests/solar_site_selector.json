@@ -1,91 +1,98 @@
 {
-  "model_id": "solar_site_selector",
+  "$schema": "../manifest.schema.json",
+  "family": "solar_site_selector",
   "name": "Solar Site Selector",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "energy",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Solar Site Selector model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores suitability for ground-mounted photovoltaic plants.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "suitability"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Suitability scores or existing plant locations.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "afae2e08c060fe482f22c2a506c970277fc98a28a66dd71aec7d66ae20acfdaf",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1f2365ceaa39e124e96dc3782d66f3823c9e99929b279f6fc6e5739caa6d444e",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "a27a327f46fe94001bb218afea7d334f417707784045919bb46a1177d58ab475",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "solar_site_selector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "ab0d8aea96940205bd362af7c5f1b3762da2c7e0f77446e8681e35b93c54a0c2"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8c9dd3d5c24eafd9322194107c4df150e48a8cbed62be579466bf6951d0bc3d0",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "14bbf2e6c88b57c3055244c07536acbed99cccf2bebb4c90925b4d851baf66da",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "a547e1c67313536fb2fd288da52d5547ac1ac29270d1e48490e4def0c36f5a61",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "solar_site_selector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "bf1e0ee7dd62e9bb8e122ec3db57b424d1a82b57c1914c7507b481cfa1295524"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "94c9a6054ea8850566de51585b2dc6e903b9cd0050f0f11c6e15e3b6c1a8466c",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6ebb285e5a8904b6f802ab164ff06f2e93906e7215350d6e56890aa11fa975ed",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "cbefe398744d8863e07f306e8601be554a9f2dc84d30cda26192d0ae929605b0",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "solar_site_selector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "2ddc94455364758642b3bb91edc8b374ffd5adf91dfe77e44248cec4c583df94"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d86018d93b62e147358d6209e2cd3d22b7962e37bacfa449c0052cf3ef85063b",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "89fa150a9563ac0b41102c19e89c1b07411886ce309aacd7e556c852fdb45656",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "af6c15555d0dd245bf5f075071ba7f958f4f5ba09061a7c078dd12509c0c763d",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "solar_site_selector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "d602c1d283da81a7ce3908d18e1cd45d0ffbb9d6ad6d3bdc2a993555676f7cfc"
     }
-  },
-  "capabilities": [
-    "solar_site_selector"
-  ]
+  }
 }

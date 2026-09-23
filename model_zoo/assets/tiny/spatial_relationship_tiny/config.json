@@ -1,8 +1,0 @@
-{
-  "model_id": "spatial_relationship_tiny",
-  "task": "regression",
-  "variant": "tiny",
-  "params": 68225,
-  "resolution": 64,
-  "base_channels": 32
-}

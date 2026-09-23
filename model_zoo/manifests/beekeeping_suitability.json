@@ -1,91 +1,98 @@
 {
-  "model_id": "beekeeping_suitability",
+  "$schema": "../manifest.schema.json",
+  "family": "beekeeping_suitability",
   "name": "Beekeeping Suitability",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "agriculture",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Beekeeping Suitability model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores the suitability of land for apiaries.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "suitability"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Suitability scores from expert assessment or productivity records.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "eaa674455b18bd2bac99fde1f90f72aa3299a21996917e1bef723a28bcb886cb",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0415a768b05957b3c56e95f0e7d31c0fb1737e22b960bd3cc63a8750f579695e",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "b5ca6f4497d9339d9e5752a32ef37974f9f13018769648dbc41a451149507a44",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "beekeeping_suitability_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "2620ed0e26a840f05bf8617c043d59b7244f9799f33b2ae3666d1e8a0f60df3d"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "43feeceffa5277b771cd5d5dc19e943f9ccb0448ceb0dbbd7722695e1b3538c4",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4a7c75ee14803d8bc999475a79d4798e90f7f354d14f27df5268c6c93710b749",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "2610dce310e9d5d9debbe7711091661e1acddd79184ef4127758f2a9784b5f2e",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "beekeeping_suitability_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "07acf516c074d8410afd44d8ecc167b141cd96eca374e4614909b4a15144342f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ae9b53ce173bdfbafbeb8a2c7a8ba964af3bb2d7fcb4a302e94a0beeba8a1e97",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "29b25ca48cd3b329a9defb4b70b8685cbfa5ddb8c6e7f441c0ccd2b7ac285b60",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "78ca71b50404983101e63eb50640c77e63842a99b4701d32c92b780543ce1fe3",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "beekeeping_suitability_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "6582b64342a3575e356a7e230fb890fda45679f3bcbb6bee43ac25fd8faab3c1"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ab70daa0be32671bd63f3c77758d0b90b51ba0418cd7811989303c9c2eba1251",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c589916de37628d05325a53eaaa48518a2e2a8e8f26063d47f20c2673c087ed3",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "0109748c7e6eeec2c4fb5981a238d75c40eaca9923f683b38b34b81f61b68e96",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "beekeeping_suitability_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "a79aec8bbfa94fb5cdaeb7147c2f39e3c15a7854001e4ab810886f09bcdf64c8"
     }
-  },
-  "capabilities": [
-    "beekeeping_suitability"
-  ]
+  }
 }

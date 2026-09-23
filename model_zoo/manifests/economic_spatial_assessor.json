@@ -1,91 +1,76 @@
 {
-  "model_id": "economic_spatial_assessor",
-  "name": "Economic Spatial Assessor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "economic_spatial_assessor",
+  "name": "Property Value Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "analysis",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Economic Spatial Assessor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates median property value of an area.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "median_value"
+    ],
+    "units": [
+      "currency m-2"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Property transaction statistics aggregated to chips.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "88ec2e501f394e2fc8c6841b163f63173a610707798d61197eba23ddd990b527",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "958d9918b5dbb8f52a930618816c27a8c3e7534aef6eb190897158061cbd558a",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "a6ec356d968ae19b12eabe8731b9323ea2a04e4eea613981f1c76a88a9ec5fcd",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "economic_spatial_assessor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494481,
+      "weights_digest": "2ff065cce8c5be3ebc4e46041b40b61caad22901bb5a3db1188bb69038b83281"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d065a29132e586e207d1a9be465f28e154600cfe4b83ee9e1a3fd623625c40bd",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3de665cc209fe63ab4b06b6f5e154a5c97c78a8fc70853e488ce90aa21374145",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "395f521d2e5d51a705401d620fbcb9e0e99bc3b5e9a8b7c43aca1580b4b61b8b",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "economic_spatial_assessor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3745057,
+      "weights_digest": "6e8167e448e263235d2ef9e8835d0096efd5deba8a407519a4999bbfd6deb988"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9c6474b7b6168e2844ef81917d72cac159456a70fa8e3e63d9ae6174ae7e4267",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7689a2b9550a9ddd9afdcb4df15128cc4dfbf0c3ff2be1565984c1fe6e0d2a9c",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "30d03f3d9601b43c7556aa544ddaf45383eb183226e3b17ec4d6e9c5115cab34",
-          "size_bytes": 191
-        }
-      ]
+      "model_id": "economic_spatial_assessor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14606065,
+      "weights_digest": "70912f0e6f7064f69fb6b7ad42acb8e108fa9149cad4f9a23d4293cee939caa1"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ef9b2485a7aa7d15158bf2febfdba517b6dfec8094c0f19b5922b8dc081cb1cd",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "413a300ea1ac8f975c274de7452a5c00643fe203dfd0e4e68cd71036d9885791",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "fe1d63a53c42d0e04dd7af7a8eb29cb6baa9232f7f2313a0d8a4128e5a915d82",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "economic_spatial_assessor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37762369,
+      "weights_digest": "f9795d6d0a1d4084e103f159c7594805821e303c8947fcb5652ea22e400bc0cf"
     }
-  },
-  "capabilities": [
-    "economic_spatial_assessor"
-  ]
+  }
 }

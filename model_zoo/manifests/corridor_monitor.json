@@ -1,91 +1,77 @@
 {
-  "model_id": "corridor_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "corridor_monitor",
   "name": "Corridor Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
-  "architecture": "siamese_unet",
+  "domain": "assets",
+  "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Corridor Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments vegetation encroachment and structures in infrastructure corridors.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "vegetation_encroachment",
+      "structure"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Masks of vegetation encroachment and structures.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery",
+    "LiDAR-derived orthophotos"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "725b52028075e372c46c249877d4e88356b011160e46d848c5c812a17aa02b8b",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3ac90759be5e886dcc76148ef47a012acbe52c087380dbcc1a6afd567df65a27",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "49362ea519720f1e7a97071e0e6c7c0a0b4a6bc2ea6c2f52bda15cf16104873d",
-          "size_bytes": 419
-        }
-      ]
+      "model_id": "corridor_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732963,
+      "weights_digest": "ec2bc9ff88a8991f49859f3c0ace3b6a1b7b23165d15681805b64df3449e3dc1"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0e08d2dd45db913e2acce8d27f54f1567eeb6c8f2e5fb256a25a4c4d71610843",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1a98609f93be5961acabfbae53d5f47d411ffc7ff7342ecf33156afb9b269dc8",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "3e6b7cc1820a90783de6db9408c0c488a1dec332a1c8f2af713041ae9b61ad51",
-          "size_bytes": 419
-        }
-      ]
+      "model_id": "corridor_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058499,
+      "weights_digest": "ba47e3406cc352a1a11453f1adb6cc3f616f114628def39b32cf301f8cc56282"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6e8b1006fca99800d69f5bb01e1492b98948a3c18864592c311344cfc2689af5",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c90dfb3d49756efbad66170a4fd1be0182d3c895adad9a8dae77d5e88c28b7dd",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "d5d32075448220c07851134461ecd51c3434e683416bd00cd9df06cd144d01d1",
-          "size_bytes": 423
-        }
-      ]
+      "model_id": "corridor_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059171,
+      "weights_digest": "bcd3af775ed9e81098ac480d56272d14e22c9c522282d39157d7a4db24d02c56"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6bbf57cf8f452a5610d57734947cf190c40fec04ae760548fcec6c9bad58072a",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "abd180560a5c647596929fdfff582bf456cf249395a4353054a41efcdf7bdf3a",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "acd98370f23f8d1f53b05db56e04b198a653ae8f1b1254d361a7acf7bfa299a2",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "corridor_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450691,
+      "weights_digest": "d55e90f1478f3d7161ba31de89ced31efe08284d674454e0da7aa393e31ae62d"
     }
-  },
-  "capabilities": [
-    "corridor_monitor"
-  ]
+  }
 }

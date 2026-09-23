@@ -1,91 +1,95 @@
 {
-  "model_id": "natural_resources_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "natural_resources_monitor",
   "name": "Natural Resources Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "environment",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Natural Resources Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates above-ground biomass.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "VV",
+      "VH"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "VV",
+      "VH"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "above_ground_biomass"
+    ],
+    "units": [
+      "Mg ha-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Biomass plots or LiDAR-derived biomass rasters.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Sentinel-1 GRD"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f9412dc1daefb942b6b9c16d6c96e36bb95cb7e467827d5872ef6124d1029f19",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "881d9f5ee3261e37138029f7224718fdf664d2dbb0f7f831a375513a02f640c9",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "9d8a673ac6b8f529d833210f7d572288ba0311311af720111e56f1b8c8794b4b",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "natural_resources_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "d27319da1335cfe9905b04f157df5879866927ddaa42a95ee777dfa76aea2ae4"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8ce807b9e27a4b50aab42181cb72e30b7f9d2692205017c726f78db69649d69a",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0f634a84061b7b7477827187483defb0f7f92371b81894eae6400c25f444dcc2",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "3208c120cbd585d07ed3fcef176bca4a431d4cae27e8fde8b947b8243f5e3b3f",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "natural_resources_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "f2980a3e09949456108cb9b73d734dd2d8234445828218f21a12cc6d0125f52f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "076723843f052ec89ad610ae08d8b7b9f289b3db00944e1642eb8d4acb92d364",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ff00758d13ffb43e5aef4aa11853668fa7998e5af86437e8216e33815a65c388",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "fcd1aac91d80aea91c94f49a7f3df1e2131740104cbda8d2ad0baec24d921509",
-          "size_bytes": 191
-        }
-      ]
+      "model_id": "natural_resources_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "19b4bf3a8c8247fd7e3d4389396833110aa74a05c241744076782429ef1f5217"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "280f6d2f55d0f22b688b0617e3f81d51843e49f8698733215aa6db35471ef00f",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "518add4a121cfcb75b356b33aa657ee6fd53435026c7831c00d7fd426b871160",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "e9d0d7beacb7f65286823e2d808044c5c8994959b0105e44426ccc5935abf731",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "natural_resources_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "3f2eee761aeb22bf83c9ab61b6967c9e0dcf6c3421631839ad8c8883b021a9bd"
     }
-  },
-  "capabilities": [
-    "natural_resources_monitor"
-  ]
+  }
 }

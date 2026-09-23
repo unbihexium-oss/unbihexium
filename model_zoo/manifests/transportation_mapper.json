@@ -1,91 +1,78 @@
 {
-  "model_id": "transportation_mapper",
+  "$schema": "../manifest.schema.json",
+  "family": "transportation_mapper",
   "name": "Transportation Mapper",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "urban",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Transportation Mapper model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps roads, railways, airports and ports.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "road",
+      "railway",
+      "airport",
+      "port"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Transport infrastructure masks.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "00c758e41cc10f236a1e335deb437030b010fe3dbcf25902d353fc21387a09d0",
-          "size_bytes": 3732
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0e335e02ef91b4d2c931bfecd88c514e42440f7da0ef8de7fbbd053145a960fc",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "817e6c5af9e9f0e5d9323c4d2b1fb70f9d4f39a7ebe02e555b526d6e6614e140",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "transportation_mapper_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732997,
+      "weights_digest": "f3ed543f5d34bcd34dc81921822658cc10f3bea7ab5233ba7489e5ca4a65f9fc"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7b27603b57a07d69e51bf2d2990abfdf90469cde47be28d4e3caa244c4dd99a2",
-          "size_bytes": 30475
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e57f0d0e558fceaf93efa220d03c93faee9d6cd88266fe863092ac6f40f0fc50",
-          "size_bytes": 32305
-        },
-        {
-          "name": "config.json",
-          "sha256": "2d8f9a3a979811778cf121a65063f1299014b5df9101416a9ad6cbafd7949791",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "transportation_mapper_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058565,
+      "weights_digest": "84246a158a97156c22b43d84dad10ae945b601165587225fb5d5c58ddfbf8370"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ed504299b2996a80cbc0d0eb6dfde6a75fbff587d0dd744ba7edbaeae399c0bc",
-          "size_bytes": 112725
-        },
-        {
-          "name": "model.pt",
-          "sha256": "491d2a188ad702faec93ac9025c1c4642b84aaef8343e7406c27887e276e5823",
-          "size_bytes": 114545
-        },
-        {
-          "name": "config.json",
-          "sha256": "0fc7b7ed153920de009e5b0fa19da565361fad5668cd636b10222dc7ee1a5c51",
-          "size_bytes": 429
-        }
-      ]
+      "model_id": "transportation_mapper_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059269,
+      "weights_digest": "96d78953a4d9fe76ca2821bfd86cbdbc40feb79e77ca3394be9b832c23d661d0"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d4c3ce91a8cdbef7c98383b455fc127416509add92b32749a06a43abd6996b94",
-          "size_bytes": 436953
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3cc66e7be561fc6e2b4b0da14047351a678d449ac1b865c4e254be2b653efa99",
-          "size_bytes": 438769
-        },
-        {
-          "name": "config.json",
-          "sha256": "ab2ffbeb76892a81fa627d48806fed7eb29d73c91513774d551cd25a707261ae",
-          "size_bytes": 427
-        }
-      ]
+      "model_id": "transportation_mapper_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450821,
+      "weights_digest": "6cc303347eaf848f8c9c4b57b2c220141c6fb8aad9dfb0aa22d384992d6c4449"
     }
-  },
-  "capabilities": [
-    "transportation_mapper"
-  ]
+  }
 }

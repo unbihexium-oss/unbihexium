@@ -1,91 +1,95 @@
 {
-  "model_id": "thematic_mapper",
+  "$schema": "../manifest.schema.json",
+  "family": "thematic_mapper",
   "name": "Thematic Mapper",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "imaging",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Thematic Mapper model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Eight-class thematic mapping for general land cover mapping projects.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "artificial",
+      "agricultural",
+      "forest",
+      "grassland",
+      "wetland",
+      "water",
+      "bare",
+      "snow_ice"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Thematic masks.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "25e24896e1648a8ea728d768e8230a00a799ce5c13079406084898da57c145f5",
-          "size_bytes": 3732
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d151b727d73d1dcca5ef80119ea51fbfc06478c0a3ac3169df344ce9f56046e4",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "e6667608075c95aad1dfd7f1152f16de3510871ffa64795ee94deb9c70d0f3b5",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "thematic_mapper_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734056,
+      "weights_digest": "f9196c950cc627da321a2a283cd5f8d39f2dcb252dcdae2cfcd4429e7d43a996"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f2dc9a69c63149169f19724c4dc9343c5ea42915ad3bf407e19ab6e872ea4282",
-          "size_bytes": 30475
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ab9527a4750f90047f77bdf74ea4faed88341e031ae837dd6be09a460b962f90",
-          "size_bytes": 32305
-        },
-        {
-          "name": "config.json",
-          "sha256": "8a78187d2d6ea32b52d4dab178730a6f1ad229227af62f2ac4adf1364d1ea369",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "thematic_mapper_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060680,
+      "weights_digest": "ebf52dc3a51492c339ba99f7502013363c3da738af0e53e9a7cccbd007103225"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4f7910ee3fda99a163cd9212838760ba53c7ab6f65b613992940e85bef34ef2b",
-          "size_bytes": 112725
-        },
-        {
-          "name": "model.pt",
-          "sha256": "88f0436f8c69156e7524660e2b9d5ce1b62985bd273e071dd666f9a635ab9156",
-          "size_bytes": 114545
-        },
-        {
-          "name": "config.json",
-          "sha256": "67ff1b6a6627bd12e366a4ec9eff28ca4b3ae32c3febae178b44b24ab58ca300",
-          "size_bytes": 428
-        }
-      ]
+      "model_id": "thematic_mapper_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062440,
+      "weights_digest": "713b4d1d277799d30892dbd92eff23984c3aa9c722bc10f9ebe5bbb0f7d54e2c"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "57e74b21db7f9e267f786e67a318c30ab4672920f4e8db36e0683fa95979381b",
-          "size_bytes": 436953
-        },
-        {
-          "name": "model.pt",
-          "sha256": "35a9444ce0bdaa6d78e52169708b6c0c00816e61f40f7cb284d0db76a9294e20",
-          "size_bytes": 438769
-        },
-        {
-          "name": "config.json",
-          "sha256": "78b721705848b0075985eb37857ec201652f80c2ad09784512e2b401b5446a76",
-          "size_bytes": 426
-        }
-      ]
+      "model_id": "thematic_mapper_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455048,
+      "weights_digest": "638d4ffd4b0f4dc73b67de5178c7f59a1fb9ac5ea8cba6b768f156aefcaf2eca"
     }
-  },
-  "capabilities": [
-    "thematic_mapper"
-  ]
+  }
 }

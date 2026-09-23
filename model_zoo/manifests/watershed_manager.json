@@ -1,91 +1,98 @@
 {
-  "model_id": "watershed_manager",
-  "name": "Watershed Manager",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "watershed_manager",
+  "name": "Runoff Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "water",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Watershed Manager model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates a runoff coefficient per pixel for watershed management.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "runoff_coefficient"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Runoff coefficients from hydrological models.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "66e33943309cd2e9a4f71fcfb92ec59e5bb4672dc78c240da98b7c3077f1a639",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f7b7a585a282c4f2cc0ac42ef84b8349cc94f5d64a235707fef0ea6c732d5665",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "961ea7a78d4b2f8f2c7dac6bcef655b5d6e9f4ff3d9307c16da2b3302acaa6bd",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "watershed_manager_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "2a9a91c2481cf440ecb8e6eecda7cedbbb788a13d73c61e8ce97584033c3ae4f"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3a549ea1c315947c91e65d64029182806dc2c6e437c7ac63a1362ab013afca1d",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "66be6807129ce0d711ba2b4a2ca20ad4a6eef4939b3104d1e3aa192b891c6733",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "14ff65442b922f3f9f815c8a5062a77cf0d265c7319e1010db391f6dd597f4ef",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "watershed_manager_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "0b2fbc471ae2e2d3c1b64a2d320ade44b12fac53224ee4bafd732d7cae91e984"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "697212723dd1ee2ba02956bc5c4c22151c7bbb20e808c69e9eaf3c7f87ce3009",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6d3eb8ee0408fdf42f18bc061e9c388f986e18adba2e1af9ae59f322ff2b0328",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "600d10dda665f1f65315552ac530e1e8f9d88563aaabfd25e1363c7e35ad2615",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "watershed_manager_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "56eb558146cf7fd10930c6233320b6e6418dde682ff05c97a13f3920a7ca1214"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7aa4fcb3947c69611019bef8d91586ea07e30f41c72e7d30573720a39181b145",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a3e0bd8f60d4d30c4b22e1b68aefe1d1f2ad8cb919743ca6c45dffb7b452f07a",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "b61631a6e393934894aa841ceadefcbd8c73772ab5f9451ad15963ccd1b129db",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "watershed_manager_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "a2e82c8329b20cab796a0870f69afe686d801f28d3020cdd4f6212c32a0a4628"
     }
-  },
-  "capabilities": [
-    "watershed_manager"
-  ]
+  }
 }

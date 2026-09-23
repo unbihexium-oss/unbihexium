@@ -1,91 +1,74 @@
 {
-  "model_id": "vegetation_condition",
-  "name": "Vegetation Condition",
-  "version": "1.0.0",
-  "task": "index",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "vegetation_condition",
+  "name": "Vegetation Condition Index",
+  "version": "2.0.0",
+  "task": "spectral_index",
+  "domain": "indices",
+  "architecture": "spectral_formula",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Vegetation Condition model for index.",
-  "artifacts": {
+  "status": "reference",
+  "trained": false,
+  "description": "Vegetation Condition Index, (NDVI - NDVImin) / (NDVImax - NDVImin) (Kogan, 1995).",
+  "inputs": {
+    "bands": [
+      "ndvi",
+      "ndvi_min",
+      "ndvi_max"
+    ],
+    "dates": 1,
+    "channels": [
+      "ndvi",
+      "ndvi_min",
+      "ndvi_max"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vci"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": "vci",
+    "layout": "Tensor (N, 1, H, W) with the index value; NaN where undefined."
+  },
+  "training_labels": "None, the formula needs no training.",
+  "data_sources": [
+    "NDVI with its multi-year per-pixel minimum and maximum"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "97e5fb8fe5bb5e6ad0768636a1c705e89b3ae0b7e040b1b781c1d0999ba341f8",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b8a1440566a6832ddbdec72bad010dc57a484b7f5371de0b60b3985c94af300a",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "2173aa8dff00bbd39ea62f0b3a2d6513d3e1f7f9a044de1e7241a018a51aa664",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "vegetation_condition_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c6ea69a71ec0353846b9f4636223e7b5bd8f1170ca5aa7f910505dd96a44c0e4",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "00cf5f8341cc378c268d148644f5268a4f0f47a4cc6466c59199192973602bf9",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "3fc2947db4b9ee7117d0ceb7df5171d8f08e5939379e71d242ed635dba4bc68d",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "vegetation_condition_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e266b2e0b0720c7fa404f394aecf8811d38509096732221a0eebfd5fe62910da",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e524a4d7eb8cc090a8ddb98fbe92ed9897ff73fc997af7eed628b3a7be32c8ec",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "e8fd66c955014d14a14e9d90a53daeac2cc6626d7916fc43834984144741faf2",
-          "size_bytes": 359
-        }
-      ]
+      "model_id": "vegetation_condition_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5d15b14fd44f62ef2327dd6c7e8034880065bb715b07705ecdfda2c71438312f",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fa3e43c17db027ea1e6021637a44d4f44a01a79ba3fd11408789adcbed040beb",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "529a9890bf908b7445b1fb8df3f9db18dedfcf3343cf88f5f3a46b7d4070e506",
-          "size_bytes": 357
-        }
-      ]
+      "model_id": "vegetation_condition_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
-  },
-  "capabilities": [
-    "vegetation_condition"
-  ]
+  }
 }

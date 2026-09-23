@@ -1,91 +1,93 @@
 {
-  "model_id": "disaster_management",
-  "name": "Disaster Management",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "disaster_management",
+  "name": "Disaster Impact Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "risk",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Disaster Management model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the fraction of an area affected by a disaster.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "affected_fraction"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Affected area fractions from damage assessments.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0b87c3cfa3e5a447961b948c18c7e83f93f78b15ae2e33b043c6f97e7e00bfbb",
-          "size_bytes": 1483
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f614f869ff7af4c398e0b957e0c827d954dda10075b73142dbc92e826156c8d9",
-          "size_bytes": 3581
-        },
-        {
-          "name": "config.json",
-          "sha256": "9cc698bc31a084097bb7df4c84a5712013adecddc766fdfe654440c465ff06af",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "disaster_management_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 495489,
+      "weights_digest": "b3f38a14f38f502a5b4ad73a9b2242df2937403b7e8071e2b6d75002617f6f32"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2d4cb5d064e16c0fe87f8521187fea3b3262aa73303effefcc72f6998a71837a",
-          "size_bytes": 5037
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ac773761925eacae2b719445f1666e7d6a03df00525052a23f2827e235360afc",
-          "size_bytes": 6973
-        },
-        {
-          "name": "config.json",
-          "sha256": "c0bc915b731f350fec0c137eb9d456547d320f5fbf47f5d75e4cfa2c1858631f",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "disaster_management_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3747073,
+      "weights_digest": "06b7bdc48cb4713d5cab6b0a202cd31078bb6cd3e74ed792922f8253fbf31a79"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4d8753e5a6f3bf92d3ddb5d77e0b78657321cac0dff3295d780391258196e69b",
-          "size_bytes": 13361
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8594d1ae8931fa6cfbc68d46bca5c4c862d1b298db6b248f0f00398148df576a",
-          "size_bytes": 15293
-        },
-        {
-          "name": "config.json",
-          "sha256": "41eb02192f71d2f89c6ea72dc63e5092cfbbef926668e2a75183d544709cef01",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "disaster_management_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14609089,
+      "weights_digest": "640b137d2c0617054c5277e515cafe36a854a916419246684327653739392299"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c53f0ee5f609c6e4d635b2dbf0788be52d84cdd6adae602cf5a477cbf27415ba",
-          "size_bytes": 42295
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ce60b59c998591694f3854c38c62a11a44b76ad3bad45c5e4a4ed7fb0b5f2730",
-          "size_bytes": 44221
-        },
-        {
-          "name": "config.json",
-          "sha256": "1a87fcda3dc291012caecfc77780c8d91610e940203908e7c52bf1ff2b2df1e4",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "disaster_management_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37766401,
+      "weights_digest": "ac8395efc2a2397f0c58851fd314110330fdcf8e60aff8fb65fc38fb23b6a2ac"
     }
-  },
-  "capabilities": [
-    "disaster_management"
-  ]
+  }
 }

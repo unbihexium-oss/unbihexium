@@ -1,91 +1,74 @@
 {
-  "model_id": "greenhouse_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "greenhouse_detector",
   "name": "Greenhouse Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "agriculture",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Greenhouse Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects greenhouses and plastic-covered crops.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "greenhouse"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of greenhouses.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0e7c1b67058db38ad04d2c2de42a604c93037a9f107ae08004d8a7931cde2364",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ff103edca6c4f0268a09a9ef6f3408521f3bad18266465873851ad2b334edca9",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "009c7e15c1df8719bd448124671a0905c4ea2a92bfb1b236fddd4315ae30e7bd",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "greenhouse_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "8db653f0b6d4068c9796488dae44631910182b1fbf02506bea7f3c6f666c6553"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9a750d39bfed05c74b9a2fc08e3f1500329c1ae6891c3da8a9e2ceb4e8519a5f",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "78917ac42adbc6dc19486da4b22207f0a7840045eb892c289788694e72757beb",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "55905f299caabb3fb5d3e786e35943bfd77567e2be1930792340e1569179eaf0",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "greenhouse_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "7c91dc83efd4ce7cc941ca7701bc9e8efd06baa0cffdaa9eee4300955232e384"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "be46cfb03235fdc8cdf56e4f5b2424e81d7e065b82ad18cc8da73a4a2e43a7a9",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "179610b1cd83e987cc5af5b367f6af9b9832da35beaff152e20b54ea37951a7d",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "7af9f08ec6c31072f9f539a74820e081457ec074eb6ce5ef2096fff233f5bc9a",
-          "size_bytes": 409
-        }
-      ]
+      "model_id": "greenhouse_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "983358d35f4cd760f985dd42c6d05128fa532a6a18d5e5eed5d92a0577827ab7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "63deb474847a5e098cae7410026f74418be8879f262a16b3f9a68863b474a4a3",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2354211ce431be28c58b05083a50257b4573fcf8a112c500af9d5a95d7203110",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "f127fe65fbbefebde555d946961a28ab979a1e0c0930f591924e88cee287545b",
-          "size_bytes": 407
-        }
-      ]
+      "model_id": "greenhouse_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "f90ede7b8a2853607794f47a4d6490ac3be87e00dbd47fbce93e9bdf02a9f15f"
     }
-  },
-  "capabilities": [
-    "greenhouse_detector"
-  ]
+  }
 }

@@ -1,91 +1,95 @@
 {
-  "model_id": "flood_risk_assessor",
-  "name": "Flood Risk Assessor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "flood_risk_assessor",
+  "name": "Flood Depth Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "water",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Flood Risk Assessor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates flood water depth.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "water_depth"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Flood depth rasters from hydraulic models or surveys.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "531ea82cb498eab5bfc2a57b6dbeea0461f2c6c5e05edfed505a0121d86963d5",
-          "size_bytes": 1483
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2970a1a91c1f4e025de2caf613edeb56ecfc83317734b2c59ec45cc91a2e509d",
-          "size_bytes": 3581
-        },
-        {
-          "name": "config.json",
-          "sha256": "34e6deb8448a15fe636ac5136fa5600469107ef5897fef1dabf2e61dcd56981b",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "flood_risk_assessor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "a2fc58c46dfdedab73999fc026c4d4c629fb5273bde152418b8199da0e19f24c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "604d5090cd4eb0d99d0f248267519f6bfa56a6bcf2eda475250e6ece1240cfb1",
-          "size_bytes": 5037
-        },
-        {
-          "name": "model.pt",
-          "sha256": "30732b9eb83d024c3c4d20f05af4feabe42bc5aad37f057a823698d72160211b",
-          "size_bytes": 6973
-        },
-        {
-          "name": "config.json",
-          "sha256": "a4b5dd7c3e731e074e87b5bfa6932d379eb9dc7cc8aa73af64eb42106f7dd898",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "flood_risk_assessor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "6dc538b46911625c8bef8358aa460501bedc5d622825b33492ccc3cea9828d9b"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "57bae8894a5ab66774a27d68c1e2627a0648b024245be2216f0acf16fbd01532",
-          "size_bytes": 13361
-        },
-        {
-          "name": "model.pt",
-          "sha256": "29bbde3dcd1b36c3e097e9ac2d7139e86e47f3fc92c56fefdebd5b6200d4cf7f",
-          "size_bytes": 15293
-        },
-        {
-          "name": "config.json",
-          "sha256": "e61c2967e23ee3b5334005694ccb3d2d61294be1e6cba116be669ab2ad159735",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "flood_risk_assessor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "fd7a706be8d0cd351e54c6100793a03cc1da5917cd3ab0867a9946d3daa6b1f1"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "33e2801be751789a9147c76b41be9f74f825d1e6ed3651bb66b0784892e0058d",
-          "size_bytes": 42295
-        },
-        {
-          "name": "model.pt",
-          "sha256": "18c3064ef576b492552bcab56ffffc275e0e5ad190ace9319ba4e4765fa2b5c9",
-          "size_bytes": 44221
-        },
-        {
-          "name": "config.json",
-          "sha256": "281e25f0003d1bf4246d1d2b92829192a7bde9e0e0589157205fa66f0459eb6a",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "flood_risk_assessor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "cf1547c89f2514af3f7d90b612a8cdf3c5276fd20fd579e9bbe96ee25a1d986c"
     }
-  },
-  "capabilities": [
-    "flood_risk_assessor"
-  ]
+  }
 }

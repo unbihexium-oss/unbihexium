@@ -1,91 +1,78 @@
 {
-  "model_id": "plowed_land_detector",
-  "name": "Plowed Land Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "plowed_land_detector",
+  "name": "Ploughed Land Detector",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "agriculture",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Plowed Land Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments freshly ploughed fields.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "ploughed"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Masks of ploughed fields.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c2cae9b8ec8f3dd5ce67fdbd137fe7ab7e6c9c4b95f3c65e0340c2eb7b53f8ba",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "116c45f45ef764695a1e1c58ffc965c141390e400168475467d6fb24e9e10128",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "ad423a7aed7d5997d72e78917d51c3aa9d9cc1ec314cc541754015a8d9880fd6",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "plowed_land_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733090,
+      "weights_digest": "24f0e62c9edb9afd28cbd675ca77ce9184daafffee8c79ea92897e4d07c9d03a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "756d0be01c199bac204822d50bd781ca4c770fe12165788b2c5fba0035d39756",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e876f131f8f00acbcf6d11c09da7e022ffeb88bb30a01d1a7e346fe39b4af049",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "5c42526bfb9cf368c095f007bc08d8f6196ed945596d0c906ca646af4a7c79a9",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "plowed_land_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058754,
+      "weights_digest": "7408b45690fe0f8f78cfe9ab68ad4f1bbe16a611b11e06a20ea2c888f2e9fbc5"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "45eaa83349af71811125b8a0fc18da61075386775538c3b37589c106f283181b",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "21b30750caa59bd2437963e4228919507a838dee6d226a1a9d59294d65529f5a",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "83ab24c4b10a926275224760288d6bab87b9b6414149646651d9fd51d0a69ce0",
-          "size_bytes": 420
-        }
-      ]
+      "model_id": "plowed_land_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059554,
+      "weights_digest": "45150e185f1fe6bd1ad24597f90bfdc5bff751afb2fa9a7c4ec1be23915f3e79"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "deaa96c2b48e62d52d71d93606e94224384c34ed5b4bd531107a732122912de7",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "10d3c4c983581b9a6f7576e0d8b35f0be548ce3e84ef9e884ddf5373abf69517",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "98da95e6df0456782e780a7afbf6d20100e50b69b5837c943077b7e75e01572a",
-          "size_bytes": 418
-        }
-      ]
+      "model_id": "plowed_land_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451202,
+      "weights_digest": "410151017c4efda4df9a1a5d9c4cbe30ca73774691a604e6c268fb23d6987fd7"
     }
-  },
-  "capabilities": [
-    "plowed_land_detector"
-  ]
+  }
 }

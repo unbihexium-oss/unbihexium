@@ -1,91 +1,76 @@
 {
-  "model_id": "mosaic_processor",
-  "name": "Mosaic Processor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "mosaic_processor",
+  "name": "Mosaic Colour Harmoniser",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Mosaic Processor model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Harmonises the radiometry of a scene to a reference for seamless mosaics.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Radiometrically harmonised reference scenes.",
+  "data_sources": [
+    "RGB scenes of overlapping areas"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e35ca58e60667df2f6ffc71893450179a01031d5e95d6340c9ffc0ec1cb51e9c",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "76adb393747bd8554e351f2ebc17e08effe7873c8edb6c14a911c40fada9f769",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "74e5630dac0e8b643f5ff724d39d4edd7274e4c1f45c32b3b1542586095c6cd9",
-          "size_bytes": 357
-        }
-      ]
+      "model_id": "mosaic_processor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732963,
+      "weights_digest": "2dcbf9b255b9d225bac7c6967ddfc2dedc00e6b7841f790fba42420e84ec519c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "fabcf94f820ec8a9429eb168c8a0b3e3d9223ce34d1f5034cea82f40e7bb9110",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4463bcf2bcf0f7e13bc488aebaf59bce67197466de534a160f76f630c92e6ad8",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "75f968a26cc413bd675377aae9e996402930d27c94353d8694174ea14d808996",
-          "size_bytes": 357
-        }
-      ]
+      "model_id": "mosaic_processor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058499,
+      "weights_digest": "73d9224169e17fcb2ce467105dd119c692d8ed838e315ccf66c00618aae157a0"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bea9c82d253f606946626acd82a46e1413f7d1ef7d17cd7a4f57b474bde4fb81",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4dea1488e13bcb77b3ac6a337d9c358b14eba6ad91a24fa469a405aeed443fb1",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "f1c6e5e207e0bac245b5d081166f31e5bf2360ce99408dd1a4121040c68d2ed5",
-          "size_bytes": 361
-        }
-      ]
+      "model_id": "mosaic_processor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059171,
+      "weights_digest": "1de31e0db9503c4cf5d99a029d1f16e0c6f2bcd449767c0ecc19d8f2e0eb8576"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bb98e39900a0ec64851472f1f928c9a76d6db94aae655d76ea86d6ebb09c6a47",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "71de384667305d0172256e52b029e0ddb084db6a904754e86ebc0aa27e1625ea",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "b401c1e0afe8b004a99f4918e2b76adbcefffbf7047f51d5c39c8c9597f87255",
-          "size_bytes": 359
-        }
-      ]
+      "model_id": "mosaic_processor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450691,
+      "weights_digest": "519a9a69b9cc200023c0f77d253f8e7f81de6289f4e5efcd140a8db6889c3374"
     }
-  },
-  "capabilities": [
-    "mosaic_processor"
-  ]
+  }
 }

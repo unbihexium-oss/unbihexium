@@ -1,91 +1,72 @@
 {
-  "model_id": "sar_oil_spill_detector",
-  "name": "Sar Oil Spill Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_oil_spill_detector",
+  "name": "SAR Oil Spill Detector",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "sar",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Oil Spill Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Segments oil spills and look-alike dark areas on the sea surface.",
+  "inputs": {
+    "bands": [
+      "VV"
+    ],
+    "dates": 1,
+    "channels": [
+      "VV"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "sea",
+      "oil_spill",
+      "look_alike"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Oil spill and look-alike masks.",
+  "data_sources": [
+    "Sentinel-1 GRD VV"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "eb23d6577764858afdf1fbc7cb1d6f1c73261663d80ffd9f69979abae086ab99",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7a064a6e56e4f7fcb65de810fb72205044922422e1c06b9a52e6f4ad405500fb",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "8fc25a4d4a62551f29ed929bc6ad09f268d7f9b7aeb67f31e1cc2f52c8e20ea1",
-          "size_bytes": 412
-        }
-      ]
+      "model_id": "sar_oil_spill_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732675,
+      "weights_digest": "34e6315e38428d4454d9d3cd351eee876c38e25f2c20297e3530fbdd7f0fca6f"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "80a3aa6ff251fadb8b1e1a60e7bdfe9759abe018ff82409a62103bee26326997",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1f5632e414ceb5c230cafd0c31da9ad2f151e51408b1e32190f68fd11513efa3",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "a9d8734dbfe33a679a0a2d3310b63b5059ab2968d766fc0820b2ce298c8f9559",
-          "size_bytes": 412
-        }
-      ]
+      "model_id": "sar_oil_spill_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7057923,
+      "weights_digest": "8e3dba451538dab92a4a069adbcc08d976b154c1e050146b8fd4b69caad9c141"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9773a22daf6c92e2508368d57bc9bf18b1e981d793d14dede0581e0cda8da739",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d19a79ce9c749615377d460cdfeb1790586f41ca6e8853d39dcc4dc8e7ce12e2",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "db86a06f6d4e838a8eb04ebe5c7900eef2cdbc75e184f320684cb0c4ffa922be",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "sar_oil_spill_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058307,
+      "weights_digest": "09b1edf6c7018fe07cc7b1a09e5b6c838f252bd601893b0616a53d8938e2c749"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b02dbcdf8c24caabece9857b28e34ebbbd700d4a00bed029f22a48335e28f7d7",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6ff34b8e3917ed9c64576542b88f1b00e209937bfa269842164a5467230e6885",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "4f2cfd6c7cd1ea4751378df2e2d012f75db1906ab60b05c032a3677199a593c2",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "sar_oil_spill_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449539,
+      "weights_digest": "166cc2baf3aa8ee68fbb5b5cd1d8cb7024fdeabe3941d476ee64bb7c3061e6a8"
     }
-  },
-  "capabilities": [
-    "sar_oil_spill_detector"
-  ]
+  }
 }

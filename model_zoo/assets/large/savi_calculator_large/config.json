@@ -1,8 +1,0 @@
-{
-  "model_id": "savi_calculator_large",
-  "task": "index",
-  "variant": "large",
-  "params": 1664643,
-  "resolution": 256,
-  "base_channels": 96
-}

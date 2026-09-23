@@ -1,91 +1,79 @@
 {
-  "model_id": "spatial_relationship",
-  "name": "Spatial Relationship",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "spatial_relationship",
+  "name": "Proximity Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "analysis",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Spatial Relationship model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the distance to the nearest mapped feature of interest.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "distance"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Distance rasters derived from reference vector data.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4c91a3cc7884ab739a4743cb883c401c703d21bac98cfb18debb4185666b5080",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b902b37f9ecbd9a242c376b56a4c30cc73d7d22fb988706d780500cda1702266",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "38ac42ceb151b119165b07ee9bbf5838182dd033f447fe5ff5c7d18ee9450b99",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "spatial_relationship_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733073,
+      "weights_digest": "34a626d26f59a6f1cc0a0bf6203357199c5c66f039915f6cd62228620debe6d2"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5b09fdcdd85415a667949252eee3bd29872f487154c547ca69c5ca2b2cd9bb98",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "05e39c8b26fa1a35af3ee576f7b56ceedf861f19938e377c8118128eb87748d7",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "ab793cc682c9d78c3741a5fde4435f60c036906cd1590c6b00cc0a9551030a5b",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "spatial_relationship_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058721,
+      "weights_digest": "5b5080873cae7ce4feabf12a7df397d2863156b4c8a6e28a798133dc4209db73"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d3c14681dc36e406143e2dbe62b040287a35e22dc28dee2ee05a33ea5c55c66d",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d134e9e835aa254169c6b65f3840245c7a22348789bf384d42c218e5b525d6be",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "1c62714c08107d804eaf8a3f825e71d26c046cf8761fea96b2704fff4cef82c7",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "spatial_relationship_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059505,
+      "weights_digest": "0368cb8a6a3c087ad3076d11e12b9837219ec58f57a2b585fdb020426fa73731"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "64dc1e34a4bb4b2e84a67339ff2adb264a876b3fe1df344a8b0d753e27e3323c",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f1d88cf230f1daa12fd72933417b1b65c7028e16e2eca393a40472939e39252a",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "54aa6eeaf49003b547c82903cd3b88946152553cce0e6f89755d217471432e64",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "spatial_relationship_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451137,
+      "weights_digest": "4837ca2f8e275f88bdb21735b1c437db737bc388662d74852d40a20a493319d6"
     }
-  },
-  "capabilities": [
-    "spatial_relationship"
-  ]
+  }
 }

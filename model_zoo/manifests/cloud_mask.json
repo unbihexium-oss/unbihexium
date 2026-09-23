@@ -1,91 +1,97 @@
 {
-  "model_id": "cloud_mask",
-  "name": "Cloud Mask",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "cloud_mask",
+  "name": "Cloud and Shadow Mask",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "imaging",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Cloud Mask model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Masks clear sky, thick cloud, thin cloud and cloud shadow in Sentinel-2 imagery.",
+  "inputs": {
+    "bands": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B09",
+      "B10",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B09",
+      "B10",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "clear",
+      "thick_cloud",
+      "thin_cloud",
+      "cloud_shadow"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Cloud and shadow masks.",
+  "data_sources": [
+    "Sentinel-2 L1C"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dab0a45c55a0ce0c65b8245cb9f56b1b73c1802b024350d741c527e327c6d06c",
-          "size_bytes": 3732
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ca127b55215c0c85d1ac1ba8ec7f8873f1a1cb34ddc8c7fc3130693a1b7b412f",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "761e83a4e3c52c3195c1a80df2ea30e32d03e1627df556553ad7c44e9e171a1c",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "cloud_mask_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734420,
+      "weights_digest": "85edd633f829bf55ff4f2f03df587182fddd9f020b18bc429f40b984db9334f0"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3be7b614d15707dd52f174ae5057d2f4a477fefe702efc398cac928ed6a22eb2",
-          "size_bytes": 30475
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d8b5cbd4ecf536668747447de6b0c23248bc83c7a0ecd324763d7204f6817d35",
-          "size_bytes": 32305
-        },
-        {
-          "name": "config.json",
-          "sha256": "6dcb2e23321c40c7552e8acc1c6c17a629eaa468fedde4d0b46af92c71b95b3d",
-          "size_bytes": 417
-        }
-      ]
+      "model_id": "cloud_mask_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061412,
+      "weights_digest": "b773e6718fc5f2c493f9a5027938ed872521f5494036ec9b500b4b07cb00b2d5"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2a6f175a4bec61adb13067860f1777825efc72b989a4ceaaca2d9c6e2894f504",
-          "size_bytes": 112725
-        },
-        {
-          "name": "model.pt",
-          "sha256": "09415ea98d3f9f6f4630eb23003a3b739c719438fa15cf3f1b722fa3c290253e",
-          "size_bytes": 114545
-        },
-        {
-          "name": "config.json",
-          "sha256": "6de4ba35f400f49d080fc599ec7a237580e8806e371446d63de4304c152cf6ea",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "cloud_mask_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22063540,
+      "weights_digest": "a2af64f7e0d48e6f13feef4afc2c3736f33a15a033535a39a17f20a30d843e64"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c13b965bb668b04f8ebb8fec17c950878e14222efc6746ce5f3d478c50f76c68",
-          "size_bytes": 436953
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2514158e23621ed3267ede6fc698f31d792d369520254fbad32b1f5a7ae60813",
-          "size_bytes": 438769
-        },
-        {
-          "name": "config.json",
-          "sha256": "49bfbfa2681ef106704a7f61e558bc3ce88cdea5dd4e0ceab39884a3ada4f51a",
-          "size_bytes": 419
-        }
-      ]
+      "model_id": "cloud_mask_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60456516,
+      "weights_digest": "34a798e7f197f30adc3992eddfc5627b381ec049d85c25739683b8d1a4a55a32"
     }
-  },
-  "capabilities": [
-    "cloud_mask"
-  ]
+  }
 }

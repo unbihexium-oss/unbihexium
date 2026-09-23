@@ -1,91 +1,98 @@
 {
-  "model_id": "landslide_risk",
-  "name": "Landslide Risk",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "landslide_risk",
+  "name": "Landslide Susceptibility",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "risk",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Landslide Risk model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates landslide susceptibility.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "susceptibility"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Landslide inventories converted to susceptibility targets.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2020e96a0cda8b6f698b027b2d57872378df20488dc249b4bfd0a5db4cd17c4c",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b3156eba93744e906fa5d7afff985372bdb4fda0a280fe02c2a82973c1c70e63",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "1e70fc85f158ba642b2da0cb4fe612717c57fc3bddc5fdb802312d348a867622",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "landslide_risk_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "76c05d1b8232f942d42abb85a1c6504104e89bb8297844c9a854e0b2c14b88a4"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "96be7d9e087698ff0d8337c5c1f168fe6b37dfc9973211904b43aadc174d6f53",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9367175d515bfd82fc2203b838ef568d6a9d7424bb2094ad37e855dfaca5ea37",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "84859aa5f311b7a3f0e036e69006158c3dda3ed4c12e629add14d46f51c2350e",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "landslide_risk_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "aaab659e40e3bf0ee88e63109fc863b0a66cb6c5f914dd0dda0ba2ba7121cb16"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "93051cb56ac355e1767a9fb68d294ddfb005387ec390f6d65a943e75e5405fb3",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1ba12d9aa8412d59011b0e3a737fdfd0456d9b142da7f851966909277253fb3a",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "f6bf2f4da6bae872a2cb05b30a553cef74b21f8f3ded703d0260674feb706abb",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "landslide_risk_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "c46572cb80c2774d33ab33eb65a8cac2a6a24ea71bd34700a4ed307191181d77"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "306c5b1a99ec13d2ed39ae4382d162b6c55969a3705fc7ab3778b697944707b6",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e63d79ce42331ee05d4278d09db11d10d35a1dcbff65afcdeac8a0f53046e843",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "f9f1551ed598d37dee009f88ff1144171e303f0f1f6491874be514fcf3e9d96a",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "landslide_risk_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "e63ecb93e3b6f56e289ac837d4270264ef5cff36d8e55f342677f8a6272fd734"
     }
-  },
-  "capabilities": [
-    "landslide_risk"
-  ]
+  }
 }

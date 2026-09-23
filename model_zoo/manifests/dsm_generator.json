@@ -1,91 +1,74 @@
 {
-  "model_id": "dsm_generator",
-  "name": "Dsm Generator",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "dsm_generator",
+  "name": "DSM from Stereo",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "imaging",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Dsm Generator model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates surface elevation including buildings and trees from a stereo pair.",
+  "inputs": {
+    "bands": [
+      "pan_t1",
+      "pan_t2"
+    ],
+    "dates": 1,
+    "channels": [
+      "pan_t1",
+      "pan_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "surface_elevation"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Reference DSMs, for example LiDAR.",
+  "data_sources": [
+    "Epipolar-rectified panchromatic stereo pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ba28b63e9b5afd35e354a72f7d2a98c6fb1844e96723292cf062f8c40678458a",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1812744e379ff2a9a1872bb0704dadb4a466619f0f148836710e0d975b514faf",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "cadac0a2455d4265d7e97c215db0e6b523967100752004aa46b02819ec77e349",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dsm_generator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732785,
+      "weights_digest": "9d7516759b69d2d64f4f66be11106ec9ef8c0283a139e5d1962300640928f252"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "db8c5f65b0843682744b22219636fb7f6458415a7af3fc90c7c7031b16e945fc",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f1ad7341576adbda1358d81bf0fb925d9826638361a8c7d37900589ba4219911",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "e81c2bcf96d7bb01b66532d70663e001857ce2228a7361558bc23db1f11f5356",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dsm_generator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058145,
+      "weights_digest": "b2c644df2849605d1df3649b084c424c3b2e4351498ce0fe460e52709178e33f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7c82f898f5478bcbb2358ab349689d17068268fbc342bc3955a2d68ddf1fc812",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c2aea3c0da4e2116a78385a73d5664e9b89903ddc7295d70c868f7900f6a66d2",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "c8e34a4a8ed81afcf8c5cb0e589f815ace8ecf1b5727ba4ab6092df877895d4e",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "dsm_generator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058641,
+      "weights_digest": "86e5271d2c1b947c84e8f24c3e0795c1a807a3ea80465155f89a2f3a8dc8d7f7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "481d8f223308177ea23095e707635a3de45a174cff154869176eacddaf3d739f",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "055c45474d55d4a84475cc533daf4a6995dee23493fa608d82a30a9ecfbc9d1e",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "e3be6e16aab1db50a8d15ec063110f3ee493cf39c8f1d17e5faf88f918698d64",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "dsm_generator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449985,
+      "weights_digest": "52f5bc5050c9db2f45b74dd1379dfbde44b090e1a932e8750d5681df4cec65a7"
     }
-  },
-  "capabilities": [
-    "dsm_generator"
-  ]
+  }
 }

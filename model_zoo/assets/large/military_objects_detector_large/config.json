@@ -1,8 +1,0 @@
-{
-  "model_id": "military_objects_detector_large",
-  "task": "detection",
-  "variant": "large",
-  "params": 1277859,
-  "resolution": 256,
-  "base_channels": 96
-}

@@ -1,91 +1,81 @@
 {
-  "model_id": "hydroelectric_monitor",
-  "name": "Hydroelectric Monitor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "hydroelectric_monitor",
+  "name": "Hydroelectric Reservoir Level Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "energy",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Hydroelectric Monitor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates water surface elevation of reservoirs.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir",
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir",
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "water_surface_elevation"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Reservoir level records.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ca65176c2a0f28693dc3c914231d8ab50648467a5ee69c7ff156876091467b50",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "35171d333b83c00fc39a65ce3d0ba769be04a32212cc0babd4f4ad313c96b91e",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "adb9091653b37c56b9b0990b7553326eaa40c0b600518fc056ae896122527649",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "hydroelectric_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733217,
+      "weights_digest": "023633fb7cd6098e0b19881824969eba9a5054ea075d22f6c6f4016d8dae3934"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cd4361c0c63cd2184baad4eea76754c6c6e26ab7ded4416380d605760238821b",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f280877da7b120c8a2938c39fef9a7527111864e974878c667d08127b3885447",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "27563675a82ab264607375065e3d1fb1d4fdde6a76322e6253a3c77878199b82",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "hydroelectric_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059009,
+      "weights_digest": "b1026387fdcb363fbf3097e30f203f4af3415ae5e604f78574ba543d245cfff9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d6623ff92db7426af139031ad0a5705fc7c07c007451784613147693ba77c267",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f76a9841f33fa745285a6c5ae8d0b36a662b9d6db039f720b0efd259bbba56b5",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "6bff8d72c807202efdcfd3d8f3af2e3f9ffff36a6e6d75a5e8115e4248179c27",
-          "size_bytes": 186
-        }
-      ]
+      "model_id": "hydroelectric_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059937,
+      "weights_digest": "14ea833799a5c3fd4df313025644f733f02ca89c6b23300d397462094ac35364"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cd2432beba4fd5f05f76c531d3929c0d2677b92520bb87ed23dbd4957fda2314",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7a9fe653ddd9b4802d16b6f4aafb3c8bb84f7428b13e09b51d851813cba13259",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "b08c38d458f8fd14e53bfbc819718e3e30a1e9d0158bfb9b1254356d3cbea4dc",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "hydroelectric_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451713,
+      "weights_digest": "7208aa646eb293fbbdb7bc11ad438c2b399e04ff851acaa3b1c1b1ff7956475e"
     }
-  },
-  "capabilities": [
-    "hydroelectric_monitor"
-  ]
+  }
 }

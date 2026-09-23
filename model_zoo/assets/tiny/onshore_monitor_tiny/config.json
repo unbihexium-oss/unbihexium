@@ -1,8 +1,0 @@
-{
-  "model_id": "onshore_monitor_tiny",
-  "task": "regression",
-  "variant": "tiny",
-  "params": 68481,
-  "resolution": 64,
-  "base_channels": 32
-}

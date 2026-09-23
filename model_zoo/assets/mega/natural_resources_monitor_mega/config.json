@@ -1,8 +1,0 @@
-{
-  "model_id": "natural_resources_monitor_mega",
-  "task": "regression",
-  "variant": "mega",
-  "params": 1060353,
-  "resolution": 512,
-  "base_channels": 128
-}

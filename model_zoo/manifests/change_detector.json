@@ -1,91 +1,78 @@
 {
-  "model_id": "change_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "change_detector",
   "name": "Change Detector",
-  "version": "1.0.0",
-  "task": "segmentation",
-  "architecture": "siamese_unet",
+  "version": "2.0.0",
+  "task": "change_detection",
+  "domain": "ai",
+  "architecture": "unet_early_fusion",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Change Detector model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Binary change detection between two dates.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 2,
+    "channels": [
+      "red_t1",
+      "green_t1",
+      "blue_t1",
+      "red_t2",
+      "green_t2",
+      "blue_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "no_change",
+      "change"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of change class logits; softmax over K."
+  },
+  "training_labels": "Binary change masks.",
+  "data_sources": [
+    "Co-registered RGB image pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "25424aac6f476e56f205dbda5308e2fa3a7389336d1092fbf71fc84c210a7d76",
-          "size_bytes": 3243
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7c9ba2df9df56367a794f4b325697bc7d389c1620850a8cdd23a77d64d5d7020",
-          "size_bytes": 5117
-        },
-        {
-          "name": "config.json",
-          "sha256": "9464c2b7e7e78814f9244c7894a9ed418a5c2fa2150c6f5cac778f05bf7be195",
-          "size_bytes": 420
-        }
-      ]
+      "model_id": "change_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733378,
+      "weights_digest": "ea42cf2f02884363b0fdde00e7db95c72984213fa6558793ec5021636ba7dba9"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0f5f2f2753e5f2d14d5217a5bda8c5aa57941f55ad4fedbe88ab5f67e9ba6b26",
-          "size_bytes": 23458
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ab64be94cbd905e813016bdfb1c9e60a46d884e7bed46c8e819ffe95e89abae5",
-          "size_bytes": 25213
-        },
-        {
-          "name": "config.json",
-          "sha256": "6010913c51a7f3b311ae60fb64288bdf710b7c4c3cc60bb2727e89a561562e4b",
-          "size_bytes": 420
-        }
-      ]
+      "model_id": "change_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059330,
+      "weights_digest": "4ade34ac830d494f44aad8c88bc40f25dd6ea3566f08b4b475d42afa95ec1d6a"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8cc0c7bbfdbd907e214be439e519f79cafaca4d3dc4cac1303bd9fb97f5a1905",
-          "size_bytes": 82664
-        },
-        {
-          "name": "model.pt",
-          "sha256": "63ea75b6408ec228c84aa56ff261f69606587e591d323c016a3ed3f5aa6edb72",
-          "size_bytes": 84413
-        },
-        {
-          "name": "config.json",
-          "sha256": "5bba43edf9e8a4f430f1ac61aa00d356ac683a9d333a5adbae302f1f33c533b7",
-          "size_bytes": 424
-        }
-      ]
+      "model_id": "change_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060418,
+      "weights_digest": "d48eb6e31d478d0c1896c500e9bbd4b53181394adee8a6e774ed82a17c8efc38"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8c52860bdbf41b29abdc59858cfbd266d90fd6019a43241f4b7ae433f3af7b15",
-          "size_bytes": 311659
-        },
-        {
-          "name": "model.pt",
-          "sha256": "344d01f6acc7e64dc88d3c15d9aa87cdfcf50b8ed11fc303c81d9ff3dbfaa65a",
-          "size_bytes": 313405
-        },
-        {
-          "name": "config.json",
-          "sha256": "5f287f320a5dff4ff191cb9f39dd2cd9b325498ca6ec2bf98518e483465725e4",
-          "size_bytes": 422
-        }
-      ]
+      "model_id": "change_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452354,
+      "weights_digest": "f2141f08b980fccec91ef7022ad1af20c9d65765deefc6c42c334f453bb44f28"
     }
-  },
-  "capabilities": [
-    "change_detector"
-  ]
+  }
 }

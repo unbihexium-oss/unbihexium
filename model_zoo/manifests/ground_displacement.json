@@ -1,91 +1,76 @@
 {
-  "model_id": "ground_displacement",
-  "name": "Ground Displacement",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "ground_displacement",
+  "name": "Ground Displacement Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "sar",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Ground Displacement model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates line-of-sight ground displacement from a wrapped interferogram.",
+  "inputs": {
+    "bands": [
+      "cos_phase",
+      "sin_phase",
+      "coherence"
+    ],
+    "dates": 1,
+    "channels": [
+      "cos_phase",
+      "sin_phase",
+      "coherence"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "los_displacement"
+    ],
+    "units": [
+      "mm"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Unwrapped displacement from InSAR processing or GNSS.",
+  "data_sources": [
+    "Sentinel-1 SLC interferograms"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2e6f9a9731a21cfde086b5b61970b34e3f22188b7a24abb49deb93e12211b769",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4f1492873430f85831a42a02b314646654d553e60cf4c9530cb0e91ac90655a5",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "aa222092e351433ed4a67a1710b479682208167c8b207e15c9c2632bae40a827",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "ground_displacement_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732929,
+      "weights_digest": "5f012425b3fc7e2cb722f4f44559cdf8bcc2af0dd4fc4e0971972c8a14c9e392"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cccd9862a5266c847b24bf4a65b5fa5009681888697f4e76e509e586af70141c",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "27155427d140012eb41d6088027a53e56d260858ef5b83b953ebd6293aa65514",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "85df284abf2a15f4140cfbe771ede654a5b971222f410cc44ca2f2e5255d33bc",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "ground_displacement_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058433,
+      "weights_digest": "1ca8eea69f89bcc095619604556d16b4d9739dd030b510f1f36107f9849c125c"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3e73a8199a1b48d5cbf088a029a2ce3650dffd24b38bf03eb7652a027aa91dee",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "dddb8959ac71d801853f009bb2094807ddfddd8efddb252627b29a72bfc31191",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "7f791f53815225dab9874f27e903d134eab2861f13c9a506aa2a28013bc01405",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "ground_displacement_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059073,
+      "weights_digest": "76646afd2a20587c86770c80c184f4733b4455e2e87ae6ace544ccfffe963034"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "967ecc4e6893f2f0899ee4b9cef465c42df0f0d5c3b0dc0559ce932d6d20d8d4",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2b8d77fd0ab0295909c6869dc7c8faf4dc443d69708d851e7cf5bc03ee0f7ccf",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "5f394eb10a5fa6b401cdd42ca3bd4e12fdcf7de98d2078559791d1f4f924d233",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "ground_displacement_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450561,
+      "weights_digest": "c6ac3460fcd3282659d7dd23f57adc64039a81543a0c2ad87ba42af25242d5b3"
     }
-  },
-  "capabilities": [
-    "ground_displacement"
-  ]
+  }
 }

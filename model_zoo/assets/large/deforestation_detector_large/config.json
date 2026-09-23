@@ -1,8 +1,0 @@
-{
-  "model_id": "deforestation_detector_large",
-  "task": "segmentation",
-  "variant": "large",
-  "params": 2312258,
-  "resolution": 256,
-  "base_channels": 96
-}

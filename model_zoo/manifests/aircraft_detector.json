@@ -1,91 +1,75 @@
 {
-  "model_id": "aircraft_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "aircraft_detector",
   "name": "Aircraft Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "ai",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Aircraft Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects aircraft on aprons, runways and in flight in very high resolution optical imagery.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "aircraft"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of aircraft.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery",
+    "0.3 to 1 m"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7550bebb90e4df5d93a333176e46543202b2ecde21181c9ab141ce31e79251dc",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f05126e1fb651726f8b5786c9053f6913d84feda9aff610474b28ed2e4a69df6",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "433a53cfb5aeb2692c92200479afab6e9117221066fd2aafb1d69985346d3c37",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "aircraft_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "2aff48b3ea0d3144de9d99410d8c5c766463334a6feb917d4ea742d91287ed74"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e79e9aed7d47365f478a9855a21ffeb7e50db3830eef89770f7250309a7a92ce",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1346b526beffcf51cb7024cf03cf2ea50bebf2555f3a56c274f710a989a853b9",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "74dca9d676957364ab491d8e92f28494a69000451ab64917f88b23ba281c598b",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "aircraft_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "81eae07c9662fc86a08b81242e0a46c15e9dab21db594057946a0efcf22ee26b"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "290df60c92afb9e7f3ccd1b6bcc1d5af29b8d13291d57696d810c5ba4147dac9",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "83dd009cd1b0e4ec74f185c559533ef7986e4a2bc9cf00020592474e11c4f017",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "b2f3a4922e07cd159d8b1896c466780031713dba7d67ec6db0752c2347c08f9b",
-          "size_bytes": 405
-        }
-      ]
+      "model_id": "aircraft_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "5d1fb2e5295d24b6c4853229c6b31a7cb95592c47836e4d130c552901ffef78e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bd53741a9bd5d371da6b55c3e846f01f5a070f39d5ab00b6ec452afc1888ba4f",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "dfb64c4359f0cd3f22ed69eea6a47deb09198f84f0f1b6bcda93399edf6f7d3b",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "e255229ee9b8324fc9ba115f6169b1515163beca236474e7cd21c03da89ce03b",
-          "size_bytes": 403
-        }
-      ]
+      "model_id": "aircraft_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "fda24e591f2d1169dbaade1fe303e63e3cf9afce63ea2d19b1df67a138ac39e0"
     }
-  },
-  "capabilities": [
-    "aircraft_detector"
-  ]
+  }
 }

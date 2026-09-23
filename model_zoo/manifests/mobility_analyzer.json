@@ -1,91 +1,91 @@
 {
-  "model_id": "mobility_analyzer",
-  "name": "Mobility Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "mobility_analyzer",
+  "name": "Mobility Analyser",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "urban",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Mobility Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates traffic intensity per pixel on the road network.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "traffic_intensity"
+    ],
+    "units": [
+      "vehicles h-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Traffic counts interpolated along roads.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "road distance and population rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b54573c949ac995d35418b1cc3afa0c8da88a5eb01111dab0adcaa4eb391f4ea",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bdb0d4701252c8791d48c0345c4f93e7b84d08a5b9f683c2eb561d960eb6daed",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "17a49dbe644466c2975b3e8f4a96e52b03964ee4f3d80030c21a5134f80a2189",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "mobility_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "ac453351dc880200d9ce7830b74ab3c5665f4022f58aa3ae9acbe471b1a445ae"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "db98c88d2547d7eaf02e088bb6fc7ec9a6af9343f4d3ae36571f7fdccbbc74d3",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1e2eefa31114564df9c0faa9d5e9e7882e3235110d7a23b25c5ebf60c2f25417",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "82a303ea618a3a79566009da59395bf136f2b5899f0e19247cf09bfc75076fb2",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "mobility_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "68631806686b2eed24e532b86d3430f88b3efd0f2a4411d207e3a1f889e62138"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "054117aef0e12265be98bf8c7dbfff3c8a40b1fbc59a9424b9145a474293649f",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6ee4b58c0119a0162ca36af0a440d48f86f75500e9fbbdae2bf3c3b54da40520",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "4a253f66ac7cfca39bf9bab6d38dfc87da20a7d8c89f671614b6f074635d6ca0",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "mobility_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "837e639377e8835e8062983af1a65149cb3aeaf6d9df70d5d6a5ef9598cecdf7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "907db0c285159ef1329f66dbcda1e410f9c6c22cb5438a5d46bcf4948c5dce0e",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "75bb2ce04f125ea8414457b061082fbcd9d846ae5b6f38f7eaf7fb19257ef7f3",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "1a8d6391e0c4a1ee35c7246bb846694e35e12d2b94a23e33bd911e05276c6070",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "mobility_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "7c870303e9e603d1505efe1d40cb679b80b99bea7212e56c50ce1a9c6070c314"
     }
-  },
-  "capabilities": [
-    "mobility_analyzer"
-  ]
+  }
 }

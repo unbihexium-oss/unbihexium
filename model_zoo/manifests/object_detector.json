@@ -1,91 +1,79 @@
 {
-  "model_id": "object_detector",
-  "name": "Object Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "object_detector",
+  "name": "Generic Object Detector",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "ai",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Object Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Multi-class detector for common objects in overhead imagery.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "building",
+      "vehicle",
+      "ship",
+      "aircraft",
+      "storage_tank",
+      "bridge"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of the six object classes.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bcf99374ea48c8400e82469050ab98766555987f30aab879340d8238be96c081",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "43582513e326c19c0cd1a581051d7c4154e3a1fafaafdc6b45ebc8430e942caa",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "d3c1500c1114a99527359b9031b425863449fafd856049bd428a50efc28962e9",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "object_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730746,
+      "weights_digest": "0908c3d9e8120f9961209c7dc0b6058ca8a4d8d515cea3f64fcb2b3c55a54183"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e39274d903c221f9fd9b6b472fafaea7f8c91b715772e89c8735633f3decdc30",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6c62b304b1187c377fd10935e88d3a635c353bcec84f7477955a2442e9330005",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "8e6a22055933f9722979714f70c736b2ed4d8d78fba7e5785dcfd5ad0dbe90d6",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "object_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049450,
+      "weights_digest": "72b8f4f99e9a5e4e718c620935104687fcf9ed18783cc417c3aa69af12b3aca7"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cefe05043da195b12a8b0ee825e97d4d1e3461b34bc5ab5c8f27f31b1c6fba61",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5362c1266aa99cbee17d132253d54c4142c2fd9469108a8fdc82a1a22368acc1",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "1168db436727d2ad18a5bb0a4c83a728a4b8627e252d5ef12edcabf66828fc95",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "object_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038682,
+      "weights_digest": "c196b30570fa3ce23db14cc8ee5a52338217ee6bbef31b1baa7e4c89ad8371e4"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a3f768bdc9530c8e91f39c25232fbab6b5dc9ab4df6a31789f5b7f1d0666453c",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1e9823d3eac3d110252f5de16f956f38005ecc0f25ab922fe4d4619513b07b7c",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "a67d9c12b85af6ae57deb2dc00a7760bd6ed2e070134a2e3844babca3c353abe",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "object_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60414154,
+      "weights_digest": "bf03ed34396bf550157af098c9a5328a80e9ff8b373c6200d72c2db6a545af56"
     }
-  },
-  "capabilities": [
-    "object_detector"
-  ]
+  }
 }

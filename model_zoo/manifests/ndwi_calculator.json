@@ -1,91 +1,73 @@
 {
-  "model_id": "ndwi_calculator",
-  "name": "Ndwi Calculator",
-  "version": "1.0.0",
-  "task": "index",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "ndwi_calculator",
+  "name": "NDWI Calculator",
+  "version": "2.0.0",
+  "task": "spectral_index",
+  "domain": "indices",
+  "architecture": "spectral_formula",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Ndwi Calculator model for index.",
-  "artifacts": {
+  "status": "reference",
+  "trained": false,
+  "description": "Normalized Difference Water Index, (GREEN - NIR) / (GREEN + NIR) (McFeeters, 1996).",
+  "inputs": {
+    "bands": [
+      "green",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "green",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "ndwi"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": "ndwi",
+    "layout": "Tensor (N, 1, H, W) with the index value; NaN where undefined."
+  },
+  "training_labels": "None, the formula needs no training.",
+  "data_sources": [
+    "Surface reflectance from Sentinel-2",
+    "Landsat or similar sensors"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f77e43cf31f7241717ffd9cb889bd8074149018bde11de47ac524f2c4f68f1f7",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "42fe21390769dd8530f58ecb8fb004ed5fd224092ea40db1f220d1386aa05d41",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "f361d78e3e51d26ba996f4dd1fefc7cb4e48f2b09d58ed26111151820b5b42ec",
-          "size_bytes": 350
-        }
-      ]
+      "model_id": "ndwi_calculator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a1dd57c0c1cd094c3e09d289bcf50c33502022af1d3bb1b7a38a68c06cc476b4",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "3964a21e3a525a867209fc09fffa6bfa14c46d9a42339d4012a5ea87a35e2786",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "d3d050e12646e9e6a01c284e1db49e7ef6cf64babef04be190d13a606d213280",
-          "size_bytes": 350
-        }
-      ]
+      "model_id": "ndwi_calculator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f6885c6e127192f5c8b1d1bae10b09207474c3c983cc3c6f1268853866713b01",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a8d8949a19ffb21efb850e3d2174469e7c71e993b37cf36630cf6a14f996bb2b",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "794d55cfc14abd22d83e8668aea8b40222d0fc4d1e8fbf8687c8e76952da7560",
-          "size_bytes": 354
-        }
-      ]
+      "model_id": "ndwi_calculator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "44aa73d278c9b3fd68096812d3e831617f507eaf89379a39ff26a1e6c437a531",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7e00e150fa9adb0c57d126559ffebbccf8820d3b59be5ca2b344ce46b6a5e767",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "f5b30014bf4a26bf305c2ca8f999890d61910e987a61c7b2f734d3933e722d37",
-          "size_bytes": 352
-        }
-      ]
+      "model_id": "ndwi_calculator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 0,
+      "weights_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
-  },
-  "capabilities": [
-    "ndwi_calculator"
-  ]
+  }
 }

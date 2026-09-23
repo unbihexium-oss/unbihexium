@@ -1,8 +1,0 @@
-{
-  "model_id": "flood_risk_assessor_base",
-  "task": "regression",
-  "variant": "base",
-  "params": 269313,
-  "resolution": 128,
-  "base_channels": 64
-}

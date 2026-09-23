@@ -1,91 +1,98 @@
 {
-  "model_id": "wildlife_habitat_analyzer",
-  "name": "Wildlife Habitat Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "wildlife_habitat_analyzer",
+  "name": "Wildlife Habitat Suitability",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "environment",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Wildlife Habitat Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Scores habitat suitability for a target species.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "habitat_suitability"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Species occurrence data converted to suitability targets.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3f238ff4e7a05b2818c975e9199c7f4ead4119b5f85f5a95b8972dfaffba63b5",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "48cf7d27da78b589bae444c06ff1d4ac97ac0afc8d07d56f9b4625c35cf9c343",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "ba2a55789c1ad7397b53ed8574b09ddb7a00adbcadb59866e0082c8384b86603",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "wildlife_habitat_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "b5553f676697ba0af9fc54b6bb8289c2de9d558285f0797daa55a2035fcf667c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "08de3a51499158cd258d883377837167671ac0a8243a6812f905e711791b2b99",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "faca8d520a892d757d9b77ae13b8b3de50103a52dbed111ed71efcb15fcc5d71",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "8125d0dc275f211e23f466ca7dea5e4801e3f1ebaddcdbedc999bb0aa6c4f164",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "wildlife_habitat_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "b8e53acd2c9e04b3297263b871aa0270efb0cbae632053d5ecbc674bdd2b9ded"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cc700402abd0ed0bd11bb112177758293b1ece8c70765d9a889e2f3816a8d01c",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c51afc368e07715be393f418b0ea0078190092ead8ac2039131a453614ca1bb1",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "761cf1644194694b4eb2a74ecbd0cfc5013dde1bcded0153449b9c4b46522eb3",
-          "size_bytes": 191
-        }
-      ]
+      "model_id": "wildlife_habitat_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "04baebf01ddb5542179218abe516dd6dd3bdb0233aee134d7d5cf9c8bd8c2b72"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3d6594f87e7485b072dc13be464a6b5aa800ea46e6fd5c1b775470b16ed7e946",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "736be2dbfeeb041b24ef4a6a9c618210afaeb8d4ea32e46e20055283fee7e0fc",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "ae038768a71bb3f5e81cfd4904260d23bf07822ba4e7add1b345af7ee156fd6c",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "wildlife_habitat_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "3b6153490bce14dd053d3e481dd12bb326f1e1ddfc3cb935b23ab1865eeb12a9"
     }
-  },
-  "capabilities": [
-    "wildlife_habitat_analyzer"
-  ]
+  }
 }

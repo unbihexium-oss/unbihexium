@@ -1,91 +1,79 @@
 {
-  "model_id": "sar_amplitude",
-  "name": "Sar Amplitude",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_amplitude",
+  "name": "SAR Backscatter Normaliser",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "sar",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Amplitude model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates terrain-flattened gamma0 backscatter from sigma0 and elevation.",
+  "inputs": {
+    "bands": [
+      "VV",
+      "VH",
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "VV",
+      "VH",
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "gamma0_vv",
+      "gamma0_vh"
+    ],
+    "units": [
+      "dB",
+      "dB"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Terrain-flattened gamma0 from radiometric terrain correction.",
+  "data_sources": [
+    "Sentinel-1 GRD",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "df3390ddc99d3e6d7dc8569259a539add1c6bd89080a7b34def1f20ae706213f",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4aea90cf1f3125363210b5978137adddaf97bc39c2ac6a6d6e2ffdb437aa1a1f",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "0397679c9bc560aff32cd763083ae3070c33f44bd9d8ca89acfbfeb06d4647e0",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "sar_amplitude_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732946,
+      "weights_digest": "f02906369953e0de660bed4be68098ab806b395dc5669ddb3b200225a1753d79"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d1843fbad2fb4bf5a979155ae929cec82dac76cc8009aedbeadab33def7646d2",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "484ae42a5c9aaba44f6b440558f04b4ea5b8dcdd94000e370fbd7b1de18a2f37",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "04d4915f34ef764220905e75a66f7d37388068a38ca183a08117ee5850170cc5",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "sar_amplitude_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058466,
+      "weights_digest": "386e373ae8e577f5912f2f782318c005c050a63ebfb029a951a2941c37d329ce"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5b58b9990fa3719840386df34c359341f77da0f5dbf7f6cb5ad0b57911fad0f9",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "333e5145e63c19f1088e8bb2798fee22c51d0f08ab5a7bd0c7180c540fb7fdc8",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "bfd32cb1f70a8a1e49a56a74ff8ef72aa6d9de167516bd076b9a48e8626b5fca",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "sar_amplitude_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059122,
+      "weights_digest": "763ea7660be4670fc94cf45a70b4219b35cdb70d01d9810d330da5dc7e515a55"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "642e34b9d399c6cff9a4e99915e12388ea8e8c8c8d8149750198f2dd55c89489",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "71427b0c64a08529e6027524acb0595e22f188d7da9cbe8383a77e9415f6bad2",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "538e8c6ead0eb3d1709ba02f9f1501d690e5ac9ccba6515431deef625c1440c6",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "sar_amplitude_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450626,
+      "weights_digest": "1abd5f9a0a1a2e8bd83348c9f59ad3081acab21980d8a20ca5b99f69dded30ce"
     }
-  },
-  "capabilities": [
-    "sar_amplitude"
-  ]
+  }
 }

@@ -1,91 +1,73 @@
 {
-  "model_id": "sar_mapping_workflow",
-  "name": "Sar Mapping Workflow",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_mapping_workflow",
+  "name": "SAR Despeckler",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "sar",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Mapping Workflow model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Removes speckle from dual-polarisation SAR backscatter.",
+  "inputs": {
+    "bands": [
+      "VV",
+      "VH"
+    ],
+    "dates": 1,
+    "channels": [
+      "VV",
+      "VH"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "VV",
+      "VH"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Multi-temporal averages as speckle-free references.",
+  "data_sources": [
+    "Sentinel-1 GRD"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "128a6c1600567a2d0e52037cc1c404f25399e1fade1d9a8db4ce0fa44dc6801d",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ca2dea10b10becd1050dd1961f74a37cf7e555968460994a990b6d39852817cb",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "c9fcd6a037e118694e8aa16c094a778f8acb6be347eca6769541a60dafcfecdf",
-          "size_bytes": 361
-        }
-      ]
+      "model_id": "sar_mapping_workflow_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732802,
+      "weights_digest": "437bc2908c429846e6d80170d72da1bbba1616958f2354b97755c19c7eb4774a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "00ac015f610fc04d7ab16253695cfbd666d53d85d96de315e7cc1d2b93275250",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "84d644ebd55ef00c75a9f6212a60c3433b186e759c5dda228b8f810b57a4a626",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "abd6db30c2eb9a1fbbae34d9c8c4268f3e9832a056c64a43c3065bfae3ad9593",
-          "size_bytes": 361
-        }
-      ]
+      "model_id": "sar_mapping_workflow_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058178,
+      "weights_digest": "8790ce677c9b721c40eab335f9ea6f1073e05d56ad46a82cee3804ce7a1f9d5f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3f420a11f83dedfc78de63a9d2b0dc41824a5dd6963fe22938501a845910b13d",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8338d31d7ad3ab24d84163fb907bda98ec870dc2d0679963d875a551ee878ce1",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "baf325905621db000572a49d464d2e0452967abeb9f0f76c1ace6d7a892c6c43",
-          "size_bytes": 365
-        }
-      ]
+      "model_id": "sar_mapping_workflow_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058690,
+      "weights_digest": "e206e2a5492aff3742df28071efd29cfdb0f3c300a34cf8b3a9efad5a069a0b2"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b1067ca9eccc5e04c12a13fc053b7127da81c71ac852c749125d06a22c1159ab",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ea8558ce23778f9de6c4f8d155f4431c7f5f928b91b25468432c2942c81b2745",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "21e08bcd4cdedb8db14a4106b5b4addd0f2d4bab2d30d10361ec1794e921efa4",
-          "size_bytes": 363
-        }
-      ]
+      "model_id": "sar_mapping_workflow_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450050,
+      "weights_digest": "26392f26d6c7e309e348b5d46125b3889c24c1c42b894d41a41eff6dc17984ec"
     }
-  },
-  "capabilities": [
-    "sar_mapping_workflow"
-  ]
+  }
 }

@@ -1,91 +1,79 @@
 {
-  "model_id": "mosaicking",
-  "name": "Mosaicking",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "mosaicking",
+  "name": "Seamline Blender",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Mosaicking model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Blends two overlapping scenes into one seamless image.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 2,
+    "channels": [
+      "red_t1",
+      "green_t1",
+      "blue_t1",
+      "red_t2",
+      "green_t2",
+      "blue_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Seamlessly blended reference mosaics.",
+  "data_sources": [
+    "Overlapping RGB scenes"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d9dc288340f9618b5e922310815f348e40d03df281892b19e5d2b672ad667aaf",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "516211b651e5c097932c57907e674f6ba8934f10d5ec60c580b8293ebfb9f85f",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "8fd4fdbd86d9bb496d464002640cbae4445be78fe0c5a110443645fdbe0d5e2f",
-          "size_bytes": 351
-        }
-      ]
+      "model_id": "mosaicking_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733395,
+      "weights_digest": "403614302e879610474563c32435f879cd54d0853bb058c4003fa44f0098a651"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f7dad73737510eb5b1cfcbfbfe980733404dce764f3e23692bc37fe680c80560",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b53b9ae5914b2937427bc21afe556b523a488fca3b72b91ce0d0afc48cad866a",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "de7186ff5c544e9a8ec602d137c69473da7a405712725f36ae08eb483959a08b",
-          "size_bytes": 351
-        }
-      ]
+      "model_id": "mosaicking_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059363,
+      "weights_digest": "fbfb7266ae6ae5287276b36b25b5948b51fbe355dddedd08045645040d23b777"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "26ab2e0ef0bec5cbbd40dcafcffa5cc0e101d5b2b204294fe10973824ff00cb7",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "80b95b93905673123ca1402ce1f48456e546948b449ae3c22230c23733a74f5d",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "98597dc8a3e703d3d2c69b83e767c3d5ed30ae0207e512820f79591d2566ff7b",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "mosaicking_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060467,
+      "weights_digest": "459b98625b89ef2dffba5f15e93bbc01730742cd61bd8751304072da32cf93bd"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a8273fa8318e5014ac7e43c861393bf58d8ed89cade6c98a4c9cd8ec380f8795",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2b886ba0909ca930ed5179863a22e2598aa4952c8736481850be0cff702881b3",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "e86e07902074bf4e2e251d0f539703add5f7735c710d4fb95a95f9598ae8d8b0",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "mosaicking_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452419,
+      "weights_digest": "ec0ef3dd1fb5f478b2c7e0b04e2071d8e36666cc6eeccceaff41bb6f78d98652"
     }
-  },
-  "capabilities": [
-    "mosaicking"
-  ]
+  }
 }

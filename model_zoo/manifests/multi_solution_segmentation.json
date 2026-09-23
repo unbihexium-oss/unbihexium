@@ -1,91 +1,79 @@
 {
-  "model_id": "multi_solution_segmentation",
-  "name": "Multi Solution Segmentation",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "multi_solution_segmentation",
+  "name": "General Semantic Segmentation",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "ai",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Multi Solution Segmentation model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "General-purpose semantic segmentation with six common classes.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "building",
+      "road",
+      "water",
+      "vegetation",
+      "bare_ground"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Masks of the six classes.",
+  "data_sources": [
+    "Aerial or satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7eab5b9711f50b0c32c6b897f5384e2c1f4955d7510daa6cce8a95ed03915b13",
-          "size_bytes": 3770
-        },
-        {
-          "name": "model.pt",
-          "sha256": "62ef21eb7b68bda2469a0d627f8f3233706244c80ba8563fd1d285d6ab2f8414",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "d88cc6d226d39bdbbfaf487407a2977d736b0d9938c7927a108c54ff6d3ec166",
-          "size_bytes": 455
-        }
-      ]
+      "model_id": "multi_solution_segmentation_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733014,
+      "weights_digest": "ef1c3ceb84eca902c8c2a2de3d1701a662d31d9c1c2e3b7706e2c906f0b6f950"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8152c09eab387bc5c822818fad83f9eeacf0e2e7fa6d785de3d08db861d7b09f",
-          "size_bytes": 30607
-        },
-        {
-          "name": "model.pt",
-          "sha256": "15d2f0d2cfcc35ea1d431edd3b1e24b8fb4cd2fd22939ce521c575ec83b9155d",
-          "size_bytes": 32433
-        },
-        {
-          "name": "config.json",
-          "sha256": "524502ce34afbceaa74b3152f8fff165c05ef447f07e4fe795558898c7414d7e",
-          "size_bytes": 455
-        }
-      ]
+      "model_id": "multi_solution_segmentation_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058598,
+      "weights_digest": "760ee50b06dad5fa943c36e07e9a613408dc89ae6a4325a77636ccf7f93c66a7"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2848fddd256ce01583ad7f3fb76b179293718551447be967644f5efbcc254926",
-          "size_bytes": 112985
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9101925000617f43e4645c7de9dbef6b0a3147466de786c64f3531203eb5a960",
-          "size_bytes": 114801
-        },
-        {
-          "name": "config.json",
-          "sha256": "7736fe29e0145460789d6c07a7156411d8e2e63b23efd6d45cd9efed23e5b875",
-          "size_bytes": 459
-        }
-      ]
+      "model_id": "multi_solution_segmentation_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059318,
+      "weights_digest": "2e6ea30b07cf4f977522979315ec4f78116c2752905557620ecec3cb9d6a6b9e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "82b2ade3672a5c2388f904bfa87902e9bc3e9053b6aa96a67ad1e3c15d7f1bce",
-          "size_bytes": 437469
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f49c57b8a19701477ffd67890cecf54778078430277cc989d021ca0d1083a2a3",
-          "size_bytes": 439281
-        },
-        {
-          "name": "config.json",
-          "sha256": "6db105926e3e4e04a0dff7798c25996b98d07d84fab68a3b9b5dca10cf46e06f",
-          "size_bytes": 457
-        }
-      ]
+      "model_id": "multi_solution_segmentation_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450886,
+      "weights_digest": "57db453795136c0a634d64b40540c5705540b06fdda48c52f3697d1cc9d64dd1"
     }
-  },
-  "capabilities": [
-    "multi_solution_segmentation"
-  ]
+  }
 }

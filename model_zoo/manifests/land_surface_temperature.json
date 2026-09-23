@@ -1,91 +1,84 @@
 {
-  "model_id": "land_surface_temperature",
+  "$schema": "../manifest.schema.json",
+  "family": "land_surface_temperature",
   "name": "Land Surface Temperature",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "environment",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Land Surface Temperature model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates land surface temperature from reflective and thermal bands.",
+  "inputs": {
+    "bands": [
+      "SR_B2",
+      "SR_B3",
+      "SR_B4",
+      "SR_B5",
+      "SR_B6",
+      "SR_B7",
+      "ST_B10"
+    ],
+    "dates": 1,
+    "channels": [
+      "SR_B2",
+      "SR_B3",
+      "SR_B4",
+      "SR_B5",
+      "SR_B6",
+      "SR_B7",
+      "ST_B10"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "surface_temperature"
+    ],
+    "units": [
+      "K"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Land surface temperature products or in situ radiometry.",
+  "data_sources": [
+    "Landsat 8/9 Collection 2 Level 2"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "29bffb3fca8c575ce9a2fe3bc3bcf17b3e33b610999f326bf2b5522f8d63719e",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "876f8408453465c9b7b536e7f1e02027b539f49d890a85ea38b930dde28d51f6",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "b2d018341e17be042e4f1129032643cf4684dab265ce818106d7179b11fcaafb",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "land_surface_temperature_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733505,
+      "weights_digest": "3cf570cfef4d328b9556ca2e59bf00d55aeef40e358b32d59c2203feacf825af"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7397b5f43871410845fb1f331425512dcfa15592438a84f7459386a8f2e17be9",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4f13e4bdc0355925e35d74bf927a988af75fb5982a41a15e6b7a72d20b275dc1",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "b8b85d979c355824cc6054ead87e9a7c42bb910b9f2fb57aa64df6d5325cb7ae",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "land_surface_temperature_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7059585,
+      "weights_digest": "5d621526ab4395e926e994eaca81b27f22a68b742741d444451a5d4a6851fcd2"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b6645efeac4f7205d30484e4ef48ae42c5a777812c175c7fa85ee6c58404dffb",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "650452aba10fe6f62ddf10f9b07d42a3502d3820f1a2f30848a5a6b4a3a5cbf5",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "e9bbad50a96266b27c7484576b577ff5fd2d1cf5703a3c7765aeae3cd61b1a36",
-          "size_bytes": 189
-        }
-      ]
+      "model_id": "land_surface_temperature_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22060801,
+      "weights_digest": "489dfe4ef4d8a68f875007a34bc413efb53cb2d9b23f7cabb5582ddd904d93cc"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "81d4f30cfff108e41fb9b988b9b57b19af20e91a264f775b0ee1cd8fc86a2030",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "041c1584b9f33872bfa5dc962685d6a6e0373442e79026f8bf15baf084e7362c",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "3fb85ffadc17520871c5d8242d391aa5f7fdb595e1e53876d097afbe169daa9f",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "land_surface_temperature_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60452865,
+      "weights_digest": "3c57ab20196ed136665838e0cf3fa8ec54e9a741b4a8e70e3e6f6db1dd35b41c"
     }
-  },
-  "capabilities": [
-    "land_surface_temperature"
-  ]
+  }
 }

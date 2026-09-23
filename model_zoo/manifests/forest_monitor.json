@@ -1,91 +1,91 @@
 {
-  "model_id": "forest_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "forest_monitor",
   "name": "Forest Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "forestry",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Forest Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Maps forest cover by forest type.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "non_forest",
+      "broadleaf",
+      "coniferous",
+      "mixed"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Forest type masks.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "94a59816465300b4a99a365c375dbad149df470ba384abc03516c260447c6659",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a11966b374017b0b99548551cf3f96b85ac77b05690e342fa7e9620a7f43980a",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "ed4a23dd720df4768ab5298dcaa87fe05c52e941a89763f18ebeeef01fad9bf1",
-          "size_bytes": 412
-        }
-      ]
+      "model_id": "forest_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733988,
+      "weights_digest": "15c28d3cddebfe1741581afa556b3d06d16299976ed81b7657cd798cdb03d997"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "de7770f0fff2518eab23f7fba23e1a72bce8b83114797d4d7294496d478b8008",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2416cd581346180d1cb60cb994db174a959ce69846dcba5acbe3159d4ef913c9",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "fd72f86677fa19137d896ff4858471246c0cd5584ba95295a0b89f6247085493",
-          "size_bytes": 412
-        }
-      ]
+      "model_id": "forest_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060548,
+      "weights_digest": "cf183d227d6fba3655444e0125922b9a8dbb30fad358034b67d15f87047465ea"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2507e8004f21806517e72cc9773ecd6212e397bb9c5cffcf3b89365c1f127cf9",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "33f568027f61344cbedc4de06e8b0649586f75bf11b69de9aabc49000c00473f",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "7375127ec254f36b06bcf4fb2d8987e2a8efd29ed4d7374c16e65867d39b2ae4",
-          "size_bytes": 416
-        }
-      ]
+      "model_id": "forest_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062244,
+      "weights_digest": "dbc5d8b9770434fe383f34a5c4e8f4454671a926720262f834eda51974f7d9a9"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "915b7926cdd25265cf77613c701dd01d117a5250e2150e53565b8aa2e5983e27",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7f72f087aa241de7b291f0c2b7aef80a43b0940739ce928672f6da156c831461",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "c2a6485cde10f3e66a44ee6745a5d1750698038805a1c87535dd00a3d7954e12",
-          "size_bytes": 414
-        }
-      ]
+      "model_id": "forest_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454788,
+      "weights_digest": "0487b7c2974eec87689a095e0b9daf05e7b085a0d2941bd09f331a562ebacdc2"
     }
-  },
-  "capabilities": [
-    "forest_monitor"
-  ]
+  }
 }

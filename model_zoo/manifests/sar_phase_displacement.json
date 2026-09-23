@@ -1,91 +1,76 @@
 {
-  "model_id": "sar_phase_displacement",
-  "name": "Sar Phase Displacement",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "sar_phase_displacement",
+  "name": "InSAR Phase Unwrapper",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "sar",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Sar Phase Displacement model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates unwrapped phase from a wrapped interferogram.",
+  "inputs": {
+    "bands": [
+      "cos_phase",
+      "sin_phase",
+      "coherence"
+    ],
+    "dates": 1,
+    "channels": [
+      "cos_phase",
+      "sin_phase",
+      "coherence"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "unwrapped_phase"
+    ],
+    "units": [
+      "rad"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Unwrapped phase from SNAPHU or similar processing.",
+  "data_sources": [
+    "Sentinel-1 SLC interferograms"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "22747b3d193e8109c68e3e7329427854a2d922a1f384f241690a47c65c45948f",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "348d7f164a9d5403be2850e22297d16024f38eed7ec309e73fb9f7e43b5e1493",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "86a638eceacb2e34765aa280339f59b5e5be5df76dc0186dce6abb640da42974",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_phase_displacement_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732929,
+      "weights_digest": "8bea37fb15961d2102be0918a35e697aec907ecf60ec9b8589f6a23687dc2307"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "10cb0740c749d31cf3d5498a3bd49145aab48985b795469f2ef69226ca238dda",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d5cf676a8816285581449d46bd11ddd7379e7856c8ffe25b758d0dbe80203424",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "28309f7252d1bd94cf478f0a7ece3cff245b47765f2acd0cc82d32fe6bc94a7f",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_phase_displacement_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058433,
+      "weights_digest": "60d15effbd75bbaee50f66306280bc720d5183d1f548b8fd8e758e1a2ab35f28"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d468a2b5afa2e2f18b8eca1fdc1fcbd081d5459ba57f7fade5533f6a2a6129be",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "41180c716411ff733bba35c77abc17d4133397c831316337dfb9980cf3e4e549",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "1e3120b6ac19062c38da4364e1380e140192e31b6be872bf1504ecc917b52636",
-          "size_bytes": 187
-        }
-      ]
+      "model_id": "sar_phase_displacement_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059073,
+      "weights_digest": "c1407634ccf6ab5da84756dac502f6c5cee42667aeda4a109aeb6fa5bf5a1785"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b5dd8ec144c29b7b9302b9d6e558fb7b42749c9613dd988489efa78646b0d2a2",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7dea75aa355ea2c2a10c5ff639e50563f00b4131cd3a929468fc823e9b8352a2",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "d3e9c34b0d11bacd43ba1800cbfe0fb02694cc389f773d434d31cbd67589a4be",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "sar_phase_displacement_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450561,
+      "weights_digest": "cd04e615dafba0672efe2f2be4cebc0e73b9f3a9daabc8945f1988f6c7def88b"
     }
-  },
-  "capabilities": [
-    "sar_phase_displacement"
-  ]
+  }
 }

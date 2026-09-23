@@ -1,91 +1,78 @@
 {
-  "model_id": "builtup_detector",
-  "name": "Builtup Detector",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "builtup_detector",
+  "name": "Built-up Area Detector",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "urban",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Builtup Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects compact built-up areas such as settlements and industrial sites in multispectral imagery.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "built_up_area"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of built-up areas.",
+  "data_sources": [
+    "PlanetScope",
+    "SPOT",
+    "Sentinel-2 10 m bands"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3cfdb206f034affadf2dda7e33ae8faabb3678eb70a74bc159d2e6ade7a69050",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "affaa8002bc17cc5ce4b1f246a79d9996a4910f316b76a58a48b1cffcd1b08e7",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "a016781f31c0603e3f22e26acc2023baa3838c390d5998a8bfab16ef5495dce6",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "builtup_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730725,
+      "weights_digest": "398c1da594a2f8f741bb94d7782502f27ec92909eac86005da1c3ac29120258c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b4c4373184118a38ca0a29b357a6c4959c7fd955a567e8340b7d45899f8f7dd1",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "556c50c60959500025ff7f7c8330ca7a6f6b4daf519b10734f4f9009a0699a3a",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "3c178f3735bb98a20e4e2b74e97530d0f17a5b8c5e2d696ce3b4e891b416ccfb",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "builtup_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049413,
+      "weights_digest": "3216539785397214bc30823ab32b892f6f73223725154d31917b089d4be3878a"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "70fdf2eaffb3420ad09bd2cec8f54da1981572d0feb16ca163e9d777b1030493",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "942cd763650689b1b20b360d83985ef379de78efc3ad791b80b62e9c5bb891fa",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "491f7ec5fbc4911e0e78dfdb1b0db5056bd571d06599a69b91f5c01813870882",
-          "size_bytes": 403
-        }
-      ]
+      "model_id": "builtup_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038629,
+      "weights_digest": "cb6eee51789b36d977796e2872cf23d7ed992f740fe1c8ca33657fd3a328c946"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9a025593231c62f95964e2b0659a270d605b2528f4d9ad36b956f65344042835",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "da9d93446e994becb26876b5ab0e87a5df4ced97a1b13534e1ea34cce0a4a018",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "a7a39c5541e579b56e929f207fe722c937428303f7fceed20c5db752b4d579b6",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "builtup_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60414085,
+      "weights_digest": "478025e741f31572bc3c57c85713affdcf7bcfad1de574cd5eef242d906a06da"
     }
-  },
-  "capabilities": [
-    "builtup_detector"
-  ]
+  }
 }

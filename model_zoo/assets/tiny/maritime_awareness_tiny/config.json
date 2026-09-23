@@ -1,8 +1,0 @@
-{
-  "model_id": "maritime_awareness_tiny",
-  "task": "detection",
-  "variant": "tiny",
-  "params": 143266,
-  "resolution": 64,
-  "base_channels": 32
-}

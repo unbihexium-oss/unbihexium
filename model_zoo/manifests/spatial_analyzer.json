@@ -1,91 +1,79 @@
 {
-  "model_id": "spatial_analyzer",
-  "name": "Spatial Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "spatial_analyzer",
+  "name": "Spatial Density Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "analysis",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Spatial Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the density of a mapped phenomenon, for example buildings per hectare.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "density"
+    ],
+    "units": [
+      "ha-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Density rasters derived from reference vector data.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f1db3ad0f2fa7f8c241845be893e1212d233c0bc2623399dea5979e8e3d030e3",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c10759e9287aa6bcc880548e933b57192d46f7cc70a948e8fdc412473d856b6c",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "1577ebfa98d56ab2d79e9fd5aafb816a57469fa138366629b8b92aa27634401f",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "spatial_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733073,
+      "weights_digest": "2f8b6cd9da160a9522f09e97fce94b13a539c7c28e81b9741212478698d5965c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3a1187f8d5632c3ad973342a8381d5518d6b9f165789fa1d3be88e15c16050b7",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "4ed56d5a2ab671ec34d754d2de29ed8d5a6f8f1e84fccf84aecbb06ec5c0963c",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "c6e08de3655976e9ba8ee3d47187c9ea640d9346ed29224807ea434387a76209",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "spatial_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058721,
+      "weights_digest": "631508a120f959fdb389c8a31b9bc1a6abd33e5887f372d01f6e432ef4677bc0"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f9f5f2f54cf59d8bb036e0e22cfc996c9881bf7b2b426bb6239b11b1c25d7ef5",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "cac87493b1b5d0116fc34bb5272906babd1caff0fecc5d02ae3c513a3ba1dc02",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "6865aad51332cd6160de30a03e5d6aa9a27852f8bfa91daa392f925f98ce48dd",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "spatial_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059505,
+      "weights_digest": "14a38cd3acd46d94b4d1bd32fd9cad75ba7627664bdf5fba147c34f7621a7a99"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b1892eca58155ffba104688e902e0705c91bb61a1da9a6cc3918cb1af43cd05d",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ab9f10f25265e6cd79b8a687e8b471c6a2fb44bf4cf5ab8cafff3d379a79f33f",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "79d640506c0a4934e0af8ca3bfdcc88b461d521348a1b7e4201675ca5da50637",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "spatial_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451137,
+      "weights_digest": "efffe91c4325e161239258cc8b634221e10e5ceeb1bb21a8a61eb65d82045060"
     }
-  },
-  "capabilities": [
-    "spatial_analyzer"
-  ]
+  }
 }

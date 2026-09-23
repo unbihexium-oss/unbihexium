@@ -1,91 +1,74 @@
 {
-  "model_id": "target_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "target_detector",
   "name": "Target Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "defense",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Target Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Single-class detector for a user-defined object of interest.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "object_of_interest"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of the object of interest.",
+  "data_sources": [
+    "Very high resolution satellite or aerial RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6fecde71436fbedfd10b27dbe9c16f670886a2785458822b215d70604559b905",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "869edc6b4665d51bee124f5083976ec6bfef600479e4e620f14cfa2d57e1fffa",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "0b29bb647460593847fa25a9bd0b25958098a017660a0a617077c9fc83769029",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "target_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "a607765a5a079f28af342d5aa62664c36f6f019a99c8fa82b5af02bb54fcc88b"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f3d46909e7e7d7c42319cfa09ee99d9166043d56b053284a956d38a3b2739a51",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fabaf05be35856fc0240b5fe37311e1ea99f79e2414837a59050edb58f087460",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "8c43ec821c653e04c654847cd2d9867984decb9d32965d374851fe5cebc0798d",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "target_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "f0a0f0bad4b91a5d3158d5e8b710b9556612d365a972543b913fb0c68fd79317"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0338cf6aab6be605784396218805b60facee6d1acd47fca6d18548454878e7f3",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e3c107034982431dd2023e26aa6a62eef733487b31e160a007b55b967aea2a2f",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "272b310abb4c72142fa64ce209ed4cfa3d475d20d593a53d28a602958c47f2de",
-          "size_bytes": 401
-        }
-      ]
+      "model_id": "target_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "f53fc2076c5a50fafdab7200f15c8558488f46a14a8ef7142765df308af3728e"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ab335f464fb98134772c64ae3193e85dff8fe53cd5f1e36aeb35d1f75e6be91c",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "dc94d99ce12713d7a00cf9b0c7f7697d6d4509be7700882eb8ed99d208c070ef",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "d4f6c37cee5e06db4dba042c9044ce1d656ef8ed89bd43ace8032de24f59e74a",
-          "size_bytes": 399
-        }
-      ]
+      "model_id": "target_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "01fa987b13593a33282e5e236fe7d7618ca28ed861221371a1c82c2eb40f6e40"
     }
-  },
-  "capabilities": [
-    "target_detector"
-  ]
+  }
 }

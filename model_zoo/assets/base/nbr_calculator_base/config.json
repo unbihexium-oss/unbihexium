@@ -1,8 +1,0 @@
-{
-  "model_id": "nbr_calculator_base",
-  "task": "index",
-  "variant": "base",
-  "params": 741123,
-  "resolution": 128,
-  "base_channels": 64
-}

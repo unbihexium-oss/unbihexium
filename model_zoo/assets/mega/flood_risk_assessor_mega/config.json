@@ -1,8 +1,0 @@
-{
-  "model_id": "flood_risk_assessor_mega",
-  "task": "regression",
-  "variant": "mega",
-  "params": 1062913,
-  "resolution": 512,
-  "base_channels": 128
-}

@@ -1,91 +1,95 @@
 {
-  "model_id": "energy_potential",
+  "$schema": "../manifest.schema.json",
+  "family": "energy_potential",
   "name": "Energy Potential",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "energy",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Energy Potential model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates annual solar energy potential per pixel.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "solar_potential"
+    ],
+    "units": [
+      "kWh m-2 a-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Solar potential rasters from irradiance models.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "86c047469150d74d545e0a4d336c03754291165285f27b9e853c5a9b4bccc2a3",
-          "size_bytes": 1323
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5cb9ca129040fbff408d2998f55087bf566a91b7e8e820bed63047659325e0f3",
-          "size_bytes": 3389
-        },
-        {
-          "name": "config.json",
-          "sha256": "3769ea71ac78e8cb053c879aa7dedd9af8a7c21c08fc7906575601cc9bbee3c4",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "energy_potential_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "26b6eb59188a0b75e208074433a4b7ef12d526d5bc72df3739593014fec9ff8d"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c1e3d32086d59742ce78bb2d88d778101400d3bcfc0d9d277bcd1d9b9f5cc31e",
-          "size_bytes": 4397
-        },
-        {
-          "name": "model.pt",
-          "sha256": "a1b3ce060bd4a42e42e841f0d42ec8a88fd1993cc2e42d99295192a3f4e68c5c",
-          "size_bytes": 6333
-        },
-        {
-          "name": "config.json",
-          "sha256": "e04c6933ca0837295a43b7eee3b854a381d34cf465bf820f299847fae7ecd5e7",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "energy_potential_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "04f0687ccc5ae1496be497fcbee2b13c2f4ed5964879976fe55c0b54fb83a0ae"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8a5a78ce348e1e6e0e54ccb749b6ca30dc752bb1f16205ed2c3a0bb57c221294",
-          "size_bytes": 12081
-        },
-        {
-          "name": "model.pt",
-          "sha256": "138af6295c00631804d49610c0a1afcceabde49b582e4e8885da42fd02b5e775",
-          "size_bytes": 14013
-        },
-        {
-          "name": "config.json",
-          "sha256": "cfb7a5231dcf2e917d9f24ef317046bca39f34124b47e22e6841ec3fec5ccb35",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "energy_potential_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "eaf866889a7f18cfd831e2cd0d012587836210d9b6a4a260565637bec6cc8832"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e4f8da2e71c4f833ea8159b8f104e4d6c770670dba30b18f8d529905d8c747e7",
-          "size_bytes": 39735
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ad1e67d6607c8d8734f5077bfc64a312b6ee19ad5cbc12a711798753e0327592",
-          "size_bytes": 41661
-        },
-        {
-          "name": "config.json",
-          "sha256": "77b9e7b6f2ed1347aedea02a3c961e6840b61b8d146898449fcb0e59c1a1414f",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "energy_potential_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "a1092a7b3d5f51b721d116c12da2fce7a0b24cf41bdc2553f8ba4ac9040bffe6"
     }
-  },
-  "capabilities": [
-    "energy_potential"
-  ]
+  }
 }

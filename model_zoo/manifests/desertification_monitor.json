@@ -1,91 +1,92 @@
 {
-  "model_id": "desertification_monitor",
+  "$schema": "../manifest.schema.json",
+  "family": "desertification_monitor",
   "name": "Desertification Monitor",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "environment",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Desertification Monitor model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Classifies land degradation severity in drylands.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "not_degraded",
+      "low",
+      "moderate",
+      "severe"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Degradation severity masks from field surveys.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Landsat 8/9"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b893107d83a1b8f9cbc8139334468bb63ee83d534034d4e2ba7d6f8f0d7b29db",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7238203fac8ab5b5c2852da2a5a87fdedb78977fe3a956079843c7f94d352f12",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "971c4e854bdfb5b2f45cec6ee9dfd408308596f552e40f487e3fcf4d4d55450a",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "desertification_monitor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733988,
+      "weights_digest": "bc701283d74c7973074e348c8c14f00d7c71da2062747ba14895d33b0d009075"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "ba38e3eabdd07a6dd427c5edf80658f2c66dd5e1f77a3fdb3dc43e0943fffc15",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "53bae569d119f51505fca7fa35cec0d3c8b0f2a485717c260ee2ed69e85e05f2",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "5dc8e3688ce43b27db0f55a899d27ab596b723616280bf45ef3d3ae477108159",
-          "size_bytes": 421
-        }
-      ]
+      "model_id": "desertification_monitor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060548,
+      "weights_digest": "4955b155404bc6b0d5f5d9e59007678f2408b6f028e6588e0c83cfc914941247"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "6620be591edb813231cc668b2fe9a0dd04301d301cc869aecd37349cbb1d55e0",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "82d276805970105e93958f940de4498b26b25abb78f26914362ebd1cb4956cbd",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "4216bc7f7cfe69cc8418765bec920bf368d8852764ee52d55cf5c516cff6ba7d",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "desertification_monitor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062244,
+      "weights_digest": "71e4f0ce5dca0da833761bff1bf407187a9e766c719565f63b2e51b993ca3719"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "4b28c61fa8571d4d13e0176f2f0dcedd09c4e27bc469e2953963e7e1f637efd6",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f4f50f3d8beb146326e4e170e34350a0f867939ab6feedb801a027ce439b96e4",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "b8e366c0bb084b337e1a6712f5695399fc1bd4c86a9d079ecabdd1ff79d3900c",
-          "size_bytes": 423
-        }
-      ]
+      "model_id": "desertification_monitor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454788,
+      "weights_digest": "07c3a075b4875cb3fd8c60ba0a2a4eec5838279aa31e502707e03f0a9301ca13"
     }
-  },
-  "capabilities": [
-    "desertification_monitor"
-  ]
+  }
 }

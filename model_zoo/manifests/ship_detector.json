@@ -1,91 +1,75 @@
 {
-  "model_id": "ship_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "ship_detector",
   "name": "Ship Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "ai",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Ship Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects ships in optical imagery.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "ship"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of ships.",
+  "data_sources": [
+    "Very high resolution satellite RGB imagery",
+    "Sentinel-2 10 m RGB for large vessels"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9568e7fa41f1f2581ea539988ed63065ba4993ccdee7148a04a0d4d749f1950e",
-          "size_bytes": 3660
-        },
-        {
-          "name": "model.pt",
-          "sha256": "979b61bb281fa06dd2a2932e6453875ba835bb183aea7a5f3b5f93aded241619",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "0fe202df4b57a46d4c6bf24626e25dfbe5819d8a4974b6a457c3b73a92a5dddd",
-          "size_bytes": 393
-        }
-      ]
+      "model_id": "ship_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730581,
+      "weights_digest": "e278457bcbb75b891f2b0730889fab1a33a7f346fa695e33cc5545b5952e2899"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dfbc92dc2c42bb93a2bd094b82e0571e93d6884e712dc83bd826ffabf24abc5d",
-          "size_bytes": 30211
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d890df3817f004031961266058689b0d83784fca4710f0bca09ab74072b80082",
-          "size_bytes": 32049
-        },
-        {
-          "name": "config.json",
-          "sha256": "14b53ccd34dd10364e9a3cdddecb37c86cf51cb51e5cd61c06e71ddd62672937",
-          "size_bytes": 393
-        }
-      ]
+      "model_id": "ship_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049125,
+      "weights_digest": "42d16ec0158ec38ab7f19e0553df0b0a1c73ec318dd5cb9d21e45f62562e434d"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "f3707cf092c6e94f54104a65475b196737d617cc646705330658a4e21991d02b",
-          "size_bytes": 112205
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0d2fee2f6255e8c4e505824f64f59e8bec49efbdd70ce7420ca329163cfc8f9c",
-          "size_bytes": 114033
-        },
-        {
-          "name": "config.json",
-          "sha256": "8745dd6f84804d33a504d00f202e8df9df064ddb531428bee3dffa4a95f3b137",
-          "size_bytes": 397
-        }
-      ]
+      "model_id": "ship_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038197,
+      "weights_digest": "f448bf81a536d39334b627e188e543db880e3247a5888c7333eed3f76ab89ed3"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "536a8cf0d758cff458d269a288eb61adeab8ea96e3365da6a378c72382fe4a73",
-          "size_bytes": 435921
-        },
-        {
-          "name": "model.pt",
-          "sha256": "745a37cc785104e3fd8fe48b83e2e5785093918963eeda2d029c64a2ade075c5",
-          "size_bytes": 437745
-        },
-        {
-          "name": "config.json",
-          "sha256": "e431a5aa2be264eb8e220c47c88ddf2e98223e7b9d5a485c02f6af14d2b1ac94",
-          "size_bytes": 395
-        }
-      ]
+      "model_id": "ship_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413509,
+      "weights_digest": "400169ead3bd5f086f382d1476257170e937b9111495a8047f75871719977e60"
     }
-  },
-  "capabilities": [
-    "ship_detector"
-  ]
+  }
 }

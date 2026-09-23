@@ -1,8 +1,0 @@
-{
-  "model_id": "onshore_monitor_base",
-  "task": "regression",
-  "variant": "base",
-  "params": 268033,
-  "resolution": 128,
-  "base_channels": 64
-}

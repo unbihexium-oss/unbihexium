@@ -1,91 +1,97 @@
 {
-  "model_id": "multispectral_processor",
-  "name": "Multispectral Processor",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "multispectral_processor",
+  "name": "Multispectral Denoiser",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Multispectral Processor model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Reduces noise and striping in multispectral imagery.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Clean reference images, for example temporal composites.",
+  "data_sources": [
+    "Sentinel-2 L2A"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "680b69969ae39ecad30526ab40a5fa3f692f347ee0f8c28d3f95938540dfe396",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "45f79a6bb60fc189ba68264b514e543994e32f4ab5c573d29cdf0ba8b9e8291b",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "ce7aa65f702d58ed0c8ab495edfcd655e3124c4d70fb75a2938840a4670e43d1",
-          "size_bytes": 364
-        }
-      ]
+      "model_id": "multispectral_processor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734090,
+      "weights_digest": "3068d414cf406a2c4c55208314ef039e7fd2e8ba0b4b685763e0bf2dae715470"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9810fdb99eb1189f57cb147ab98313c3cc845432298bb79c57a16e64d8e58da4",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9c37d238bd35a95e44361077ac1b32f2598feabf2cd66b4ce29c21f7795406b2",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "37565fe4e77cc3860e911603a5c18061b59345fb07de6c012088a2f76a006c90",
-          "size_bytes": 364
-        }
-      ]
+      "model_id": "multispectral_processor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060746,
+      "weights_digest": "b416431bfcf936c9ff435b17f1d451b6579c48ac9e9a808a85da58fa0e828b61"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "c9744d99064650d950ba2d1de7f5e402baef6db6baf4aef6ed32ce4977f59b18",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "022b0cc4329fddc26fadbf64faf2bbf40eadf461f890c7dac3bb6f8e19bee95a",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "0e2a754ac870e2fab023e34d9f949802e51287a1706de133844bc735f821a09b",
-          "size_bytes": 368
-        }
-      ]
+      "model_id": "multispectral_processor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062538,
+      "weights_digest": "144291057dcbcb07f32290ee32a38e7c4a84328e50d7c022805226976eeebf78"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0fa6e5ab51eeceb5fdabfe4d270b29ea41aec957d66bb6ba6b33bef2e94fb290",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "09b3a558a305ca4c2f84dab6b35408367ae40a69bc64610b8ac51ef6248bd0c8",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "97e2ce7e33dd462f66c5b3d71565c2a235dc6752ba81f9fb5b9e737939d2da69",
-          "size_bytes": 366
-        }
-      ]
+      "model_id": "multispectral_processor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455178,
+      "weights_digest": "3cff22ff06869ff2f20865bfa075dc2bb39d9d401539026a623b556f741ee526"
     }
-  },
-  "capabilities": [
-    "multispectral_processor"
-  ]
+  }
 }

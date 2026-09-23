@@ -1,91 +1,78 @@
 {
-  "model_id": "orthorectification",
-  "name": "Orthorectification",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "orthorectification",
+  "name": "Learned Orthorectification",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Orthorectification model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Produces an orthorectified image from a raw image and a DEM.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue",
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue",
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Orthorectified reference images.",
+  "data_sources": [
+    "Raw imagery with a co-registered DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a462b4b8655ea26ea7f14676d9073f5f72289bf0f738bbaad9d485436d40dfb4",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8659c07dc36b3992b0f1f11c7b4c298201e97da3803cf1daa9a55d3369b0ad4a",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "7e6bed73fb8ac42b274971469c4af88f30a5dbfb7f71b2dc2b47e9465f8ae970",
-          "size_bytes": 359
-        }
-      ]
+      "model_id": "orthorectification_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733107,
+      "weights_digest": "412f0b8a49382308b975b9f2f4258ac3ae20692973e6f8f90b5a19c25b8428b6"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5f8adc948333a8f83ec0cdcd9418ef660490f09e1e7fc579320f7f358fe290aa",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8575cd367f76fbee56e08e45f58079545214eda2ca14449806aebef24a9e1894",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "71812fcdb0d6eec1abdb727ecd504591e83864ee1afb53d7a462df9873aaf23c",
-          "size_bytes": 359
-        }
-      ]
+      "model_id": "orthorectification_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058787,
+      "weights_digest": "f18ccb8f0429706b370ba43710564fbfbae2e03254c0a2973c183966a29b7c2d"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0747fd397d01f714874cd6ce4354cbbb362972bef68a05dd49979eab4ea684f1",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "76b3cc2e898a4dbc874e6585db0210e3d57857c34475cf33f070832868db59ac",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "3fdde40fdb8c7031ada9bca76620e7ab1ed703836c3dbe266bf9a4af1d8f644a",
-          "size_bytes": 363
-        }
-      ]
+      "model_id": "orthorectification_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059603,
+      "weights_digest": "80c53359d1d4e57eacf431d045036915e9447607b4fb5e671263d3e9564527fb"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "45ab0ffb8411d67cbf717d1d1dc8ebc73230982bac7945b17dc287499c95b052",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d8de2dfb7dd19013f8fcc5925b0fb931a0dd4c9e79e3b010559fe7bb71d6f065",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "1bf6af30df2805711e514f5fd4e0cd79d8d38880fd5a3c093ddba1e41023f286",
-          "size_bytes": 361
-        }
-      ]
+      "model_id": "orthorectification_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451267,
+      "weights_digest": "18d13f351c760556a55dc344086b87d51aa20ae94991d11f0ac0b307917bab21"
     }
-  },
-  "capabilities": [
-    "orthorectification"
-  ]
+  }
 }

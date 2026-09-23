@@ -1,91 +1,98 @@
 {
-  "model_id": "wildfire_risk",
+  "$schema": "../manifest.schema.json",
+  "family": "wildfire_risk",
   "name": "Wildfire Risk",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "risk",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Wildfire Risk model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates wildfire susceptibility.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08",
+      "B8A",
+      "B11",
+      "B12",
+      "elevation",
+      "slope"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "susceptibility"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": [
+      0.0,
+      1.0
+    ],
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Burned area history converted to susceptibility targets.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "98e0e592aec43a98a1e3013d23dd0faa0386cbab9fd3d5891520dfcd7a9121f1",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b85d1e40ea956fd391e8f9977ad598b67338bfd96b25560dcafe7d8385bf557c",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "70d00650bf683e44bb9d7f58432c0f609905e94b20978de164937bd81b6c9eb5",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "wildfire_risk_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 734225,
+      "weights_digest": "33faf6ca26e52932968da79500ced9643de6f397cb592f7c6b7bb7abeb04483a"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a8b52fc0fb94e5efd0faa8082bd493bd36976c45d508e9af1f211dbcf410bcf1",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "b7a01e361788803cad10180ea59dfb83f555f1a60d1ccaae0c35617524226708",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "f2ee97af55435874e725644c4eaeb12f91c8814b313aec72863fb3b25d6bcb98",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "wildfire_risk_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7061025,
+      "weights_digest": "14fd53f7ebcf0ebde371f2ae9c909b125d593c129ea4e7893e7c974c439fe78e"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b769c483a8b91ea5b3207225f5fa1bd3d6b2a84eac74b9825f3eb40ae360ec9f",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6aad1ba50cbdd083feab708d85814f98c25459d7b3a767d03b8f4fd7a809a991",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "2b566d760e51d3864d065e3dbc8ab2ba0140a9cf53df9adef5ab9a3fdbf345d2",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "wildfire_risk_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062961,
+      "weights_digest": "ddc112b4846a51bdca5459ca78df503be7fc913c9248cd308abbd9e50ecbd567"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9deb9df59b5b8ceb5ecff352621a5b0d1b80c9666325aa1da1d1f0ae572c66be",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "63a9cc868a5b12251a54cfdd6dd94ec3e55726b47d7c6f171c11c6d0de96c8a0",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "1ca72ce9365d69a404c38af3710ad0b206f86c93d20c4e29bdf76b34af02ae5c",
-          "size_bytes": 177
-        }
-      ]
+      "model_id": "wildfire_risk_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60455745,
+      "weights_digest": "87734b483cb3f584f7de6f4f4e92c6d53e722d0fdd12e0f2be28e975f24be45b"
     }
-  },
-  "capabilities": [
-    "wildfire_risk"
-  ]
+  }
 }

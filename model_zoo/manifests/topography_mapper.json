@@ -1,91 +1,76 @@
 {
-  "model_id": "topography_mapper",
-  "name": "Topography Mapper",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "topography_mapper",
+  "name": "Landform Mapper",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "imaging",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Topography Mapper model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Classifies landforms from a digital elevation model.",
+  "inputs": {
+    "bands": [
+      "elevation"
+    ],
+    "dates": 1,
+    "channels": [
+      "elevation"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "flat",
+      "slope",
+      "ridge",
+      "valley",
+      "peak",
+      "pit"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Landform masks, for example geomorphons.",
+  "data_sources": [
+    "Copernicus DEM GLO-30",
+    "national DEMs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "944d14e7d41d3eb8f010ccea53949916b5e844abf81594f5bacbf3073862c487",
-          "size_bytes": 3770
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c50377fec262615bc605e8fd95eddefdd8b8eec64d058067d32aad2e9048b272",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "ce349791dbba1829fb1aa5219304dcfaca5471e4d60db856f57278e2d0491110",
-          "size_bytes": 439
-        }
-      ]
+      "model_id": "topography_mapper_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732726,
+      "weights_digest": "7e422fb7baf19a0350b64cea6a44b62fbb3b4b40fce3d9161820951e0920f974"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "5845ad3616efce02ce4beb6b523b0cfb5483b1babda86c41587aac5f049928f1",
-          "size_bytes": 30607
-        },
-        {
-          "name": "model.pt",
-          "sha256": "2deebd296795470fbd896f5acfe80febe7929099333560e3a05d56db0c19e50b",
-          "size_bytes": 32433
-        },
-        {
-          "name": "config.json",
-          "sha256": "4a611b9805abff783046b8bbb214f7a3fed173397ed0966da0d66a5381cacc77",
-          "size_bytes": 439
-        }
-      ]
+      "model_id": "topography_mapper_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058022,
+      "weights_digest": "90ebeaf10cf291cc56caf7648cf624cb9f62e8acf96f4ed1fcbb797674216089"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "d000ab93f9594a41696711864fed7a07b24122a40668ef23e079055699c61931",
-          "size_bytes": 112985
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fbdb9cb192bfe34327952f1c76e98f78e7714a2afccf406d632198936b8b1257",
-          "size_bytes": 114801
-        },
-        {
-          "name": "config.json",
-          "sha256": "4664106a7bb45b3fd03aa0c6004a074a2dbf2cc8ea8f5990b33ce7110c728c1f",
-          "size_bytes": 443
-        }
-      ]
+      "model_id": "topography_mapper_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058454,
+      "weights_digest": "b8add6e7c679dff507c23a2827a2899d5510f311f130224fcc93049b3327334d"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "44302f659975c7d80418cc8bff47f6059d0d47a0a41973c405f11a2232b75710",
-          "size_bytes": 437469
-        },
-        {
-          "name": "model.pt",
-          "sha256": "eeb4f5d4bb4d370ba11bb76dbf78340ed8a4b917f3d6b35106d04c0d03b329f2",
-          "size_bytes": 439281
-        },
-        {
-          "name": "config.json",
-          "sha256": "293566bee6d98489a1f9321255e34ac16da8b9fb88358698ebcc78dbe0a7cd91",
-          "size_bytes": 441
-        }
-      ]
+      "model_id": "topography_mapper_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449734,
+      "weights_digest": "4901c2acf1e642835fa5cc28bc60a08f16a6c190b9ce7c3ee110e865f4281112"
     }
-  },
-  "capabilities": [
-    "topography_mapper"
-  ]
+  }
 }

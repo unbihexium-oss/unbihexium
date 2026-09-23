@@ -1,91 +1,92 @@
 {
-  "model_id": "route_planner",
-  "name": "Route Planner",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "route_planner",
+  "name": "Route Cost Surface",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "tourism",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Route Planner model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates a travel cost surface for least-cost routing.",
+  "inputs": {
+    "bands": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ],
+    "dates": 1,
+    "channels": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B11",
+      "B12",
+      "elevation",
+      "slope",
+      "population",
+      "road_distance"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "travel_cost"
+    ],
+    "units": [
+      "s m-1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Travel cost rasters from speed models.",
+  "data_sources": [
+    "Sentinel-2 L2A",
+    "Copernicus DEM",
+    "road distance rasters"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "99857b4d1a99848b4c3fa6d823b473e7175bea59ef66f87b8849156cfd889b45",
-          "size_bytes": 1259
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8f47878387293473d276f03a3a01d47e527db44dfee49d62ae239a34ad0eab6d",
-          "size_bytes": 3325
-        },
-        {
-          "name": "config.json",
-          "sha256": "75989fe5327dcbf77a6cb9d8d9b19ea4664b2affa67ed489e8d7984fea79ed20",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "route_planner_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733937,
+      "weights_digest": "4965bcbf980b5c740c346b349923f4b23bd26f36a3ba69e2cf99f5c590a8e3da"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0b3a875850c64991624a3f6951dc82cfffe03519a983ee2f446ec323e924f8ed",
-          "size_bytes": 4141
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d579eb2e2a46ab6a881823bd1f2e70c0b15414fe4e5ce909ae4c3d6bebe29b7e",
-          "size_bytes": 6077
-        },
-        {
-          "name": "config.json",
-          "sha256": "ceb60deeb7f37d820f136f819c1dd2e8022605badfba648a608736b5a54b7aa6",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "route_planner_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7060449,
+      "weights_digest": "ea38aec6437c110fe94d20d35e3838295240e51b1c9e6d9b4f423a954e96259d"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1734a1a31fdf3d72ec013b65a2cd5981d6e85c81c03fbaf051a4218fa39d3cd3",
-          "size_bytes": 11569
-        },
-        {
-          "name": "model.pt",
-          "sha256": "6836a4791b4d43d02835f9839da7a6e112956045e8ecb8554c4712e4ce7df8e5",
-          "size_bytes": 13501
-        },
-        {
-          "name": "config.json",
-          "sha256": "64757dbafaa6e206d4f22fcad986fe1df268ef5a096eaaad84234b82466c3dcb",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "route_planner_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22062097,
+      "weights_digest": "27e2cb7d2f03a34ecb34b0ff3cc2f8f0133179de019fdee3eea6d6e46825b9e3"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "714d0e25cfb08361a5c11f7a843b4138ad0feac8f679a8b5eaf3d87d1a60b64b",
-          "size_bytes": 38711
-        },
-        {
-          "name": "model.pt",
-          "sha256": "be5af64899d670e394dacfb167350f5b3aea1f29057df029cecdd0681f897b07",
-          "size_bytes": 40637
-        },
-        {
-          "name": "config.json",
-          "sha256": "9f3e76be957277cacd6334321bc0e4a8cbbd25e3adcd907844321aaa5ccc9483",
-          "size_bytes": 176
-        }
-      ]
+      "model_id": "route_planner_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60454593,
+      "weights_digest": "8d3388c4ea666e5d743a9fa8b20563770cd56733ec4a26147d61af9cbf654d9f"
     }
-  },
-  "capabilities": [
-    "route_planner"
-  ]
+  }
 }

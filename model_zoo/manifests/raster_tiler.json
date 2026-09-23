@@ -1,91 +1,76 @@
 {
-  "model_id": "raster_tiler",
-  "name": "Raster Tiler",
-  "version": "1.0.0",
+  "$schema": "../manifest.schema.json",
+  "family": "raster_tiler",
+  "name": "Tile Radiometric Normaliser",
+  "version": "2.0.0",
   "task": "enhancement",
-  "architecture": "cnn",
+  "domain": "imaging",
+  "architecture": "unet_image_to_image",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Raster Tiler model for enhancement.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Normalises the radiometry of individual tiles before tiling into a web map.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of output bands or displacement components."
+  },
+  "training_labels": "Radiometrically normalised reference tiles.",
+  "data_sources": [
+    "RGB tiles"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9a4b8bad07bd66557db1d405a5af177b8101115cc9c0197abca3c236aa51d2f2",
-          "size_bytes": 3431
-        },
-        {
-          "name": "model.pt",
-          "sha256": "9557339cab8ba6fa74318eaf014c9b85b37e305e21c4bf27525a48b20dcdbf5f",
-          "size_bytes": 5373
-        },
-        {
-          "name": "config.json",
-          "sha256": "d8353cbdd590cc54c46a8269a8f802f51c351023dc37a678abd09df09255994b",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "raster_tiler_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732963,
+      "weights_digest": "5268c881613c557f6eb054bf3dffd7776c1c97d331796a7bd02977a0af5e9800"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "a0f86c321d68a09c264cdd5ced7dd94f1da40e550086db9425dcbbdc1388bcd0",
-          "size_bytes": 24748
-        },
-        {
-          "name": "model.pt",
-          "sha256": "7a82bf3382c32165647f51f3e2d5b137efdb006c1fb64107729b45bb286f5f78",
-          "size_bytes": 26557
-        },
-        {
-          "name": "config.json",
-          "sha256": "2e064c74825e7fd01c030c5e4c032c968d6ba4245ad49babc663fb1e4082c571",
-          "size_bytes": 353
-        }
-      ]
+      "model_id": "raster_tiler_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058499,
+      "weights_digest": "8114bf9e2887936d49fda8542bcee061d215a18ac807b0446824af30ca42a474"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2b98bc1c6db62bb6e1be3d67d8c1dc2d764a4640a0dba517a48b330b23d82de9",
-          "size_bytes": 85426
-        },
-        {
-          "name": "model.pt",
-          "sha256": "efc99c2a10444ab3ee29210769148e6cb7ad4ef2d61d8e35fefdaa87f6694c27",
-          "size_bytes": 87229
-        },
-        {
-          "name": "config.json",
-          "sha256": "2995baeac094eaf7d3c09865ccb0a609d31224bf544eb70ce2e4c104d5b27e2e",
-          "size_bytes": 357
-        }
-      ]
+      "model_id": "raster_tiler_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059171,
+      "weights_digest": "7904d1bbf6dc4c5589911ac02f8c019dc21cd4cd90d1987b29ca05134c68330d"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "3f5d8b92065debd25bf471eb9fa5552652e508aef90e182aa98e01339fcd072c",
-          "size_bytes": 317365
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ed97c23bfe9e10741f5bddd9df0d902d0decde90002a5671df56c376e53591bc",
-          "size_bytes": 319165
-        },
-        {
-          "name": "config.json",
-          "sha256": "057663e98a14472f5336f6b848cab2c286f0e7bab1b32edee2d724db0e090f48",
-          "size_bytes": 355
-        }
-      ]
+      "model_id": "raster_tiler_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60450691,
+      "weights_digest": "dbe51a5aa0e4abf178a2c372fedfc8a126a3b81b5f87a3322368d114ad369446"
     }
-  },
-  "capabilities": [
-    "raster_tiler"
-  ]
+  }
 }

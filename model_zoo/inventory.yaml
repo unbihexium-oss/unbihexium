@@ -1,925 +1,1455 @@
-# Model Zoo Inventory
-# Single source of truth for all 130 models in the Unbihexium Model Zoo
-# Each model has 4 variants: tiny, base, large, mega (520 total)
-
-version: "1.0.0"
-last_updated: "2025-12-20"
-
-models:
-  # Detection (15 models)
-  - model_id: aircraft_detector
-    name: Aircraft Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: building_detector
-    name: Building Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: builtup_detector
-    name: Built-up Area Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: crop_detector
-    name: Crop Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: greenhouse_detector
-    name: Greenhouse Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: object_detector
-    name: Generic Object Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: ship_detector
-    name: Ship Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: target_detector
-    name: Target Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: vehicle_detector
-    name: Vehicle Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: damage_assessor
-    name: Damage Assessor
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: encroachment_detector
-    name: Encroachment Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: fire_monitor
-    name: Fire Monitor
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: border_monitor
-    name: Border Monitor
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: military_objects_detector
-    name: Military Objects Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: sar_ship_detector
-    name: SAR Ship Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  # Segmentation (27 models)
-  - model_id: change_detector
-    name: Change Detector
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: cloud_mask
-    name: Cloud Mask
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: crop_classifier
-    name: Crop Classifier
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: lulc_classifier
-    name: Land Use Land Cover Classifier
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: multi_solution_segmentation
-    name: Multi-Solution Segmentation
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: protected_area_change_detector
-    name: Protected Area Change Detector
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: water_surface_detector
-    name: Water Surface Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: thematic_mapper
-    name: Thematic Mapper
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: transportation_mapper
-    name: Transportation Mapper
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: urban_planner
-    name: Urban Planner
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: utility_mapper
-    name: Utility Mapper
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: topography_mapper
-    name: Topography Mapper
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: crop_boundary_delineation
-    name: Crop Boundary Delineation
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: plowed_land_detector
-    name: Plowed Land Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: salinity_detector
-    name: Salinity Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: deforestation_detector
-    name: Deforestation Detector
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: desertification_monitor
-    name: Desertification Monitor
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: erosion_detector
-    name: Erosion Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: forest_monitor
-    name: Forest Monitor
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: land_degradation_detector
-    name: Land Degradation Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: construction_monitor
-    name: Construction Monitor
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: corridor_monitor
-    name: Corridor Monitor
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: infrastructure_monitor
-    name: Infrastructure Monitor
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: urban_growth_assessor
-    name: Urban Growth Assessor
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: road_network_analyzer
-    name: Road Network Analyzer
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: digitization_2d
-    name: 2D Digitization
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: tourist_destination_monitor
-    name: Tourist Destination Monitor
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  # Risk / Regression (40+ models)
-  - model_id: flood_risk
-    name: Flood Risk Scorer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: flood_risk_assessor
-    name: Flood Risk Assessor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: hazard_vulnerability
-    name: Hazard Vulnerability
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: landslide_risk
-    name: Landslide Risk
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: seismic_risk
-    name: Seismic Risk
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: wildfire_risk
-    name: Wildfire Risk
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: environmental_risk
-    name: Environmental Risk
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: disaster_management
-    name: Disaster Management
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: emergency_disaster_manager
-    name: Emergency Disaster Manager
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: preparedness_manager
-    name: Preparedness Manager
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: crop_growth_monitor
-    name: Crop Growth Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: crop_health_assessor
-    name: Crop Health Assessor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: livestock_estimator
-    name: Livestock Estimator
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: yield_predictor
-    name: Yield Predictor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: beekeeping_suitability
-    name: Beekeeping Suitability
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: grazing_potential
-    name: Grazing Potential
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: perennial_garden_suitability
-    name: Perennial Garden Suitability
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: drought_monitor
-    name: Drought Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: natural_resources_monitor
-    name: Natural Resources Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: wildlife_habitat_analyzer
-    name: Wildlife Habitat Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: watershed_manager
-    name: Watershed Manager
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: environmental_monitor
-    name: Environmental Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: pipeline_route_planner
-    name: Pipeline Route Planner
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: route_planner
-    name: Route Planner
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: accessibility_analyzer
-    name: Accessibility Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: network_analyzer
-    name: Network Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: viewshed_analyzer
-    name: Viewshed Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: energy_potential
-    name: Energy Potential
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: hydroelectric_monitor
-    name: Hydroelectric Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: solar_site_selector
-    name: Solar Site Selector
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: wind_site_selector
-    name: Wind Site Selector
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: offshore_survey
-    name: Offshore Survey
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: onshore_monitor
-    name: Onshore Monitor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: business_valuation
-    name: Business Valuation
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: economic_spatial_assessor
-    name: Economic Spatial Assessor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: insurance_underwriting
-    name: Insurance Underwriting
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: site_suitability
-    name: Site Suitability
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: resource_allocation
-    name: Resource Allocation
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: water_quality_assessor
-    name: Water Quality Assessor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: geostatistical_analyzer
-    name: Geostatistical Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: mobility_analyzer
-    name: Mobility Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: spatial_analyzer
-    name: Spatial Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: spatial_relationship
-    name: Spatial Relationship
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: timeseries_analyzer
-    name: Timeseries Analyzer
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: zonal_statistics
-    name: Zonal Statistics
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  - model_id: field_surveyor
-    name: Field Surveyor
-    task: regression
-    architecture: mlp
-    license: MPL-2.0
-    status: production
-
-  # CNN-based regression/processing
-  - model_id: sar_amplitude
-    name: SAR Amplitude
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: sar_phase_displacement
-    name: SAR Phase Displacement
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: sar_subsidence_monitor
-    name: SAR Subsidence Monitor
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: ground_displacement
-    name: Ground Displacement
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: forest_density_estimator
-    name: Forest Density Estimator
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: dem_generator
-    name: DEM Generator
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: dsm_generator
-    name: DSM Generator
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: dtm_generator
-    name: DTM Generator
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: digitization_3d
-    name: 3D Digitization
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: model_3d
-    name: 3D Model
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: stereo_processor
-    name: Stereo Processor
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: tri_stereo_processor
-    name: Tri-Stereo Processor
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: tree_height_estimator
-    name: Tree Height Estimator
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: land_surface_temperature
-    name: Land Surface Temperature
-    task: regression
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  # SAR Segmentation
-  - model_id: sar_flood_detector
-    name: SAR Flood Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: sar_oil_spill_detector
-    name: SAR Oil Spill Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: reservoir_monitor
-    name: Reservoir Monitor
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: marine_pollution_detector
-    name: Marine Pollution Detector
-    task: segmentation
-    architecture: unet
-    license: MPL-2.0
-    status: production
-
-  - model_id: asset_condition_change
-    name: Asset Condition Change
-    task: segmentation
-    architecture: siamese_unet
-    license: MPL-2.0
-    status: production
-
-  # Detection additional
-  - model_id: leakage_detector
-    name: Leakage Detector
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: pivot_inventory
-    name: Pivot Inventory
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: maritime_awareness
-    name: Maritime Awareness
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  - model_id: security_monitor
-    name: Security Monitor
-    task: detection
-    architecture: resnet_fpn
-    license: MPL-2.0
-    status: production
-
-  # Enhancement / Super-Resolution
-  - model_id: super_resolution
-    name: Super Resolution
-    task: super_resolution
-    architecture: srcnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: pansharpening
-    name: Pansharpening
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: orthorectification
-    name: Orthorectification
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: coregistration
-    name: Coregistration
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: mosaicking
-    name: Mosaicking
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: mosaic_processor
-    name: Mosaic Processor
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: ortho_processor
-    name: Ortho Processor
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: raster_tiler
-    name: Raster Tiler
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: sar_mapping_workflow
-    name: SAR Mapping Workflow
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: multispectral_processor
-    name: Multispectral Processor
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: panchromatic_processor
-    name: Panchromatic Processor
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: synthetic_imagery
-    name: Synthetic Imagery
-    task: enhancement
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  # Index Calculators
-  - model_id: evi_calculator
-    name: EVI Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: msi_calculator
-    name: MSI Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: nbr_calculator
-    name: NBR Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: ndvi_calculator
-    name: NDVI Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: ndwi_calculator
-    name: NDWI Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: savi_calculator
-    name: SAVI Calculator
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
-
-  - model_id: vegetation_condition
-    name: Vegetation Condition
-    task: index
-    architecture: cnn
-    license: MPL-2.0
-    status: production
+# Model zoo inventory, generated from src/unbihexium/zoo/catalog.yaml by
+# `python -m unbihexium.zoo.sync`. Do not edit by hand.
+version: 2.0.0
+families: 130
+models: 520
+entries:
+- family: aircraft_detector
+  name: Aircraft Detector
+  task: detection
+  domain: ai
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - aircraft
+  license: MPL-2.0
+  status: starter
+- family: border_monitor
+  name: Border Area Monitor
+  task: detection
+  domain: defense
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - vehicle
+  - vessel
+  - structure
+  license: MPL-2.0
+  status: starter
+- family: building_detector
+  name: Building Detector
+  task: detection
+  domain: urban
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - building
+  license: MPL-2.0
+  status: starter
+- family: builtup_detector
+  name: Built-up Area Detector
+  task: detection
+  domain: urban
+  architecture: centernet
+  in_channels: 4
+  outputs:
+  - built_up_area
+  license: MPL-2.0
+  status: starter
+- family: crop_detector
+  name: Crop Parcel Detector
+  task: detection
+  domain: agriculture
+  architecture: centernet
+  in_channels: 4
+  outputs:
+  - crop_parcel
+  - orchard
+  license: MPL-2.0
+  status: starter
+- family: damage_assessor
+  name: Building Damage Assessor
+  task: detection
+  domain: risk
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - damaged_building
+  - destroyed_building
+  license: MPL-2.0
+  status: starter
+- family: encroachment_detector
+  name: Encroachment Detector
+  task: detection
+  domain: assets
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - structure
+  - vehicle
+  - excavation
+  license: MPL-2.0
+  status: starter
+- family: fire_monitor
+  name: Active Fire Detector
+  task: detection
+  domain: environment
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - active_fire
+  license: MPL-2.0
+  status: starter
+- family: greenhouse_detector
+  name: Greenhouse Detector
+  task: detection
+  domain: agriculture
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - greenhouse
+  license: MPL-2.0
+  status: starter
+- family: leakage_detector
+  name: Leakage Detector
+  task: detection
+  domain: assets
+  architecture: centernet
+  in_channels: 5
+  outputs:
+  - leak_signature
+  license: MPL-2.0
+  status: starter
+- family: maritime_awareness
+  name: Maritime Awareness Detector
+  task: detection
+  domain: defense
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - vessel
+  - offshore_platform
+  license: MPL-2.0
+  status: starter
+- family: military_objects_detector
+  name: Military Objects Detector
+  task: detection
+  domain: defense
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - vehicle
+  - aircraft
+  - vessel
+  - fortified_structure
+  license: MPL-2.0
+  status: starter
+- family: object_detector
+  name: Generic Object Detector
+  task: detection
+  domain: ai
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - building
+  - vehicle
+  - ship
+  - aircraft
+  - storage_tank
+  - bridge
+  license: MPL-2.0
+  status: starter
+- family: pivot_inventory
+  name: Centre Pivot Inventory
+  task: detection
+  domain: agriculture
+  architecture: centernet
+  in_channels: 4
+  outputs:
+  - centre_pivot
+  license: MPL-2.0
+  status: starter
+- family: sar_ship_detector
+  name: SAR Ship Detector
+  task: detection
+  domain: sar
+  architecture: centernet
+  in_channels: 2
+  outputs:
+  - ship
+  license: MPL-2.0
+  status: starter
+- family: security_monitor
+  name: Security Monitor
+  task: detection
+  domain: defense
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - vehicle
+  - vessel
+  - temporary_structure
+  license: MPL-2.0
+  status: starter
+- family: ship_detector
+  name: Ship Detector
+  task: detection
+  domain: ai
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - ship
+  license: MPL-2.0
+  status: starter
+- family: target_detector
+  name: Target Detector
+  task: detection
+  domain: defense
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - object_of_interest
+  license: MPL-2.0
+  status: starter
+- family: vehicle_detector
+  name: Vehicle Detector
+  task: detection
+  domain: ai
+  architecture: centernet
+  in_channels: 3
+  outputs:
+  - car
+  - truck
+  - bus
+  license: MPL-2.0
+  status: starter
+- family: cloud_mask
+  name: Cloud and Shadow Mask
+  task: segmentation
+  domain: imaging
+  architecture: unet
+  in_channels: 13
+  outputs:
+  - clear
+  - thick_cloud
+  - thin_cloud
+  - cloud_shadow
+  license: MPL-2.0
+  status: starter
+- family: corridor_monitor
+  name: Corridor Monitor
+  task: segmentation
+  domain: assets
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - vegetation_encroachment
+  - structure
+  license: MPL-2.0
+  status: starter
+- family: crop_boundary_delineation
+  name: Crop Boundary Delineation
+  task: segmentation
+  domain: agriculture
+  architecture: unet
+  in_channels: 4
+  outputs:
+  - background
+  - field_interior
+  - field_boundary
+  license: MPL-2.0
+  status: starter
+- family: crop_classifier
+  name: Crop Type Classifier
+  task: segmentation
+  domain: agriculture
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - background
+  - wheat
+  - maize
+  - rice
+  - soybean
+  - sunflower
+  - other_crop
+  license: MPL-2.0
+  status: starter
+- family: desertification_monitor
+  name: Desertification Monitor
+  task: segmentation
+  domain: environment
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - not_degraded
+  - low
+  - moderate
+  - severe
+  license: MPL-2.0
+  status: starter
+- family: digitization_2d
+  name: 2D Digitisation
+  task: segmentation
+  domain: imaging
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - building
+  - road
+  - water
+  - vegetation
+  license: MPL-2.0
+  status: starter
+- family: erosion_detector
+  name: Erosion Detector
+  task: segmentation
+  domain: environment
+  architecture: unet
+  in_channels: 5
+  outputs:
+  - stable
+  - sheet_erosion
+  - gully
+  license: MPL-2.0
+  status: starter
+- family: forest_monitor
+  name: Forest Monitor
+  task: segmentation
+  domain: forestry
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - non_forest
+  - broadleaf
+  - coniferous
+  - mixed
+  license: MPL-2.0
+  status: starter
+- family: infrastructure_monitor
+  name: Infrastructure Monitor
+  task: segmentation
+  domain: assets
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - road
+  - railway
+  - building
+  - bridge
+  license: MPL-2.0
+  status: starter
+- family: land_degradation_detector
+  name: Land Degradation Detector
+  task: segmentation
+  domain: environment
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - not_degraded
+  - degraded
+  license: MPL-2.0
+  status: starter
+- family: lulc_classifier
+  name: Land Use and Land Cover Classifier
+  task: segmentation
+  domain: environment
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - tree_cover
+  - shrubland
+  - grassland
+  - cropland
+  - built_up
+  - bare_sparse
+  - snow_ice
+  - water
+  - herbaceous_wetland
+  - mangroves
+  - moss_lichen
+  license: MPL-2.0
+  status: starter
+- family: marine_pollution_detector
+  name: Marine Pollution Detector
+  task: segmentation
+  domain: water
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - water
+  - floating_debris
+  - oil_sheen
+  license: MPL-2.0
+  status: starter
+- family: multi_solution_segmentation
+  name: General Semantic Segmentation
+  task: segmentation
+  domain: ai
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - building
+  - road
+  - water
+  - vegetation
+  - bare_ground
+  license: MPL-2.0
+  status: starter
+- family: plowed_land_detector
+  name: Ploughed Land Detector
+  task: segmentation
+  domain: agriculture
+  architecture: unet
+  in_channels: 4
+  outputs:
+  - background
+  - ploughed
+  license: MPL-2.0
+  status: starter
+- family: reservoir_monitor
+  name: Reservoir Monitor
+  task: segmentation
+  domain: water
+  architecture: unet
+  in_channels: 4
+  outputs:
+  - background
+  - water
+  license: MPL-2.0
+  status: starter
+- family: road_network_analyzer
+  name: Road Network Extractor
+  task: segmentation
+  domain: urban
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - road
+  license: MPL-2.0
+  status: starter
+- family: salinity_detector
+  name: Soil Salinity Detector
+  task: segmentation
+  domain: agriculture
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - non_saline
+  - slight
+  - moderate
+  - strong
+  license: MPL-2.0
+  status: starter
+- family: sar_flood_detector
+  name: SAR Flood Detector
+  task: segmentation
+  domain: sar
+  architecture: unet
+  in_channels: 2
+  outputs:
+  - non_flooded
+  - flooded
+  license: MPL-2.0
+  status: starter
+- family: sar_oil_spill_detector
+  name: SAR Oil Spill Detector
+  task: segmentation
+  domain: sar
+  architecture: unet
+  in_channels: 1
+  outputs:
+  - sea
+  - oil_spill
+  - look_alike
+  license: MPL-2.0
+  status: starter
+- family: thematic_mapper
+  name: Thematic Mapper
+  task: segmentation
+  domain: imaging
+  architecture: unet
+  in_channels: 10
+  outputs:
+  - artificial
+  - agricultural
+  - forest
+  - grassland
+  - wetland
+  - water
+  - bare
+  - snow_ice
+  license: MPL-2.0
+  status: starter
+- family: topography_mapper
+  name: Landform Mapper
+  task: segmentation
+  domain: imaging
+  architecture: unet
+  in_channels: 1
+  outputs:
+  - flat
+  - slope
+  - ridge
+  - valley
+  - peak
+  - pit
+  license: MPL-2.0
+  status: starter
+- family: tourist_destination_monitor
+  name: Tourist Destination Monitor
+  task: segmentation
+  domain: tourism
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - beach
+  - built_up
+  - vegetation
+  - water
+  license: MPL-2.0
+  status: starter
+- family: transportation_mapper
+  name: Transportation Mapper
+  task: segmentation
+  domain: urban
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - road
+  - railway
+  - airport
+  - port
+  license: MPL-2.0
+  status: starter
+- family: urban_planner
+  name: Urban Land Use Mapper
+  task: segmentation
+  domain: urban
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - residential
+  - commercial
+  - industrial
+  - green_space
+  license: MPL-2.0
+  status: starter
+- family: utility_mapper
+  name: Utility Mapper
+  task: segmentation
+  domain: assets
+  architecture: unet
+  in_channels: 3
+  outputs:
+  - background
+  - power_line
+  - pipeline_corridor
+  - substation
+  license: MPL-2.0
+  status: starter
+- family: water_surface_detector
+  name: Water Surface Detector
+  task: segmentation
+  domain: water
+  architecture: unet
+  in_channels: 4
+  outputs:
+  - background
+  - water
+  license: MPL-2.0
+  status: starter
+- family: asset_condition_change
+  name: Asset Condition Change
+  task: change_detection
+  domain: assets
+  architecture: unet_early_fusion
+  in_channels: 6
+  outputs:
+  - no_change
+  - deterioration
+  - repair
+  license: MPL-2.0
+  status: starter
+- family: change_detector
+  name: Change Detector
+  task: change_detection
+  domain: ai
+  architecture: unet_early_fusion
+  in_channels: 6
+  outputs:
+  - no_change
+  - change
+  license: MPL-2.0
+  status: starter
+- family: construction_monitor
+  name: Construction Monitor
+  task: change_detection
+  domain: urban
+  architecture: unet_early_fusion
+  in_channels: 6
+  outputs:
+  - no_change
+  - new_construction
+  - demolition
+  license: MPL-2.0
+  status: starter
+- family: deforestation_detector
+  name: Deforestation Detector
+  task: change_detection
+  domain: forestry
+  architecture: unet_early_fusion
+  in_channels: 20
+  outputs:
+  - no_change
+  - forest_loss
+  license: MPL-2.0
+  status: starter
+- family: protected_area_change_detector
+  name: Protected Area Change Detector
+  task: change_detection
+  domain: environment
+  architecture: unet_early_fusion
+  in_channels: 20
+  outputs:
+  - no_change
+  - vegetation_loss
+  - new_structure
+  - other_change
+  license: MPL-2.0
+  status: starter
+- family: urban_growth_assessor
+  name: Urban Growth Assessor
+  task: change_detection
+  domain: urban
+  architecture: unet_early_fusion
+  in_channels: 20
+  outputs:
+  - no_change
+  - urban_expansion
+  license: MPL-2.0
+  status: starter
+- family: accessibility_analyzer
+  name: Accessibility Analyser
+  task: dense_regression
+  domain: tourism
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - travel_time
+  license: MPL-2.0
+  status: starter
+- family: beekeeping_suitability
+  name: Beekeeping Suitability
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - suitability
+  license: MPL-2.0
+  status: starter
+- family: crop_growth_monitor
+  name: Crop Growth Monitor
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - leaf_area_index
+  license: MPL-2.0
+  status: starter
+- family: crop_health_assessor
+  name: Crop Health Assessor
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - health_score
+  license: MPL-2.0
+  status: starter
+- family: drought_monitor
+  name: Drought Monitor
+  task: dense_regression
+  domain: environment
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - drought_severity
+  license: MPL-2.0
+  status: starter
+- family: energy_potential
+  name: Energy Potential
+  task: dense_regression
+  domain: energy
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - solar_potential
+  license: MPL-2.0
+  status: starter
+- family: environmental_risk
+  name: Environmental Risk
+  task: dense_regression
+  domain: risk
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - risk_score
+  license: MPL-2.0
+  status: starter
+- family: flood_risk
+  name: Flood Risk
+  task: dense_regression
+  domain: water
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - flood_susceptibility
+  license: MPL-2.0
+  status: starter
+- family: forest_density_estimator
+  name: Forest Density Estimator
+  task: dense_regression
+  domain: forestry
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - canopy_cover
+  license: MPL-2.0
+  status: starter
+- family: grazing_potential
+  name: Grazing Potential
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - forage_biomass
+  license: MPL-2.0
+  status: starter
+- family: hazard_vulnerability
+  name: Hazard Vulnerability
+  task: dense_regression
+  domain: risk
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - vulnerability
+  license: MPL-2.0
+  status: starter
+- family: landslide_risk
+  name: Landslide Susceptibility
+  task: dense_regression
+  domain: risk
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - susceptibility
+  license: MPL-2.0
+  status: starter
+- family: mobility_analyzer
+  name: Mobility Analyser
+  task: dense_regression
+  domain: urban
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - traffic_intensity
+  license: MPL-2.0
+  status: starter
+- family: perennial_garden_suitability
+  name: Perennial Garden Suitability
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - suitability
+  license: MPL-2.0
+  status: starter
+- family: pipeline_route_planner
+  name: Pipeline Route Cost Surface
+  task: dense_regression
+  domain: assets
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - cost
+  license: MPL-2.0
+  status: starter
+- family: route_planner
+  name: Route Cost Surface
+  task: dense_regression
+  domain: tourism
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - travel_cost
+  license: MPL-2.0
+  status: starter
+- family: seismic_risk
+  name: Seismic Risk
+  task: dense_regression
+  domain: risk
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - risk_score
+  license: MPL-2.0
+  status: starter
+- family: site_suitability
+  name: Site Suitability
+  task: dense_regression
+  domain: analysis
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - suitability
+  license: MPL-2.0
+  status: starter
+- family: solar_site_selector
+  name: Solar Site Selector
+  task: dense_regression
+  domain: energy
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - suitability
+  license: MPL-2.0
+  status: starter
+- family: spatial_analyzer
+  name: Spatial Density Estimator
+  task: dense_regression
+  domain: analysis
+  architecture: unet_regression
+  in_channels: 4
+  outputs:
+  - density
+  license: MPL-2.0
+  status: starter
+- family: viewshed_analyzer
+  name: Visibility Estimator
+  task: dense_regression
+  domain: tourism
+  architecture: unet_regression
+  in_channels: 1
+  outputs:
+  - visible_fraction
+  license: MPL-2.0
+  status: starter
+- family: water_quality_assessor
+  name: Water Quality Assessor
+  task: dense_regression
+  domain: water
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - chlorophyll_a
+  - turbidity
+  license: MPL-2.0
+  status: starter
+- family: wildfire_risk
+  name: Wildfire Risk
+  task: dense_regression
+  domain: risk
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - susceptibility
+  license: MPL-2.0
+  status: starter
+- family: wildlife_habitat_analyzer
+  name: Wildlife Habitat Suitability
+  task: dense_regression
+  domain: environment
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - habitat_suitability
+  license: MPL-2.0
+  status: starter
+- family: wind_site_selector
+  name: Wind Site Selector
+  task: dense_regression
+  domain: energy
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - suitability
+  license: MPL-2.0
+  status: starter
+- family: flood_risk_assessor
+  name: Flood Depth Estimator
+  task: dense_regression
+  domain: water
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - water_depth
+  license: MPL-2.0
+  status: starter
+- family: geostatistical_analyzer
+  name: Geostatistical Surface Estimator
+  task: dense_regression
+  domain: analysis
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - value
+  license: MPL-2.0
+  status: starter
+- family: spatial_relationship
+  name: Proximity Estimator
+  task: dense_regression
+  domain: analysis
+  architecture: unet_regression
+  in_channels: 4
+  outputs:
+  - distance
+  license: MPL-2.0
+  status: starter
+- family: natural_resources_monitor
+  name: Natural Resources Monitor
+  task: dense_regression
+  domain: environment
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - above_ground_biomass
+  license: MPL-2.0
+  status: starter
+- family: environmental_monitor
+  name: Environmental Condition Monitor
+  task: dense_regression
+  domain: environment
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - condition
+  license: MPL-2.0
+  status: starter
+- family: network_analyzer
+  name: Road Network Density Estimator
+  task: dense_regression
+  domain: urban
+  architecture: unet_regression
+  in_channels: 4
+  outputs:
+  - road_density
+  license: MPL-2.0
+  status: starter
+- family: watershed_manager
+  name: Runoff Estimator
+  task: dense_regression
+  domain: water
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - runoff_coefficient
+  license: MPL-2.0
+  status: starter
+- family: hydroelectric_monitor
+  name: Hydroelectric Reservoir Level Estimator
+  task: dense_regression
+  domain: energy
+  architecture: unet_regression
+  in_channels: 5
+  outputs:
+  - water_surface_elevation
+  license: MPL-2.0
+  status: starter
+- family: offshore_survey
+  name: Bathymetry Estimator
+  task: dense_regression
+  domain: water
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - depth
+  license: MPL-2.0
+  status: starter
+- family: onshore_monitor
+  name: Surface Temperature Anomaly
+  task: dense_regression
+  domain: energy
+  architecture: unet_regression
+  in_channels: 7
+  outputs:
+  - temperature_anomaly
+  license: MPL-2.0
+  status: starter
+- family: field_surveyor
+  name: Field Productivity Estimator
+  task: dense_regression
+  domain: agriculture
+  architecture: unet_regression
+  in_channels: 10
+  outputs:
+  - relative_yield
+  license: MPL-2.0
+  status: starter
+- family: yield_predictor
+  name: Yield Predictor
+  task: scene_regression
+  domain: agriculture
+  architecture: encoder_regressor
+  in_channels: 10
+  outputs:
+  - yield
+  license: MPL-2.0
+  status: starter
+- family: business_valuation
+  name: Economic Activity Estimator
+  task: scene_regression
+  domain: analysis
+  architecture: encoder_regressor
+  in_channels: 4
+  outputs:
+  - activity_index
+  license: MPL-2.0
+  status: starter
+- family: economic_spatial_assessor
+  name: Property Value Estimator
+  task: scene_regression
+  domain: analysis
+  architecture: encoder_regressor
+  in_channels: 3
+  outputs:
+  - median_value
+  license: MPL-2.0
+  status: starter
+- family: insurance_underwriting
+  name: Insurance Risk Scorer
+  task: scene_regression
+  domain: risk
+  architecture: encoder_regressor
+  in_channels: 10
+  outputs:
+  - hazard_score
+  - exposure_score
+  license: MPL-2.0
+  status: starter
+- family: livestock_estimator
+  name: Livestock Estimator
+  task: scene_regression
+  domain: agriculture
+  architecture: encoder_regressor
+  in_channels: 3
+  outputs:
+  - head_count
+  license: MPL-2.0
+  status: starter
+- family: resource_allocation
+  name: Service Demand Estimator
+  task: scene_regression
+  domain: analysis
+  architecture: encoder_regressor
+  in_channels: 4
+  outputs:
+  - population
+  - service_demand
+  license: MPL-2.0
+  status: starter
+- family: disaster_management
+  name: Disaster Impact Estimator
+  task: scene_regression
+  domain: risk
+  architecture: encoder_regressor
+  in_channels: 10
+  outputs:
+  - affected_fraction
+  license: MPL-2.0
+  status: starter
+- family: emergency_disaster_manager
+  name: Emergency Needs Estimator
+  task: scene_regression
+  domain: risk
+  architecture: encoder_regressor
+  in_channels: 4
+  outputs:
+  - affected_population
+  - shelter_need
+  license: MPL-2.0
+  status: starter
+- family: preparedness_manager
+  name: Preparedness Scorer
+  task: scene_regression
+  domain: risk
+  architecture: encoder_regressor
+  in_channels: 10
+  outputs:
+  - preparedness
+  license: MPL-2.0
+  status: starter
+- family: timeseries_analyzer
+  name: Phenology Estimator
+  task: scene_regression
+  domain: agriculture
+  architecture: encoder_regressor
+  in_channels: 6
+  outputs:
+  - start_of_season
+  - peak_of_season
+  - end_of_season
+  license: MPL-2.0
+  status: starter
+- family: zonal_statistics
+  name: Zonal Cover Estimator
+  task: scene_regression
+  domain: analysis
+  architecture: encoder_regressor
+  in_channels: 10
+  outputs:
+  - vegetation_fraction
+  - water_fraction
+  - built_up_fraction
+  license: MPL-2.0
+  status: starter
+- family: dem_generator
+  name: DEM from Stereo
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 2
+  outputs:
+  - elevation
+  license: MPL-2.0
+  status: starter
+- family: digitization_3d
+  name: Building Height Estimator
+  task: dense_regression
+  domain: urban
+  architecture: unet_regression
+  in_channels: 4
+  outputs:
+  - building_height
+  license: MPL-2.0
+  status: starter
+- family: dsm_generator
+  name: DSM from Stereo
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 2
+  outputs:
+  - surface_elevation
+  license: MPL-2.0
+  status: starter
+- family: dtm_generator
+  name: DTM from DSM
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 1
+  outputs:
+  - ground_elevation
+  license: MPL-2.0
+  status: starter
+- family: ground_displacement
+  name: Ground Displacement Estimator
+  task: dense_regression
+  domain: sar
+  architecture: unet_regression
+  in_channels: 3
+  outputs:
+  - los_displacement
+  license: MPL-2.0
+  status: starter
+- family: land_surface_temperature
+  name: Land Surface Temperature
+  task: dense_regression
+  domain: environment
+  architecture: unet_regression
+  in_channels: 7
+  outputs:
+  - surface_temperature
+  license: MPL-2.0
+  status: starter
+- family: model_3d
+  name: Normalised Surface Model
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 4
+  outputs:
+  - object_height
+  license: MPL-2.0
+  status: starter
+- family: sar_amplitude
+  name: SAR Backscatter Normaliser
+  task: dense_regression
+  domain: sar
+  architecture: unet_regression
+  in_channels: 3
+  outputs:
+  - gamma0_vv
+  - gamma0_vh
+  license: MPL-2.0
+  status: starter
+- family: sar_phase_displacement
+  name: InSAR Phase Unwrapper
+  task: dense_regression
+  domain: sar
+  architecture: unet_regression
+  in_channels: 3
+  outputs:
+  - unwrapped_phase
+  license: MPL-2.0
+  status: starter
+- family: sar_subsidence_monitor
+  name: Subsidence Velocity Estimator
+  task: dense_regression
+  domain: sar
+  architecture: unet_regression
+  in_channels: 6
+  outputs:
+  - velocity
+  license: MPL-2.0
+  status: starter
+- family: stereo_processor
+  name: Stereo Disparity Estimator
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 2
+  outputs:
+  - disparity
+  license: MPL-2.0
+  status: starter
+- family: tree_height_estimator
+  name: Canopy Height Estimator
+  task: dense_regression
+  domain: forestry
+  architecture: unet_regression
+  in_channels: 12
+  outputs:
+  - canopy_height
+  license: MPL-2.0
+  status: starter
+- family: tri_stereo_processor
+  name: DSM from Tri-Stereo
+  task: dense_regression
+  domain: imaging
+  architecture: unet_regression
+  in_channels: 3
+  outputs:
+  - surface_elevation
+  license: MPL-2.0
+  status: starter
+- family: coregistration
+  name: Co-registration Flow Estimator
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 6
+  outputs:
+  - dx
+  - dy
+  license: MPL-2.0
+  status: starter
+- family: mosaic_processor
+  name: Mosaic Colour Harmoniser
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 3
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: mosaicking
+  name: Seamline Blender
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 6
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: multispectral_processor
+  name: Multispectral Denoiser
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 10
+  outputs:
+  - B02
+  - B03
+  - B04
+  - B05
+  - B06
+  - B07
+  - B08
+  - B8A
+  - B11
+  - B12
+  license: MPL-2.0
+  status: starter
+- family: ortho_processor
+  name: Orthorectification Flow Estimator
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 4
+  outputs:
+  - dx
+  - dy
+  license: MPL-2.0
+  status: starter
+- family: orthorectification
+  name: Learned Orthorectification
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 4
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: panchromatic_processor
+  name: Panchromatic Denoiser
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 1
+  outputs:
+  - pan
+  license: MPL-2.0
+  status: starter
+- family: pansharpening
+  name: Pansharpening
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 5
+  outputs:
+  - blue
+  - green
+  - red
+  - nir
+  license: MPL-2.0
+  status: starter
+- family: raster_tiler
+  name: Tile Radiometric Normaliser
+  task: enhancement
+  domain: imaging
+  architecture: unet_image_to_image
+  in_channels: 3
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: sar_mapping_workflow
+  name: SAR Despeckler
+  task: enhancement
+  domain: sar
+  architecture: unet_image_to_image
+  in_channels: 2
+  outputs:
+  - VV
+  - VH
+  license: MPL-2.0
+  status: starter
+- family: synthetic_imagery
+  name: SAR to Optical Translator
+  task: enhancement
+  domain: ai
+  architecture: unet_image_to_image
+  in_channels: 2
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: super_resolution
+  name: Super-Resolution
+  task: super_resolution
+  domain: imaging
+  architecture: residual_subpixel
+  in_channels: 3
+  outputs:
+  - red
+  - green
+  - blue
+  license: MPL-2.0
+  status: starter
+- family: evi_calculator
+  name: EVI Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 3
+  outputs:
+  - evi
+  license: MPL-2.0
+  status: reference
+- family: msi_calculator
+  name: MSI Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 2
+  outputs:
+  - msi
+  license: MPL-2.0
+  status: reference
+- family: nbr_calculator
+  name: NBR Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 2
+  outputs:
+  - nbr
+  license: MPL-2.0
+  status: reference
+- family: ndvi_calculator
+  name: NDVI Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 2
+  outputs:
+  - ndvi
+  license: MPL-2.0
+  status: reference
+- family: ndwi_calculator
+  name: NDWI Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 2
+  outputs:
+  - ndwi
+  license: MPL-2.0
+  status: reference
+- family: savi_calculator
+  name: SAVI Calculator
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 2
+  outputs:
+  - savi
+  license: MPL-2.0
+  status: reference
+- family: vegetation_condition
+  name: Vegetation Condition Index
+  task: spectral_index
+  domain: indices
+  architecture: spectral_formula
+  in_channels: 3
+  outputs:
+  - vci
+  license: MPL-2.0
+  status: reference

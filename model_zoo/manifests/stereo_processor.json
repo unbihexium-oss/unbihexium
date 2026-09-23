@@ -1,91 +1,74 @@
 {
-  "model_id": "stereo_processor",
-  "name": "Stereo Processor",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "stereo_processor",
+  "name": "Stereo Disparity Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "imaging",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Stereo Processor model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates disparity between the two images of an epipolar stereo pair.",
+  "inputs": {
+    "bands": [
+      "pan_t1",
+      "pan_t2"
+    ],
+    "dates": 1,
+    "channels": [
+      "pan_t1",
+      "pan_t2"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "disparity"
+    ],
+    "units": [
+      "px"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Reference disparity maps.",
+  "data_sources": [
+    "Epipolar-rectified stereo pairs"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "cd28edadf8a7f474dbf266c360f18dcb115208364e4fc0a06053d3f73b386799",
-          "size_bytes": 1065
-        },
-        {
-          "name": "model.pt",
-          "sha256": "1bd180b109a3088c36d88bad2b67142ad45b0dc16d44384d23515f05616a7b10",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "83dbcfa47be1ecb6464e3601a707f9816940306540ece716903ec80a03e00a99",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "stereo_processor_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 732785,
+      "weights_digest": "bc84236000a007636715fc0413d02e5b694d4fc9ec93097e364c482f5a55a1bc"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "31d9ec2782a46a95e686eb3908c9d650cef95913d9bb1de6250d3f83d976b255",
-          "size_bytes": 3373
-        },
-        {
-          "name": "model.pt",
-          "sha256": "df59e72150f4311328b7f1c3275bcd5f453b7e947dc18c92b4d54c6e7c96f10d",
-          "size_bytes": 5309
-        },
-        {
-          "name": "config.json",
-          "sha256": "36183562a29f5c2c5f380a1a025254d9b3d832fc1e8c9ab3a76d382555877a27",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "stereo_processor_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058145,
+      "weights_digest": "028350c0c0f29bd5a347bdf38d2578777b82159531ec768e8682f0214ffdac40"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "1b28bdc539186f55b2391f604d829c9be43fdc2e471f6ff36b0a242a12d2ca81",
-          "size_bytes": 10033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "61dec4dabb049d5505cdbcf70d26f8fb5bc9835b5af8ea9660c44814a8c3974f",
-          "size_bytes": 11965
-        },
-        {
-          "name": "config.json",
-          "sha256": "0c1cd9997136ab7b83826adf7af14322c5319784213006438a86f7f63c6ca798",
-          "size_bytes": 181
-        }
-      ]
+      "model_id": "stereo_processor_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22058641,
+      "weights_digest": "a856f5b52ef5f2800d1b9f04d9858883edf9bc15d59c47a2e48a7e67a97514d2"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7b97c80fde54e573a46da538bc95d2452e6f433704de55798894c10b7040d901",
-          "size_bytes": 35639
-        },
-        {
-          "name": "model.pt",
-          "sha256": "fa0c064145497f2582b5a63267b95fa283f9996b6c6419244f4f5b6b4490d0aa",
-          "size_bytes": 37565
-        },
-        {
-          "name": "config.json",
-          "sha256": "b7aaf866610727dc091786d8f64058ff39643998923fc59c3dccdac9a659fbe3",
-          "size_bytes": 179
-        }
-      ]
+      "model_id": "stereo_processor_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60449985,
+      "weights_digest": "83bf5b565608c22d41e96a70ffe4815d074314e23dab66b5104455c9b74ddadf"
     }
-  },
-  "capabilities": [
-    "stereo_processor"
-  ]
+  }
 }

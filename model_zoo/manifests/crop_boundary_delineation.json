@@ -1,91 +1,79 @@
 {
-  "model_id": "crop_boundary_delineation",
+  "$schema": "../manifest.schema.json",
+  "family": "crop_boundary_delineation",
   "name": "Crop Boundary Delineation",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "segmentation",
+  "domain": "agriculture",
   "architecture": "unet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Crop Boundary Delineation model for segmentation.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Delineates agricultural field boundaries by segmenting field interiors and boundary lines.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "background",
+      "field_interior",
+      "field_boundary"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of class logits; apply softmax over K."
+  },
+  "training_labels": "Field polygons rasterised into interiors and boundaries.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "PlanetScope"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "7b7846b057fb88bfce5fba7910d9a0f26311bc270a1f1bc6e0703615066e4e0b",
-          "size_bytes": 3696
-        },
-        {
-          "name": "model.pt",
-          "sha256": "dd9dfcb4bc870844ed6b8bb848a7dd0d40ebc63fe683850e67fd50c68e4e0713",
-          "size_bytes": 5681
-        },
-        {
-          "name": "config.json",
-          "sha256": "4a700ce7f32114da7d123d5de3bd8145e18c188a479a53558c4007db81dd35af",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "crop_boundary_delineation_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733107,
+      "weights_digest": "7b11fd0e62bb4521ca5c6c71229ddf4aab7bea1e5fa05ddaa983e62e9ab8e3c2"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "386aef582c58637f2bfbda79bf490c84e7abaea4defd4c41dd6cd1514549328f",
-          "size_bytes": 30343
-        },
-        {
-          "name": "model.pt",
-          "sha256": "06d0e9bbfaad7a99b231f06f2e057b6f8658b33dee9603767afb93da1e27db26",
-          "size_bytes": 32177
-        },
-        {
-          "name": "config.json",
-          "sha256": "521c2233629b01a5657f32fb911848a617d6991c7c7b99d56493bcd378e3e67f",
-          "size_bytes": 425
-        }
-      ]
+      "model_id": "crop_boundary_delineation_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058787,
+      "weights_digest": "843a3c4f05d4201fa33106e049d5167f4ca5795642a85bc16d56c213d4db8cd2"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2136759efded6a74def0604f277ea1fcfad4efafbe15e9558e3bf958a86599b7",
-          "size_bytes": 112465
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8999f3fca2c5856df19d419a9893bd75c8657660387cb4e466a01c2c3f45a116",
-          "size_bytes": 114289
-        },
-        {
-          "name": "config.json",
-          "sha256": "e108b91dc6b0c6a11dd91aed04bfef376786a48a30a7c9dbb51aa990ac353945",
-          "size_bytes": 429
-        }
-      ]
+      "model_id": "crop_boundary_delineation_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059603,
+      "weights_digest": "9a0bd4a58c9eeaf808be65eec0d947f2017efd86d2f30fa4bdea550de03ae710"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8e44107956b9a9507de06bb537c29f38edbf49bfd0196b0e8fbe9f311d47ea2b",
-          "size_bytes": 436437
-        },
-        {
-          "name": "model.pt",
-          "sha256": "d8715613a669e3be67e6ef528084cf912cb01a5db71890fec7582615af882e5c",
-          "size_bytes": 438257
-        },
-        {
-          "name": "config.json",
-          "sha256": "d98b4fdbf009ba18df477f536bd5192db1601775bfe6a9360fc25aa0ed6d46a7",
-          "size_bytes": 427
-        }
-      ]
+      "model_id": "crop_boundary_delineation_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451267,
+      "weights_digest": "7556a3341f655f9cd471919404306e62d2d603d857867f1d197200edb541edcd"
     }
-  },
-  "capabilities": [
-    "crop_boundary_delineation"
-  ]
+  }
 }

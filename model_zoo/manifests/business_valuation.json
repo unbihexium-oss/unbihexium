@@ -1,91 +1,79 @@
 {
-  "model_id": "business_valuation",
-  "name": "Business Valuation",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "business_valuation",
+  "name": "Economic Activity Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "analysis",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Business Valuation model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates an economic activity index of an area from imagery.",
+  "inputs": {
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "dates": 1,
+    "channels": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "activity_index"
+    ],
+    "units": [
+      "1"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Economic indicators aggregated to chips.",
+  "data_sources": [
+    "Sentinel-2 10 m bands",
+    "night lights composites"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "88a925a731385822bf2a5bb6d7b09d77bde7fbd76dabb50885a479d08bd53de9",
-          "size_bytes": 1483
-        },
-        {
-          "name": "model.pt",
-          "sha256": "f2bd7561b6af0bc28dc5e14d2a4d6d409a911d29b295fcc049505aa4a745ea08",
-          "size_bytes": 3581
-        },
-        {
-          "name": "config.json",
-          "sha256": "c2e3cd48066069e3cd8992eb45d70e5a90612e517c8eb55ad1f0508728813c26",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "business_valuation_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494625,
+      "weights_digest": "7ce1c3ef9d13c2bb12a19b28b23ee78ba74141ed6e6b912cc1c1fb2f24c32844"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "feded0038cd92a0b65484b9484e1c3e8c33163a4da73c69e63d44ce7b74ef18c",
-          "size_bytes": 5037
-        },
-        {
-          "name": "model.pt",
-          "sha256": "55398f0d403878c2a6c36ce6da118eff758adfe91f8d24568af2375b5d07d6df",
-          "size_bytes": 6973
-        },
-        {
-          "name": "config.json",
-          "sha256": "4c37a54f4731f38f3a42fdb6a0f2879808f59de4bf4c47c7033216f7f98975af",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "business_valuation_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3745345,
+      "weights_digest": "50cbc4e2ab9a289f38b8825a8e8dc739ab1adb21e96cac5c895d68eed0c1cad5"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "e860299602bc68efbb5915fee56aa238e2baccd147f3e10738803aee78983c7b",
-          "size_bytes": 13361
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e45a96341c374687c66cfad6d65b9e02602685eddd86861e987075218865cbc1",
-          "size_bytes": 15293
-        },
-        {
-          "name": "config.json",
-          "sha256": "a1a4ed0e17ea609aa18256e306a2ec87b1ae00769567b734e4cad6448f776c99",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "business_valuation_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14606497,
+      "weights_digest": "8d7330be36baa260b339c129b6d8aadac2d1659cca1e2fcbddb3d5bdccf015b1"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bcaf02bd979eda755a78fa3e31eab54e74e0132706980684540d7e8e1f694f1c",
-          "size_bytes": 42295
-        },
-        {
-          "name": "model.pt",
-          "sha256": "8b5b00af688d10ebe8b8a049fad6a213790f552bd472c2761365091a1550a9e5",
-          "size_bytes": 44221
-        },
-        {
-          "name": "config.json",
-          "sha256": "a8254ffab481a704c8732e517645e19190d0ec90aabc764cecefc476532c9f80",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "business_valuation_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37762945,
+      "weights_digest": "d1d06d6e0343c5098a13362426b9bdb703be85c3789dd6ff9b2495f4854eaca1"
     }
-  },
-  "capabilities": [
-    "business_valuation"
-  ]
+  }
 }

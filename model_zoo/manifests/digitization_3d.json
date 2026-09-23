@@ -1,91 +1,78 @@
 {
-  "model_id": "digitization_3d",
-  "name": "Digitization 3D",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "cnn",
+  "$schema": "../manifest.schema.json",
+  "family": "digitization_3d",
+  "name": "Building Height Estimator",
+  "version": "2.0.0",
+  "task": "dense_regression",
+  "domain": "urban",
+  "architecture": "unet_regression",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Digitization 3D model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates building heights from imagery and a surface model.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue",
+      "surface_height"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue",
+      "surface_height"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "building_height"
+    ],
+    "units": [
+      "m"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K, H, W) of target values in the listed units."
+  },
+  "training_labels": "Building heights from LiDAR or cadastral 3D models.",
+  "data_sources": [
+    "RGB orthophotos with a DSM"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "112af7c806b80ca3c71ee487b506181c2fcf3b0763e1695c303df806cd771840",
-          "size_bytes": 1033
-        },
-        {
-          "name": "model.pt",
-          "sha256": "366e59539b4b002704d9d73ac3acabfaae778026d124e4b6f1820f60343c765b",
-          "size_bytes": 3133
-        },
-        {
-          "name": "config.json",
-          "sha256": "87a1165751bbef83f0cf6aee0f522778dc83855c7120139fa106816a75ff932b",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "digitization_3d_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 733073,
+      "weights_digest": "b094c68e59e834fcd6bc7258ed0958e33894e22bb33f0591af341ebf9bbb45b4"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "13f3d036055b698d81e23b6346425db56d0b0ee3543d1ee1ea1d398cebfd6557",
-          "size_bytes": 3245
-        },
-        {
-          "name": "model.pt",
-          "sha256": "c866bd7a43789420b60c0bf7fe3db9bb229868340abf5f9cd8653abffa3e72e5",
-          "size_bytes": 5181
-        },
-        {
-          "name": "config.json",
-          "sha256": "e9fe569cad14166013a9da24838b36c146929927cf3570d55753beb1898357c7",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "digitization_3d_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7058721,
+      "weights_digest": "796043b78aeab35f69757771590f344f57a4fd54dde2ec547c9e92c48c66af01"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "455c5d4e106043c44dff39d0b3ae916878dda2ae61939c0f712e9499d5ad42aa",
-          "size_bytes": 9777
-        },
-        {
-          "name": "model.pt",
-          "sha256": "95ff29849b86280500ef1702d36aa4df61d03ca3942ede314e97111f44c36ee4",
-          "size_bytes": 11709
-        },
-        {
-          "name": "config.json",
-          "sha256": "347a66eca9655f9334528470fdccfbff9e2e69dcbfe11d8268bdd7985259cd9c",
-          "size_bytes": 180
-        }
-      ]
+      "model_id": "digitization_3d_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22059505,
+      "weights_digest": "2bf3b93bec2fe03d4ce5d97f7c492c425ef2935b9cbe2f38bffb438f204d15cb"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "dfb26ef7100e1384f7495320b066288c4cb445b735a2a5cefc9eba8458b28b3e",
-          "size_bytes": 35127
-        },
-        {
-          "name": "model.pt",
-          "sha256": "603c5ccfac607c28d6d850a95169c35931e1457303a059c6529dbe929ed514cf",
-          "size_bytes": 37053
-        },
-        {
-          "name": "config.json",
-          "sha256": "506df4fb7c504092026ce98a93698f128aa6c024f7014b2484d20643ee80560d",
-          "size_bytes": 178
-        }
-      ]
+      "model_id": "digitization_3d_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60451137,
+      "weights_digest": "2ba65dc138854885dab8523881368ce0214c4537d92fb715a079c19bb0fc3409"
     }
-  },
-  "capabilities": [
-    "digitization_3d"
-  ]
+  }
 }

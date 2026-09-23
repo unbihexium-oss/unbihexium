@@ -1,8 +1,0 @@
-{
-  "model_id": "fire_monitor_large",
-  "task": "detection",
-  "variant": "large",
-  "params": 1277473,
-  "resolution": 256,
-  "base_channels": 96
-}

@@ -1,91 +1,76 @@
 {
-  "model_id": "livestock_estimator",
+  "$schema": "../manifest.schema.json",
+  "family": "livestock_estimator",
   "name": "Livestock Estimator",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "agriculture",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Livestock Estimator model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates the number of livestock in a chip.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "head_count"
+    ],
+    "units": [
+      "animals"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Livestock counts per chip.",
+  "data_sources": [
+    "Very high resolution RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "8c13c51c4e4e0fbcb07d1c9a5f9df57a9282f56d9f0cbe888d7b8d06d40f9965",
-          "size_bytes": 1195
-        },
-        {
-          "name": "model.pt",
-          "sha256": "e5b7e2eb292f582640d99f6612e00d06b7867812a47e92a79458300ca45f1cad",
-          "size_bytes": 3261
-        },
-        {
-          "name": "config.json",
-          "sha256": "857bf2e49f361e56cb9d2d271ead155b55d73f2ca19a036b5262d39c0c72237e",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "livestock_estimator_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494481,
+      "weights_digest": "65dfec3048c347eee3fb52a38ab93806eece1f7bc12a81fb19e5da7f684eb27c"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "afc5c2661de368e39e1ccace6903df9c1f6db95a8ca5a5a04387c75486ccf74c",
-          "size_bytes": 3885
-        },
-        {
-          "name": "model.pt",
-          "sha256": "5ea746bbbc74266cff54f0dac63b9cc276534183f4ccdfb6dacee2dd2e553711",
-          "size_bytes": 5821
-        },
-        {
-          "name": "config.json",
-          "sha256": "4b3f4b32d1f40d85894ab81175779b959f5eb06caac0e6816138d5047c35ec97",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "livestock_estimator_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3745057,
+      "weights_digest": "1fb5ced7b33c9858f986a7b93053d63f0a22545571fb828806b86f89a1fbb60f"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "0f67175ddc1d9eda1a81dcb5cf10cb0440685463d10c644b7ac7c1720ac82cf9",
-          "size_bytes": 11057
-        },
-        {
-          "name": "model.pt",
-          "sha256": "11be278617bc3a4843705d9ec8f89b7ccc0ebb92a75890f3794031c36cf15cf0",
-          "size_bytes": 12989
-        },
-        {
-          "name": "config.json",
-          "sha256": "e802b5c6f0ea6aa3edcfa39cff05ec726863b07c8d7f780744aec2a9c762aa2d",
-          "size_bytes": 184
-        }
-      ]
+      "model_id": "livestock_estimator_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14606065,
+      "weights_digest": "f6a07af02917c873dda714bc572c11ddb2a3aceadfdeb67cff227df787418d3a"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "102b01bda31a8a69b15f7b68a110c22b491d4413bb50e460c74338dfc09c511e",
-          "size_bytes": 37687
-        },
-        {
-          "name": "model.pt",
-          "sha256": "15f72b3fd2a20460e16e5f5ddf53fb518187b8cf474b2b7ef19dbaf9d0ef3944",
-          "size_bytes": 39613
-        },
-        {
-          "name": "config.json",
-          "sha256": "29068af796ca4f2faaf3c54ac2ed3aa7614ee9bddce89d3b793983b0e7870ffa",
-          "size_bytes": 182
-        }
-      ]
+      "model_id": "livestock_estimator_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37762369,
+      "weights_digest": "dc61bb8cc359a352d98c6883e9a2dd6c5af773a9157c44aab2d4604f40785621"
     }
-  },
-  "capabilities": [
-    "livestock_estimator"
-  ]
+  }
 }

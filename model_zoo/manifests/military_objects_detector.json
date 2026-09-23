@@ -1,91 +1,77 @@
 {
-  "model_id": "military_objects_detector",
+  "$schema": "../manifest.schema.json",
+  "family": "military_objects_detector",
   "name": "Military Objects Detector",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "task": "detection",
-  "architecture": "resnet_fpn",
+  "domain": "defense",
+  "architecture": "centernet",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Military Objects Detector model for detection.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Detects vehicles, aircraft, vessels and fortified structures for neutral monitoring and verification.",
+  "inputs": {
+    "bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "dates": 1,
+    "channels": [
+      "red",
+      "green",
+      "blue"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "vehicle",
+      "aircraft",
+      "vessel",
+      "fortified_structure"
+    ],
+    "units": [],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets."
+  },
+  "training_labels": "Bounding boxes of the four object classes.",
+  "data_sources": [
+    "Very high resolution satellite RGB imagery"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "eb68d4678dd5b7f999a1030d206ec4412e022bff584ad31d6855af9ce601a263",
-          "size_bytes": 3732
-        },
-        {
-          "name": "model.pt",
-          "sha256": "49f552e3eec0a7d2700acd2254c53fb0a391302bd86c9f37aa7c4be6f17fb7e9",
-          "size_bytes": 5745
-        },
-        {
-          "name": "config.json",
-          "sha256": "57963aefcaacd274f26266a0c8a96deea0b3a549c84ecf1be7eb076ec4cbf3c8",
-          "size_bytes": 444
-        }
-      ]
+      "model_id": "military_objects_detector_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 730680,
+      "weights_digest": "da8e557122f6a4894f0b3f87779e9fccf2e1993623c74a6b2af28da3b61e7413"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "9141b5e4b323c2ef804937a02fdfc18caf6d3ace225d40aa7ed7110855ddcd05",
-          "size_bytes": 30475
-        },
-        {
-          "name": "model.pt",
-          "sha256": "ccd4c4f1683540bd333db3e0390f8a8c56c4be8eb6466f0b267881d4138b0f08",
-          "size_bytes": 32305
-        },
-        {
-          "name": "config.json",
-          "sha256": "48752c4c4b2ec177023073003502c733e12bd10f8f5db87bae5ae47505fb67a4",
-          "size_bytes": 444
-        }
-      ]
+      "model_id": "military_objects_detector_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 7049320,
+      "weights_digest": "e0916faf9861435952032d7b934e88355c9411e9d7f99d4647813fae18919ef9"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "eba765bfce693cbb09930e59cdc22fe85972fc24d42fb8a774cf5db6c74035da",
-          "size_bytes": 112725
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0f720f021614119da61bbfa6bcbde7bded680122fe2dafbaa92635528eb17fed",
-          "size_bytes": 114545
-        },
-        {
-          "name": "config.json",
-          "sha256": "3a2630dd0c9871e3d218e18939e3d0f38d25609f760b34a7f41ff15df5194d00",
-          "size_bytes": 448
-        }
-      ]
+      "model_id": "military_objects_detector_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 22038488,
+      "weights_digest": "250c2b2b87e06c07fbec6a9b3fca8f5329197adb7f5036383eda8748d233abf0"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "bc4242ca964b58e44de0b2ba2403e09df84a8551b99e11396b12e94fd097c5fb",
-          "size_bytes": 436953
-        },
-        {
-          "name": "model.pt",
-          "sha256": "02957370212c01ad4fd2564026b35aec8c24f910cc770690e0e29dc55a53882d",
-          "size_bytes": 438769
-        },
-        {
-          "name": "config.json",
-          "sha256": "1ca6a50c4518b6c166274cd7240a64cf58c11e85eaa696b989debb556fe08010",
-          "size_bytes": 446
-        }
-      ]
+      "model_id": "military_objects_detector_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 60413896,
+      "weights_digest": "9c53ae3e8d9c940abf780469f3a7d289ae5b4bee6f89f16ea93652916f88c252"
     }
-  },
-  "capabilities": [
-    "military_objects_detector"
-  ]
+  }
 }

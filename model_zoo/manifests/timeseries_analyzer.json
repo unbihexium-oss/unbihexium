@@ -1,91 +1,87 @@
 {
-  "model_id": "timeseries_analyzer",
-  "name": "Timeseries Analyzer",
-  "version": "1.0.0",
-  "task": "regression",
-  "architecture": "mlp",
+  "$schema": "../manifest.schema.json",
+  "family": "timeseries_analyzer",
+  "name": "Phenology Estimator",
+  "version": "2.0.0",
+  "task": "scene_regression",
+  "domain": "agriculture",
+  "architecture": "encoder_regressor",
   "license": "MPL-2.0",
-  "status": "production",
-  "description": "Timeseries Analyzer model for regression.",
-  "artifacts": {
+  "status": "starter",
+  "trained": false,
+  "description": "Estimates start, peak and end of season from a stack of six NDVI observations.",
+  "inputs": {
+    "bands": [
+      "ndvi_t1",
+      "ndvi_t2",
+      "ndvi_t3",
+      "ndvi_t4",
+      "ndvi_t5",
+      "ndvi_t6"
+    ],
+    "dates": 1,
+    "channels": [
+      "ndvi_t1",
+      "ndvi_t2",
+      "ndvi_t3",
+      "ndvi_t4",
+      "ndvi_t5",
+      "ndvi_t6"
+    ]
+  },
+  "outputs": {
+    "names": [
+      "start_of_season",
+      "peak_of_season",
+      "end_of_season"
+    ],
+    "units": [
+      "day of year",
+      "day of year",
+      "day of year"
+    ],
+    "range": null,
+    "scale": 1,
+    "formula": null,
+    "layout": "Tensor (N, K) with one value per target and chip."
+  },
+  "training_labels": "Phenology dates from field observation or reference products.",
+  "data_sources": [
+    "Sentinel-2 L2A time series",
+    "Landsat 8/9 time series"
+  ],
+  "variants": {
     "tiny": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "b4c4ba7153a0c3bd0c1738869db4e9220bff3e8d3a546306d733f0085a0e8355",
-          "size_bytes": 1387
-        },
-        {
-          "name": "model.pt",
-          "sha256": "bc31db4ef7b6be7ba6e13c1a6e9deaa9b0ff47d55db549ce96748e89484f167e",
-          "size_bytes": 3453
-        },
-        {
-          "name": "config.json",
-          "sha256": "09a294c49d3593d1b1e29924d7b9fa97d6983b96aec32a816debf1054871bfab",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "timeseries_analyzer_tiny",
+      "tile_size": 256,
+      "base_channels": 16,
+      "depth": 3,
+      "num_parameters": 494979,
+      "weights_digest": "bdf4c862bab85231c896c7dc4e5b40754cad70fa7ac1c95a0f070f5f84412848"
     },
     "base": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2e37e622d071c35c8c55be543bd8ad38d6720bb25b696a4c229edf82f77c9990",
-          "size_bytes": 4653
-        },
-        {
-          "name": "model.pt",
-          "sha256": "eb2c61257a64100160d73a642fa4f3b71d5bf3afdef08e718976c138f76758a0",
-          "size_bytes": 6589
-        },
-        {
-          "name": "config.json",
-          "sha256": "707938c62dc1b66c450c7fdcd9cbca15befeb1899fc914fb401f7c03ba80d8cf",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "timeseries_analyzer_base",
+      "tile_size": 256,
+      "base_channels": 32,
+      "depth": 4,
+      "num_parameters": 3746051,
+      "weights_digest": "5b2ab8fad4fa526cc21444305851336a031cb2411f855cf8d33ede0e02ef5478"
     },
     "large": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "643c1a26238c80ea6da4131d681ed5b4e56136ee84f1a2afe0f84ef6b0db403b",
-          "size_bytes": 12593
-        },
-        {
-          "name": "model.pt",
-          "sha256": "722a7c09afaea459e3779c8fa8c7f38f6737362dc945306e8bd6301c39f5b9fe",
-          "size_bytes": 14525
-        },
-        {
-          "name": "config.json",
-          "sha256": "25372e6995adf0360dc62ee8b77a01503ef0b7121ec173d24f784e3558824173",
-          "size_bytes": 185
-        }
-      ]
+      "model_id": "timeseries_analyzer_large",
+      "tile_size": 512,
+      "base_channels": 48,
+      "depth": 4,
+      "num_parameters": 14607555,
+      "weights_digest": "307f224e34847200ce7fa3a78661444964beccf9bc4ed9a6867f06edcb185ba7"
     },
     "mega": {
-      "files": [
-        {
-          "name": "model.onnx",
-          "sha256": "2ab3b26e69e7be8093428ff9f2ee2ed62d4fad85d94c71cb4571227a8c491e10",
-          "size_bytes": 40759
-        },
-        {
-          "name": "model.pt",
-          "sha256": "0c179929b95b3f63ef13142b463001c2d4b49509b408db2526102f512f04b029",
-          "size_bytes": 42685
-        },
-        {
-          "name": "config.json",
-          "sha256": "e05c5239bc8b673687c982edb16bd6ebcd511aed9c732248742861e9d10a2d02",
-          "size_bytes": 183
-        }
-      ]
+      "model_id": "timeseries_analyzer_mega",
+      "tile_size": 512,
+      "base_channels": 64,
+      "depth": 5,
+      "num_parameters": 37764355,
+      "weights_digest": "1f905f9e06be4eaf37d2d351ea3abffe69328ef0d5bc5b90df1a02be35cd4bed"
     }
-  },
-  "capabilities": [
-    "timeseries_analyzer"
-  ]
+  }
 }
