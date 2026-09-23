@@ -32,6 +32,25 @@ jobs:
       - name: Check tracked text files
         run: python .github/scripts/check_text_policy.py
 
+  python-style:
+    name: Python documentation style
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      # Header, footer, no docstrings and a comment for every code line in
+      # the directories listed in STYLE_ROOTS of the script.
+      - name: Check the Python documentation style
+        run: python .github/scripts/check_python_style.py
+
   commit-messages:
     name: Commit messages
     if: github.event_name == 'pull_request'

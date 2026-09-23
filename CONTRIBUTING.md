@@ -53,8 +53,19 @@ $$
 
 - Python 3.10+
 - Type hints required
-- Docstrings for public APIs
+- `#` comments instead of docstrings (see Python Documentation Style)
 - No emojis in code or commits
+
+## Python Documentation Style
+
+Python files use `#` comments instead of docstrings, and follow a fixed layout that `.github/scripts/check_python_style.py` enforces in CI and in pre-commit for the directories converted so far (listed in `STYLE_ROOTS` of the script):
+
+1. The MPL-2.0 notice in the first lines, as required by the licence check.
+2. An academic header block with the fields `Project`, `Module` (the repository path of the file), `Title`, `Author`, `Affiliation`, `Copyright`, `Licence` and `Python`, followed by an `Abstract` and, where useful, `Usage`, `Method`, `References` and `Exit status` sections.
+3. A comment for every line of code, either on the line itself or on the line directly above it. Lines that hold only closing brackets, and continuation lines of a string inside brackets, count as punctuation. A comment above a decorator also covers the decorated definition.
+4. A footer block that starts with `# End of module <path>`.
+
+Libraries that read docstrings at runtime need explicit arguments instead: pass `help=` to command line options, and `description=` to FastAPI routes and `json_schema_extra` to Pydantic models so that the OpenAPI documentation keeps its text.
 
 ## Commit Messages
 
