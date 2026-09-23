@@ -323,7 +323,7 @@ The CI job "Test" runs the whole suite (`pytest tests/`); the Coverage workflow 
 - Tests MUST NOT require network access, credentials or a GPU unless they are marked accordingly. The registered markers are `slow`, `gpu` and `integration` (`pyproject.toml`); pytest runs with `--strict-markers`, so other markers are rejected.
 - Tests that depend on an optional extra SHOULD skip with `pytest.mark.skipif` when the extra is not installed, as `tests/unit/test_io.py` does for rasterio, GeoPandas, pyproj and Zarr.
 - Test data MUST be synthetic or openly licensed. Small fixtures live in `tests/fixtures/` (see its README); tests SHOULD create larger inputs in temporary directories.
-- Tests that touch the model zoo SHOULD set the environment variable `UNBIHEXIUM_CACHE` to a temporary directory and use the `tiny` variants. The 520 models of the zoo (130 families in four variants: tiny, base, large and mega) are untrained starter models with deterministic weights, except the seven spectral index models, which compute exact formulas. Tests MUST NOT assert accuracy figures for the starter models.
+- Tests that touch the model zoo SHOULD set the environment variable `UNBIHEXIUM_CACHE` to a temporary directory and use the `tiny` variants. The 520 models of the zoo (130 families in four variants: tiny, base, large and mega) are untrained starter models with deterministic weights, except the 28 models of the 7 spectral index families, which compute exact formulas. Tests MUST NOT assert accuracy figures for the starter models.
 
 ### 6.3 Fuzz targets
 
