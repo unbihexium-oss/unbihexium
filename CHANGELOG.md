@@ -49,10 +49,16 @@ Where:
 - Issue forms for bug reports, feature requests, documentation, model zoo, performance, compliance, build and questions, each with about 95 mandatory questions, an AI usage declaration and regulatory confirmations
 - Pull request template with the same declarations, AI usage declaration and regulatory confirmations
 - CODEOWNERS, label definitions with a label sync workflow, and release notes categories
+- Workflows for package builds, licence compliance, text policy, Markdown, model zoo integrity, notebooks, repository configuration schemas, workflow linting, secret scanning, container scanning, pull request titles, path labels, link checking, stale items and first-time contributor greetings
+- Pull request path labeler configuration, dependency review policy, link checker configuration and instructions for AI coding assistants in `.github/`
 
 ### Fixed (Unreleased)
 
 - Invalid YAML in `.github/FUNDING.yml`
+- SLSA provenance workflow, which called the reusable generator as a step and could not run
+- Release workflow wrote `SHA256SUMS.txt` into `dist/`, which would have made the PyPI upload fail
+- pre-commit hook pointing to a missing script
+- markdownlint findings in the documentation
 
 ### Changed (Unreleased)
 
