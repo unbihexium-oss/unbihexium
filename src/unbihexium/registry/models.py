@@ -17,7 +17,7 @@ class ModelEntry:
     sha256: str = ""
     download_url: str | None = None
     size_bytes: int = 0
-    license: str = "Apache-2.0"
+    license: str = "MPL-2.0"
     source: str = "release"  # repo, release, lfs, external
 
     def to_dict(self) -> dict[str, Any]:

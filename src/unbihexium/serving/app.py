@@ -61,7 +61,7 @@ def create_app(
         title=title,
         description="REST API for Earth Observation and Geospatial AI",
         version=version or unbihexium.__version__,
-        license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
+        license_info={"name": "MPL-2.0", "url": "https://mozilla.org/MPL/2.0/"},
     )
 
     # Middleware

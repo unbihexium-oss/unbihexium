@@ -17,7 +17,7 @@ class ModelZooEntry:
     sha256: str = ""
     download_url: str | None = None
     size_bytes: int = 0
-    license: str = "Apache-2.0"
+    license: str = "MPL-2.0"
     source: str = "release"  # repo, release, lfs, external
     version: str = "1.0.0"
     description: str = ""

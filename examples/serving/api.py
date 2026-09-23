@@ -37,7 +37,7 @@ app = FastAPI(
     title="Unbihexium API",
     description="REST API for Earth Observation and Geospatial AI",
     version=unbihexium.__version__,
-    license_info={"name": "Apache-2.0"},
+    license_info={"name": "MPL-2.0", "url": "https://mozilla.org/MPL/2.0/"},
 )
 
 
