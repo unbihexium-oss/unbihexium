@@ -29,6 +29,9 @@
 - name: security
   color: "ee0701"
   description: "Security hardening; report vulnerabilities privately"
+- name: tests
+  color: "bfdadc"
+  description: "Tests and test configuration"
 - name: breaking-change
   color: "e11d21"
   description: "Changes existing behaviour and requires a major version"
@@ -54,6 +57,9 @@
 - name: confirmed
   color: "0e8a16"
   description: "Reproduced or accepted by a maintainer"
+- name: stale
+  color: "dddddd"
+  description: "No recent activity; closes automatically unless updated"
 - name: blocked
   color: "000000"
   description: "Blocked by another issue or an external factor"

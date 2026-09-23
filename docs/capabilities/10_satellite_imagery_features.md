@@ -139,9 +139,11 @@ $$
 
 Q-Index (Universal Quality Index):
 
+<!-- markdownlint-disable MD011 -->
 $$
 Q = \frac{4 \sigma_{xy} \bar{x} \bar{y}}{(\sigma_x^2 + \sigma_y^2)[(\bar{x})^2 + (\bar{y})^2]}
 $$
+<!-- markdownlint-enable MD011 -->
 
 ERGAS (Erreur Relative Globale Adimensionnelle de Synthèse):
 

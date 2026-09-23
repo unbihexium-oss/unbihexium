@@ -1,0 +1,76 @@
+name: Repository Config
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/**"
+      - ".readthedocs.yaml"
+      - "CITATION.cff"
+      - "docker-compose.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/**"
+      - ".readthedocs.yaml"
+      - "CITATION.cff"
+      - "docker-compose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  schemas:
+    name: Validate configuration schemas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install check-jsonschema
+        run: python -m pip install check-jsonschema
+
+      - name: Issue forms
+        run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml
+
+      - name: Issue template chooser
+        run: check-jsonschema --builtin-schema vendor.github-issue-config .github/ISSUE_TEMPLATE/config.yml
+
+      - name: Workflows
+        run: check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml
+
+      - name: Dependabot
+        run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
+
+      - name: Read the Docs
+        run: check-jsonschema --builtin-schema vendor.readthedocs .readthedocs.yaml
+
+      - name: Citation File Format
+        run: check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff
+
+      - name: Docker Compose
+        run: check-jsonschema --builtin-schema vendor.compose-spec docker-compose.yml
+
+      - name: Remaining YAML files parse
+        run: |
+          python - <<'PY'
+          import pathlib
+          import yaml
+
+          files = ["labels.yml", "labeler.yml", "release.yml", "dependency-review-config.yml", "FUNDING.yml"]
+          for name in files:
+              yaml.safe_load(pathlib.Path(".github", name).read_text(encoding="utf-8"))
+              print(f"{name}: ok")
+          PY

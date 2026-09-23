@@ -4,7 +4,7 @@ This directory contains example scripts, notebooks, and applications demonstrati
 
 ## Directory Structure
 
-```
+```text
 examples/
 ├── notebooks/          # Jupyter notebooks for interactive exploration
 │   ├── 01_getting_started.ipynb

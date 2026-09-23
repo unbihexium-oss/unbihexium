@@ -1,0 +1,42 @@
+name: Notebooks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/notebooks/**"
+      - ".github/scripts/check_notebooks.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "examples/notebooks/**"
+      - ".github/scripts/check_notebooks.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    name: Validate notebooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install nbformat
+        run: python -m pip install nbformat
+
+      - name: Check format and absence of outputs
+        run: python .github/scripts/check_notebooks.py examples/notebooks

@@ -1,0 +1,56 @@
+name: Model Zoo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "model_zoo/**"
+      - ".github/scripts/check_model_zoo.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "model_zoo/**"
+      - ".github/scripts/check_model_zoo.py"
+  workflow_dispatch:
+    inputs:
+      lfs-tier:
+        description: "Download the weights of this tier with Git LFS and hash them (uses LFS bandwidth)"
+        type: choice
+        default: none
+        options:
+          - none
+          - tiny
+          - base
+          - large
+          - mega
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  integrity:
+    name: Structure and checksums
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Download weights with Git LFS
+        if: github.event_name == 'workflow_dispatch' && inputs.lfs-tier != 'none'
+        env:
+          TIER: ${{ inputs.lfs-tier }}
+        run: git lfs pull --include "model_zoo/assets/${TIER}/**"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Check model zoo structure, checksums, cards and manifests
+        run: python .github/scripts/check_model_zoo.py

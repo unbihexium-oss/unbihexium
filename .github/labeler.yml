@@ -1,0 +1,74 @@
+# Path-based labels applied to pull requests by .github/workflows/labeler.yml.
+# Every label used here is defined in .github/labels.yml.
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "examples/**"
+          - "**/*.md"
+          - "mkdocs.yml"
+          - ".readthedocs.yaml"
+
+model-zoo:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "model_zoo/**"
+          - "src/unbihexium/zoo/**"
+          - "src/unbihexium/registry/**"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+          - "tox.ini"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/scripts/**"
+          - ".pre-commit-config.yaml"
+
+build:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "pyproject.toml"
+          - "requirements*.txt"
+          - "Makefile"
+          - "tox.ini"
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "Dockerfile"
+          - "docker-compose.yml"
+          - ".dockerignore"
+          - "deploy/**"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "requirements*.txt"
+
+compliance:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "LICENSE.txt"
+          - "NOTICE"
+          - "NOTICE.md"
+          - "THIRD_PARTY_NOTICES.md"
+          - "COMPLIANCE.md"
+          - "PRIVACY.md"
+          - "CITATION.cff"
+          - "CITATION.md"
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "SECURITY.md"
+          - ".github/workflows/security.yml"
+          - ".github/workflows/secret-scan.yml"
+          - ".github/workflows/container-scan.yml"
+          - ".github/workflows/scorecard.yml"
+          - ".github/dependency-review-config.yml"

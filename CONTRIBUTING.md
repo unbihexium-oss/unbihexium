@@ -83,6 +83,27 @@ Issues are opened through the forms in `.github/ISSUE_TEMPLATE/`; blank issues a
 - The declarations cover the repository, third-party libraries, models and data involved.
 - The regulatory confirmations link to the exact articles of the GDPR, the EU AI Act, the Cyber Resilience Act and the other regulations listed in [COMPLIANCE.md](COMPLIANCE.md).
 
+## Continuous Integration
+
+Every pull request runs the workflows in `.github/workflows/`. The most important checks are:
+
+| Workflow | What it checks |
+| --- | --- |
+| CI | Lint, type check and tests on Python 3.10 to 3.14 |
+| Integration Tests | Integration, end-to-end and API tests |
+| Package | Builds the sdist and wheel, validates metadata and installs the wheel on Python 3.10 and 3.14 |
+| License Compliance | MPL-2.0 notices in every source file and licences of all dependencies |
+| Text Policy | English only, no emojis and no em dashes in files and commit messages |
+| Markdown | markdownlint with `.markdownlint.json` |
+| Model Zoo | Model zoo structure, SHA256 checksums, model cards and manifests |
+| Notebooks | Valid notebook format and no committed outputs |
+| Repository Config | Issue forms, workflows, Dependabot, Read the Docs, CITATION.cff and Compose files against their schemas |
+| Workflow Lint | actionlint and shellcheck on all workflows |
+| Security, Secret Scan, Container Scan | Bandit, pip-audit, dependency review, TruffleHog and Grype |
+| PR Title | Conventional commit format of the pull request title |
+
+Scheduled workflows check links (Links), mark inactive issues and pull requests (Stale) and run the OpenSSF Scorecard.
+
 ## AI-Assisted Contributions
 
 Contributions prepared with AI assistance are accepted when they are disclosed. Every issue form and the pull request template contain an AI usage declaration. Contributors must:

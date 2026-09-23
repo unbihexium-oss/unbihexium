@@ -59,5 +59,4 @@ jobs:
       - name: Dependency Review
         uses: actions/dependency-review-action@v4
         with:
-          fail-on-severity: critical
-        continue-on-error: true
+          config-file: ./.github/dependency-review-config.yml

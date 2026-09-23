@@ -153,7 +153,7 @@ settings.cache_dir = "/path/to/cache"
 
 #### Issue: ImportError for deprecated modules
 
-```
+```text
 ImportError: cannot import name 'detect_ships' from 'unbihexium'
 ```
 

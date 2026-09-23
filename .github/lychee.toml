@@ -1,0 +1,17 @@
+# Link checker configuration used by .github/workflows/links.yml.
+
+max_concurrency = 16
+max_retries = 2
+timeout = 20
+include_mail = false
+
+# Rate limiting and bot protection are not broken links.
+accept = ["200..=299", "403", "429"]
+
+exclude = [
+    "^https?://localhost",
+    "^https?://127\\.0\\.0\\.1",
+    "^https?://0\\.0\\.0\\.0",
+    "^https?://example\\.(com|org)",
+    "^https?://(www\\.)?doi\\.org/10\\.5281/zenodo\\.0000000",
+]

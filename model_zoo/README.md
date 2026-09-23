@@ -33,7 +33,7 @@ git lfs pull --include "model_zoo/assets/tiny/*"
 
 ## Directory Structure
 
-```
+```text
 model_zoo/
 ├── assets/
 │   ├── tiny/           # 130 tiny models (32ch, 64px)

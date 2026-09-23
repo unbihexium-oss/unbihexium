@@ -1,0 +1,98 @@
+name: Package
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install build tools
+        run: python -m pip install build twine
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Check distribution metadata
+        run: python -m twine check --strict dist/*
+
+      - name: Check that licence files are shipped
+        run: |
+          python - <<'PY'
+          import pathlib
+          import tarfile
+          import zipfile
+
+          required = {"LICENSE.txt", "NOTICE"}
+          wheel = next(pathlib.Path("dist").glob("*.whl"))
+          names = {pathlib.PurePosixPath(n).name for n in zipfile.ZipFile(wheel).namelist() if ".dist-info/licenses/" in n}
+          missing = required - names
+          assert not missing, f"wheel is missing {missing}"
+          sdist = next(pathlib.Path("dist").glob("*.tar.gz"))
+          names = {pathlib.PurePosixPath(n).name for n in tarfile.open(sdist).getnames()}
+          missing = required - names
+          assert not missing, f"sdist is missing {missing}"
+          print("Licence files present in wheel and sdist")
+          PY
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  smoke-test:
+    name: Install wheel (Python ${{ matrix.python-version }})
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.14"]
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install the wheel in a clean environment
+        run: |
+          python -m venv /tmp/venv
+          /tmp/venv/bin/python -m pip install --upgrade pip
+          /tmp/venv/bin/python -m pip install dist/*.whl
+
+      - name: Import the package and run the CLI
+        working-directory: /tmp
+        run: |
+          /tmp/venv/bin/python -c "import unbihexium; print(unbihexium.__version__)"
+          /tmp/venv/bin/unbihexium --help

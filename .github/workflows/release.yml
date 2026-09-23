@@ -27,10 +27,12 @@ jobs:
       - name: Build package
         run: python -m build
 
+      # Keep SHA256SUMS.txt outside dist/ so that only distributions are uploaded to PyPI.
       - name: Generate checksums
         run: |
+          mkdir -p checksums
           cd dist
-          sha256sum * > SHA256SUMS.txt
+          sha256sum -- * > ../checksums/SHA256SUMS.txt
 
       - name: Generate attestations
         uses: actions/attest-build-provenance@v3
@@ -42,7 +44,7 @@ jobs:
         with:
           files: |
             dist/*
-            dist/SHA256SUMS.txt
+            checksums/SHA256SUMS.txt
           generate_release_notes: true
 
       - name: Publish to PyPI

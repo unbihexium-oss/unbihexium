@@ -1,0 +1,49 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  stale:
+    name: Mark and close stale issues and pull requests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v11
+        with:
+          days-before-issue-stale: 60
+          days-before-issue-close: 14
+          days-before-pr-stale: 45
+          days-before-pr-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: security,confirmed,blocked,help wanted,good first issue,breaking-change,compliance
+          exempt-pr-labels: security,blocked,breaking-change,dependencies
+          exempt-draft-pr: true
+          remove-stale-when-updated: true
+          operations-per-run: 100
+          stale-issue-message: >-
+            This issue has had no activity for 60 days and is now marked as stale.
+            It will be closed in 14 days unless there is new activity. Comment with
+            any new information to keep it open.
+          close-issue-message: >-
+            This issue was closed because it had no activity for 14 days after being
+            marked as stale. Reopen it or open a new issue if the problem persists.
+          stale-pr-message: >-
+            This pull request has had no activity for 45 days and is now marked as
+            stale. It will be closed in 14 days unless there is new activity.
+          close-pr-message: >-
+            This pull request was closed because it had no activity for 14 days after
+            being marked as stale. Reopen it when you resume work.
