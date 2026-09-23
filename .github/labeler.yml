@@ -62,6 +62,10 @@ compliance:
           - "PRIVACY.md"
           - "CITATION.cff"
           - "CITATION.md"
+          - "codemeta.json"
+          - "REUSE.toml"
+          - "LICENSES/**"
+          - "RESPONSIBLE_USE.md"
 
 security:
   - changed-files:
@@ -72,3 +76,4 @@ security:
           - ".github/workflows/container-scan.yml"
           - ".github/workflows/scorecard.yml"
           - ".github/dependency-review-config.yml"
+          - "security-insights.yml"

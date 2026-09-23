@@ -1,0 +1,91 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Unbihexium",
+  "description": "Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library",
+  "version": "1.0.1",
+  "license": "https://spdx.org/licenses/MPL-2.0",
+  "codeRepository": "https://github.com/unbihexium-oss/unbihexium",
+  "issueTracker": "https://github.com/unbihexium-oss/unbihexium/issues",
+  "readme": "https://github.com/unbihexium-oss/unbihexium/blob/main/README.md",
+  "continuousIntegration": "https://github.com/unbihexium-oss/unbihexium/actions",
+  "developmentStatus": "https://www.repostatus.org/#active",
+  "datePublished": "2025-12-18",
+  "dateModified": "2026-09-23",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "Python",
+    "url": "https://www.python.org/"
+  },
+  "runtimePlatform": [
+    "Python 3.10",
+    "Python 3.11",
+    "Python 3.12",
+    "Python 3.13",
+    "Python 3.14"
+  ],
+  "operatingSystem": [
+    "Linux",
+    "macOS",
+    "Windows"
+  ],
+  "applicationCategory": "Earth observation, geospatial analysis and remote sensing",
+  "keywords": [
+    "earth-observation",
+    "geospatial",
+    "remote-sensing",
+    "sar",
+    "satellite-imagery",
+    "gis",
+    "machine-learning",
+    "deep-learning",
+    "object-detection",
+    "segmentation",
+    "change-detection",
+    "flood-mapping",
+    "agriculture",
+    "urban-planning",
+    "environmental-monitoring"
+  ],
+  "softwareRequirements": [
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "rasterio>=1.3.0",
+    "shapely>=2.0.0",
+    "geopandas>=0.14.0",
+    "pyproj>=3.6.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "pydantic>=2.5.0",
+    "pyyaml>=6.0.0",
+    "requests>=2.31.0",
+    "tqdm>=4.66.0",
+    "pillow>=10.0.0",
+    "scikit-learn>=1.3.0",
+    "scikit-image>=0.22.0"
+  ],
+  "author": [
+    {
+      "@type": "Organization",
+      "name": "Unbihexium OSS Foundation",
+      "email": "opensource@unbihexium.org"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Olaf Yunus",
+      "familyName": "Laitinen Imanov",
+      "email": "yunus.z.imanov@helsinki.fi",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "University of Helsinki"
+      }
+    }
+  ],
+  "copyrightHolder": {
+    "@type": "Organization",
+    "name": "Unbihexium OSS Foundation"
+  },
+  "copyrightYear": 2025
+}

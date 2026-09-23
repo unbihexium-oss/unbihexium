@@ -1,0 +1,14 @@
+# Licensing and copyright information for every file in the repository,
+# following the REUSE specification 3.3 (https://reuse.software/spec-3.3/).
+# Check compliance with `reuse lint`.
+
+version = 1
+SPDX-PackageName = "unbihexium"
+SPDX-PackageSupplier = "Unbihexium OSS Foundation <opensource@unbihexium.org>"
+SPDX-PackageDownloadLocation = "https://github.com/unbihexium-oss/unbihexium"
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Unbihexium OSS Foundation and contributors"
+SPDX-License-Identifier = "MPL-2.0"

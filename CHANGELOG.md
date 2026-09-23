@@ -51,6 +51,8 @@ Where:
 - CODEOWNERS, label definitions with a label sync workflow, and release notes categories
 - Workflows for package builds, licence compliance, text policy, Markdown, model zoo integrity, notebooks, repository configuration schemas, workflow linting, secret scanning, container scanning, pull request titles, path labels, link checking, stale items and first-time contributor greetings
 - Pull request path labeler configuration, dependency review policy, link checker configuration and instructions for AI coding assistants in `.github/`
+- Root project files: AUTHORS.md, MAINTAINERS.md, ROADMAP.md, RESPONSIBLE_USE.md, security-insights.yml (OpenSSF Security Insights 2.0), codemeta.json, codecov.yml, REUSE.toml with LICENSES/, .mailmap, .env.example and .yamllint.yml
+- REUSE compliance, Security Insights, Codecov, CodeMeta and yamllint checks in CI
 
 ### Fixed (Unreleased)
 
@@ -59,6 +61,8 @@ Where:
 - Release workflow wrote `SHA256SUMS.txt` into `dist/`, which would have made the PyPI upload fail
 - pre-commit hook pointing to a missing script
 - markdownlint findings in the documentation
+- Repository Config workflow failed because PyYAML was not installed
+- README security controls table listed tools that the repository does not run
 
 ### Changed (Unreleased)
 

@@ -34,6 +34,26 @@ jobs:
       - name: Check licence text and source file notices
         run: python .github/scripts/check_license_headers.py
 
+  reuse:
+    name: REUSE compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Install reuse
+        run: python -m pip install reuse
+
+      - name: Check that every file has copyright and licence information
+        run: reuse lint
+
   dependencies:
     name: Dependency licences
     runs-on: ubuntu-latest

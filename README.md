@@ -705,12 +705,14 @@ $$
 
 | Control | Implementation | Status | Verification |
 | --------- | --------------- | -------- | -------------- |
-| Dependency Scanning | Dependabot, Safety, pip-audit | Active | Daily |
-| Static Analysis | CodeQL, Bandit, Semgrep | Active | Every PR |
-| Model Integrity | SHA256 checksums | Active | On download |
-| Supply Chain | SBOM generation, SLSA Level 3 | Active | Every release |
-| Secrets Management | GitHub Secrets, no hardcoding | Enforced | Pre-commit |
-| Container Scanning | Trivy, Grype | Active | Every build |
+| Dependency Scanning | Dependabot, pip-audit, Dependency Review | Active | Every PR and weekly |
+| Static Analysis | Bandit, Ruff | Active | Every PR |
+| Secret Scanning | TruffleHog | Active | Every PR and push |
+| Model Integrity | SHA256 checksums of every model variant | Active | Every model zoo change and on download |
+| Supply Chain | Container SBOM, build provenance attestations, SLSA Level 3 provenance | Active | Every release |
+| Container Scanning | Grype | Active | Image changes and weekly |
+| Licence Compliance | REUSE, MPL-2.0 notices, dependency licences | Active | Every PR |
+| Repository Security | OpenSSF Scorecard, [security-insights.yml](security-insights.yml) | Active | Weekly |
 
 ### Compliance Certifications
 
@@ -731,6 +733,10 @@ We welcome contributions from the community. Please review:
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Community standards
 - [GOVERNANCE.md](GOVERNANCE.md) - Project governance
+- [MAINTAINERS.md](MAINTAINERS.md) - Maintainers and responsibilities
+- [AUTHORS.md](AUTHORS.md) - Authors and contributors
+- [ROADMAP.md](ROADMAP.md) - Planned work
+- [RESPONSIBLE_USE.md](RESPONSIBLE_USE.md) - Intended use, limitations and deployer obligations
 - [SECURITY.md](SECURITY.md) - Security reporting
 
 ### Development Workflow

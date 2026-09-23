@@ -5,16 +5,20 @@ on:
     branches: [main]
     paths:
       - ".github/**"
-      - ".readthedocs.yaml"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - ".yamllint.yml"
       - "CITATION.cff"
-      - "docker-compose.yml"
+      - "codemeta.json"
   pull_request:
     branches: [main]
     paths:
       - ".github/**"
-      - ".readthedocs.yaml"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - ".yamllint.yml"
       - "CITATION.cff"
-      - "docker-compose.yml"
+      - "codemeta.json"
   workflow_dispatch:
 
 permissions:
@@ -39,8 +43,8 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Install check-jsonschema
-        run: python -m pip install check-jsonschema
+      - name: Install validators
+        run: python -m pip install check-jsonschema pyyaml yamllint
 
       - name: Issue forms
         run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml
@@ -63,6 +67,15 @@ jobs:
       - name: Docker Compose
         run: check-jsonschema --builtin-schema vendor.compose-spec docker-compose.yml
 
+      - name: Codecov
+        run: check-jsonschema --builtin-schema vendor.codecov codecov.yml
+
+      - name: CodeMeta is valid JSON
+        run: python -m json.tool codemeta.json > /dev/null
+
+      - name: yamllint
+        run: yamllint --strict --config-file .yamllint.yml .
+
       - name: Remaining YAML files parse
         run: |
           python - <<'PY'
@@ -74,3 +87,27 @@ jobs:
               yaml.safe_load(pathlib.Path(".github", name).read_text(encoding="utf-8"))
               print(f"{name}: ok")
           PY
+
+  security-insights:
+    name: Validate security-insights.yml
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CUE_VERSION: v0.17.1
+      SPEC_VERSION: v2.2.0
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install cue and fetch the Security Insights schema
+        run: |
+          curl -sSfL "https://github.com/cue-lang/cue/releases/download/${CUE_VERSION}/cue_${CUE_VERSION}_linux_amd64.tar.gz" | tar -xz -C "${RUNNER_TEMP}" cue
+          git clone --quiet --depth 1 --branch "${SPEC_VERSION}" https://github.com/ossf/security-insights.git "${RUNNER_TEMP}/security-insights"
+
+      # cue resolves the schema package relative to the working directory,
+      # so run it from inside the schema checkout.
+      - name: Validate against the Security Insights schema
+        working-directory: ${{ runner.temp }}/security-insights
+        run: |
+          "${RUNNER_TEMP}/cue" vet -d '#SecurityInsights' ./spec "${GITHUB_WORKSPACE}/security-insights.yml"
