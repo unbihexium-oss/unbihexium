@@ -1,44 +1,74 @@
-# Categories for automatically generated release notes.
-changelog:
-  exclude:
-    labels:
-      - ignore-for-release
-      - duplicate
-      - invalid
-      - wontfix
-  categories:
-    - title: Breaking changes
-      labels:
-        - breaking-change
-    - title: Security
-      labels:
-        - security
-    - title: New features
-      labels:
-        - enhancement
-    - title: Bug fixes
-      labels:
-        - bug
-    - title: Model zoo
-      labels:
-        - model-zoo
-    - title: Performance
-      labels:
-        - performance
-    - title: Compliance and licensing
-      labels:
-        - compliance
-    - title: Documentation
-      labels:
-        - documentation
-    - title: Build, CI and containers
-      labels:
-        - build
-        - ci
-        - docker
-    - title: Dependencies
-      labels:
-        - dependencies
-    - title: Other changes
-      labels:
-        - "*"
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/release.yml
+# Title       : Categories for generated release notes
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub automatically generated release notes configuration (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# GitHub reads this file when release notes are generated for a new release,
+# whether from the release page or by the Release workflow. Merged pull
+# requests are sorted into the categories below by their labels (defined in
+# .github/labels.yml); a pull request goes into the first category whose
+# labels match, so the order of the categories is the order of priority.
+# Pull requests without a matching label end up under "Other changes".
+# =============================================================================
+
+changelog:  # Settings for the generated changelog.
+  exclude:  # Pull requests left out of the notes entirely.
+    labels:  # Any of these labels excludes a pull request.
+      - ignore-for-release  # Explicit opt-out by a maintainer.
+      - duplicate  # Superseded by another pull request.
+      - invalid  # Not a real change.
+      - wontfix  # Declined change.
+  categories:  # Sections of the notes, in order of priority.
+    - title: Breaking changes  # Listed first so that users see them.
+      labels:  # Labels that select this section.
+        - breaking-change  # Changes that need a major version.
+    - title: Security  # Security fixes and hardening.
+      labels:  # Labels that select this section.
+        - security  # Security related changes.
+    - title: New features  # User-facing additions.
+      labels:  # Labels that select this section.
+        - enhancement  # New features and improvements.
+    - title: Bug fixes  # Corrections of documented behaviour.
+      labels:  # Labels that select this section.
+        - bug  # Defect fixes.
+    - title: Model zoo  # Changes to models and their metadata.
+      labels:  # Labels that select this section.
+        - model-zoo  # Weights, manifests, model cards and checksums.
+    - title: Performance  # Speed and memory improvements.
+      labels:  # Labels that select this section.
+        - performance  # Performance work.
+    - title: Compliance and licensing  # Legal and regulatory changes.
+      labels:  # Labels that select this section.
+        - compliance  # Licence, privacy and policy documents.
+    - title: Documentation  # Documentation changes.
+      labels:  # Labels that select this section.
+        - documentation  # Guides, docstrings, notebooks and model cards.
+    - title: Build, CI and containers  # Tooling changes.
+      labels:  # Labels that select this section.
+        - build  # Packaging and build.
+        - ci  # Workflows and automation.
+        - docker  # Container image and deployment.
+    - title: Dependencies  # Dependency updates.
+      labels:  # Labels that select this section.
+        - dependencies  # Dependabot and manual pin updates.
+    - title: Other changes  # Everything not matched above.
+      labels:  # Labels that select this section.
+        - "*"  # Wildcard that matches every pull request.
+
+# =============================================================================
+# End of file .github/release.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

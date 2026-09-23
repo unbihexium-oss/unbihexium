@@ -1,7 +1,20 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# Codecov configuration
+# Project     : Unbihexium
+# File        : codecov.yml
+# Title       : Codecov coverage reporting settings
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : Codecov configuration (YAML)
 # =============================================================================
 #
+# Abstract
+# --------
 # Coverage is measured by pytest-cov in .github/workflows/coverage.yml and
 # uploaded to Codecov with the flag `unittests`. Measurement settings
 # (source, branch coverage, excluded lines) live in [tool.coverage.*] in
@@ -20,38 +33,38 @@
 # The targets below record the direction of travel, not a gate.
 # =============================================================================
 
-codecov:
+codecov:  # Behaviour of the Codecov service.
   # Wait for the other CI checks to pass before sending statuses and
   # comments, so that a failed test run does not report partial coverage as
   # the final result.
   require_ci_to_pass: true
-  notify:
+  notify:  # When Codecov sends its results.
     # One upload per commit, from the Coverage workflow.
     after_n_builds: 1
-    wait_for_ci: true
+    wait_for_ci: true  # Hold notifications until the CI run has finished.
 
-coverage:
+coverage:  # How coverage is shown and judged.
   # Two decimal places, rounded down, so that a report never overstates
   # coverage.
   precision: 2
-  round: down
+  round: down  # Round towards lower coverage.
   # Colour scale on the Codecov dashboard: red below 60 %, green above 90 %.
   range: "60...90"
 
-  status:
+  status:  # Commit statuses posted to GitHub.
     # Coverage of the whole project compared with the base commit.
     project:
-      default:
-        target: auto
-        threshold: 1%
-        informational: true
-        only_pulls: false
+      default:  # Single status for the whole project.
+        target: auto  # Compare with the coverage of the base commit.
+        threshold: 1%  # Allow a drop of up to one percentage point.
+        informational: true  # Report only; never fail the status.
+        only_pulls: false  # Also report on pushes to branches.
     # Coverage of the lines changed by a pull request.
     patch:
-      default:
-        target: 80%
-        informational: true
-        only_pulls: true
+      default:  # Single status for the changed lines.
+        target: 80%  # Aim for four in five changed lines covered.
+        informational: true  # Report only; never fail the status.
+        only_pulls: true  # Patch coverage only makes sense for pull requests.
     # The "changes" status (coverage changes not explained by the diff) is
     # left at its default, disabled.
 
@@ -59,9 +72,9 @@ coverage:
 # Flags: one per kind of upload
 # -----------------------------------------------------------------------------
 flags:
-  unittests:
-    paths:
-      - src/unbihexium/
+  unittests:  # Flag set by the Coverage workflow upload.
+    paths:  # Files that this flag covers.
+      - src/unbihexium/  # The installed package only.
     # Keep the last known coverage for this flag when a commit has no upload,
     # for example a documentation-only change.
     carryforward: true
@@ -71,70 +84,77 @@ flags:
 # the dashboard
 # -----------------------------------------------------------------------------
 component_management:
-  default_rules:
-    statuses:
-      - type: project
-        target: auto
-        informational: true
-  individual_components:
+  default_rules:  # Settings shared by every component.
+    statuses:  # Statuses posted for each component.
+      - type: project  # Whole-component coverage against the base commit.
+        target: auto  # Compare with the coverage of the base commit.
+        informational: true  # Report only; never fail the status.
+  individual_components:  # One entry per group of subpackages.
+    # Core types, configuration, registry and top-level modules.
     - component_id: core
-      name: Core, configuration and registry
-      paths:
-        - src/unbihexium/core/**
-        - src/unbihexium/config/**
-        - src/unbihexium/registry/**
-        - src/unbihexium/utils/**
-        - src/unbihexium/*.py
+      name: Core, configuration and registry  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/core/**  # Core data types.
+        - src/unbihexium/config/**  # Configuration handling.
+        - src/unbihexium/registry/**  # Capability and model registry.
+        - src/unbihexium/utils/**  # Shared helpers.
+        - src/unbihexium/*.py  # Top-level package modules.
+    # Raster, vector and catalogue readers and writers.
     - component_id: io
-      name: Input and output
-      paths:
-        - src/unbihexium/io/**
+      name: Input and output  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/io/**  # Readers and writers.
+    # Image processing before and after the models.
     - component_id: processing
-      name: Preprocessing, indices and postprocessing
-      paths:
-        - src/unbihexium/preprocessing/**
-        - src/unbihexium/indices/**
-        - src/unbihexium/postprocessing/**
+      name: Preprocessing, indices and postprocessing  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/preprocessing/**  # Input preparation.
+        - src/unbihexium/indices/**  # Spectral indices.
+        - src/unbihexium/postprocessing/**  # Output cleaning and vectorisation.
+    # Analytical methods.
     - component_id: analysis
-      name: Analysis, terrain and geostatistics
-      paths:
-        - src/unbihexium/analysis/**
-        - src/unbihexium/terrain/**
-        - src/unbihexium/geostat/**
-        - src/unbihexium/metrics/**
+      name: Analysis, terrain and geostatistics  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/analysis/**  # General analysis tools.
+        - src/unbihexium/terrain/**  # Terrain analysis.
+        - src/unbihexium/geostat/**  # Variograms and kriging.
+        - src/unbihexium/metrics/**  # Evaluation metrics.
+    # Radar processing.
     - component_id: sar
-      name: Synthetic aperture radar
-      paths:
-        - src/unbihexium/sar/**
+      name: Synthetic aperture radar  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/sar/**  # SAR calibration, filtering and interferometry.
+    # Machine learning models and their distribution.
     - component_id: ai
-      name: AI models and model zoo
-      paths:
-        - src/unbihexium/ai/**
-        - src/unbihexium/zoo/**
+      name: AI models and model zoo  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/ai/**  # Model architectures and inference.
+        - src/unbihexium/zoo/**  # Model download and verification.
+    # User-facing entry points.
     - component_id: interfaces
-      name: CLI, REST service and visualisation
-      paths:
-        - src/unbihexium/cli/**
-        - src/unbihexium/serving/**
-        - src/unbihexium/visualization/**
+      name: CLI, REST service and visualisation  # Name shown in reports.
+      paths:  # Files in this component.
+        - src/unbihexium/cli/**  # Command line interface.
+        - src/unbihexium/serving/**  # REST service.
+        - src/unbihexium/visualization/**  # Plotting helpers.
 
 # -----------------------------------------------------------------------------
 # Pull request comment
 # -----------------------------------------------------------------------------
 comment:
-  layout: "condensed_header, diff, flags, components, condensed_files, condensed_footer"
+  layout: "condensed_header, diff, flags, components, condensed_files, condensed_footer"  # Sections of the comment, in order.
   # Update the existing comment instead of posting a new one.
   behavior: default
   # Comment only when coverage changes.
   require_changes: true
-  require_base: false
-  require_head: true
-  hide_project_coverage: false
+  require_base: false  # Comment even when the base commit has no report.
+  require_head: true  # Comment only when the pull request head has a report.
+  hide_project_coverage: false  # Show project coverage next to patch coverage.
 
 # Line annotations in the "Files changed" tab are disabled: the pull request
 # comment and the dashboard already show uncovered lines.
 github_checks:
-  annotations: false
+  annotations: false  # No per-line annotations.
 
 # -----------------------------------------------------------------------------
 # Paths excluded from coverage reports
@@ -142,11 +162,17 @@ github_checks:
 # Only the package under src/ is measured. Tests, examples, scripts,
 # deployment files and repository automation are not library code.
 ignore:
-  - "tests/**"
-  - "examples/**"
-  - "scripts/**"
-  - "docs/**"
-  - "deploy/**"
-  - "model_zoo/**"
-  - ".github/**"
-  - "src/unbihexium/_version.py"
+  - "tests/**"  # Test suite.
+  - "examples/**"  # Example scripts.
+  - "scripts/**"  # Maintenance scripts.
+  - "docs/**"  # Documentation.
+  - "deploy/**"  # Deployment manifests.
+  - "model_zoo/**"  # Model files and metadata.
+  - ".github/**"  # Repository automation.
+  - "src/unbihexium/_version.py"  # Version constants only, no logic to test.
+
+# =============================================================================
+# End of file codecov.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,21 +1,36 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# yamllint configuration
-# https://yamllint.readthedocs.io/en/stable/configuration.html
+# Project     : Unbihexium
+# File        : .yamllint.yml
+# Title       : yamllint rules for the repository
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : yamllint configuration (YAML)
 # =============================================================================
 #
+# Abstract
+# --------
+# Rules for yamllint (https://yamllint.readthedocs.io/en/stable/configuration.html).
 # Used by the Repository Config workflow (.github/workflows/repo-config.yml),
-# the pre-commit hook and `make yaml-lint`, always in strict mode, so warnings
-# fail as well as errors.
+# the pre-commit hook and `make yaml-lint`, always in strict mode, so
+# warnings fail as well as errors. The configuration starts from the default
+# rule set and relaxes only the rules that conflict with GitHub Actions
+# syntax, long URLs and the comment style of the repository.
 # =============================================================================
 
-extends: default
+extends: default  # Start from the default rule set of yamllint.
 
 # Helm templates contain Go template expressions and are not valid YAML
-# before rendering.
+# before rendering, so they are skipped (gitignore-style patterns).
 ignore: |
   deploy/helm/*/templates/
 
-rules:
+rules:  # Changes to the default rules.
   # Long URLs, descriptions and shell commands in workflows cannot be wrapped
   # without changing their meaning.
   line-length: disable
@@ -27,17 +42,23 @@ rules:
   # GitHub Actions uses the key "on", which YAML 1.1 treats as a boolean.
   # Only values are checked.
   truthy:
-    check-keys: false
+    check-keys: false  # Do not flag keys such as "on".
 
   # Allow a single space between code and an inline comment, as written by
   # most editors and by Dependabot.
   comments:
-    min-spaces-from-content: 1
+    min-spaces-from-content: 1  # At least one space before the "#".
 
   # Comments may be indented to explain the following block.
   comments-indentation: disable
 
   # Sequences may be indented or not, but consistently within a file.
   indentation:
-    spaces: consistent
-    indent-sequences: whatever
+    spaces: consistent  # Same indentation width throughout a file.
+    indent-sequences: whatever  # Indented and flush sequences are both accepted.
+
+# =============================================================================
+# End of file .yamllint.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

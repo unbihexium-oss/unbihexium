@@ -1,76 +1,113 @@
-# Path-based labels applied to pull requests by .github/workflows/labeler.yml.
-# Every label used here is defined in .github/labels.yml.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/labeler.yml
+# Title       : Path-based pull request labels
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : actions/labeler configuration, version 5 syntax (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Read by actions/labeler in .github/workflows/labeler.yml, which adds labels
+# to a pull request according to the files it changes. Each top-level key is
+# a label name; the label is applied when any changed file matches any of
+# its globs. Every label used here must exist in .github/labels.yml, since the
+# labeler does not create labels. The labels then decide the section of the
+# release notes (.github/release.yml) in which the change appears.
+# =============================================================================
 
+# Documentation, examples and any Markdown file.
 documentation:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "docs/**"
-          - "examples/**"
-          - "**/*.md"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "docs/**"  # Documentation tree.
+          - "examples/**"  # Example scripts and notebooks.
+          - "**/*.md"  # Markdown anywhere in the repository.
 
+# Model zoo files and the code that loads and registers models.
 model-zoo:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "model_zoo/**"
-          - "src/unbihexium/zoo/**"
-          - "src/unbihexium/registry/**"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "model_zoo/**"  # Weights, manifests, model cards and checksums.
+          - "src/unbihexium/zoo/**"  # Model download and verification code.
+          - "src/unbihexium/registry/**"  # Capability and model registry.
 
+# Tests and the tox environments that run them.
 tests:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "tests/**"
-          - "tox.ini"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "tests/**"  # Test suite.
+          - "tox.ini"  # Test environments.
 
+# Continuous integration and repository automation.
 ci:
-  - changed-files:
-      - any-glob-to-any-file:
-          - ".github/workflows/**"
-          - ".github/scripts/**"
-          - ".pre-commit-config.yaml"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - ".github/workflows/**"  # GitHub Actions workflows.
+          - ".github/scripts/**"  # Policy and helper scripts used by the workflows.
+          - ".pre-commit-config.yaml"  # Local hooks that mirror the CI checks.
 
+# Packaging, build tooling and dependency pins.
 build:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "pyproject.toml"
-          - "requirements*.txt"
-          - "Makefile"
-          - "tox.ini"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "pyproject.toml"  # Package metadata and build backend.
+          - "requirements*.txt"  # Locked dependency lists.
+          - "Makefile"  # Developer task shortcuts.
+          - "tox.ini"  # Test environments.
 
+# Container image and deployment manifests.
 docker:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "Dockerfile"
-          - "docker-compose.yml"
-          - ".dockerignore"
-          - "deploy/**"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "Dockerfile"  # Container image definition.
+          - "docker-compose.yml"  # Local multi-container setup.
+          - ".dockerignore"  # Build context exclusions.
+          - "deploy/**"  # Kubernetes and Helm manifests.
 
+# Dependency pin changes, in addition to the Dependabot label.
 dependencies:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "requirements*.txt"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "requirements*.txt"  # Locked dependency lists.
 
+# Licence, legal, citation and policy documents.
 compliance:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "LICENSE.txt"
-          - "NOTICE"
-          - "NOTICE.md"
-          - "THIRD_PARTY_NOTICES.md"
-          - "COMPLIANCE.md"
-          - "PRIVACY.md"
-          - "CITATION.cff"
-          - "CITATION.md"
-          - "codemeta.json"
-          - "REUSE.toml"
-          - "RESPONSIBLE_USE.md"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "LICENSE.txt"  # Project licence text.
+          - "NOTICE"  # Plain-text legal notice.
+          - "NOTICE.md"  # Readable legal notice.
+          - "THIRD_PARTY_NOTICES.md"  # Third-party licences.
+          - "COMPLIANCE.md"  # Compliance statement.
+          - "PRIVACY.md"  # Privacy statement.
+          - "CITATION.cff"  # Machine-readable citation metadata.
+          - "CITATION.md"  # Citation guidance.
+          - "codemeta.json"  # CodeMeta software metadata.
+          - "REUSE.toml"  # REUSE licensing annotations.
+          - "RESPONSIBLE_USE.md"  # Responsible use policy.
 
+# Security policy, scanners and security metadata.
 security:
-  - changed-files:
-      - any-glob-to-any-file:
-          - "SECURITY.md"
-          - ".github/workflows/security.yml"
-          - ".github/workflows/secret-scan.yml"
-          - ".github/workflows/container-scan.yml"
-          - ".github/workflows/scorecard.yml"
-          - ".github/dependency-review-config.yml"
-          - "security-insights.yml"
+  - changed-files:  # Match against the files changed by the pull request.
+      - any-glob-to-any-file:  # Label when any changed file matches any glob.
+          - "SECURITY.md"  # Vulnerability reporting policy.
+          - ".github/workflows/security.yml"  # Dependency, licence and code scanning.
+          - ".github/workflows/secret-scan.yml"  # Secret scanning.
+          - ".github/workflows/container-scan.yml"  # Container image scanning.
+          - ".github/workflows/scorecard.yml"  # OpenSSF Scorecard.
+          - ".github/dependency-review-config.yml"  # Dependency Review policy.
+          - "security-insights.yml"  # OpenSSF Security Insights metadata.
+
+# =============================================================================
+# End of file .github/labeler.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,7 +1,20 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
 # =============================================================================
-# OpenSSF Security Insights
+# Project     : Unbihexium
+# File        : security-insights.yml
+# Title       : OpenSSF Security Insights for the repository
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : OpenSSF Security Insights 2.2.0 (YAML)
 # =============================================================================
 #
+# Abstract
+# --------
 # Machine-readable description of the security posture of this repository,
 # following the OpenSSF Security Insights specification 2.2.0:
 #   https://github.com/ossf/security-insights
@@ -25,12 +38,12 @@
 #     cue vet -c -d '#SecurityInsights' ./spec /path/to/security-insights.yml
 # =============================================================================
 
-header:
-  schema-version: 2.2.0
-  last-updated: "2026-09-23"
-  last-reviewed: "2026-09-23"
-  url: https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml
-  comment: |
+header:  # Metadata about this file.
+  schema-version: 2.2.0  # Version of the Security Insights specification used.
+  last-updated: "2026-09-23"  # Date of the last change to any value.
+  last-reviewed: "2026-09-23"  # Date of the last full review, at most six months ago.
+  url: https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml  # Canonical location of this file.
+  comment: |  # Scope of the security description.
     Security posture of the Unbihexium repository: the Python library, the
     command line interface, the REST service, the model zoo and the
     container image built from it.
@@ -38,54 +51,54 @@ header:
 # -----------------------------------------------------------------------------
 # Project: people, documentation and vulnerability reporting
 # -----------------------------------------------------------------------------
-project:
-  name: Unbihexium
-  homepage: https://github.com/unbihexium-oss/unbihexium
-  funding: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/FUNDING.yml
-  roadmap: https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md
-  administrators:
-    - name: Olaf Yunus Laitinen Imanov
-      affiliation: Unbihexium OSS Foundation
-      email: yunus.z.imanov@helsinki.fi
-      social: https://github.com/olaflaitinen
-      primary: true
-  documentation:
-    quickstart-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/quickstart.md
-    detailed-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/index.md
-    design: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/architecture/overview.md
-    code-of-conduct: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md
-    release-process: https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md
-    support-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md
-    signature-verification: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/security/supply_chain_security.md
-  repositories:
-    - name: unbihexium
-      url: https://github.com/unbihexium-oss/unbihexium
-      comment: |
+project:  # The project as a whole.
+  name: Unbihexium  # Project name.
+  homepage: https://github.com/unbihexium-oss/unbihexium  # Main web page of the project.
+  funding: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/FUNDING.yml  # How the project is funded.
+  roadmap: https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md  # Planned work.
+  administrators:  # People with administrative rights on the project.
+    - name: Olaf Yunus Laitinen Imanov  # Full name.
+      affiliation: Unbihexium OSS Foundation  # Organisation the person acts for.
+      email: yunus.z.imanov@helsinki.fi  # Contact address.
+      social: https://github.com/olaflaitinen  # GitHub profile.
+      primary: true  # Main contact for this role.
+  documentation:  # Documents for users and contributors.
+    quickstart-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/getting_started/quickstart.md  # First steps for new users.
+    detailed-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/index.md  # Full documentation index.
+    design: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/architecture/overview.md  # Architecture overview.
+    code-of-conduct: https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md  # Community rules.
+    release-process: https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md  # Versioning and release policy.
+    support-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md  # Support channels and supported versions.
+    signature-verification: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/security/supply_chain_security.md  # How to verify release signatures and provenance.
+  repositories:  # Repositories that make up the project.
+    - name: unbihexium  # Repository name.
+      url: https://github.com/unbihexium-oss/unbihexium  # Repository location.
+      comment: |  # What the repository contains.
         Library, command line interface, REST service, model zoo, container
         image definition, deployment manifests and documentation.
-  vulnerability-reporting:
-    reports-accepted: true
-    bug-bounty-available: false
-    contact:
-      name: Olaf Yunus Laitinen Imanov
-      affiliation: Unbihexium OSS Foundation
-      email: yunus.z.imanov@helsinki.fi
-      social: https://github.com/olaflaitinen
-      primary: true
-    policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md
-    in-scope:
-      - Source code of the unbihexium Python package under src/
-      - Command line interface and REST service (unbihexium.serving)
-      - Model zoo weights, manifests and checksums under model_zoo/
-      - Container image built from the Dockerfile
-      - Deployment manifests under deploy/
-      - GitHub Actions workflows and release pipeline under .github/
-    out-of-scope:
-      - Vulnerabilities in third-party dependencies that are already publicly known; report them to the upstream project
-      - Deployments operated by third parties
-      - Findings that require an already compromised host or a malicious local administrator
-      - Denial of service through intentionally oversized inputs without a practical amplification
-    comment: |
+  vulnerability-reporting:  # How to report a vulnerability.
+    reports-accepted: true  # Vulnerability reports are welcome.
+    bug-bounty-available: false  # No paid bug bounty programme.
+    contact:  # Person who receives vulnerability reports.
+      name: Olaf Yunus Laitinen Imanov  # Full name.
+      affiliation: Unbihexium OSS Foundation  # Organisation the person acts for.
+      email: yunus.z.imanov@helsinki.fi  # Contact address.
+      social: https://github.com/olaflaitinen  # GitHub profile.
+      primary: true  # Main contact for this role.
+    policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md  # Disclosure policy.
+    in-scope:  # Components covered by the policy.
+      - Source code of the unbihexium Python package under src/  # Covered by the security policy.
+      - Command line interface and REST service (unbihexium.serving)  # Covered by the security policy.
+      - Model zoo weights, manifests and checksums under model_zoo/  # Covered by the security policy.
+      - Container image built from the Dockerfile  # Covered by the security policy.
+      - Deployment manifests under deploy/  # Covered by the security policy.
+      - GitHub Actions workflows and release pipeline under .github/  # Covered by the security policy.
+    out-of-scope:  # Reports that are not handled as vulnerabilities.
+      - Vulnerabilities in third-party dependencies that are already publicly known; report them to the upstream project  # Not handled as a vulnerability.
+      - Deployments operated by third parties  # Not handled as a vulnerability.
+      - Findings that require an already compromised host or a malicious local administrator  # Not handled as a vulnerability.
+      - Denial of service through intentionally oversized inputs without a practical amplification  # Not handled as a vulnerability.
+    comment: |  # Reporting channel in words.
       Report vulnerabilities privately through GitHub private vulnerability
       reporting at
       https://github.com/unbihexium-oss/unbihexium/security/advisories/new,
@@ -95,186 +108,192 @@ project:
 # -----------------------------------------------------------------------------
 # Repository: status, licence, release process and security tooling
 # -----------------------------------------------------------------------------
-repository:
-  url: https://github.com/unbihexium-oss/unbihexium
-  status: active
-  bug-fixes-only: false
-  accepts-change-request: true
-  accepts-automated-change-request: true
-  no-third-party-packages: false
-  core-team:
-    - name: Olaf Yunus Laitinen Imanov
-      affiliation: Unbihexium OSS Foundation
-      email: yunus.z.imanov@helsinki.fi
-      social: https://github.com/olaflaitinen
-      primary: true
-  documentation:
-    contributing-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md
-    review-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md
-    security-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md
-    governance: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md
-    dependency-management-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/dependency-review-config.yml
-  license:
-    url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
-    expression: MPL-2.0
+repository:  # This repository.
+  url: https://github.com/unbihexium-oss/unbihexium  # Repository location.
+  status: active  # Actively developed and maintained.
+  bug-fixes-only: false  # New features are still accepted.
+  accepts-change-request: true  # Pull requests from contributors are accepted.
+  accepts-automated-change-request: true  # Pull requests from Dependabot and other bots are accepted.
+  no-third-party-packages: false  # The package depends on third-party packages.
+  core-team:  # Maintainers with write access.
+    - name: Olaf Yunus Laitinen Imanov  # Full name.
+      affiliation: Unbihexium OSS Foundation  # Organisation the person acts for.
+      email: yunus.z.imanov@helsinki.fi  # Contact address.
+      social: https://github.com/olaflaitinen  # GitHub profile.
+      primary: true  # Main contact for this role.
+  documentation:  # Policies that apply to this repository.
+    contributing-guide: https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md  # How to contribute.
+    review-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md  # How changes are reviewed.
+    security-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md  # Vulnerability handling.
+    governance: https://github.com/unbihexium-oss/unbihexium/blob/main/GOVERNANCE.md  # Decision making and roles.
+    dependency-management-policy: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/dependency-review-config.yml  # Rules for new dependencies.
+  license:  # Licence of the repository contents.
+    url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt  # Licence text.
+    expression: MPL-2.0  # SPDX licence expression.
 
   # Releases are built by the Release workflow when a version tag is pushed,
   # uploaded to PyPI, and attested with GitHub artifact attestations
   # and SLSA provenance.
-  release:
-    changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md
-    automated-pipeline: true
-    attestations:
-      - name: GitHub build provenance
-        predicate-uri: https://slsa.dev/provenance/v1
-        location: https://github.com/unbihexium-oss/unbihexium/attestations
-        comment: |
+  release:  # How releases are produced.
+    changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md  # Release history.
+    automated-pipeline: true  # Releases are built by a workflow, not by hand.
+    attestations:  # Signed statements about release artefacts.
+      - name: GitHub build provenance  # Attestation name.
+        predicate-uri: https://slsa.dev/provenance/v1  # In-toto predicate type of the attestation.
+        location: https://github.com/unbihexium-oss/unbihexium/attestations  # Where the attestations are published.
+        comment: |  # How the attestation is made and verified.
           Created by actions/attest-build-provenance in the Release and SLSA
           Provenance workflows for every file in dist/. Verify with
           `gh attestation verify <file> --repo unbihexium-oss/unbihexium`.
-      - name: SLSA level 3 provenance
-        predicate-uri: https://slsa.dev/provenance/v1
-        location: https://github.com/unbihexium-oss/unbihexium/releases
-        comment: |
+      - name: SLSA level 3 provenance  # Attestation name.
+        predicate-uri: https://slsa.dev/provenance/v1  # In-toto predicate type of the attestation.
+        location: https://github.com/unbihexium-oss/unbihexium/releases  # Where the attestations are published.
+        comment: |  # How the attestation is made and verified.
           Created by the slsa-framework/slsa-github-generator generic
           generator and attached to each GitHub release as a .intoto.jsonl
           file. Verify with slsa-verifier.
-    distribution-points:
-      - uri: pkg:pypi/unbihexium
-        comment: Python Package Index, uploaded by the Release workflow
-      - uri: https://github.com/unbihexium-oss/unbihexium/releases
-        comment: GitHub releases with SHA256SUMS.txt and SLSA provenance
-      - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium
-        comment: Container image on the GitHub Container Registry; the Docker workflow stores an SPDX SBOM of each pushed image as a workflow artifact
-    license:
-      url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt
-      expression: MPL-2.0
+    distribution-points:  # Where released artefacts can be obtained.
+      - uri: pkg:pypi/unbihexium  # Package URL or web address.
+        comment: Python Package Index, uploaded by the Release workflow  # What is published there.
+      - uri: https://github.com/unbihexium-oss/unbihexium/releases  # Package URL or web address.
+        comment: GitHub releases with SHA256SUMS.txt and SLSA provenance  # What is published there.
+      - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium  # Package URL or web address.
+        comment: Container image on the GitHub Container Registry; the Docker workflow stores an SPDX SBOM of each pushed image as a workflow artifact  # What is published there.
+    license:  # Licence of the released artefacts.
+      url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt  # Licence text.
+      expression: MPL-2.0  # SPDX licence expression.
 
-  security:
-    assessments:
-      self:
-        comment: |
+  security:  # Security assessments, contacts and tooling.
+    assessments:  # Security assessments of the project.
+      self:  # Assessment by the maintainers.
+        comment: |  # Status of the self-assessment.
           No formal security self-assessment has been published yet. The
           threat model and security controls are described in
           docs/architecture/security_model.md.
-    champions:
-      - name: Olaf Yunus Laitinen Imanov
-        affiliation: Unbihexium OSS Foundation
-        email: yunus.z.imanov@helsinki.fi
-        social: https://github.com/olaflaitinen
-        primary: true
+    champions:  # People who lead security work.
+      - name: Olaf Yunus Laitinen Imanov  # Full name.
+        affiliation: Unbihexium OSS Foundation  # Organisation the person acts for.
+        email: yunus.z.imanov@helsinki.fi  # Contact address.
+        social: https://github.com/olaflaitinen  # GitHub profile.
+        primary: true  # Main contact for this role.
 
     # Every tool below runs in a workflow under .github/workflows/. `adhoc`
     # means the workflow can also be started by hand (workflow_dispatch) or
     # runs on a schedule; `release` means it gates the release pipeline.
-    tools:
-      - name: Dependabot
-        type: SCA
-        comment: |
+    tools:  # Security tools run on this repository.
+      - name: Dependabot  # Tool name.
+        type: SCA  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Weekly version updates for pip and GitHub Actions, monthly for
           the Docker base image (.github/dependabot.yml), and security
           updates for known vulnerabilities.
-        rulesets:
-          - default
-        integration:
-          adhoc: false
-          ci: true
-          release: false
-        results: {}
-      - name: Dependency Review
-        type: SCA
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: false  # Not started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: Dependency Review  # Tool name.
+        type: SCA  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Blocks pull requests that add dependencies with high or critical
           vulnerabilities or with licences denied by the project policy
           (Security workflow).
-        rulesets:
-          - .github/dependency-review-config.yml
-        integration:
-          adhoc: false
-          ci: true
-          release: false
-        results: {}
-      - name: pip-audit
-        type: SCA
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - .github/dependency-review-config.yml  # Configuration file of the tool.
+        integration:  # When the tool runs.
+          adhoc: false  # Not started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: pip-audit  # Tool name.
+        type: SCA  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Checks the installed dependencies against the PyPI advisory
           database (Security workflow, `make security`).
-        rulesets:
-          - default
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results: {}
-      - name: Bandit
-        type: SAST
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: Bandit  # Tool name.
+        type: SAST  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Static analysis of src/ for common Python security issues
           (Security workflow, pre-commit, `make security`).
-        rulesets:
-          - pyproject.toml
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results: {}
-      - name: TruffleHog
-        type: secret
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - pyproject.toml  # Configuration file of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: TruffleHog  # Tool name.
+        type: secret  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Scans pushed commits and pull requests for verified secrets
           (Secret Scan workflow).
-        rulesets:
-          - default
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results: {}
-      - name: Grype
-        type: container
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: Grype  # Tool name.
+        type: container  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Scans the container image for vulnerable packages and uploads the
           results to GitHub code scanning (Container Scan workflow).
-        rulesets:
-          - default
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results:
-          ci:
-            name: Grype SARIF report
-            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
-            location: https://github.com/unbihexium-oss/unbihexium/security/code-scanning
-            comment: Visible to repository maintainers in GitHub code scanning.
-      - name: actionlint
-        type: SAST
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results:  # Published results.
+          ci:  # Results of the CI runs.
+            name: Grype SARIF report  # Name of the result set.
+            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html  # Format of the results, SARIF 2.1.0.
+            location: https://github.com/unbihexium-oss/unbihexium/security/code-scanning  # Where the results can be seen.
+            comment: Visible to repository maintainers in GitHub code scanning.  # Who can see the results.
+      - name: actionlint  # Tool name.
+        type: SAST  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Lints GitHub Actions workflows, including shellcheck of run steps
           and detection of untrusted input in scripts (Workflow Lint
           workflow, pre-commit).
-        rulesets:
-          - default
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results: {}
-      - name: OpenSSF Scorecard
-        type: other
-        comment: |
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: OpenSSF Scorecard  # Tool name.
+        type: other  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
           Weekly assessment of repository security practices (Scorecard
           workflow). Results are published to the OpenSSF Scorecard API and
           uploaded to GitHub code scanning.
-        rulesets:
-          - default
-        integration:
-          adhoc: true
-          ci: true
-          release: false
-        results:
-          ci:
-            name: OpenSSF Scorecard results
-            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
-            location: https://scorecard.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium
-            comment: Public Scorecard report for the default branch.
+        rulesets:  # Rule sets or configuration files used.
+          - default  # Default rules of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results:  # Published results.
+          ci:  # Results of the CI runs.
+            name: OpenSSF Scorecard results  # Name of the result set.
+            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html  # Format of the results, SARIF 2.1.0.
+            location: https://scorecard.dev/viewer/?uri=github.com/unbihexium-oss/unbihexium  # Where the results can be seen.
+            comment: Public Scorecard report for the default branch.  # Who can see the results.
+
+# =============================================================================
+# End of file security-insights.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
