@@ -1,42 +1,73 @@
-name: Notebooks
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/notebooks.yml
+# Title       : Validate the example notebooks
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Validates every notebook under examples/notebooks with
+# .github/scripts/check_notebooks.py: the file must be a valid nbformat
+# document and must be committed without outputs or execution counts, which
+# keeps diffs reviewable and the repository small. The notebooks are not
+# executed here. The workflow starts only when a notebook or the check
+# script changes, or on demand.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - "examples/notebooks/**"
-      - ".github/scripts/check_notebooks.py"
-  pull_request:
-    branches: [main]
-    paths:
-      - "examples/notebooks/**"
-      - ".github/scripts/check_notebooks.py"
-  workflow_dispatch:
+name: Notebooks  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when a notebook or the check changes.
+      - "examples/notebooks/**"  # The example notebooks.
+      - ".github/scripts/check_notebooks.py"  # The check script.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "examples/notebooks/**"  # The example notebooks.
+      - ".github/scripts/check_notebooks.py"  # The check script.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only needs to read the repository.
 
-jobs:
-  validate:
-    name: Validate notebooks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  validate:  # Check format and absence of outputs.
+    name: Validate notebooks  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the validation job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Install nbformat
-        run: python -m pip install nbformat
+      - name: Set up Python  # Install the interpreter for the check script.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Check format and absence of outputs
-        run: python .github/scripts/check_notebooks.py examples/notebooks
+      - name: Install nbformat  # Install the notebook format validator.
+        run: python -m pip install nbformat  # Only dependency of the check script.
+
+      - name: Check format and absence of outputs  # Run the notebook check.
+        run: python .github/scripts/check_notebooks.py examples/notebooks  # Validate every notebook in the directory.
+
+# =============================================================================
+# End of file .github/workflows/notebooks.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

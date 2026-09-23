@@ -1,90 +1,129 @@
-name: Model Zoo
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/model-zoo.yml
+# Title       : Model zoo consistency and weight reproducibility
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Guards the model zoo with .github/scripts/check_model_zoo.py in two jobs:
+#
+#   consistency      the catalogue, the generated manifests and the model
+#                    cards agree; no PyTorch needed
+#   reproducibility  rebuilds starter weights with CPU-only PyTorch and
+#                    compares their digests with the published ones
+#
+# Pull requests rebuild only the tiny variants to stay fast. The weekly run
+# (Monday 05:00 UTC) rebuilds all 520 models to detect platform drift, and a
+# manual run can pick the variant family to rebuild. The workflow starts
+# only when the model zoo, its sources, the check script or this file
+# change.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - "model_zoo/**"
-      - "src/unbihexium/zoo/**"
-      - "src/unbihexium/ai/models/**"
-      - ".github/scripts/check_model_zoo.py"
-      - ".github/workflows/model-zoo.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "model_zoo/**"
-      - "src/unbihexium/zoo/**"
-      - "src/unbihexium/ai/models/**"
-      - ".github/scripts/check_model_zoo.py"
-      - ".github/workflows/model-zoo.yml"
-  schedule:
+name: Model Zoo  # Name shown in the Actions tab and in the status checks.
+
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when the model zoo or its tooling changes.
+      - "model_zoo/**"  # Generated manifests, cards and checksums.
+      - "src/unbihexium/zoo/**"  # Catalogue and generator sources.
+      - "src/unbihexium/ai/models/**"  # Model architectures.
+      - ".github/scripts/check_model_zoo.py"  # The check script.
+      - ".github/workflows/model-zoo.yml"  # This workflow.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "model_zoo/**"  # Generated manifests, cards and checksums.
+      - "src/unbihexium/zoo/**"  # Catalogue and generator sources.
+      - "src/unbihexium/ai/models/**"  # Model architectures.
+      - ".github/scripts/check_model_zoo.py"  # The check script.
+      - ".github/workflows/model-zoo.yml"  # This workflow.
+  schedule:  # Periodic full rebuild.
     # Weekly full rebuild of all 520 models to detect platform drift.
     - cron: "0 5 * * 1"
-  workflow_dispatch:
-    inputs:
-      rebuild:
-        description: "Variants to rebuild and compare with the published digests"
-        type: choice
-        default: all
-        options:
-          - tiny
-          - base
-          - large
-          - mega
-          - all
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
+    inputs:  # Parameters of a manual run.
+      rebuild:  # Which variant family to rebuild.
+        description: "Variants to rebuild and compare with the published digests"  # Help text in the run dialog.
+        type: choice  # Drop-down list in the run dialog.
+        default: all  # Rebuild everything unless another choice is made.
+        options:  # Values offered in the drop-down list.
+          - tiny  # Smallest variants only.
+          - base  # Base variants only.
+          - large  # Large variants only.
+          - mega  # Largest variants only.
+          - all  # Every variant.
 
-permissions:
-  contents: read
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-jobs:
-  consistency:
-    name: Catalogue, manifests and cards
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+jobs:  # Jobs of the workflow.
+  consistency:  # Check the generated files against the catalogue.
+    name: Catalogue, manifests and cards  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the consistency job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+      - name: Set up Python  # Install the interpreter for the check script.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
       # The consistency check reads the catalogue and the generated files
       # only, so PyTorch is not installed here.
       - name: Install the package and jsonschema
-        run: python -m pip install --no-deps . && python -m pip install pyyaml jsonschema
+        run: python -m pip install --no-deps . && python -m pip install pyyaml jsonschema  # Package without dependencies, plus the two libraries the check needs.
 
-      - name: Check that the model zoo files match the catalogue
-        run: python .github/scripts/check_model_zoo.py
+      - name: Check that the model zoo files match the catalogue  # Run the consistency check.
+        run: python .github/scripts/check_model_zoo.py  # Without --rebuild only the files are compared.
 
-  reproducibility:
-    name: Rebuild starter weights
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+  reproducibility:  # Rebuild weights and compare digests.
+    name: Rebuild starter weights  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 60  # A full rebuild of all models takes up to an hour.
+    steps:  # Steps of the rebuild job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+      - name: Set up Python  # Install the interpreter for the rebuild.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Install the package with CPU-only PyTorch
-        run: |
+      - name: Install the package with CPU-only PyTorch  # Install what the rebuild needs.
+        run: |  # Shell script run by bash.
+          # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the package and the schema validator.
           python -m pip install . jsonschema
 
       # Pull requests rebuild the tiny variants; the schedule and manual runs
       # rebuild the selected variants (all 520 models by default).
       - name: Rebuild models and compare digests
-        env:
-          REBUILD: ${{ github.event_name == 'pull_request' && 'tiny' || inputs.rebuild || 'all' }}
-        run: python .github/scripts/check_model_zoo.py --rebuild "${REBUILD}"
+        env:  # Environment of the rebuild step.
+          REBUILD: ${{ github.event_name == 'pull_request' && 'tiny' || inputs.rebuild || 'all' }}  # Variant family chosen by event and input.
+        run: python .github/scripts/check_model_zoo.py --rebuild "${REBUILD}"  # Rebuild and compare with the published digests.
+
+# =============================================================================
+# End of file .github/workflows/model-zoo.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

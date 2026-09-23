@@ -1,34 +1,65 @@
-name: Labels
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/labels.yml
+# Title       : Synchronise repository labels from .github/labels.yml
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Creates and updates the issue and pull request labels of the repository
+# so that they match the definitions in .github/labels.yml (names, colours
+# and descriptions). Labels that exist on GitHub but not in the file are
+# kept. Pull requests that change the label file run in dry-run mode and only
+# print the planned changes; the labels are applied after the merge to main
+# or on a manual run.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/labels.yml"
-      - ".github/workflows/labels.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/labels.yml"
-      - ".github/workflows/labels.yml"
-  workflow_dispatch:
+name: Labels  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch applies the labels.
+    paths:  # Only when the label definitions or this workflow change.
+      - ".github/labels.yml"  # Label definitions.
+      - ".github/workflows/labels.yml"  # This workflow.
+  pull_request:  # Run on pull requests (dry run).
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - ".github/labels.yml"  # Label definitions.
+      - ".github/workflows/labels.yml"  # This workflow.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-jobs:
-  sync:
-    name: Sync labels
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-    steps:
-      - uses: actions/checkout@v6
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-      - name: Synchronise labels from .github/labels.yml
-        uses: crazy-max/ghaction-github-labeler@v6
-        with:
-          yaml-file: .github/labels.yml
-          skip-delete: true
-          dry-run: ${{ github.event_name == 'pull_request' }}
+jobs:  # Jobs of the workflow.
+  sync:  # Apply the label definitions.
+    name: Sync labels  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    permissions:  # Token permissions of this job.
+      contents: read  # Read the label file.
+      issues: write  # Create and edit labels.
+    steps:  # Steps of the sync job.
+      - uses: actions/checkout@v6  # Check out the label definitions.
+
+      - name: Synchronise labels from .github/labels.yml  # Create and update labels.
+        uses: crazy-max/ghaction-github-labeler@v6  # Label synchronisation action.
+        with:  # Inputs of the labeler action.
+          yaml-file: .github/labels.yml  # Label definitions to apply.
+          skip-delete: true  # Keep labels that are not in the file.
+          dry-run: ${{ github.event_name == 'pull_request' }}  # Only report changes for pull requests.
+
+# =============================================================================
+# End of file .github/workflows/labels.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

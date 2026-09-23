@@ -1,35 +1,66 @@
-name: Workflow Lint
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/workflow-lint.yml
+# Title       : Lint the GitHub Actions workflows with actionlint
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs actionlint over every workflow in .github/workflows/ whenever one of
+# them changes. actionlint checks the workflow syntax, expressions, job
+# dependencies and action inputs, and runs shellcheck over the shell
+# scripts of the run steps. The actionlint release is pinned twice in the
+# install command (download script and binary version); keep both in step
+# with the actionlint hook in .pre-commit-config.yaml.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/**"
-  workflow_dispatch:
+name: Workflow Lint  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when a workflow changes.
+      - ".github/workflows/**"  # All workflow files.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - ".github/workflows/**"  # All workflow files.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only needs to read the repository.
 
-jobs:
-  actionlint:
-    name: actionlint
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Install actionlint
-        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12
+jobs:  # Jobs of the workflow.
+  actionlint:  # Lint the workflows.
+    name: actionlint  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner with shellcheck preinstalled.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the lint job.
+      - uses: actions/checkout@v6  # Check out the workflows.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Lint workflows (actionlint with shellcheck)
-        run: ./actionlint -color
+      - name: Install actionlint  # Download the pinned actionlint binary into the workspace.
+        run: bash <(curl -sSfL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash) 1.7.12  # Official download script at the pinned tag.
+
+      - name: Lint workflows (actionlint with shellcheck)  # Check every workflow file.
+        run: ./actionlint -color  # Coloured output for the log.
+
+# =============================================================================
+# End of file .github/workflows/workflow-lint.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -1,50 +1,89 @@
-name: Links
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/links.yml
+# Title       : Weekly check of links in the documentation
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Checks every link in the Markdown files and the example notebooks with
+# lychee, configured by .github/lychee.toml. It runs weekly on Monday at
+# 05:00 UTC and on demand, not on pull requests, because external sites fail
+# intermittently and must not block merges. Broken links never fail the run;
+# instead the report is posted to an open issue titled "Broken links report",
+# which is created with the documentation label when none is open. The
+# lychee action is pinned by commit SHA; Dependabot keeps the trailing
+# version comment up to date.
+# =============================================================================
 
-on:
-  schedule:
-    - cron: "0 5 * * 1"
-  workflow_dispatch:
+name: Links  # Name shown in the Actions tab.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  schedule:  # Periodic check; links rot without code changes.
+    - cron: "0 5 * * 1"  # Every Monday at 05:00 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-jobs:
-  lychee:
-    name: Check links
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      issues: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # Never run two link checks at once.
+  group: ${{ github.workflow }}  # A single group for the whole workflow.
+  cancel-in-progress: false  # Queue a new run instead of cancelling the running one.
 
-      - name: Check links in Markdown and notebooks
-        id: lychee
+jobs:  # Jobs of the workflow.
+  lychee:  # Check the links and report the result.
+    name: Check links  # Name of the job.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 30  # Cancel a hung check after half an hour.
+    permissions:  # Token permissions of this job.
+      contents: read  # Read the documentation.
+      issues: write  # Create or comment on the report issue.
+    steps:  # Steps of the link check job.
+      - uses: actions/checkout@v6  # Check out the documentation.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Check links in Markdown and notebooks  # Run lychee over the documentation.
+        id: lychee  # Identifier for reading the exit code later.
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
-        with:
-          args: >-
+        with:  # Inputs of the lychee action.
+          args: >-  # lychee options followed by the files to check.
             --config .github/lychee.toml
             './**/*.md'
             './examples/**/*.ipynb'
-          output: lychee/report.md
-          fail: false
+          output: lychee/report.md  # Markdown report used as the issue body.
+          fail: false  # Broken links do not fail the job; the issue reports them.
 
-      - name: Open or update the broken links issue
-        if: steps.lychee.outputs.exit_code != 0
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TITLE: Broken links report
-        run: |
+      - name: Open or update the broken links issue  # Publish the report.
+        if: steps.lychee.outputs.exit_code != 0  # Only when lychee found problems.
+        env:  # Environment of the reporting step.
+          GH_TOKEN: ${{ github.token }}  # Token for the GitHub CLI.
+          TITLE: Broken links report  # Title of the report issue.
+        run: |  # Shell script run by bash.
+          # Look up the number of an open report issue, if there is one.
           number=$(gh issue list --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number')
+          # An open issue exists.
           if [ -n "$number" ]; then
+            # Add the new report as a comment.
             gh issue comment "$number" --body-file lychee/report.md
+          # No open issue yet.
           else
+            # Open a new issue with the report as its body.
             gh issue create --title "$TITLE" --label documentation --body-file lychee/report.md
+          # End of the issue selection.
           fi
+
+# =============================================================================
+# End of file .github/workflows/links.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

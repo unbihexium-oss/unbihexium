@@ -1,34 +1,63 @@
-name: Markdown
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/markdown.yml
+# Title       : Lint the Markdown documentation with markdownlint
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs markdownlint-cli over every Markdown file of the repository with the
+# rules in .markdownlint.yaml. The workflow only starts when a Markdown file
+# or the rule file changes, or on demand. The markdownlint-cli version is
+# pinned in the npx command; keep it in step with the pre-commit hook.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - "**/*.md"
-      - ".markdownlint.yaml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "**/*.md"
-      - ".markdownlint.yaml"
-  workflow_dispatch:
+name: Markdown  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when documentation or its rules change.
+      - "**/*.md"  # Any Markdown file.
+      - ".markdownlint.yaml"  # The lint rules.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "**/*.md"  # Any Markdown file.
+      - ".markdownlint.yaml"  # The lint rules.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only needs to read the repository.
 
-jobs:
-  markdownlint:
-    name: markdownlint
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Lint Markdown files
-        run: npx --yes markdownlint-cli@0.49.1 --config .markdownlint.yaml "**/*.md" --ignore node_modules
+jobs:  # Jobs of the workflow.
+  markdownlint:  # Lint the Markdown files.
+    name: markdownlint  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Node.js.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the lint job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Lint Markdown files  # Run the pinned markdownlint-cli through npx.
+        run: npx --yes markdownlint-cli@0.49.1 --config .markdownlint.yaml "**/*.md" --ignore node_modules  # Check all Markdown files except dependencies.
+
+# =============================================================================
+# End of file .github/workflows/markdown.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

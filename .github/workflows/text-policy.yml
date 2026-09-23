@@ -1,94 +1,159 @@
-name: Text Policy
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/text-policy.yml
+# Title       : Text policy, Python documentation style and commit messages
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Enforces the writing rules of the project:
+#
+#   text-policy      check_text_policy.py: tracked text files are English
+#                    only and contain no emojis and no em dashes
+#   python-style     check_python_style.py: header, footer, no docstrings
+#                    and a comment for every code line in the Python sources
+#   config-style     check_config_style.py: the same header, footer and line
+#                    comments in the configuration and data files
+#   commit-messages  pull requests only: every commit message between the
+#                    base and the head is free of emojis, em dashes,
+#                    horizontal bars and the Turkish letters with breve,
+#                    dot or cedilla (U+011E, U+011F, U+0130, U+0131,
+#                    U+015E, U+015F); offending commits are reported as
+#                    error annotations
+#
+# The same checks run locally as pre-commit hooks.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+name: Text Policy  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-jobs:
-  text-policy:
-    name: English only, no emojis, no em dashes
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  text-policy:  # Language and character policy of the tracked files.
+    name: English only, no emojis, no em dashes  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the text policy job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Check tracked text files
-        run: python .github/scripts/check_text_policy.py
+      - name: Set up Python  # Install the interpreter for the check script.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-  python-style:
-    name: Python documentation style
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+      - name: Check tracked text files  # Run the text policy check.
+        run: python .github/scripts/check_text_policy.py  # Standard library only, no installation needed.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+  python-style:  # Documentation style of the Python sources.
+    name: Python documentation style  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 5  # The check takes seconds; cancel a hung job early.
+    steps:  # Steps of the style job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Set up Python  # Install the interpreter for the check script.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
       # Header, footer, no docstrings and a comment for every code line in
       # the directories listed in STYLE_ROOTS of the script.
       - name: Check the Python documentation style
-        run: python .github/scripts/check_python_style.py
+        run: python .github/scripts/check_python_style.py  # Standard library only, no installation needed.
 
-  commit-messages:
-    name: Commit messages
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          persist-credentials: false
+      # Header, footer and a comment for every line in the other text files
+      # (YAML, TOML, INI, Dockerfile, Makefile, shell and lock files).
+      - name: Check the configuration file documentation style
+        run: python .github/scripts/check_config_style.py  # Standard library only, no installation needed.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+  commit-messages:  # Character policy of the commit messages.
+    name: Commit messages  # Name of the status check.
+    if: github.event_name == 'pull_request'  # Needs a base and head to compare.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 5  # The check takes seconds; cancel a hung job early.
+    steps:  # Steps of the commit message job.
+      - uses: actions/checkout@v6  # Check out the pull request.
+        with:  # Inputs of the checkout action.
+          fetch-depth: 0  # Full history, so that the base commit is present.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Check commit messages of the pull request
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
+      - name: Set up Python  # Install the interpreter for the check.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+
+      - name: Check commit messages of the pull request  # Scan every new commit message.
+        env:  # Environment of the check step.
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}  # Last commit of the target branch.
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}  # Last commit of the pull request.
+        run: |  # Shell script run by bash.
+          # Run the following Python program from standard input.
           python - <<'PY'
+          # Read the commit range from the environment.
           import os
+          # Match the forbidden characters.
           import re
+          # Run git log.
           import subprocess
+          # Set the exit status.
           import sys
 
+          # Hash and message of every commit in the range, separated by NUL and SOH control characters.
           log = subprocess.run(
+              # git log with a custom format over the range from base to head.
               ["git", "log", "--format=%H%x00%B%x01", f"{os.environ['BASE_SHA']}..{os.environ['HEAD_SHA']}"],
+              # Fail on a git error and capture the output as text.
               check=True, capture_output=True, text=True,
+          # Keep the standard output only.
           ).stdout
+          # Emojis, symbols, dashes and the Turkish letters with breve, dot or cedilla.
           bad = re.compile("[\U0001f000-\U0001faff\u2600-\u27bf\u2b00-\u2bff\ufe0f\u2014\u2015\u011e\u011f\u0130\u0131\u015e\u015f]")
+          # Number of offending commits.
           failures = 0
+          # Walk over the non-empty commit records.
           for entry in filter(None, (e.strip() for e in log.split("\x01"))):
+              # Split the record into hash and message.
               sha, message = entry.split("\x00", 1)
+              # First forbidden character in the message, if any.
               match = bad.search(message)
+              # The message breaks the policy.
               if match:
+                  # Count the commit.
                   failures += 1
+                  # Report it as an error annotation with the code point.
                   print(f"::error::Commit {sha[:10]} contains a forbidden character U+{ord(match.group(0)):04X}")
+          # Fail the step when any commit broke the policy.
           sys.exit(1 if failures else 0)
+          # End of the Python program.
           PY
+
+# =============================================================================
+# End of file .github/workflows/text-policy.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

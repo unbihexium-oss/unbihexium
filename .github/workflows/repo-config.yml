@@ -1,110 +1,161 @@
-name: Repository Config
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/repo-config.yml
+# Title       : Schema validation of the repository configuration files
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Validates the configuration files of the repository before GitHub or
+# other services read them:
+#
+#   schemas            check-jsonschema with its built-in schemas for the
+#                      issue forms, the issue template chooser, the
+#                      workflows, Dependabot, CITATION.cff, Docker Compose
+#                      and Codecov; codemeta.json must be valid JSON;
+#                      yamllint --strict over all YAML with .yamllint.yml;
+#                      the remaining .github YAML files must parse
+#   security-insights  security-insights.yml against the OpenSSF Security
+#                      Insights schema, using the cue tool
+#
+# The cue and schema versions are pinned in the job environment. The
+# workflow starts when anything under .github/, any YAML file, CITATION.cff
+# or codemeta.json changes, or on demand.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/**"
-      - "**/*.yml"
-      - "**/*.yaml"
-      - ".yamllint.yml"
-      - "CITATION.cff"
-      - "codemeta.json"
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/**"
-      - "**/*.yml"
-      - "**/*.yaml"
-      - ".yamllint.yml"
-      - "CITATION.cff"
-      - "codemeta.json"
-  workflow_dispatch:
+name: Repository Config  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when a configuration file changes.
+      - ".github/**"  # Workflows, templates and GitHub settings.
+      - "**/*.yml"  # Any YAML file.
+      - "**/*.yaml"  # Any YAML file with the long extension.
+      - ".yamllint.yml"  # The yamllint rules.
+      - "CITATION.cff"  # Citation metadata.
+      - "codemeta.json"  # Software metadata.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - ".github/**"  # Workflows, templates and GitHub settings.
+      - "**/*.yml"  # Any YAML file.
+      - "**/*.yaml"  # Any YAML file with the long extension.
+      - ".yamllint.yml"  # The yamllint rules.
+      - "CITATION.cff"  # Citation metadata.
+      - "codemeta.json"  # Software metadata.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-jobs:
-  schemas:
-    name: Validate configuration schemas
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  schemas:  # Schema and syntax checks.
+    name: Validate configuration schemas  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    steps:  # Steps of the schema job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Install validators
-        run: python -m pip install check-jsonschema pyyaml yamllint
+      - name: Set up Python  # Install the interpreter for the validators.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Issue forms
-        run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml
+      - name: Install validators  # Install the schema validator, PyYAML and yamllint.
+        run: python -m pip install check-jsonschema pyyaml yamllint  # Latest releases from PyPI.
 
-      - name: Issue template chooser
-        run: check-jsonschema --builtin-schema vendor.github-issue-config .github/ISSUE_TEMPLATE/config.yml
+      - name: Issue forms  # The numbered issue forms.
+        run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml  # Validate against the GitHub issue forms schema.
 
-      - name: Workflows
-        run: check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml
+      - name: Issue template chooser  # The issue template configuration.
+        run: check-jsonschema --builtin-schema vendor.github-issue-config .github/ISSUE_TEMPLATE/config.yml  # Validate against the issue config schema.
 
-      - name: Dependabot
-        run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
+      - name: Workflows  # The GitHub Actions workflows.
+        run: check-jsonschema --builtin-schema vendor.github-workflows .github/workflows/*.yml  # Validate against the workflow schema.
 
-      - name: Citation File Format
-        run: check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff
+      - name: Dependabot  # The Dependabot configuration.
+        run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml  # Validate against the Dependabot schema.
 
-      - name: Docker Compose
-        run: check-jsonschema --builtin-schema vendor.compose-spec docker-compose.yml
+      - name: Citation File Format  # The citation metadata.
+        run: check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff  # Validate against the CFF schema.
 
-      - name: Codecov
-        run: check-jsonschema --builtin-schema vendor.codecov codecov.yml
+      - name: Docker Compose  # The Compose file.
+        run: check-jsonschema --builtin-schema vendor.compose-spec docker-compose.yml  # Validate against the Compose specification.
 
-      - name: CodeMeta is valid JSON
-        run: python -m json.tool codemeta.json > /dev/null
+      - name: Codecov  # The Codecov configuration.
+        run: check-jsonschema --builtin-schema vendor.codecov codecov.yml  # Validate against the Codecov schema.
 
-      - name: yamllint
-        run: yamllint --strict --config-file .yamllint.yml .
+      - name: CodeMeta is valid JSON  # CodeMeta has no built-in schema; check the syntax.
+        run: python -m json.tool codemeta.json > /dev/null  # Fails on invalid JSON; the output is discarded.
 
-      - name: Remaining YAML files parse
-        run: |
+      - name: yamllint  # Style and syntax of every YAML file.
+        run: yamllint --strict --config-file .yamllint.yml .  # Warnings fail as well as errors.
+
+      - name: Remaining YAML files parse  # GitHub files without a published schema.
+        run: |  # Shell script run by bash.
+          # Run the following Python program from standard input.
           python - <<'PY'
+          # Build the file paths.
           import pathlib
+          # Parse YAML.
           import yaml
 
+          # Files in .github/ that are only checked for valid YAML syntax.
           files = ["labels.yml", "labeler.yml", "release.yml", "dependency-review-config.yml", "FUNDING.yml"]
+          # Check each file in turn.
           for name in files:
+              # Parse the file; a syntax error raises and fails the step.
               yaml.safe_load(pathlib.Path(".github", name).read_text(encoding="utf-8"))
+              # Report the file as valid.
               print(f"{name}: ok")
+          # End of the Python program.
           PY
 
-  security-insights:
-    name: Validate security-insights.yml
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      CUE_VERSION: v0.17.1
-      SPEC_VERSION: v2.2.0
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
+  security-insights:  # OpenSSF Security Insights file.
+    name: Validate security-insights.yml  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 10  # Cancel a hung job after ten minutes.
+    env:  # Pinned tool and schema versions.
+      CUE_VERSION: v0.17.1  # Release of the cue tool.
+      SPEC_VERSION: v2.2.0  # Release of the Security Insights specification.
+    steps:  # Steps of the Security Insights job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Install cue and fetch the Security Insights schema
-        run: |
+      - name: Install cue and fetch the Security Insights schema  # Download the pinned tool and schema.
+        run: |  # Shell script run by bash.
+          # Download the cue release archive and extract only the cue binary into the runner temp directory.
           curl -sSfL "https://github.com/cue-lang/cue/releases/download/${CUE_VERSION}/cue_${CUE_VERSION}_linux_amd64.tar.gz" | tar -xz -C "${RUNNER_TEMP}" cue
+          # Shallow clone of the specification at the pinned release.
           git clone --quiet --depth 1 --branch "${SPEC_VERSION}" https://github.com/ossf/security-insights.git "${RUNNER_TEMP}/security-insights"
 
       # cue resolves the schema package relative to the working directory,
       # so run it from inside the schema checkout.
       - name: Validate against the Security Insights schema
-        working-directory: ${{ runner.temp }}/security-insights
-        run: |
+        working-directory: ${{ runner.temp }}/security-insights  # Root of the schema checkout.
+        run: |  # Shell script run by bash.
+          # Validate the file of the repository against the SecurityInsights definition.
           "${RUNNER_TEMP}/cue" vet -d '#SecurityInsights' ./spec "${GITHUB_WORKSPACE}/security-insights.yml"
+
+# =============================================================================
+# End of file .github/workflows/repo-config.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

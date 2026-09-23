@@ -1,28 +1,60 @@
-name: Labeler
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/labeler.yml
+# Title       : Label pull requests by the paths they change
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Adds labels to pull requests according to the path rules in
+# .github/labeler.yml (not to be confused with this workflow file). The
+# workflow uses pull_request_target so that pull requests from forks receive
+# a token that can write labels. This is safe because nothing from the pull
+# request is checked out or executed: the action only reads the list of
+# changed files and the configuration from the base branch. Labels that no
+# longer match are kept, so manual labels are never removed.
+# =============================================================================
 
-on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+name: Labeler  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  pull_request_target:  # Runs in the context of the base branch, also for forks.
+    types: [opened, synchronize, reopened]  # New pull requests and new commits.
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+permissions:  # Least-privilege default token for every job.
+  contents: read  # Read the repository only.
 
-jobs:
-  label:
-    name: Label by changed paths
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: write
-    steps:
+concurrency:  # One run per pull request at a time.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}  # Group by pull request number.
+  cancel-in-progress: true  # A newer push supersedes the running labeling.
+
+jobs:  # Jobs of the workflow.
+  label:  # Apply the path-based labels.
+    name: Label by changed paths  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 5  # Labeling takes seconds; cancel a hung job early.
+    permissions:  # Token permissions of this job.
+      contents: read  # Read the labeler configuration.
+      pull-requests: write  # Add labels to the pull request.
+    steps:  # Steps of the labeling job.
       # The action reads .github/labeler.yml from the base branch and never
       # checks out or runs code from the pull request.
       - uses: actions/labeler@v7
-        with:
-          configuration-path: .github/labeler.yml
-          sync-labels: false
+        with:  # Inputs of the labeler action.
+          configuration-path: .github/labeler.yml  # Path rules for the labels.
+          sync-labels: false  # Never remove labels, so manual labels stay.
+
+# =============================================================================
+# End of file .github/workflows/labeler.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

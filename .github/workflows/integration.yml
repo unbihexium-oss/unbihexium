@@ -1,103 +1,161 @@
-name: Integration Tests
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/integration.yml
+# Title       : Integration, end-to-end and API tests
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs the slower test tiers on pushes to main, on pull requests and weekly
+# on Monday at 06:00 UTC:
+#
+#   integration  tests/integration/ on every supported CPython, with the
+#                GDAL system libraries installed on a best-effort basis
+#   e2e          tests/e2e/ on the newest CPython, after integration passed
+#   api-test     starts the FastAPI serving app with uvicorn on port 8000
+#                and polls GET /health until it answers, after integration
+#
+# The unit tests run in ci.yml. The API server is started in the background
+# with a 30 second lifetime, which bounds the health check window.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  schedule:
-    - cron: "0 6 * * 1"
+name: Integration Tests  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+  schedule:  # Weekly run to catch breakage from new dependency releases.
+    - cron: "0 6 * * 1"  # Every Monday at 06:00 UTC.
 
-jobs:
-  integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-    steps:
-      - uses: actions/checkout@v6
+jobs:  # Jobs of the workflow.
+  integration:  # Integration tests on every supported Python version.
+    name: Integration Tests  # Name of the status check (the matrix adds the version).
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    strategy:  # Matrix over the Python versions.
+      fail-fast: false  # Let the other versions finish when one fails.
+      matrix:  # Values of the matrix.
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
+    steps:  # Steps of the integration job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Install system dependencies
-        run: |
+      - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: ${{ matrix.python-version }}  # Version from the matrix.
+          cache: "pip"  # Cache downloaded wheels between runs.
+
+      - name: Install system dependencies  # GDAL libraries for the raster backends.
+        run: |  # Shell script run by bash.
+          # Refresh the package index of the runner.
           sudo apt-get update
+          # Install GDAL; a failure is tolerated because the wheels bundle their own copy.
           sudo apt-get install -y libgdal-dev gdal-bin || true
 
-      - name: Install dependencies
-        run: |
+      - name: Install dependencies  # Install the package with its test extras.
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the package in editable mode with the test and backend extras.
           python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
-      - name: Run integration tests
-        run: |
+      - name: Run integration tests  # Run the integration test tier.
+        run: |  # Shell script run by bash.
+          # Short tracebacks keep the log readable.
           pytest tests/integration/ --tb=short
 
-  e2e:
-    name: End-to-End Tests
-    runs-on: ubuntu-latest
-    needs: integration
-    steps:
-      - uses: actions/checkout@v6
+  e2e:  # End-to-end tests on the newest Python.
+    name: End-to-End Tests  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    needs: integration  # Start only after all integration jobs passed.
+    steps:  # Steps of the end-to-end job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
-          cache: "pip"
+      - name: Set up Python  # Install the interpreter for the tests.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+          cache: "pip"  # Cache downloaded wheels between runs.
 
-      - name: Install dependencies
-        run: |
+      - name: Install dependencies  # Install the package with its test extras.
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the package in editable mode with the test and backend extras.
           python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
-      - name: Run E2E tests
-        run: |
+      - name: Run E2E tests  # Run the end-to-end test tier.
+        run: |  # Shell script run by bash.
+          # Short tracebacks keep the log readable.
           pytest tests/e2e/ --tb=short
 
-  api-test:
-    name: API Integration
-    runs-on: ubuntu-latest
-    needs: integration
-    steps:
-      - uses: actions/checkout@v6
+  api-test:  # Smoke test of the HTTP serving app.
+    name: API Integration  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    needs: integration  # Start only after all integration jobs passed.
+    steps:  # Steps of the API job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
-          cache: "pip"
+      - name: Set up Python  # Install the interpreter for the server.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+          cache: "pip"  # Cache downloaded wheels between runs.
 
-      - name: Install dependencies
-        run: |
+      - name: Install dependencies  # Install the package with the serving extra only.
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the package in editable mode with FastAPI and uvicorn.
           python -m pip install -e ".[serving]"
 
-      - name: Start API server
-        run: |
+      - name: Start API server  # Launch the server in the background.
+        run: |  # Shell script run by bash.
+          # Run a small Python program that serves the app for at most 30 seconds.
           timeout 30 python -c "
+          # Import the application factory of the package.
           from unbihexium.serving import create_app
+          # Import the ASGI server.
           import uvicorn
+          # Build the application with its default settings.
           app = create_app()
+          # Serve on the loopback interface, port 8000, until the timeout stops it.
           uvicorn.run(app, host='127.0.0.1', port=8000)
+          # Close the program text and send the server to the background.
           " &
+          # Give the server a head start before the next step polls it.
           sleep 5
 
       # Wait up to 30 seconds for the server, then require a healthy answer.
       - name: Test API endpoints
-        run: |
+        run: |  # Shell script run by bash.
+          # Poll the health endpoint once per second and succeed on the first healthy answer.
           for _ in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && exit 0; sleep 1; done
+          # No healthy answer within 30 seconds: fail the step.
           exit 1
+
+# =============================================================================
+# End of file .github/workflows/integration.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

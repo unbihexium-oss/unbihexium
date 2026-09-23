@@ -1,53 +1,90 @@
-name: Release
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/release.yml
+# Title       : Publish a release to GitHub and PyPI
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs when a version tag (v*) is pushed. It builds the sdist and the wheel,
+# writes SHA256SUMS.txt, creates GitHub build provenance attestations for the
+# distributions, creates the GitHub release with the distributions, the
+# checksum file and generated release notes (categories in
+# .github/release.yml), and finally uploads the distributions to PyPI with
+# the PYPI_API_TOKEN repository secret. The distribution version is the
+# static version in pyproject.toml, not the tag, so bump it before tagging;
+# the workflow does not compare the two. SLSA provenance for the published
+# release is produced separately by slsa.yml.
+# =============================================================================
 
-on:
-  push:
-    tags:
-      - "v*"
+name: Release  # Name shown in the Actions tab.
 
-permissions:
-  contents: write
-  id-token: write
-  attestations: write
+on:  # Events that start the workflow.
+  push:  # Run on pushes.
+    tags:  # Only tag pushes, never branch pushes.
+      - "v*"  # Version tags such as v1.2.3.
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+permissions:  # Token permissions for every job.
+  contents: write  # Create the GitHub release and upload its assets.
+  id-token: write  # Request the OIDC token for the attestations.
+  attestations: write  # Store the build provenance attestations.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow.
+  release:  # Build, attest and publish.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    steps:  # Steps of the release job.
+      - uses: actions/checkout@v6  # Check out the tagged commit.
 
-      - name: Install build tools
-        run: pip install build
+      - name: Set up Python  # Install the interpreter for the build.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Build package
-        run: python -m build
+      - name: Install build tools  # Install the PEP 517 frontend.
+        run: pip install build  # Latest build release from PyPI.
+
+      - name: Build package  # Create the sdist and the wheel in dist/.
+        run: python -m build  # Builds in an isolated environment.
 
       # Keep SHA256SUMS.txt outside dist/ so that only distributions are uploaded to PyPI.
       - name: Generate checksums
-        run: |
+        run: |  # Shell script run by bash.
+          # Directory for the checksum file, outside dist/.
           mkdir -p checksums
+          # Hash the files by their bare names.
           cd dist
+          # Write one SHA-256 line per distribution.
           sha256sum -- * > ../checksums/SHA256SUMS.txt
 
-      - name: Generate attestations
-        uses: actions/attest-build-provenance@v3
-        with:
-          subject-path: dist/*
+      - name: Generate attestations  # Sign build provenance for the distributions.
+        uses: actions/attest-build-provenance@v3  # Official attestation action.
+        with:  # Inputs of the attestation action.
+          subject-path: dist/*  # Attest every distribution file.
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
+      - name: Create GitHub Release  # Publish the release page with its assets.
+        uses: softprops/action-gh-release@v2  # Release creation action.
+        with:  # Inputs of the release action.
+          files: |  # Assets attached to the release, one pattern per line.
             dist/*
             checksums/SHA256SUMS.txt
-          generate_release_notes: true
+          generate_release_notes: true  # Build the notes from merged pull requests.
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Publish to PyPI  # Upload the distributions to PyPI.
+        uses: pypa/gh-action-pypi-publish@release/v1  # Official PyPA publish action.
+        with:  # Inputs of the publish action.
+          password: ${{ secrets.PYPI_API_TOKEN }}  # PyPI API token from the repository secrets.
+
+# =============================================================================
+# End of file .github/workflows/release.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

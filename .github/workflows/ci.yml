@@ -1,78 +1,120 @@
-name: CI
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/ci.yml
+# Title       : Continuous integration: lint, type check and unit tests
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# The main quality gate for pushes to and pull requests against main. Three
+# independent jobs run in parallel:
+#
+#   lint       ruff check and ruff format --check over src/, with the rules
+#              from pyproject.toml (the pre-commit hooks run the same checks)
+#   typecheck  pyright in basic mode; it only reports and never fails the run
+#   test       pytest over tests/ on every supported CPython from 3.10 to
+#              3.14, with CPU-only PyTorch and the optional backends
+#
+# Keep the Python versions of the test matrix in step with the classifiers
+# and requires-python in pyproject.toml.
+# =============================================================================
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+name: CI  # Name shown in the Actions tab and in the status checks.
 
-permissions:
-  contents: read
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch; feature branches use pull requests.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
 
-jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+permissions:  # Least-privilege token for every job.
+  contents: read  # The jobs only need to read the repository.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+jobs:  # Jobs of the workflow; they run in parallel.
+  lint:  # Lint and format check with ruff.
+    name: Lint  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    steps:  # Steps of the lint job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Install ruff
-        run: pip install ruff
+      - name: Set up Python  # Install the interpreter used by ruff.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
 
-      - name: Run ruff check
-        run: ruff check src/ --config pyproject.toml
+      - name: Install ruff  # Install the linter and formatter.
+        run: pip install ruff  # Latest ruff release from PyPI.
 
-      - name: Run ruff format check
-        run: ruff format --check src/
+      - name: Run ruff check  # Lint the package sources.
+        run: ruff check src/ --config pyproject.toml  # Use the rule set from pyproject.toml.
 
-  typecheck:
-    name: Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
+      - name: Run ruff format check  # Verify the code formatting.
+        run: ruff format --check src/  # Fail when a file would be reformatted.
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.14"
+  typecheck:  # Static type check with pyright.
+    name: Type Check  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    steps:  # Steps of the type check job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Install dependencies
-        run: |
+      - name: Set up Python  # Install the interpreter that pyright resolves imports against.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+
+      - name: Install dependencies  # Install pyright and the package so imports resolve.
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the pyright command line wrapper.
           pip install pyright
+          # Install the package; fall back to the core dependencies if that fails.
           pip install -e . || pip install numpy onnxruntime rasterio
 
-      - name: Run pyright
-        run: pyright src/ --level basic || true
+      - name: Run pyright  # Report type errors in src/.
+        run: pyright src/ --level basic || true  # Informational only: type errors do not fail the job.
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+  test:  # Unit tests on every supported Python version.
+    name: Test  # Name of the status check (the matrix adds the version).
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    strategy:  # Matrix over the Python versions.
+      fail-fast: false  # Let the other versions finish when one fails.
+      matrix:  # Values of the matrix.
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
-    steps:
-      - uses: actions/checkout@v6
+    steps:  # Steps of the test job.
+      - uses: actions/checkout@v6  # Check out the commit under test.
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
+        uses: actions/setup-python@v6  # Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: ${{ matrix.python-version }}  # Version from the matrix.
 
       # CPU wheels of PyTorch keep the download small; the extras cover the
       # optional backends that the tests exercise.
       - name: Install dependencies
-        run: |
+        run: |  # Shell script run by bash.
+          # Upgrade pip first so that current wheels are found.
           python -m pip install --upgrade pip
+          # Install the CPU-only PyTorch build from the PyTorch index.
           python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install the package in editable mode with the test and backend extras.
           python -m pip install -e ".[test,onnx,serving,zarr,parquet,stac]"
 
-      - name: Run tests
-        run: pytest tests/ --tb=short
+      - name: Run tests  # Run the whole test suite.
+        run: pytest tests/ --tb=short  # Short tracebacks keep the log readable.
+
+# =============================================================================
+# End of file .github/workflows/ci.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
