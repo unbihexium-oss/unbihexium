@@ -32,8 +32,9 @@
 # -----
 #   python fuzz/fuzz_geojson.py [corpus directory] [libFuzzer options]
 #
-# ClusterFuzzLite builds and runs the target (see .clusterfuzzlite/). The
-# unit tests call test_one_input directly on a fixed corpus.
+# The Fuzzing workflow (.github/workflows/fuzz.yml) runs the target from
+# fuzz/corpus/geojson/. The unit tests call test_one_input directly on that
+# corpus.
 # =============================================================================
 
 # Postpone the evaluation of annotations so that modern type syntax works on
