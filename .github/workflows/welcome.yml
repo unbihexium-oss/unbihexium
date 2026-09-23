@@ -1,0 +1,30 @@
+name: Welcome
+
+on:
+  issues:
+    types: [opened]
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  welcome:
+    name: Welcome first-time contributors
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/first-interaction@v3
+        with:
+          issue_message: |
+            Thank you for opening your first issue in Unbihexium.
+
+            A maintainer will triage it according to the response times in [SUPPORT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md). Please keep an eye on this issue in case more information is needed, and remember that security vulnerabilities must be reported privately as described in [SECURITY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md).
+          pr_message: |
+            Thank you for your first pull request to Unbihexium.
+
+            Please make sure that every question in the pull request template is answered, that the title follows the `type(scope): description` format, that new source files carry the MPL-2.0 notice and that all checks pass. See [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md) for details.
