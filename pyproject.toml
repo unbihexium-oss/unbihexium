@@ -1,5 +1,40 @@
+# =============================================================================
+# Unbihexium package configuration
+# =============================================================================
+#
+# This file is the single source of truth for package metadata, dependencies
+# and tool configuration. It follows:
+#
+# - PEP 517 / PEP 518  build system declaration
+# - PEP 621            project metadata in pyproject.toml
+# - PEP 639            SPDX licence expression and licence files
+# - PEP 508            dependency specifiers with environment markers
+#
+# Dependency policy (reviewed September 2026)
+# -------------------------------------------
+# Unbihexium supports CPython 3.10 to 3.14 (see VERSIONING.md). Lower bounds
+# are chosen with three rules, and the highest resulting version wins:
+#
+# 1. Compiled packages: the first release that publishes CPython 3.14 wheels,
+#    so that no compiler is needed on any supported Python version.
+# 2. Pure Python packages: the release that was current when Python 3.14 was
+#    released on 2025-10-07.
+# 3. Security: the first release without known vulnerabilities in the PyPI
+#    advisory database at the time of review.
+#
+# Several scientific packages dropped Python 3.10 in their newest releases.
+# For those, an environment marker keeps a lower bound that still supports
+# Python 3.10, so installers pick the newest compatible release per
+# interpreter. Upper bounds are intentionally not set; Dependabot and the CI
+# matrix detect incompatible releases.
+#
+# requirements.txt and requirements-dev.txt contain fully resolved lock files
+# generated from this file for reproducible environments.
+# =============================================================================
+
 [build-system]
-requires = ["hatchling>=1.21.0"]
+# hatchling 1.27 is the first release with PEP 639 licence expression support.
+requires = ["hatchling>=1.27.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -7,13 +42,14 @@ name = "unbihexium"
 version = "1.0.1"
 description = "Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library"
 readme = "README.md"
-license = {text = "MPL-2.0"}
 requires-python = ">=3.10"
+license = "MPL-2.0"
+license-files = ["LICENSE.txt", "NOTICE", "NOTICE.md"]
 authors = [
     {name = "Unbihexium OSS Foundation", email = "opensource@unbihexium.org"},
 ]
 maintainers = [
-    {name = "Unbihexium OSS Foundation", email = "opensource@unbihexium.org"},
+    {name = "Olaf Yunus Laitinen Imanov", email = "yunus.z.imanov@helsinki.fi"},
 ]
 keywords = [
     "earth-observation",
@@ -32,88 +68,151 @@ keywords = [
     "urban-planning",
     "environmental-monitoring",
 ]
+# Licence classifiers are superseded by the SPDX expression in `license`
+# (PEP 639) and are therefore not listed.
 classifiers = [
     "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: GPU :: NVIDIA CUDA",
+    "Framework :: FastAPI",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Typing :: Typed",
 ]
+
+# -----------------------------------------------------------------------------
+# Runtime dependencies
+# -----------------------------------------------------------------------------
 dependencies = [
-    "numpy>=1.24.0",
-    "scipy>=1.11.0",
-    "rasterio>=1.3.0",
-    "shapely>=2.0.0",
-    "geopandas>=0.14.0",
-    "pyproj>=3.6.0",
-    "click>=8.1.0",
-    "rich>=13.0.0",
-    "pydantic>=2.5.0",
-    "pyyaml>=6.0.0",
-    "requests>=2.31.0",
-    "tqdm>=4.66.0",
-    "pillow>=10.0.0",
-    "scikit-learn>=1.3.0",
-    "scikit-image>=0.22.0",
+    # Arrays and scientific computing. numpy 2.3, scipy 1.16, pyproj 3.7.2 and
+    # scikit-image 0.26 require Python 3.11 or newer.
+    "numpy>=2.2.6; python_version < '3.11'",
+    "numpy>=2.3.3; python_version >= '3.11'",
+    "scipy>=1.15.3; python_version < '3.11'",
+    "scipy>=1.16.2; python_version >= '3.11'",
+    # Geospatial input and output, geometry and projections.
+    "rasterio>=1.4.4",
+    "shapely>=2.1.2",
+    "geopandas>=1.1.2",
+    "pyproj>=3.7.1; python_version < '3.11'",
+    "pyproj>=3.7.2; python_version >= '3.11'",
+    # Command line interface and terminal output.
+    "click>=8.3.3",
+    "rich>=14.1.0",
+    # Configuration, validation and serialisation.
+    "pydantic>=2.12.0",
+    "pyyaml>=6.0.3",
+    # Model download and progress reporting.
+    "requests>=2.33.0",
+    "tqdm>=4.67.1",
+    # Image processing and classical machine learning.
+    "pillow>=12.3.0",
+    "scikit-learn>=1.7.2",
+    "scikit-image>=0.25.2; python_version < '3.11'",
+    "scikit-image>=0.26.0; python_version >= '3.11'",
 ]
 
+# -----------------------------------------------------------------------------
+# Optional dependencies (extras)
+# -----------------------------------------------------------------------------
 [project.optional-dependencies]
-torch = [
-    "torch>=2.1.0",
-    "torchvision>=0.16.0",
+# ONNX Runtime inference for the model zoo (CPU execution provider).
+# onnxruntime 1.24 declares Python 3.10 support but publishes no CPython 3.10
+# wheels, so Python 3.10 is held on the 1.23 series.
+onnx = [
+    "onnxruntime>=1.23.2,<1.24; python_version < '3.11'",
+    "onnxruntime>=1.24.1; python_version >= '3.11'",
 ]
+# PyTorch backend for training and inference. torchvision releases are tied
+# to one torch release: torchvision 0.28 requires torch 2.13.
+torch = [
+    "torch>=2.13.0",
+    "torchvision>=0.28.0",
+]
+# GPU acceleration with CUDA 12. Install the matching PyTorch CUDA build from
+# https://pytorch.org/get-started/locally/ first.
 gpu = [
     "unbihexium[torch]",
-    "cupy-cuda12x>=12.0.0",
+    "cupy-cuda12x>=14.0.0",
 ]
+# REST serving with FastAPI (unbihexium.serving). starlette is pinned
+# explicitly because releases before 1.3.1 have known vulnerabilities.
+serving = [
+    "fastapi>=0.133.0",
+    "starlette>=1.3.1",
+    "uvicorn[standard]>=0.37.0",
+    "python-multipart>=0.0.31",
+]
+# Parallel and distributed processing.
 dask = [
-    "dask[complete]>=2024.1.0",
+    "dask[complete]>=2025.9.1",
 ]
 ray = [
-    "ray>=2.9.0",
+    "ray>=2.56.0",
 ]
+# Chunked array storage. zarr 3 and numcodecs 0.16 require Python 3.11.
+# zarr 3.1.4 is the first zarr 3 release that installs a working crc32c codec
+# (google-crc32c) together with numcodecs 0.16.
 zarr = [
-    "zarr>=2.16.0",
+    "zarr>=2.18.3; python_version < '3.11'",
+    "zarr>=3.1.4; python_version >= '3.11'",
+    "numcodecs>=0.13.1; python_version < '3.11'",
+    "numcodecs>=0.16.4; python_version >= '3.11'",
 ]
+# NetCDF and HDF5 input and output.
 netcdf = [
-    "netCDF4>=1.6.0",
-    "h5py>=3.10.0",
+    "netCDF4>=1.7.2",
+    "h5py>=3.15.0",
 ]
+# SpatioTemporal Asset Catalog search and metadata.
 stac = [
-    "pystac>=1.9.0",
-    "pystac-client>=0.7.0",
+    "pystac>=1.14.1",
+    "pystac-client>=0.9.0",
 ]
+# GeoParquet and Arrow input and output.
 parquet = [
-    "pyarrow>=14.0.0",
+    "pyarrow>=23.0.1",
 ]
-docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.5.0",
-    "mkdocstrings[python]>=0.24.0",
-    "pymdown-extensions>=10.0.0",
+# Test suite (tests/).
+test = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.0.0",
+    "pytest-xdist>=3.8.0",
+    "pytest-asyncio>=1.2.0",
+    "httpx>=0.28.1",
 ]
+# Development tools used locally and in CI.
 dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "pytest-xdist>=3.5.0",
-    "ruff>=0.1.0",
-    "pyright>=1.1.340",
-    "pre-commit>=3.6.0",
-    "bandit>=1.7.0",
-    "pip-audit>=2.6.0",
+    "unbihexium[test]",
+    "ruff>=0.14.0",
+    "pyright>=1.1.406",
+    "pre-commit>=4.3.0",
+    "bandit[toml]>=1.8.6",
+    "pip-audit>=2.9.0",
+    "build>=1.3.0",
+    "twine>=6.2.0",
+    "tox>=4.30.3",
+    # reuse and yamllint are GPL-3.0-or-later (reuse in part). The licence
+    # policy in .github/dependency-review-config.yml denies GPL licences for
+    # every dependency scope, so both run in isolated environments created
+    # by pre-commit and tox instead of being installed here.
 ]
+# Everything except GPU packages, which depend on the local CUDA installation.
 all = [
-    "unbihexium[torch,dask,ray,zarr,netcdf,stac,parquet,docs,dev]",
+    "unbihexium[onnx,torch,serving,dask,ray,zarr,netcdf,stac,parquet,dev]",
 ]
 
 [project.scripts]
@@ -121,24 +220,42 @@ unbihexium = "unbihexium.cli.main:main"
 
 [project.urls]
 Homepage = "https://unbihexium.org"
-Documentation = "https://unbihexium.org/docs"
+Documentation = "https://github.com/unbihexium-oss/unbihexium/tree/main/docs"
 Repository = "https://github.com/unbihexium-oss/unbihexium"
 Issues = "https://github.com/unbihexium-oss/unbihexium/issues"
 Changelog = "https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md"
+Security = "https://github.com/unbihexium-oss/unbihexium/blob/main/SECURITY.md"
+
+# =============================================================================
+# Build configuration (hatchling)
+# =============================================================================
 
 [tool.hatch.build.targets.sdist]
+# The source distribution contains the package, the model zoo metadata and
+# assets, and every document needed to satisfy the MPL-2.0 and REUSE.
 include = [
     "/src",
     "/model_zoo",
-    "/LICENSE",
+    "/tests",
+    "/LICENSE.txt",
+    "/NOTICE",
+    "/NOTICE.md",
+    "/THIRD_PARTY_NOTICES.md",
+    "/REUSE.toml",
     "/README.md",
     "/CHANGELOG.md",
+    "/CITATION.cff",
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/unbihexium"]
 
+# =============================================================================
+# Ruff: linting and formatting (https://docs.astral.sh/ruff/)
+# =============================================================================
+
 [tool.ruff]
+# Generate code compatible with the oldest supported Python version.
 target-version = "py310"
 line-length = 100
 src = ["src"]
@@ -154,7 +271,7 @@ select = [
     "UP",     # pyupgrade
     "ARG",    # flake8-unused-arguments
     "SIM",    # flake8-simplify
-    "TCH",    # flake8-type-checking
+    "TC",     # flake8-type-checking
     "PTH",    # flake8-use-pathlib
     "RUF",    # Ruff-specific rules
     "ANN",    # flake8-annotations
@@ -181,34 +298,35 @@ ignore = [
     "D105",   # Missing docstring in magic method
     "D107",   # Missing docstring in __init__
     "D301",   # Use raw docstring for backslashes
+    "D417",   # Missing argument descriptions in docstring
     "E741",   # Ambiguous variable name
     "F401",   # Imported but unused
     "F403",   # Star imports used
     "F405",   # May be undefined from star import
     "F841",   # Local variable assigned but never used
     "S101",   # Use of assert detected
+    "S104",   # Possible binding to all interfaces
+    "S113",   # Requests call without timeout
     "ARG001", # Unused function argument
     "ARG002", # Unused method argument
     "ARG005", # Unused lambda argument
-    "D417",   # Missing argument descriptions in docstring
     "PTH123", # open() should be Path.open()
-    "S104",   # Possible binding to all interfaces
-    "S113",   # Requests call without timeout
-    "SIM102", # Use single if statement
-    "SIM108", # Use ternary operator
+    "RUF012", # Mutable class attributes
+    "RUF022", # __all__ is not sorted
     "RUF059", # Unpacked variable never used
+    "SIM102", # Use single if statement
+    "SIM105", # Use contextlib.suppress
+    "SIM108", # Use ternary operator
     "TC001",  # Move application import into type-checking block
     "TC002",  # Move third-party import into type-checking block
     "TC003",  # Move standard library import into type-checking block
-    "TCH001", # (deprecated)
-    "TCH002", # (deprecated)
-    "TCH003", # (deprecated)
-    "RUF012", # Mutable class attributes
-    "RUF022", # __all__ is not sorted
-    "SIM105", # Use contextlib.suppress
     "UP035",  # Import from collections.abc
     "W293",   # Blank line contains whitespace
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests use assert, fixtures without docstrings and magic values by design.
+"tests/**" = ["S", "D", "ANN", "ARG"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -216,14 +334,31 @@ convention = "google"
 [tool.ruff.lint.isort]
 known-first-party = ["unbihexium"]
 
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true
+
+# =============================================================================
+# Pyright: static type checking (https://microsoft.github.io/pyright/)
+# =============================================================================
+
 [tool.pyright]
 include = ["src"]
+exclude = ["**/__pycache__"]
+# Check against the oldest supported Python version.
 pythonVersion = "3.10"
 typeCheckingMode = "strict"
 reportMissingImports = true
 reportMissingTypeStubs = false
 
+# =============================================================================
+# Pytest (https://docs.pytest.org/)
+# =============================================================================
+
 [tool.pytest.ini_options]
+minversion = "9.0"
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = [
@@ -238,12 +373,18 @@ markers = [
     "integration: marks integration tests",
 ]
 
+# =============================================================================
+# Coverage.py (https://coverage.readthedocs.io/)
+# =============================================================================
+
 [tool.coverage.run]
 source = ["src/unbihexium"]
 branch = true
 parallel = true
 
 [tool.coverage.report]
+show_missing = true
+skip_covered = false
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -254,6 +395,11 @@ exclude_lines = [
     "@abstractmethod",
 ]
 
+# =============================================================================
+# Bandit: security linting (https://bandit.readthedocs.io/)
+# =============================================================================
+
 [tool.bandit]
 exclude_dirs = ["tests", "benchmarks"]
+# B101: assert statements are used for internal invariants, not for security.
 skips = ["B101"]
