@@ -1,134 +1,115 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/visualization/__init__.py
+# Title       : Display images, colour maps, relief shading and legends
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy and Pillow; matplotlib
+#               is optional
+# =============================================================================
+#
+# Abstract
+# --------
+# Rendering of imagery and map products without a plotting library:
+#
+#   colormaps    colour maps for indices, class palettes (ESA WorldCover),
+#                class breaks
+#   composites   RGB composites with stretches and gamma, overlays
+#   relief       Horn hillshade, multidirectional hillshade, shaded images
+#   output       PNG quicklooks with world files, legends (Pillow; a
+#                matplotlib figure only when matplotlib is installed)
+#
+# Usage
+# -----
+#   from unbihexium.visualization import rgb_composite, save_png
+#   rgb = rgb_composite(stack, "true_color", band_names=names, gamma=1.2)
+#   save_png("quicklook.png", rgb, transform=raster_transform)
+# =============================================================================
 
-"""Visualization module for result display.
+# Colour maps and palettes.
+from unbihexium.visualization.colormaps import (
+    COLORMAPS,  # Named colour maps.
+    DEFAULT_PALETTE,  # Default class colours.
+    INDEX_COLORMAPS,  # Colour maps of common indices.
+    WORLDCOVER_PALETTE,  # ESA WorldCover legend.
+    apply_colormap,  # Values to RGBA.
+    classify_colors,  # Values to RGBA by breaks.
+    color_to_rgb,  # Colour to an RGB tuple.
+    colorize_classes,  # Class map to RGBA.
+    colorize_mask,  # Class map to RGB.
+    colormap_lut,  # Lookup table.
+    hex_to_rgb,  # Hex string to RGB.
+)  # End of the colour map imports.
 
-This module provides functions for visualizing geospatial
-analysis results and model outputs.
-"""
+# Composites and overlays.
+from unbihexium.visualization.composites import (
+    LANDSAT89_COMPOSITES,  # Landsat band combinations.
+    SENTINEL2_COMPOSITES,  # Sentinel-2 band combinations.
+    alpha_composite,  # Porter-Duff over.
+    normalize_for_display,  # Percentile stretch to bytes.
+    overlay_mask,  # Coloured mask overlay.
+    rgb_composite,  # Three bands to RGB.
+    to_uint8,  # Unit interval to bytes.
+)  # End of the composite imports.
 
-from __future__ import annotations
+# Output.
+from unbihexium.visualization.output import (
+    create_legend,  # Legend array.
+    legend_figure,  # Matplotlib legend.
+    legend_image,  # Pillow legend.
+    quicklook,  # Reduced PNG.
+    save_png,  # PNG writer.
+    world_file_lines,  # World file content.
+)  # End of the output imports.
 
-from typing import Sequence
+# Relief shading.
+from unbihexium.visualization.relief import (
+    hillshade,  # Illumination.
+    multidirectional_hillshade,  # Several light directions.
+    shade_image,  # Shaded RGB image.
+    slope_aspect,  # Slope and aspect.
+)  # End of the relief imports.
 
-import numpy as np
-from numpy.typing import NDArray
-
-
-def colorize_mask(
-    mask: NDArray,
-    colormap: dict[int, tuple[int, int, int]] | None = None,
-) -> NDArray:
-    """Convert class mask to RGB image.
-
-    Args:
-        mask: Class label array
-        colormap: Dictionary mapping class IDs to RGB tuples
-
-    Returns:
-        RGB image array
-    """
-    if colormap is None:
-        colormap = {
-            0: (0, 0, 0),  # Background
-            1: (255, 0, 0),  # Class 1
-            2: (0, 255, 0),  # Class 2
-            3: (0, 0, 255),  # Class 3
-            4: (255, 255, 0),  # Class 4
-            5: (255, 0, 255),  # Class 5
-        }
-
-    h, w = mask.shape
-    rgb = np.zeros((h, w, 3), dtype=np.uint8)
-
-    for class_id, color in colormap.items():
-        rgb[mask == class_id] = color
-
-    return rgb
-
-
-def overlay_mask(
-    image: NDArray,
-    mask: NDArray,
-    alpha: float = 0.5,
-    color: tuple[int, int, int] = (255, 0, 0),
-) -> NDArray:
-    """Overlay binary mask on image.
-
-    Args:
-        image: RGB image array
-        mask: Binary mask array
-        alpha: Overlay transparency
-        color: Mask color
-
-    Returns:
-        Blended RGB image
-    """
-    result = image.copy()
-    mask_rgb = np.zeros_like(image)
-    mask_rgb[..., 0] = color[0] * mask
-    mask_rgb[..., 1] = color[1] * mask
-    mask_rgb[..., 2] = color[2] * mask
-
-    mask_bool = mask > 0
-    result[mask_bool] = ((1 - alpha) * result[mask_bool] + alpha * mask_rgb[mask_bool]).astype(
-        np.uint8
-    )
-
-    return result
-
-
-def create_legend(
-    labels: Sequence[str],
-    colors: Sequence[tuple[int, int, int]],
-    size: tuple[int, int] = (200, 20),
-) -> NDArray:
-    """Create color legend image.
-
-    Args:
-        labels: Class labels
-        colors: Class colors
-        size: Size of each legend entry
-
-    Returns:
-        Legend image array
-    """
-    n = len(labels)
-    legend = np.ones((n * size[1], size[0] + 100, 3), dtype=np.uint8) * 255
-
-    for i, (label, color) in enumerate(zip(labels, colors)):
-        y = i * size[1]
-        legend[y : y + size[1], : size[0]] = color
-
-    return legend
-
-
-def normalize_for_display(
-    image: NDArray,
-    percentile: tuple[float, float] = (2, 98),
-) -> NDArray:
-    """Normalize image for display using percentile stretch.
-
-    Args:
-        image: Input image array
-        percentile: Low and high percentiles
-
-    Returns:
-        Normalized uint8 image
-    """
-    low = np.percentile(image, percentile[0])
-    high = np.percentile(image, percentile[1])
-
-    stretched = (image - low) / (high - low + 1e-8)
-    stretched = np.clip(stretched, 0, 1)
-
-    return (stretched * 255).astype(np.uint8)
-
-
+# Public names of the package.
 __all__ = [
-    "colorize_mask",
-    "overlay_mask",
-    "create_legend",
-    "normalize_for_display",
-]
+    "COLORMAPS",  # Named colour maps.
+    "DEFAULT_PALETTE",  # Default class colours.
+    "INDEX_COLORMAPS",  # Colour maps of common indices.
+    "LANDSAT89_COMPOSITES",  # Landsat band combinations.
+    "SENTINEL2_COMPOSITES",  # Sentinel-2 band combinations.
+    "WORLDCOVER_PALETTE",  # ESA WorldCover legend.
+    "alpha_composite",  # Porter-Duff over.
+    "apply_colormap",  # Values to RGBA.
+    "classify_colors",  # Values to RGBA by breaks.
+    "color_to_rgb",  # Colour to an RGB tuple.
+    "colorize_classes",  # Class map to RGBA.
+    "colorize_mask",  # Class map to RGB.
+    "colormap_lut",  # Lookup table.
+    "create_legend",  # Legend array.
+    "hex_to_rgb",  # Hex string to RGB.
+    "hillshade",  # Illumination.
+    "legend_figure",  # Matplotlib legend.
+    "legend_image",  # Pillow legend.
+    "multidirectional_hillshade",  # Several light directions.
+    "normalize_for_display",  # Percentile stretch to bytes.
+    "overlay_mask",  # Coloured mask overlay.
+    "quicklook",  # Reduced PNG.
+    "rgb_composite",  # Three bands to RGB.
+    "save_png",  # PNG writer.
+    "shade_image",  # Shaded RGB image.
+    "slope_aspect",  # Slope and aspect.
+    "to_uint8",  # Unit interval to bytes.
+    "world_file_lines",  # World file content.
+]  # End of the public names.
+
+# =============================================================================
+# End of module src/unbihexium/visualization/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
