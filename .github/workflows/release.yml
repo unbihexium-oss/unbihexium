@@ -33,7 +33,7 @@ jobs:
           sha256sum * > SHA256SUMS.txt
 
       - name: Generate attestations
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: dist/*
 
