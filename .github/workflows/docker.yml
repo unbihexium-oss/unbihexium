@@ -34,9 +34,8 @@ on:  # Events that start the workflow.
   pull_request:  # Run on pull requests (build only).
     branches: [main]  # Only pull requests that target the default branch.
 
-permissions:  # Token permissions for every job.
+permissions:  # Least-privilege default token; the job widens only what it needs.
   contents: read  # Read the repository.
-  packages: write  # Push the image to the GitHub Container Registry.
 
 env:  # Variables shared by all steps.
   REGISTRY: ghcr.io  # GitHub Container Registry host.
@@ -46,6 +45,9 @@ jobs:  # Jobs of the workflow.
   build-and-push:  # Build the image and publish it outside pull requests.
     name: Build and Push Docker Image  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Docker.
+    permissions:  # Token permissions of the build job.
+      contents: read  # Read the repository.
+      packages: write  # Push the image to the GitHub Container Registry.
     steps:  # Steps of the build job.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit to build.
 
