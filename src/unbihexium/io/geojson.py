@@ -464,6 +464,23 @@ def ring_area(ring: Any) -> float:
     return float(0.5 * np.sum(xy[:, 0] * nxt[:, 1] - nxt[:, 0] * xy[:, 1]))
 
 
+# Orientation of a ring: 1 counterclockwise, -1 clockwise, 0 without area.
+def _orientation(ring: Any) -> int:
+    # Horizontal coordinates; positions may mix two and three dimensions.
+    xy = np.asarray([p[:2] for p in ring], dtype=np.float64).reshape(-1, 2)
+    # Next vertex of every vertex.
+    nxt = np.roll(xy, -1, axis=0)
+    # Cross products of the shoelace formula.
+    cross = xy[:, 0] * nxt[:, 1] - nxt[:, 0] * xy[:, 1]
+    # Twice the signed area.
+    total = float(np.sum(cross))
+    # Rounding error of the sum, relative to the size of its terms.
+    tolerance = 1e-9 * float(np.sum(np.abs(cross)))
+    # Collinear and repeated vertices give an area within the rounding error,
+    # whose sign would flip at random when the ring is reversed.
+    return 0 if abs(total) <= tolerance else (1 if total > 0 else -1)
+
+
 # Orient the rings of one polygon: exterior counterclockwise, holes clockwise.
 def _rewind_polygon(rings: list[Any]) -> list[Any]:
     # Oriented rings.
@@ -472,10 +489,10 @@ def _rewind_polygon(rings: list[Any]) -> list[Any]:
     for i, ring in enumerate(rings):
         # The exterior ring is the first one.
         want_ccw = i == 0
-        # Signed area; zero for degenerate rings, which have no orientation.
-        area = ring_area(ring)
+        # Orientation; zero for degenerate rings, which have no orientation.
+        sign = _orientation(ring)
         # Reverse rings with the wrong orientation and keep degenerate rings.
-        out.append(list(ring)[::-1] if area != 0 and (area > 0) != want_ccw else list(ring))
+        out.append(list(ring)[::-1] if sign != 0 and (sign > 0) != want_ccw else list(ring))
     # Return the rings.
     return out
 
