@@ -1,24 +1,144 @@
+# =============================================================================
+# Citation metadata for Unbihexium
+# =============================================================================
+#
+# Citation File Format (CFF) 1.2.0: https://citation-file-format.github.io/
+# Schema: https://github.com/citation-file-format/citation-file-format/blob/main/schema.json
+#
+# GitHub reads this file to show a "Cite this repository" button with APA and
+# BibTeX output, and Zenodo, Zotero and other reference managers import it.
+# CITATION.md explains how to cite Unbihexium in text.
+#
+# Update `version` and `date-released` in every release, together with
+# `version` in pyproject.toml and codemeta.json (see VERSIONING.md).
+#
+# Validate with:
+#   check-jsonschema --builtin-schema vendor.citation-file-format CITATION.cff
+# or:
+#   cffconvert --validate
+# =============================================================================
+
 cff-version: 1.2.0
-title: Unbihexium
+title: "Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python"
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use Unbihexium in your research or in a product, please cite it
+  using the metadata in this file. Cite the exact version you used, and cite
+  the libraries listed under references where your work depends on them
+  directly.
 type: software
+
+# -----------------------------------------------------------------------------
+# Authors and contact
+# -----------------------------------------------------------------------------
+# The copyright holder is the Unbihexium OSS Foundation. Individual
+# contributors are listed in AUTHORS.md and in the version history.
 authors:
   - name: Unbihexium OSS Foundation
     email: opensource@unbihexium.org
-repository-code: https://github.com/unbihexium-oss/unbihexium
-url: https://unbihexium.org
-abstract: >-
-  Production-grade Earth Observation, Geospatial,
-  Remote Sensing, and SAR Python library.
-keywords:
-  - earth-observation
-  - geospatial
-  - remote-sensing
-  - sar
-  - satellite-imagery
-  - machine-learning
-license: MPL-2.0
+    website: "https://github.com/unbihexium-oss"
+  - given-names: Olaf Yunus
+    family-names: Laitinen Imanov
+    email: yunus.z.imanov@helsinki.fi
+    affiliation: University of Helsinki
+    website: "https://github.com/olaflaitinen"
+contact:
+  - given-names: Olaf Yunus
+    family-names: Laitinen Imanov
+    email: yunus.z.imanov@helsinki.fi
+    affiliation: University of Helsinki
+
+# -----------------------------------------------------------------------------
+# Version
+# -----------------------------------------------------------------------------
 version: 1.0.1
-date-released: 2025-12-18
+date-released: "2025-12-21"
+
+# -----------------------------------------------------------------------------
+# Locations
+# -----------------------------------------------------------------------------
+url: "https://unbihexium.org"
+repository-code: "https://github.com/unbihexium-oss/unbihexium"
+repository-artifact: "https://pypi.org/project/unbihexium/"
+identifiers:
+  - type: url
+    value: "https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1"
+    description: Source code and release notes of version 1.0.1.
+  - type: url
+    value: "https://pypi.org/project/unbihexium/1.0.1/"
+    description: Python package of version 1.0.1 on the Python Package Index.
+  - type: url
+    value: "https://github.com/unbihexium-oss/unbihexium/pkgs/container/unbihexium"
+    description: Container images on the GitHub Container Registry.
+
+# -----------------------------------------------------------------------------
+# Description
+# -----------------------------------------------------------------------------
+abstract: >-
+  Unbihexium is a Python library for Earth observation, geospatial analysis,
+  remote sensing and synthetic aperture radar (SAR). It provides raster and
+  vector input and output (GeoTIFF, Cloud Optimized GeoTIFF, Zarr,
+  GeoParquet, GeoJSON and STAC catalogues), spectral indices, SAR processing
+  (calibration, speckle filtering, polarimetric decomposition and
+  interferometry), terrain analysis, geostatistics (variograms and
+  kriging), tiled inference pipelines, a command line interface, a FastAPI
+  based REST service, and a model zoo of 130 capabilities in four size
+  variants (tiny, base, large and mega) for object detection, semantic
+  segmentation, change detection, classification and regression. Models
+  run with ONNX Runtime or PyTorch on CPU or GPU. The library supports
+  CPython 3.10 to 3.14 on Linux, macOS and Windows.
+keywords:
+  - earth observation
+  - geospatial
+  - remote sensing
+  - synthetic aperture radar
+  - SAR
+  - satellite imagery
+  - GIS
+  - machine learning
+  - deep learning
+  - object detection
+  - semantic segmentation
+  - change detection
+  - flood mapping
+  - agriculture
+  - urban planning
+  - environmental monitoring
+  - spectral indices
+  - geostatistics
+  - ONNX
+  - Python
+license: MPL-2.0
+license-url: "https://mozilla.org/MPL/2.0/"
+
+# -----------------------------------------------------------------------------
+# Works that Unbihexium builds on
+# -----------------------------------------------------------------------------
+# Raster and coordinate operations go through GDAL (via rasterio) and PROJ
+# (via pyproj), and model inference through ONNX Runtime. The entries below
+# use the citations recommended by those projects.
+references:
+  - type: software
+    title: "GDAL/OGR Geospatial Data Abstraction software Library"
+    authors:
+      - name: GDAL/OGR contributors
+    publisher:
+      name: Open Source Geospatial Foundation
+    url: "https://gdal.org"
+    doi: 10.5281/zenodo.5884351
+    license: MIT
+  - type: software
+    title: "PROJ coordinate transformation software library"
+    authors:
+      - name: PROJ contributors
+    publisher:
+      name: Open Source Geospatial Foundation
+    url: "https://proj.org"
+    doi: 10.5281/zenodo.5884394
+    license: MIT
+  - type: software
+    title: "ONNX Runtime"
+    authors:
+      - name: ONNX Runtime developers
+    url: "https://onnxruntime.ai"
+    repository-code: "https://github.com/microsoft/onnxruntime"
+    license: MIT
