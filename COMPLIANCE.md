@@ -80,7 +80,7 @@ Contributions are licensed under the MPL-2.0, the licence of the files they chan
 
 ### 3.1 REUSE
 
-The repository follows the REUSE Specification, version 3.3 [4], which requires copyright and licence information for every file. [REUSE.toml](REUSE.toml) assigns `SPDX-FileCopyrightText` and `SPDX-License-Identifier: MPL-2.0` to all files and records the package name, supplier and download location for SPDX documents. Because the repository keeps a single licence text in [LICENSE.txt](LICENSE.txt), the CI job copies it to `LICENSES/MPL-2.0.txt` (the location REUSE expects, ignored by Git) before running `reuse lint`.
+The repository follows the REUSE Specification, version 3.3 [4], which requires copyright and licence information for every file. [REUSE.toml](REUSE.toml) assigns the copyright holder and the licence MPL-2.0 to all files and records the package name, supplier and download location for SPDX documents. Because the repository keeps a single licence text in [LICENSE.txt](LICENSE.txt), the CI job copies it to `LICENSES/MPL-2.0.txt` (the location REUSE expects, ignored by Git) before running `reuse lint`.
 
 ### 3.2 Distribution Contents
 
