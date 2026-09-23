@@ -1,0 +1,44 @@
+# Categories for automatically generated release notes.
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - duplicate
+      - invalid
+      - wontfix
+  categories:
+    - title: Breaking changes
+      labels:
+        - breaking-change
+    - title: Security
+      labels:
+        - security
+    - title: New features
+      labels:
+        - enhancement
+    - title: Bug fixes
+      labels:
+        - bug
+    - title: Model zoo
+      labels:
+        - model-zoo
+    - title: Performance
+      labels:
+        - performance
+    - title: Compliance and licensing
+      labels:
+        - compliance
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Build, CI and containers
+      labels:
+        - build
+        - ci
+        - docker
+    - title: Dependencies
+      labels:
+        - dependencies
+    - title: Other changes
+      labels:
+        - "*"
