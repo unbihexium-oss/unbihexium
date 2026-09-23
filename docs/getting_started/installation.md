@@ -29,7 +29,7 @@ $$
 
 | Component | Minimum | Recommended |
 | ----------- | --------- | ------------- |
-| Python | 3.10 | 3.12 |
+| Python | 3.10 | 3.14 |
 | RAM | 8GB | 16GB |
 | Disk | 5GB | 20GB |
 | GPU | None | CUDA 11.8+ |
