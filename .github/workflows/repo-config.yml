@@ -105,6 +105,9 @@ jobs:
           curl -sSfL "https://github.com/cue-lang/cue/releases/download/${CUE_VERSION}/cue_${CUE_VERSION}_linux_amd64.tar.gz" | tar -xz -C "${RUNNER_TEMP}" cue
           git clone --quiet --depth 1 --branch "${SPEC_VERSION}" https://github.com/ossf/security-insights.git "${RUNNER_TEMP}/security-insights"
 
+      # cue resolves the schema package relative to the working directory,
+      # so run it from inside the schema checkout.
       - name: Validate against the Security Insights schema
+        working-directory: ${{ runner.temp }}/security-insights
         run: |
-          "${RUNNER_TEMP}/cue" vet -d '#SecurityInsights' "${RUNNER_TEMP}/security-insights/spec" security-insights.yml
+          "${RUNNER_TEMP}/cue" vet -d '#SecurityInsights' ./spec "${GITHUB_WORKSPACE}/security-insights.yml"
