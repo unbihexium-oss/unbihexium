@@ -1,149 +1,107 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# Module      : src/unbihexium/indices/__init__.py
+# Title       : Spectral and radar indices
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Python      : CPython 3.10 to 3.14, requires NumPy
+# =============================================================================
+#
+# Abstract
+# --------
+# Array functions for band-ratio indices of optical and radar imagery
+# (vegetation, water, built-up, snow, fire and radar vegetation indices).
+# The functions live in unbihexium.indices.spectral, which lists the
+# formulas and references. They work on plain NumPy arrays and return NaN
+# where a ratio is undefined.
+# =============================================================================
 
-"""Spectral indices computation module.
+# Index functions.
+from unbihexium.indices.spectral import (
+    BURN_SEVERITY_BREAKS,  # dNBR class limits.
+    BURN_SEVERITY_CLASSES,  # dNBR class names.
+    INDEX_FUNCTIONS,  # Index functions by name.
+    arvi,  # Atmospherically resistant vegetation index.
+    awei_nsh,  # Water extraction index, no shadow.
+    awei_sh,  # Water extraction index, shadow.
+    bsi,  # Bare soil index.
+    burn_severity,  # dNBR severity classes.
+    ci_green,  # Green chlorophyll index.
+    ci_rededge,  # Red-edge chlorophyll index.
+    compute_index,  # Index by name.
+    cross_pol_ratio,  # Radar cross-polarisation ratio.
+    dnbr,  # Differenced burn ratio.
+    evi,  # Enhanced vegetation index.
+    evi2,  # Two-band EVI.
+    gndvi,  # Green NDVI.
+    kndvi,  # Kernel NDVI.
+    mndwi,  # Modified water index.
+    msavi,  # Modified soil adjusted vegetation index.
+    msi,  # Moisture stress index.
+    nbr,  # Normalized burn ratio.
+    nbr2,  # Normalized burn ratio 2.
+    ndbi,  # Built-up index.
+    ndmi,  # Moisture index.
+    ndre,  # Red-edge index.
+    ndsi,  # Snow index.
+    ndvi,  # Vegetation index.
+    ndwi,  # Water index.
+    normalized_difference,  # Generic normalised difference.
+    osavi,  # Optimised soil adjusted vegetation index.
+    rdnbr,  # Relative differenced burn ratio.
+    rvi,  # Radar vegetation index.
+    safe_divide,  # Division with NaN for zero denominators.
+    savi,  # Soil adjusted vegetation index.
+    vari,  # Visible atmospherically resistant index.
+)  # End of the index imports.
 
-This module provides functions for computing common spectral indices
-from multispectral satellite imagery.
-"""
-
-from __future__ import annotations
-
-import numpy as np
-from numpy.typing import NDArray
-
-
-def ndvi(nir: NDArray, red: NDArray, epsilon: float = 1e-8) -> NDArray:
-    """Compute Normalized Difference Vegetation Index.
-
-    NDVI = (NIR - Red) / (NIR + Red)
-
-    Args:
-        nir: Near-infrared band array
-        red: Red band array
-        epsilon: Small value to avoid division by zero
-
-    Returns:
-        NDVI array with values in range [-1, 1]
-    """
-    return (nir - red) / (nir + red + epsilon)
-
-
-def ndwi(green: NDArray, nir: NDArray, epsilon: float = 1e-8) -> NDArray:
-    """Compute Normalized Difference Water Index.
-
-    NDWI = (Green - NIR) / (Green + NIR)
-
-    Args:
-        green: Green band array
-        nir: Near-infrared band array
-        epsilon: Small value to avoid division by zero
-
-    Returns:
-        NDWI array with values in range [-1, 1]
-    """
-    return (green - nir) / (green + nir + epsilon)
-
-
-def evi(
-    nir: NDArray,
-    red: NDArray,
-    blue: NDArray,
-    g: float = 2.5,
-    c1: float = 6.0,
-    c2: float = 7.5,
-    l: float = 1.0,
-) -> NDArray:
-    """Compute Enhanced Vegetation Index.
-
-    EVI = G * (NIR - Red) / (NIR + C1*Red - C2*Blue + L)
-
-    Args:
-        nir: Near-infrared band array
-        red: Red band array
-        blue: Blue band array
-        g: Gain factor (default 2.5)
-        c1: Coefficient 1 (default 6.0)
-        c2: Coefficient 2 (default 7.5)
-        l: Canopy background adjustment (default 1.0)
-
-    Returns:
-        EVI array
-    """
-    return g * (nir - red) / (nir + c1 * red - c2 * blue + l)
-
-
-def savi(nir: NDArray, red: NDArray, l: float = 0.5, epsilon: float = 1e-8) -> NDArray:
-    """Compute Soil Adjusted Vegetation Index.
-
-    SAVI = ((NIR - Red) * (1 + L)) / (NIR + Red + L)
-
-    Args:
-        nir: Near-infrared band array
-        red: Red band array
-        l: Soil brightness correction factor (default 0.5)
-        epsilon: Small value to avoid division by zero
-
-    Returns:
-        SAVI array
-    """
-    return ((nir - red) * (1 + l)) / (nir + red + l + epsilon)
-
-
-def nbr(nir: NDArray, swir: NDArray, epsilon: float = 1e-8) -> NDArray:
-    """Compute Normalized Burn Ratio.
-
-    NBR = (NIR - SWIR) / (NIR + SWIR)
-
-    Args:
-        nir: Near-infrared band array
-        swir: Shortwave infrared band array
-        epsilon: Small value to avoid division by zero
-
-    Returns:
-        NBR array with values in range [-1, 1]
-    """
-    return (nir - swir) / (nir + swir + epsilon)
-
-
-def msi(swir: NDArray, nir: NDArray, epsilon: float = 1e-8) -> NDArray:
-    """Compute Moisture Stress Index.
-
-    MSI = SWIR / NIR
-
-    Args:
-        swir: Shortwave infrared band array
-        nir: Near-infrared band array
-        epsilon: Small value to avoid division by zero
-
-    Returns:
-        MSI array (higher values indicate water stress)
-    """
-    return swir / (nir + epsilon)
-
-
-def dnbr(nbr_pre: NDArray, nbr_post: NDArray) -> NDArray:
-    """Compute differenced Normalized Burn Ratio.
-
-    dNBR = NBR_pre - NBR_post
-
-    Args:
-        nbr_pre: Pre-fire NBR array
-        nbr_post: Post-fire NBR array
-
-    Returns:
-        dNBR array (positive values indicate burn severity)
-    """
-    return nbr_pre - nbr_post
-
-
+# Public names of the package.
 __all__ = [
-    "ndvi",
-    "ndwi",
-    "evi",
-    "savi",
-    "nbr",
-    "msi",
-    "dnbr",
-]
+    "BURN_SEVERITY_BREAKS",  # dNBR class limits.
+    "BURN_SEVERITY_CLASSES",  # dNBR class names.
+    "INDEX_FUNCTIONS",  # Index functions by name.
+    "arvi",  # Atmospherically resistant vegetation index.
+    "awei_nsh",  # Water extraction index, no shadow.
+    "awei_sh",  # Water extraction index, shadow.
+    "bsi",  # Bare soil index.
+    "burn_severity",  # dNBR severity classes.
+    "ci_green",  # Green chlorophyll index.
+    "ci_rededge",  # Red-edge chlorophyll index.
+    "compute_index",  # Index by name.
+    "cross_pol_ratio",  # Radar cross-polarisation ratio.
+    "dnbr",  # Differenced burn ratio.
+    "evi",  # Enhanced vegetation index.
+    "evi2",  # Two-band EVI.
+    "gndvi",  # Green NDVI.
+    "kndvi",  # Kernel NDVI.
+    "mndwi",  # Modified water index.
+    "msavi",  # Modified soil adjusted vegetation index.
+    "msi",  # Moisture stress index.
+    "nbr",  # Normalized burn ratio.
+    "nbr2",  # Normalized burn ratio 2.
+    "ndbi",  # Built-up index.
+    "ndmi",  # Moisture index.
+    "ndre",  # Red-edge index.
+    "ndsi",  # Snow index.
+    "ndvi",  # Vegetation index.
+    "ndwi",  # Water index.
+    "normalized_difference",  # Generic normalised difference.
+    "osavi",  # Optimised soil adjusted vegetation index.
+    "rdnbr",  # Relative differenced burn ratio.
+    "rvi",  # Radar vegetation index.
+    "safe_divide",  # Division with NaN for zero denominators.
+    "savi",  # Soil adjusted vegetation index.
+    "vari",  # Visible atmospherically resistant index.
+]  # End of the public names.
+
+# =============================================================================
+# End of module src/unbihexium/indices/__init__.py
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================
