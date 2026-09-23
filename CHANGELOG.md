@@ -80,6 +80,7 @@ Where:
 
 ### Changed (Unreleased)
 
+- Python files outside the package (`.github/scripts/`, `scripts/` and `examples/`) use `#` comments instead of docstrings, carry an academic header and footer with project, module, author, affiliation, copyright and licence, and have a comment for every line of code; behaviour is unchanged and the example API keeps its OpenAPI descriptions
 - Contact address in package metadata, citation files, the container image, the Helm chart and the security, privacy, conduct and support policies changed to `yunus.z.imanov@helsinki.fi`
 - Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)
 - Added MPL-2.0 license headers to source files
