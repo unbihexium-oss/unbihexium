@@ -12,7 +12,7 @@ flowchart TB
     A --> C[Export Control]
     A --> D[Data Protection]
     
-    B --> E[Apache-2.0]
+    B --> E[MPL-2.0]
     C --> F[EAR Review]
     D --> G[GDPR Alignment]
 ```
@@ -27,14 +27,14 @@ $$
 
 | Regulation | Applicability | Status |
 | ------------ | --------------- | -------- |
-| Apache-2.0 | License | Compliant |
+| MPL-2.0 | License | Compliant |
 | GDPR | Data privacy | Aligned |
 | EAR | Export control | Under review |
 | SOC 2 | Security | Not applicable |
 
 ## License Compliance
 
-- Apache-2.0 license
+- MPL-2.0 license
 - NOTICE file maintained
 - Third-party licenses tracked
 - SBOM generated per release

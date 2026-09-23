@@ -22,7 +22,7 @@ $$
 \text{Risk} = \sum_i \text{Copyleft}_i \times \text{LinkType}_i
 $$
 
-All dependencies use permissive licenses compatible with Apache-2.0.
+All dependencies use permissive licenses compatible with MPL-2.0.
 
 ## Dependency Table
 

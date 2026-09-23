@@ -84,7 +84,7 @@ The library is named after the theoretical chemical element with atomic number 1
 | --------- | ------------ | ----------------- | ------------------- |
 | Offline Capable | Yes | Yes | No |
 | Model Count | 520 | 0 | 10-50 |
-| Open Source | Apache-2.0 | Varies | No |
+| Open Source | MPL-2.0 | Varies | No |
 | Self-Hosted | Yes | Yes | No |
 | GPU Acceleration | Yes | Limited | Yes |
 | Edge Deployment | Yes | No | No |
@@ -716,7 +716,7 @@ $$
 
 | Standard | Status | Scope |
 | ---------- | -------- | ------- |
-| Apache-2.0 License | Compliant | Full codebase |
+| MPL-2.0 License | Compliant | Full codebase |
 | GDPR | Compliant | No PII collection |
 | CCPA | Compliant | No PII collection |
 | EAR | Reviewed | Non-controlled items |
@@ -756,7 +756,7 @@ We welcome contributions from the community. Please review:
   publisher    = {GitHub},
   url          = {https://github.com/unbihexium-oss/unbihexium},
   doi          = {10.5281/zenodo.0000000},
-  license      = {Apache-2.0},
+  license      = {MPL-2.0},
   note         = {520 models, 515M parameters, 12 capability domains}
 }
 ```
@@ -767,20 +767,12 @@ We welcome contributions from the community. Please review:
 
 Copyright 2025 Unbihexium OSS Foundation
 
-Licensed under the Apache License, Version 2.0. See [LICENSE.txt](LICENSE.txt) for the full license text.
+Licensed under the Mozilla Public License, Version 2.0 (MPL-2.0). See [LICENSE.txt](LICENSE.txt) for the full license text.
 
 ```text
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ```
 
 ---
