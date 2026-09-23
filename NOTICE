@@ -1,11 +1,217 @@
-NOTICE
-
 Unbihexium
-Copyright 2025 Unbihexium OSS Foundation
+Copyright 2025-2026 Unbihexium OSS Foundation and contributors
 
-This product includes software developed by the Unbihexium OSS Foundation.
+This product includes software developed by the Unbihexium OSS Foundation
+and the contributors listed in AUTHORS.md
+(https://github.com/unbihexium-oss/unbihexium).
 
-Licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
-See LICENSE.txt or https://mozilla.org/MPL/2.0/ for the full license text.
 
-Third-party components are listed in THIRD_PARTY_NOTICES.
+===============================================================================
+1. Licence
+===============================================================================
+
+Unbihexium is licensed under the Mozilla Public License, version 2.0
+(SPDX licence identifier MPL-2.0). The full licence text is in LICENSE.txt
+at the root of the source tree and of every source distribution, and at
+https://mozilla.org/MPL/2.0/.
+
+Every source file carries the MPL-2.0 Exhibit A notice:
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Files that cannot carry a comment, such as JSON, notebooks, images and model
+weights, are covered by the annotation in REUSE.toml, which applies the same
+copyright and licence to every file in the repository.
+
+The MPL-2.0 is a file-level copyleft licence:
+
+  - Modified versions of files covered by the MPL-2.0 must remain under the
+    MPL-2.0, and their source code must be made available when they are
+    distributed (MPL-2.0 sections 3.1 and 3.2).
+  - Unbihexium may be combined with code under other licences, including
+    proprietary code, to form a "Larger Work" (MPL-2.0 section 3.3). Files
+    that do not contain MPL-2.0 covered code may be licensed as their authors
+    choose.
+  - The MPL-2.0 is compatible with the GNU GPL 2.0 or later, the GNU LGPL
+    2.1 or later and the GNU AGPL 3.0 or later (MPL-2.0 section 3.3 and
+    Exhibit B). No file in Unbihexium carries the "Incompatible With
+    Secondary Licenses" notice.
+  - The licence grants no rights to the trademarks of any contributor
+    (MPL-2.0 section 2.3).
+
+This NOTICE file is informational. It does not modify the MPL-2.0, and where
+it and LICENSE.txt differ, LICENSE.txt prevails.
+
+
+===============================================================================
+2. Disclaimer of warranty and limitation of liability
+===============================================================================
+
+Unbihexium is provided on an "as is" basis, without warranty of any kind,
+as set out in sections 6 (Disclaimer of Warranty) and 7 (Limitation of
+Liability) of the MPL-2.0. Results produced with Unbihexium, including the
+output of the models in the model zoo, must be validated before they are
+used for decisions that affect people, property or the environment. See
+RESPONSIBLE_USE.md and COMPLIANCE.md.
+
+
+===============================================================================
+3. Model zoo
+===============================================================================
+
+The model weights, configurations, manifests and model cards under
+model_zoo/ were produced by the Unbihexium project and are licensed under
+the MPL-2.0, like the rest of the repository. According to their model
+cards, the models were trained on synthetic data generated with a fixed
+random seed. They contain no third-party weights and no third-party
+training data. Each model card under model_zoo/cards/ records the licence
+and provenance of its model, and model_zoo/checksums.txt lists SHA-256
+digests of the published files.
+
+
+===============================================================================
+4. Third-party software
+===============================================================================
+
+Unbihexium is distributed as a pure Python package. The wheel and the
+source distribution contain no third-party code: the packages below are
+installed separately by the package installer, each under its own licence,
+and are not relicensed by Unbihexium. The container image built from the
+Dockerfile does contain them; see section 5.
+
+The licences below were taken from the package metadata published on PyPI
+in September 2026. The version column is the lowest version Unbihexium
+supports. Verify the licence of the exact version you install, for example
+with `pip-licenses`, before you redistribute it.
+
+4.1 Runtime dependencies (always installed)
+
+  Package          Minimum version        Licence
+  ---------------  ---------------------  -----------------------------------
+  numpy            2.2.6 / 2.3.3 (1)      BSD-3-Clause (bundled parts: 0BSD,
+                                          MIT, Zlib, CC0-1.0)
+  scipy            1.15.3 / 1.16.2 (1)    BSD-3-Clause
+  rasterio         1.4.4                  BSD-3-Clause (wheels bundle GDAL
+                                          and PROJ, MIT, and other libraries)
+  shapely          2.1.2                  BSD-3-Clause (wheels bundle GEOS,
+                                          LGPL-2.1-or-later)
+  geopandas        1.1.2                  BSD-3-Clause
+  pyproj           3.7.1 / 3.7.2 (1)      MIT (wheels bundle PROJ, MIT)
+  click            8.3.3                  BSD-3-Clause
+  rich             14.1.0                 MIT
+  pydantic         2.12.0                 MIT
+  pyyaml           6.0.3                  MIT
+  requests         2.33.0                 Apache-2.0
+  tqdm             4.67.1                 MPL-2.0 AND MIT
+  pillow           12.3.0                 MIT-CMU
+  scikit-learn     1.7.2                  BSD-3-Clause
+  scikit-image     0.25.2 / 0.26.0 (1)    BSD-3-Clause
+
+  (1) The first version applies to Python 3.10, the second to Python 3.11
+      and later.
+
+4.2 Optional dependencies (installed only with an extra)
+
+  Extra      Package          Minimum version   Licence
+  ---------  ---------------  ----------------  -----------------------------
+  onnx       onnxruntime      1.23.2 / 1.24.1   MIT
+  torch      torch            2.13.0            BSD-3-Clause and others (2)
+  torch      torchvision      0.28.0            BSD-3-Clause
+  gpu        cupy-cuda12x     14.0.0            MIT (requires the NVIDIA CUDA
+                                                runtime under NVIDIA's terms)
+  serving    fastapi          0.133.0           MIT
+  serving    starlette        1.3.1             BSD-3-Clause
+  serving    uvicorn          0.37.0            BSD-3-Clause
+  serving    python-multipart 0.0.31            Apache-2.0
+  dask       dask             2025.9.1          BSD-3-Clause
+  ray        ray              2.56.0            Apache-2.0
+  zarr       zarr             2.18.3 / 3.1.4    MIT
+  zarr       numcodecs        0.13.1 / 0.16.4   MIT
+  netcdf     netCDF4          1.7.2             MIT
+  netcdf     h5py             3.15.0            BSD-3-Clause
+  stac       pystac           1.14.1            Apache-2.0
+  stac       pystac-client    0.9.0             Apache-2.0
+  parquet    pyarrow          23.0.1            Apache-2.0
+
+  (2) torch declares Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND
+      BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT for the components
+      it bundles. CUDA builds of torch also install NVIDIA libraries under
+      the NVIDIA Software License Agreement.
+
+4.3 Development and test tools (not distributed with Unbihexium)
+
+  pytest, pytest-cov, pytest-xdist, ruff, pyright, pre-commit, build, tox
+  and hatchling (build backend) are MIT licensed; pytest-asyncio, bandit,
+  pip-audit and twine are Apache-2.0; httpx is BSD-3-Clause; reuse is
+  Apache-2.0 with parts under GPL-3.0-or-later; yamllint is
+  GPL-3.0-or-later. These tools are used to build and check Unbihexium.
+  They are not imported by the library and not included in any
+  distribution, so their licences place no obligations on users of
+  Unbihexium.
+
+4.4 Licence compatibility
+
+All runtime and optional dependencies are under licences that permit use
+with MPL-2.0 code. The allowed and denied licences for new dependencies are
+enforced by .github/dependency-review-config.yml and
+.github/scripts/check_dependency_licenses.py. The Docker workflow generates
+an SPDX software bill of materials (SBOM) of the container image. For an
+installed environment, `pip-licenses --from=mixed` lists every package with
+its version and licence.
+
+
+===============================================================================
+5. Container image
+===============================================================================
+
+The image built from the Dockerfile and published at
+ghcr.io/unbihexium-oss/unbihexium contains, in addition to Unbihexium and
+the packages from requirements.txt:
+
+  - CPython, under the Python Software Foundation License Version 2
+    (PSF-2.0), from the official python:3.14-slim-trixie image;
+  - a minimal Debian 13 (trixie) system, whose packages are under their own
+    free software licences, recorded in /usr/share/doc/*/copyright inside
+    the image.
+
+Redistributors of the image must comply with the licences of all of these
+components, including the source availability obligations of the GPL and
+LGPL licensed Debian packages. Debian publishes the corresponding source
+code at https://sources.debian.org/.
+
+
+===============================================================================
+6. Data
+===============================================================================
+
+Unbihexium does not ship Earth observation imagery or other third-party
+data. Users are responsible for complying with the licences and terms of
+use of the data they process, for example the Copernicus Sentinel data
+licence or the USGS Landsat terms. The test fixtures in tests/fixtures/
+are small simulated arrays, not real imagery, and are licensed under the
+MPL-2.0.
+
+
+===============================================================================
+7. Trademarks
+===============================================================================
+
+"Unbihexium" is the name of this project. All other product names, logos
+and brands mentioned in the source code or the documentation are the
+property of their respective owners and are used for identification only.
+Their use does not imply endorsement.
+
+
+===============================================================================
+8. More information
+===============================================================================
+
+  Licence text                 LICENSE.txt
+  Notices in Markdown          NOTICE.md
+  Third-party software         THIRD_PARTY_NOTICES.md
+  Copyright and licence map    REUSE.toml (https://reuse.software/)
+  Citation                     CITATION.cff, CITATION.md
+  Security policy              SECURITY.md
+  Contact                      https://github.com/unbihexium-oss/unbihexium/issues
