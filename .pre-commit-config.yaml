@@ -26,8 +26,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: no-emoji
-        name: no-emoji
-        entry: python scripts/no_emoji_check.py
-        language: python
-        types: [text]
+      - id: text-policy
+        name: text policy (English only, no emojis, no em dashes)
+        entry: python .github/scripts/check_text_policy.py
+        language: system
+        pass_filenames: false
+        always_run: true
