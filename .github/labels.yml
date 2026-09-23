@@ -57,6 +57,9 @@
 - name: confirmed
   color: "0e8a16"
   description: "Reproduced or accepted by a maintainer"
+- name: stale
+  color: "dddddd"
+  description: "No recent activity; closes automatically unless updated"
 - name: blocked
   color: "000000"
   description: "Blocked by another issue or an external factor"
