@@ -80,4 +80,4 @@ Report security issues via [SECURITY.md](SECURITY.md), not public issues.
 
 ## License
 
-Contributions are licensed under Apache-2.0.
+Contributions are licensed under the Mozilla Public License 2.0 (MPL-2.0). By submitting a contribution, you agree that it is made available under the terms of [LICENSE.txt](LICENSE.txt).

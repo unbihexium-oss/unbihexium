@@ -62,4 +62,4 @@ jupyter notebook examples/notebooks/
 
 ## License
 
-Examples are licensed under Apache-2.0, same as the main library.
+Examples are licensed under MPL-2.0, same as the main library.

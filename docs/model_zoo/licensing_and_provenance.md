@@ -8,7 +8,7 @@ License terms and provenance tracking for models.
 
 ```mermaid
 graph TB
-    A[Unbihexium Models] --> B[Apache-2.0]
+    A[Unbihexium Models] --> B[MPL-2.0]
     B --> C[Use]
     B --> D[Modify]
     B --> E[Distribute]
@@ -23,13 +23,14 @@ $$
 
 | Model | License | Training Data | Origin |
 | ------- | --------- | --------------- | -------- |
-| All models | Apache-2.0 | Synthetic | Unbihexium |
+| All models | MPL-2.0 | Synthetic | Unbihexium |
 
 ## License Terms
 
-- **Use**: Permitted for any purpose
-- **Modify**: Permitted with attribution
-- **Distribute**: Permitted with license
+- **Use**: Permitted for any purpose, including commercial use
+- **Modify**: Permitted; modified MPL-2.0 files remain under MPL-2.0
+- **Distribute**: Permitted; source of MPL-2.0 files must be made available
+- **Combine**: Permitted in larger works under other licenses (file-level copyleft)
 - **Patent**: Grant included
 - **Trademark**: Not granted
 
@@ -54,5 +55,5 @@ When using Unbihexium models, include:
 
 ```text
 Models from Unbihexium (https://github.com/unbihexium-oss/unbihexium)
-Licensed under Apache-2.0
+Licensed under MPL-2.0 (https://mozilla.org/MPL/2.0/)
 ```

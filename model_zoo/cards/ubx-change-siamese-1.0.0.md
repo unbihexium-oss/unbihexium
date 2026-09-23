@@ -8,7 +8,7 @@
 | Task | Change Detection |
 | Architecture | Siamese Network |
 | Version | 1.0.0 |
-| License | Apache-2.0 |
+| License | MPL-2.0 |
 | Status | Production |
 
 ## Description

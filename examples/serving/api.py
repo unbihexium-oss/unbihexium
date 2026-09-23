@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 """FastAPI serving example for unbihexium models.
 
 This module provides a simple REST API for serving unbihexium models.
@@ -37,7 +41,7 @@ app = FastAPI(
     title="Unbihexium API",
     description="REST API for Earth Observation and Geospatial AI",
     version=unbihexium.__version__,
-    license_info={"name": "Apache-2.0"},
+    license_info={"name": "MPL-2.0", "url": "https://mozilla.org/MPL/2.0/"},
 )
 
 

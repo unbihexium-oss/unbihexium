@@ -40,6 +40,16 @@ Where:
 
 ---
 
+## [Unreleased]
+
+### Changed (Unreleased)
+
+- Relicensed the project from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0)
+- Added MPL-2.0 license headers to source files
+- Updated package metadata, model manifests, model cards, and notebooks to reference MPL-2.0
+
+---
+
 ## [1.0.0] - 2025-12-19
 
 ### Added (1.0.0)

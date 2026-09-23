@@ -122,6 +122,6 @@ python scripts/validate_models.py
 
 ## License
 
-Models are licensed under Apache-2.0, same as the library.
+Models are licensed under MPL-2.0, same as the library.
 
 See [model_catalog.md](../docs/model_zoo/model_catalog.md) for complete documentation.

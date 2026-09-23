@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 """Model zoo registry for managing model entries."""
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ class ModelZooEntry:
     sha256: str = ""
     download_url: str | None = None
     size_bytes: int = 0
-    license: str = "Apache-2.0"
+    license: str = "MPL-2.0"
     source: str = "release"  # repo, release, lfs, external
     version: str = "1.0.0"
     description: str = ""

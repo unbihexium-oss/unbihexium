@@ -40,7 +40,7 @@ $$
   year = {2025},
   version = {1.0.0},
   url = {https://github.com/unbihexium-oss/unbihexium},
-  license = {Apache-2.0}
+  license = {MPL-2.0}
 }
 ```
 

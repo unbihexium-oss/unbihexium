@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "task": "enhancement",
   "architecture": "cnn",
-  "license": "Apache-2.0",
+  "license": "MPL-2.0",
   "status": "production",
   "description": "Synthetic Imagery model for enhancement.",
   "artifacts": {

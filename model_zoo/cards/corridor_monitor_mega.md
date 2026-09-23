@@ -9,7 +9,7 @@
 | Architecture | SIAMESE_UNET |
 | Variant | mega |
 | Resolution | 256x256 |
-| License | Apache-2.0 |
+| License | MPL-2.0 |
 
 ## Description
 

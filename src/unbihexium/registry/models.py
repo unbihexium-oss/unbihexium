@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 """Model registry for ML models."""
 
 from __future__ import annotations
@@ -17,7 +21,7 @@ class ModelEntry:
     sha256: str = ""
     download_url: str | None = None
     size_bytes: int = 0
-    license: str = "Apache-2.0"
+    license: str = "MPL-2.0"
     source: str = "release"  # repo, release, lfs, external
 
     def to_dict(self) -> dict[str, Any]:

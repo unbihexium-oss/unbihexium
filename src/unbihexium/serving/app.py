@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 """FastAPI application factory for unbihexium serving.
 
 This module provides the main FastAPI application with endpoints for:
@@ -61,7 +65,7 @@ def create_app(
         title=title,
         description="REST API for Earth Observation and Geospatial AI",
         version=version or unbihexium.__version__,
-        license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
+        license_info={"name": "MPL-2.0", "url": "https://mozilla.org/MPL/2.0/"},
     )
 
     # Middleware

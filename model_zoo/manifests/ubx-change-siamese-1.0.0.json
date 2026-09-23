@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "task": "change_detection",
     "architecture": "siamese",
-    "license": "Apache-2.0",
+    "license": "MPL-2.0",
     "status": "production",
     "description": "Siamese network for change detection between two temporal images. Detects changes using feature difference and produces binary change mask.",
     "input": {
