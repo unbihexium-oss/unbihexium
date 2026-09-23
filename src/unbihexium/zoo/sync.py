@@ -603,8 +603,8 @@ def render_checksums(digests: dict[str, dict[str, Any]]) -> str:
     )  # End of the header.
     # One line per model, sorted by id, with the parameter count as comment.
     lines = [
-        f"{digests[k]['weights_digest']}  {k}  # {digests[k]['num_parameters']:,} parameters.\n"  # Entry.
-        for k in sorted(digests)  # Every model.
+        f"{d['weights_digest']}  {k}  # {d['num_parameters']:,} parameters.\n"  # Entry.
+        for k, d in sorted(digests.items())  # Every model.
     ]  # End of the lines.
     # Header, entries and footer.
     return header + "".join(lines) + generated_footer("model_zoo/checksums.txt")
