@@ -5,12 +5,12 @@ on:
     branches: [main]
     paths:
       - "**/*.md"
-      - ".markdownlint.json"
+      - ".markdownlint.yaml"
   pull_request:
     branches: [main]
     paths:
       - "**/*.md"
-      - ".markdownlint.json"
+      - ".markdownlint.yaml"
   workflow_dispatch:
 
 permissions:
@@ -31,4 +31,4 @@ jobs:
           persist-credentials: false
 
       - name: Lint Markdown files
-        run: npx --yes markdownlint-cli@0.45.0 --config .markdownlint.json "**/*.md" --ignore node_modules
+        run: npx --yes markdownlint-cli@0.49.1 --config .markdownlint.yaml "**/*.md" --ignore node_modules

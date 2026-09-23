@@ -94,7 +94,7 @@ Every pull request runs the workflows in `.github/workflows/`. The most importan
 | Package | Builds the sdist and wheel, validates metadata and installs the wheel on Python 3.10 and 3.14 |
 | License Compliance | MPL-2.0 notices in every source file and licences of all dependencies |
 | Text Policy | English only, no emojis and no em dashes in files and commit messages |
-| Markdown | markdownlint with `.markdownlint.json` |
+| Markdown | markdownlint with `.markdownlint.yaml` |
 | Model Zoo | Model zoo structure, SHA256 checksums, model cards and manifests |
 | Notebooks | Valid notebook format and no committed outputs |
 | Repository Config | Issue forms, workflows, Dependabot, CITATION.cff, Codecov, Security Insights and Compose files against their schemas, and YAML style |
