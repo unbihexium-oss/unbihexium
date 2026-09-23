@@ -74,6 +74,24 @@ All PRs require:
 - Code review approval
 - Documentation updates (if applicable)
 
+## Issue and Pull Request Templates
+
+Issues are opened through the forms in `.github/ISSUE_TEMPLATE/`; blank issues are disabled. Pull requests use `.github/PULL_REQUEST_TEMPLATE.md`. Every question in the templates is mandatory:
+
+- Closed questions list all expected answers and always offer an "Other" answer with room to specify it.
+- Open questions must be answered in full; write `N/A` only when a question genuinely does not apply.
+- The declarations cover the repository, third-party libraries, models and data involved.
+- The regulatory confirmations link to the exact articles of the GDPR, the EU AI Act, the Cyber Resilience Act and the other regulations listed in [COMPLIANCE.md](COMPLIANCE.md).
+
+## AI-Assisted Contributions
+
+Contributions prepared with AI assistance are accepted when they are disclosed. Every issue form and the pull request template contain an AI usage declaration. Contributors must:
+
+- Declare which parts were produced with AI assistance and which tools were used.
+- Review, understand and verify all AI generated content before submitting it.
+- Never use AI to fabricate logs, benchmark results, test results or citations.
+- Not enter personal data or confidential data into AI tools without a lawful basis and permission.
+
 ## Security
 
 Report security issues via [SECURITY.md](SECURITY.md), not public issues.
