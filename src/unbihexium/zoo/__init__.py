@@ -45,6 +45,12 @@ from unbihexium.zoo.catalog import (
     parse_model_id,  # Split a model id into family and variant.
 )  # End of the catalogue imports.
 
+# Effective configuration of a model.
+from unbihexium.zoo.config import (
+    DETECTION_STRIDE,  # Output stride of the detectors.
+    BuildConfig,  # Effective configuration of a model.
+)  # End of the configuration imports.
+
 # Registry of model entries.
 from unbihexium.zoo.registry import (
     ModelZooEntry,  # Description of one model.
@@ -80,6 +86,8 @@ from unbihexium.zoo.verify import (
 
 # Names exported by `from unbihexium.zoo import *`.
 __all__ = [
+    "DETECTION_STRIDE",  # Output stride of the detectors.
+    "BuildConfig",  # Effective configuration of a model.
     "CatalogError",  # Raised for invalid catalogue entries or names.
     "ModelSpec",  # Catalogue entry of a model family.
     "ModelZooEntry",  # Description of one model.

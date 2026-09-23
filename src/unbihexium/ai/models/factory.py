@@ -44,8 +44,8 @@
 # every supported Python version.
 from __future__ import annotations
 
-# Immutable configuration records and replacement of fields.
-from dataclasses import dataclass, field, replace
+# Replacement of fields in frozen records.
+from dataclasses import replace
 
 # Type of loosely structured values.
 from typing import Any
@@ -73,7 +73,6 @@ from unbihexium.ai.models.spectral import FORMULA_CHANNELS, SpectralIndex
 
 # Catalogue types and lookups.
 from unbihexium.zoo.catalog import (
-    ModelSpec,  # Catalogue entry of a family.
     Task,  # Task enumeration.
     Variant,  # Size variant enumeration.
     VariantSpec,  # Variant hyperparameters.
@@ -81,6 +80,9 @@ from unbihexium.zoo.catalog import (
     get_variant,  # Look up a variant.
     parse_model_id,  # Split a model id.
 )  # End of the catalogue imports.
+
+# Effective configuration of a model, shared with the torch-free code.
+from unbihexium.zoo.config import BuildConfig
 
 # Tasks served by the U-Net architecture.
 UNET_TASKS = frozenset(
@@ -94,121 +96,6 @@ UNET_TASKS = frozenset(
 
 # Output names that denote displacement fields rather than image bands.
 DISPLACEMENT_OUTPUTS = frozenset({"dx", "dy"})
-
-
-# Effective configuration of a built model.
-@dataclass(frozen=True)
-class BuildConfig:
-    # Model id: family and variant.
-    model_id: str
-    # Model family.
-    family: str
-    # Size variant.
-    variant: Variant
-    # Task of the model.
-    task: Task
-    # Names of the input channels, in order.
-    channel_names: tuple[str, ...]
-    # Class, target or output band names.
-    outputs: tuple[str, ...]
-    # Units of regression targets.
-    units: tuple[str, ...] = ()
-    # Bounds of regression targets.
-    value_range: tuple[float, float] | None = None
-    # Upscaling factor of super-resolution models.
-    scale: int = 1
-    # Formula of spectral index models.
-    formula: str | None = None
-    # Recommended square tile size.
-    tile_size: int = 256
-    # True when channel_names or outputs differ from the catalogue.
-    customised: bool = False
-    # Additional metadata, for example the training history.
-    extra: dict[str, Any] = field(default_factory=dict, compare=False)
-
-    # Number of input channels.
-    @property
-    def in_channels(self) -> int:
-        # One channel per name.
-        return len(self.channel_names)
-
-    # Number of network outputs (classes, targets or bands).
-    @property
-    def out_channels(self) -> int:
-        # One output per name.
-        return len(self.outputs)
-
-    # Serialise to plain Python types for checkpoints and JSON files.
-    def to_dict(self) -> dict[str, Any]:
-        # Plain dictionary.
-        return {
-            "model_id": self.model_id,  # Model id.
-            "family": self.family,  # Model family.
-            "variant": self.variant.value,  # Size variant.
-            "task": self.task.value,  # Task.
-            "channel_names": list(self.channel_names),  # Input channels.
-            "outputs": list(self.outputs),  # Outputs.
-            "units": list(self.units),  # Target units.
-            "value_range": list(self.value_range) if self.value_range else None,  # Bounds.
-            "scale": self.scale,  # Upscaling factor.
-            "formula": self.formula,  # Index formula.
-            "tile_size": self.tile_size,  # Tile size.
-            "customised": self.customised,  # Deviates from the catalogue.
-            "extra": dict(self.extra),  # Additional metadata.
-        }  # End of the dictionary.
-
-    # Rebuild a configuration from its dictionary form.
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> BuildConfig:
-        # Convert every field back to its Python type.
-        return cls(
-            model_id=str(data["model_id"]),  # Model id.
-            family=str(data["family"]),  # Model family.
-            variant=Variant(data["variant"]),  # Size variant.
-            task=Task(data["task"]),  # Task.
-            channel_names=tuple(data["channel_names"]),  # Input channels.
-            outputs=tuple(data["outputs"]),  # Outputs.
-            units=tuple(data.get("units") or ()),  # Target units.
-            value_range=tuple(data["value_range"]) if data.get("value_range") else None,  # Bounds.
-            scale=int(data.get("scale", 1)),  # Upscaling factor.
-            formula=data.get("formula"),  # Index formula.
-            tile_size=int(data.get("tile_size", 256)),  # Tile size.
-            customised=bool(data.get("customised", False)),  # Deviation flag.
-            extra=dict(data.get("extra") or {}),  # Additional metadata.
-        )  # End of the configuration.
-
-    # Derive the configuration of a catalogue entry and variant.
-    @classmethod
-    def from_spec(
-        cls,  # The class itself.
-        spec: ModelSpec,  # Catalogue entry.
-        variant: Variant | str,  # Size variant.
-        channel_names: tuple[str, ...] | list[str] | None = None,  # Input override.
-        outputs: tuple[str, ...] | list[str] | None = None,  # Output override.
-    ) -> BuildConfig:  # The derived configuration.
-        # Normalise the variant.
-        variant = Variant(variant)
-        # Use the catalogue channels unless overridden.
-        names = tuple(channel_names) if channel_names else spec.channel_names
-        # Use the catalogue outputs unless overridden.
-        outs = tuple(outputs) if outputs else spec.outputs
-        # Units only apply when the outputs are unchanged.
-        units = spec.units if outs == spec.outputs else ()
-        # Build the configuration.
-        return cls(
-            model_id=spec.model_id(variant),  # Model id.
-            family=spec.family,  # Model family.
-            variant=variant,  # Size variant.
-            task=spec.task,  # Task.
-            channel_names=names,  # Input channels.
-            outputs=outs,  # Outputs.
-            units=units,  # Target units.
-            value_range=spec.value_range,  # Bounds.
-            scale=spec.scale,  # Upscaling factor.
-            formula=spec.formula,  # Index formula.
-            tile_size=get_variant(variant).tile_size,  # Tile size.
-            customised=(names != spec.channel_names or outs != spec.outputs),  # Deviation flag.
-        )  # End of the configuration.
 
 
 # A network together with the configuration that describes it.
