@@ -1,22 +1,152 @@
-# Codecov configuration for the coverage uploaded by .github/workflows/coverage.yml.
+# =============================================================================
+# Codecov configuration
+# =============================================================================
+#
+# Coverage is measured by pytest-cov in .github/workflows/coverage.yml and
+# uploaded to Codecov with the flag `unittests`. Measurement settings
+# (source, branch coverage, excluded lines) live in [tool.coverage.*] in
+# pyproject.toml; this file controls only how Codecov reports the results.
+#
+# Reference:  https://docs.codecov.com/docs/codecovyml-reference
+# Validation: check-jsonschema --builtin-schema vendor.codecov codecov.yml
+#             (run by the Repository Config workflow), or
+#             curl --data-binary @codecov.yml https://codecov.io/validate
+#
+# Policy
+# ------
+# Coverage statuses are informational: they are shown on every pull request
+# but never block a merge. Reviewers use the patch coverage and the
+# per-component breakdown to decide whether new code needs more tests.
+# The targets below record the direction of travel, not a gate.
+# =============================================================================
+
+codecov:
+  # Wait for the other CI checks to pass before sending statuses and
+  # comments, so that a failed test run does not report partial coverage as
+  # the final result.
+  require_ci_to_pass: true
+  notify:
+    # One upload per commit, from the Coverage workflow.
+    after_n_builds: 1
+    wait_for_ci: true
+
 coverage:
+  # Two decimal places, rounded down, so that a report never overstates
+  # coverage.
   precision: 2
   round: down
+  # Colour scale on the Codecov dashboard: red below 60 %, green above 90 %.
   range: "60...90"
+
   status:
+    # Coverage of the whole project compared with the base commit.
     project:
       default:
+        target: auto
+        threshold: 1%
         informational: true
+        only_pulls: false
+    # Coverage of the lines changed by a pull request.
     patch:
       default:
+        target: 80%
         informational: true
+        only_pulls: true
+    # The "changes" status (coverage changes not explained by the diff) is
+    # left at its default, disabled.
 
+# -----------------------------------------------------------------------------
+# Flags: one per kind of upload
+# -----------------------------------------------------------------------------
+flags:
+  unittests:
+    paths:
+      - src/unbihexium/
+    # Keep the last known coverage for this flag when a commit has no upload,
+    # for example a documentation-only change.
+    carryforward: true
+
+# -----------------------------------------------------------------------------
+# Components: coverage per subpackage in the pull request comment and on
+# the dashboard
+# -----------------------------------------------------------------------------
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+        informational: true
+  individual_components:
+    - component_id: core
+      name: Core, configuration and registry
+      paths:
+        - src/unbihexium/core/**
+        - src/unbihexium/config/**
+        - src/unbihexium/registry/**
+        - src/unbihexium/utils/**
+        - src/unbihexium/*.py
+    - component_id: io
+      name: Input and output
+      paths:
+        - src/unbihexium/io/**
+    - component_id: processing
+      name: Preprocessing, indices and postprocessing
+      paths:
+        - src/unbihexium/preprocessing/**
+        - src/unbihexium/indices/**
+        - src/unbihexium/postprocessing/**
+    - component_id: analysis
+      name: Analysis, terrain and geostatistics
+      paths:
+        - src/unbihexium/analysis/**
+        - src/unbihexium/terrain/**
+        - src/unbihexium/geostat/**
+        - src/unbihexium/metrics/**
+    - component_id: sar
+      name: Synthetic aperture radar
+      paths:
+        - src/unbihexium/sar/**
+    - component_id: ai
+      name: AI models and model zoo
+      paths:
+        - src/unbihexium/ai/**
+        - src/unbihexium/zoo/**
+    - component_id: interfaces
+      name: CLI, REST service and visualisation
+      paths:
+        - src/unbihexium/cli/**
+        - src/unbihexium/serving/**
+        - src/unbihexium/visualization/**
+
+# -----------------------------------------------------------------------------
+# Pull request comment
+# -----------------------------------------------------------------------------
 comment:
-  layout: "condensed_header, diff, flags, files"
+  layout: "condensed_header, diff, flags, components, condensed_files, condensed_footer"
+  # Update the existing comment instead of posting a new one.
+  behavior: default
+  # Comment only when coverage changes.
   require_changes: true
+  require_base: false
+  require_head: true
+  hide_project_coverage: false
 
+# Line annotations in the "Files changed" tab are disabled: the pull request
+# comment and the dashboard already show uncovered lines.
+github_checks:
+  annotations: false
+
+# -----------------------------------------------------------------------------
+# Paths excluded from coverage reports
+# -----------------------------------------------------------------------------
+# Only the package under src/ is measured. Tests, examples, scripts,
+# deployment files and repository automation are not library code.
 ignore:
   - "tests/**"
   - "examples/**"
   - "scripts/**"
+  - "docs/**"
+  - "deploy/**"
+  - "model_zoo/**"
   - ".github/**"
+  - "src/unbihexium/_version.py"
