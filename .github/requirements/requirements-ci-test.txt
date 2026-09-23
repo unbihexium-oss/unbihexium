@@ -18,8 +18,8 @@
 # Exact versions of the runtime dependencies of Unbihexium and of the test,
 # onnx, serving, zarr, parquet and stac extras, which the test, coverage and
 # integration workflows install. PyTorch is not included: the workflows
-# install the CPU build from the PyTorch index, whose files cannot be hashed
-# from the environment that generates this lock. After this file the
+# install its CPU build from requirements-ci-torch.txt, which the Torch Lock
+# workflow compiles against the PyTorch index. After this file the
 # workflows install Unbihexium itself with `pip install --no-deps -e .`.
 #
 # Every distribution carries its SHA-256 hash; install the file with
