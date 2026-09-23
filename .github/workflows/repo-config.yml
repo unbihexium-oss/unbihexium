@@ -39,8 +39,8 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Install check-jsonschema
-        run: python -m pip install check-jsonschema
+      - name: Install validators
+        run: python -m pip install check-jsonschema pyyaml
 
       - name: Issue forms
         run: check-jsonschema --builtin-schema vendor.github-issue-forms .github/ISSUE_TEMPLATE/[0-9]*.yml
