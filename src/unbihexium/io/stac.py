@@ -60,6 +60,9 @@ from __future__ import annotations
 # JSON files.
 import json
 
+# Check that numbers are finite.
+import math
+
 # Fractional seconds of RFC 3339 times.
 import re
 
@@ -82,7 +85,7 @@ from typing import Any, Callable
 from urllib.parse import urljoin, urlparse
 
 # Box of a geometry.
-from unbihexium.io.geojson import geojson_bounds
+from unbihexium.io.geojson import geojson_bounds, geojson_problems
 
 # HTTP transport: (method, url, json body or None) -> decoded JSON response.
 Transport = Callable[[str, str, "dict[str, Any] | None"], "dict[str, Any]"]
@@ -160,6 +163,86 @@ def parse_datetime_range(value: Any) -> tuple[datetime | None, datetime | None]:
         raise ValueError(f"the range starts after it ends: {value!r}")
     # Return the interval.
     return start, end
+
+
+# Raise ValueError when a member of an item dictionary has the wrong JSON type.
+def _check_item_members(data: dict[str, Any]) -> None:
+    # Name of the item for the messages.
+    name = data["id"]
+    # Properties are an object or null.
+    if not isinstance(data.get("properties") or {}, dict):
+        # Explain the problem.
+        raise ValueError(f"item {name}: properties must be an object")
+    # Acquisition times are strings or null.
+    props = data.get("properties") or {}
+    # Check the three time members.
+    for key in ("datetime", "start_datetime", "end_datetime"):
+        # Strings or null only.
+        if props.get(key) is not None and not isinstance(props[key], str):
+            # Explain the problem.
+            raise ValueError(f"item {name}: {key} must be a string or null")
+    # Links are an array of objects.
+    links = data.get("links") or []
+    # Check the container and every link.
+    if not isinstance(links, list) or not all(isinstance(lk, dict) for lk in links):
+        # Explain the problem.
+        raise ValueError(f"item {name}: links must be an array of objects")
+    # Assets are an object of objects.
+    assets = data.get("assets") or {}
+    # Check the container and every asset.
+    if not isinstance(assets, dict) or not all(isinstance(a, dict) for a in assets.values()):
+        # Explain the problem.
+        raise ValueError(f"item {name}: assets must be an object of objects")
+    # Hrefs of links and assets are strings.
+    for entry in [*links, *assets.values()]:
+        # Missing hrefs are allowed; present ones are strings.
+        if "href" in entry and not isinstance(entry["href"], str):
+            # Explain the problem.
+            raise ValueError(f"item {name}: every href must be a string")
+    # Extension lists are arrays of strings.
+    extensions = data.get("stac_extensions") or []
+    # Check the container and every entry.
+    if not isinstance(extensions, list) or not all(isinstance(e, str) for e in extensions):
+        # Explain the problem.
+        raise ValueError(f"item {name}: stac_extensions must be an array of strings")
+    # Geometries are valid GeoJSON geometries or null.
+    geometry = data.get("geometry")
+    # Validate a present geometry.
+    if geometry is not None:
+        # Problems of the geometry.
+        found = geojson_problems(geometry)
+        # Only geometries are allowed, not features or collections.
+        if found or geometry.get("type") in ("Feature", "FeatureCollection"):
+            # First problems, or the type of a feature given as geometry.
+            detail = "; ".join(found[:3]) or geometry.get("type")
+            # Explain the problem.
+            raise ValueError(f"item {name}: invalid geometry: {detail}")
+
+
+# Raise ValueError unless a box has 4 or 6 finite numbers.
+def _check_bbox(name: str, box: Any) -> None:
+    # An array of 4 or 6 numbers; booleans are not numbers.
+    if not isinstance(box, list) or len(box) not in (4, 6):
+        # Explain the problem.
+        raise ValueError(f"item {name}: bbox must be an array of 4 or 6 numbers")
+    # Every value is a finite number.
+    for value in box:
+        # Numbers only.
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            # Explain the problem.
+            raise ValueError(f"item {name}: bbox values must be numbers")
+        # Finite numbers only, including integers too large for a float.
+        try:
+            # Convert to a float.
+            finite = math.isfinite(float(value))
+        # Integers beyond the float range.
+        except OverflowError:
+            # Not representable.
+            finite = False
+        # Reject infinities and NaN.
+        if not finite:
+            # Explain the problem.
+            raise ValueError(f"item {name}: bbox values must be finite")
 
 
 # Split a box that crosses the antimeridian into boxes with west <= east.
@@ -249,6 +332,8 @@ class STACItem:
         if not isinstance(data.get("id"), str) or not data["id"]:
             # Explain the problem.
             raise ValueError("a STAC item needs a non-empty string id")
+        # Members that must have a JSON object, array or string type.
+        _check_item_members(data)
         # Properties object.
         props = dict(data.get("properties") or {})
         # Acquisition time.
@@ -271,6 +356,8 @@ class STACItem:
         if box is None:
             # Explain the problem.
             raise ValueError(f"item {data['id']}: no bbox and no geometry")
+        # Only 2-D and 3-D boxes of finite numbers are valid.
+        _check_bbox(data["id"], box)
         # Horizontal box.
         west, south, east, north = box if len(box) == 4 else (box[0], box[1], box[3], box[4])
         # Full asset objects with resolved hrefs.
