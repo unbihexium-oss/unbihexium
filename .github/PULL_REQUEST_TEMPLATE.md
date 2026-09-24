@@ -72,7 +72,7 @@ _Select all that apply._
 - [ ] unbihexium.visualization
 - [ ] unbihexium.zoo (model download, verification and loading)
 - [ ] Model zoo assets (model_zoo/)
-- [ ] Documentation or example notebooks
+- [ ] Documentation or examples
 - [ ] Packaging, Docker image or CI configuration
 - [ ] Not sure
 - [ ] Other:
@@ -267,7 +267,7 @@ _Select all that apply._
 - [ ] README
 - [ ] Documentation in docs/
 - [ ] Docstrings
-- [ ] Example notebooks
+- [ ] Example scripts
 - [ ] Model cards
 - [ ] Not needed
 - [ ] Other:

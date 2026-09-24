@@ -37,7 +37,7 @@
 
 # User and developer documentation.
 /docs/                      @olaflaitinen
-# Example scripts and notebooks.
+# Example scripts and the example REST service.
 /examples/                  @olaflaitinen
 
 # Repository automation, templates and release configuration.

@@ -38,7 +38,7 @@ body:  # Elements of the form, in display order.
       value: |  # Markdown text of the block.
         ## About this documentation issue
 
-        Use this form for problems in the documentation under docs/, the README, notebooks, docstrings or model cards.
+        Use this form for problems in the documentation under docs/, the README, the example scripts, docstrings or model cards.
 
         **How to complete this form**
 
@@ -66,7 +66,7 @@ body:  # Elements of the form, in display order.
         - "Tutorial"  # Choice 2.
         - "How-to guide"  # Choice 3.
         - "Conceptual explanation"  # Choice 4.
-        - "Example notebook"  # Choice 5.
+        - "Example script"  # Choice 5.
         - "README"  # Choice 6.
         - "Model card"  # Choice 7.
         - "FAQ"  # Choice 8.
@@ -209,7 +209,7 @@ body:  # Elements of the form, in display order.
         - "unbihexium.visualization"  # Choice 17.
         - "unbihexium.zoo (model download, verification and loading)"  # Choice 18.
         - "Model zoo assets (model_zoo/)"  # Choice 19.
-        - "Documentation or example notebooks"  # Choice 20.
+        - "Documentation or examples"  # Choice 20.
         - "Packaging, Docker image or CI configuration"  # Choice 21.
         - "Not sure"  # Choice 22.
         - "Other (specify in the next field)"  # Choice 23.
@@ -295,7 +295,7 @@ body:  # Elements of the form, in display order.
         Select where you read the documentation.
       options:  # Answer choices, in display order.
         - "GitHub web interface"  # Choice 1.
-        - "Notebook"  # Choice 2.
+        - "PyPI project page"  # Choice 2.
         - "IDE tooltip or help()"  # Choice 3.
         - "Printed or exported PDF"  # Choice 4.
         - "Other (specify in the next field)"  # Choice 5.

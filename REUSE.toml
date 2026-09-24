@@ -27,7 +27,7 @@
 #    comment header. .github/scripts/check_license_headers.py enforces this
 #    in CI (License Compliance workflow) and in pre-commit.
 # 2. Every other file, including those that cannot hold a comment (JSON,
-#    Jupyter notebooks, images, ONNX and PyTorch model weights, lock files),
+#    images, ONNX and PyTorch model weights, lock files),
 #    is covered by the annotation below.
 # 3. The licence text is kept once, in LICENSE.txt at the repository root.
 #    REUSE expects it at LICENSES/MPL-2.0.txt, so `make licence`,
@@ -72,8 +72,8 @@ SPDX-PackageDownloadLocation = "https://github.com/unbihexium-oss/unbihexium"  #
 SPDX-PackageComment = "Earth observation, geospatial, remote sensing and SAR library for Python, with a command line interface, a REST service and a model zoo."
 
 # -----------------------------------------------------------------------------
-# All files: the library, tests, scripts, documentation, notebooks, the model
-# zoo (weights trained on synthetic data by the project, configurations,
+# All files: the library, tests, scripts, documentation, the model
+# zoo (untrained starter weights built by the project, configurations,
 # manifests and model cards), deployment manifests and repository
 # configuration.
 # -----------------------------------------------------------------------------

@@ -72,7 +72,7 @@ LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-te
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
         lint format format-check type-check security licence text-policy \
-        yaml-lint md-lint notebooks model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
+        yaml-lint md-lint model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
         validate verify clean distclean
 
 ##@ Help
@@ -205,15 +205,11 @@ md-lint: ## Lint all Markdown files with markdownlint
 # Run a pinned markdownlint-cli with the rules of .markdownlint.yaml.
 	npx --yes markdownlint-cli@0.49.1 --config .markdownlint.yaml "**/*.md" --ignore node_modules
 
-notebooks: ## Validate the example notebooks (format, no outputs)
-# Check the notebook format and that no outputs are committed.
-	$(PYTHON) .github/scripts/check_notebooks.py examples/notebooks
-
 model-zoo: ## Check model zoo structure, checksums, cards and manifests
 # Check the model zoo against its catalogue and checksums.
 	$(PYTHON) .github/scripts/check_model_zoo.py
 
-check: lint format-check type-check test licence text-policy yaml-lint notebooks model-zoo ## Run all local checks that CI runs
+check: lint format-check type-check test licence text-policy yaml-lint model-zoo ## Run all local checks that CI runs
 
 pre-commit: ## Run every pre-commit hook on all files
 # Run all hooks, not only those for changed files.

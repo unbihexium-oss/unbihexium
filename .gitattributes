@@ -93,12 +93,10 @@
 
 # -----------------------------------------------------------------------------
 # GitHub linguist
-# Keep documentation, notebooks, model cards and licence texts out of the
+# Keep documentation, model cards and licence texts out of the
 # language statistics so that the repository is classified as Python.
 # -----------------------------------------------------------------------------
 
-# Example notebooks count as documentation, not as Jupyter code.
-examples/notebooks/*.ipynb linguist-documentation
 # Model cards describe the model zoo and count as documentation.
 model_zoo/cards/** linguist-documentation
 # The documentation sources.

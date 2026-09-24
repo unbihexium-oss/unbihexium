@@ -27,11 +27,6 @@
       "@type": "WebSite",
       "name": "Support policy",
       "url": "https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md"
-    },
-    {
-      "@type": "WebSite",
-      "name": "Example notebooks",
-      "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks"
     }
   ],
   "downloadUrl": "https://pypi.org/project/unbihexium/#files",

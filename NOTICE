@@ -21,7 +21,7 @@ Every source file carries the MPL-2.0 Exhibit A notice:
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-Files that cannot carry a comment, such as JSON, notebooks, images and model
+Files that cannot carry a comment, such as JSON, images and model
 weights, are covered by the annotation in REUSE.toml, which applies the same
 copyright and licence to every file in the repository.
 

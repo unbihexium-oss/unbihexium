@@ -35,7 +35,7 @@
 # Documentation changes; also applied by the labeler.
 - name: documentation
   color: "0075ca"  # Label colour as a hex code without the leading #.
-  description: "Documentation, docstrings, notebooks or model cards"  # Tooltip shown on GitHub.
+  description: "Documentation, docstrings, examples or model cards"  # Tooltip shown on GitHub.
 # Usage questions that are not defects.
 - name: question
   color: "d876e3"  # Label colour as a hex code without the leading #.

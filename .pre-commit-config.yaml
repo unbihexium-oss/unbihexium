@@ -81,9 +81,8 @@ repos:  # Hook repositories, each pinned to a released version.
   # ---------------------------------------------------------------------------
   # Python: lint and format with ruff (settings in pyproject.toml)
   # ---------------------------------------------------------------------------
-  # Scoped to the package and its tests, as in the CI lint job. Example
-  # notebooks and code blocks in Markdown are illustrative and keep their
-  # hand-written layout.
+  # Scoped to the package and its tests, as in the CI lint job. Code blocks
+  # in Markdown are illustrative and keep their hand-written layout.
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.8  # Pinned ruff release; keep in step with pyproject.toml.
     hooks:  # Hooks used from this repository.
@@ -179,7 +178,7 @@ repos:  # Hook repositories, each pinned to a released version.
         entry: python .github/scripts/check_config_style.py  # Command that runs the check.
         language: system  # Use the Python already on the PATH.
         pass_filenames: false  # The script lists the tracked files itself.
-        exclude_types: [python, markdown, jupyter, json]  # Formats with their own rules or without comments.
+        exclude_types: [python, markdown, json]  # Formats with their own rules or without comments.
 
 # Settings for the pre-commit.ci service, if it is enabled for the repository.
 ci:

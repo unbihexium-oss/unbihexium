@@ -25,7 +25,7 @@ These instructions apply to any AI coding assistant that proposes changes to thi
 
 - Python 3.10 to 3.14 must be supported. Use type hints and Google style docstrings for public APIs.
 - Run `ruff check src/`, `ruff format --check src/` and `pytest tests/` before proposing changes.
-- Never commit secrets, credentials, personal data or notebook outputs.
+- Never commit secrets, credentials, or personal data.
 
 ## Commits and Pull Requests
 

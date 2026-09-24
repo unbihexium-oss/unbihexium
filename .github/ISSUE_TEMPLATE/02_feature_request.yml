@@ -112,7 +112,7 @@ body:  # Elements of the form, in display order.
         - "unbihexium.visualization"  # Choice 17.
         - "unbihexium.zoo (model download, verification and loading)"  # Choice 18.
         - "Model zoo assets (model_zoo/)"  # Choice 19.
-        - "Documentation or example notebooks"  # Choice 20.
+        - "Documentation or examples"  # Choice 20.
         - "Packaging, Docker image or CI configuration"  # Choice 21.
         - "Not sure"  # Choice 22.
         - "Other (specify in the next field)"  # Choice 23.
@@ -606,7 +606,7 @@ body:  # Elements of the form, in display order.
     attributes:  # Content and presentation of the element.
       label: "Documentation needed"  # Question shown to the reporter.
       description: |  # Help text shown under the question.
-        Describe the documentation, tutorials or notebooks the feature needs.
+        Describe the documentation, tutorials or examples the feature needs.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 

@@ -195,7 +195,7 @@ site/
 
 # Test suite.
 tests/
-# Example scripts and notebooks.
+# Example scripts and the example REST service.
 examples/
 # Maintenance scripts.
 scripts/

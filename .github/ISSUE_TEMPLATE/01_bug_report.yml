@@ -82,7 +82,7 @@ body:  # Elements of the form, in display order.
         - "unbihexium.visualization"  # Choice 17.
         - "unbihexium.zoo (model download, verification and loading)"  # Choice 18.
         - "Model zoo assets (model_zoo/)"  # Choice 19.
-        - "Documentation or example notebooks"  # Choice 20.
+        - "Documentation or examples"  # Choice 20.
         - "Packaging, Docker image or CI configuration"  # Choice 21.
         - "Not sure"  # Choice 22.
         - "Other (specify in the next field)"  # Choice 23.
@@ -143,7 +143,7 @@ body:  # Elements of the form, in display order.
         - "Command line interface (unbihexium)"  # Choice 2.
         - "REST API (unbihexium.serving)"  # Choice 3.
         - "Official Docker image"  # Choice 4.
-        - "Example notebook"  # Choice 5.
+        - "Example script"  # Choice 5.
         - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.

@@ -39,7 +39,7 @@
 # the comment of the line that opens them.
 #
 # Files that cannot hold comments are not checked: JSON, NumPy arrays, the
-# empty py.typed marker, the Markdown and notebook documentation (own rules),
+# empty py.typed marker, the Markdown documentation (own rules),
 # the fuzzer inputs in fuzz/corpus/ and the licence and notice texts, which
 # are reproduced verbatim.
 #
@@ -85,7 +85,7 @@ NOTICE_LINE = "# This Source Code Form is subject to the terms of the Mozilla Pu
 
 # Files and patterns that are not checked, with the reason in the comment.
 SKIPPED = (
-    re.compile(r"\.(md|ipynb)$"),  # Documentation, own rules.
+    re.compile(r"\.md$"),  # Documentation, own rules.
     re.compile(r"\.py$"),  # Python, checked by check_python_style.py.
     re.compile(r"\.json$"),  # JSON has no comment syntax.
     re.compile(r"\.npy$"),  # Binary NumPy arrays.
