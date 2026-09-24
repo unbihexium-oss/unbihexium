@@ -105,6 +105,7 @@ jobs:  # Jobs of the workflow.
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}  # The pushed image, by digest.
           artifact-name: sbom-docker.spdx.json  # Name of the uploaded SPDX artifact.
           output-file: sbom-docker.spdx.json  # Also keep the SBOM in the workspace for the attestation.
+          upload-release-assets: false  # The token of this job cannot write releases; the SBOM is attested instead.
 
       - name: Attest the build provenance  # Signed SLSA provenance of the pushed digest.
         if: github.event_name != 'pull_request'  # Only images that were pushed.

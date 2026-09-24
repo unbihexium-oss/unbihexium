@@ -66,7 +66,7 @@ contact:  # Person to contact about the software.
 # -----------------------------------------------------------------------------
 # Version
 # -----------------------------------------------------------------------------
-version: 2.0.0  # Released version described by this file.
+version: 2.0.1  # Released version described by this file.
 date-released: "2026-09-24"  # Release date of that version, quoted so it stays a string.
 
 # -----------------------------------------------------------------------------
@@ -77,12 +77,12 @@ repository-artifact: "https://pypi.org/project/unbihexium/"  # Built packages on
 identifiers:  # Further identifiers of this version.
   # Tagged source of this version.
   - type: url
-    value: "https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0"  # Release page.
-    description: Source code and release notes of version 2.0.0.  # What the identifier points to.
+    value: "https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.1"  # Release page.
+    description: Source code and release notes of version 2.0.1.  # What the identifier points to.
   # Built package of this version.
   - type: url
-    value: "https://pypi.org/project/unbihexium/2.0.0/"  # Package page.
-    description: Python package of version 2.0.0 on the Python Package Index.  # What the identifier points to.
+    value: "https://pypi.org/project/unbihexium/2.0.1/"  # Package page.
+    description: Python package of version 2.0.1 on the Python Package Index.  # What the identifier points to.
   # Container images of the project.
   - type: url
     value: "https://github.com/unbihexium-oss/unbihexium/pkgs/container/unbihexium"  # Registry page.

@@ -82,7 +82,7 @@ The size of an environment depends mostly on the extras. As a reference, a virtu
 | Container image | [6](#6-container-image) | Running the CLI or the REST service without a local Python | Yes, CPU build |
 | Git clone, editable install | [7](#7-installing-from-source) | The newest code, development and contributions | As selected |
 
-**Release status.** The latest distribution on PyPI is 2.0.0, built from the tag `v2.0.0` (24 September 2026). The documentation in `docs/` describes the main branch, which matches 2.0.0 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../../CHANGELOG.md); install from source (Section 7) to use such changes before the next release. Users of 1.0.x should read [MIGRATION.md](../MIGRATION.md) before upgrading.
+**Release status.** The latest distribution on PyPI is 2.0.1, built from the tag `v2.0.1` (24 September 2026). The documentation in `docs/` describes the main branch, which matches 2.0.1 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../../CHANGELOG.md); install from source (Section 7) to use such changes before the next release. Users of 1.0.x should read [MIGRATION.md](../MIGRATION.md) before upgrading.
 
 ## 4. Installing from PyPI
 
@@ -243,8 +243,8 @@ unbihexium info
 Output on the main branch:
 
 ```text
-unbihexium, version 2.0.0
-Unbihexium v2.0.0
+unbihexium, version 2.0.1
+Unbihexium v2.0.1
 Registered capabilities: 147
 Model zoo models: 520 (catalogue 2.0.0)
 Registered pipelines: 5

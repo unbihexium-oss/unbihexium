@@ -64,7 +64,7 @@ Security fixes are made on the main branch and released as a new patch version o
 | Version | Status | Security fixes |
 | --- | --- | --- |
 | main branch | Development | Yes, fixes land here first |
-| 2.0.x (latest: 2.0.0) | Current release series | Yes, in the next 2.0.x patch release |
+| 2.0.x (latest: 2.0.1) | Current release series | Yes, in the next 2.0.x patch release |
 | 1.0.x | Previous release series | No; upgrade to 2.0.x ([docs/MIGRATION.md](docs/MIGRATION.md)) |
 | Earlier than 1.0.0 | Not released on PyPI | No |
 

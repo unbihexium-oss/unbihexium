@@ -349,7 +349,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "X-API-Key: change-me" http://127.0.
 ```
 
 ```text
-{"status":"healthy","version":"2.0.0","ready":true,"models_available":520,"models_loaded":0}
+{"status":"healthy","version":"2.0.1","ready":true,"models_available":520,"models_loaded":0}
 401
 200
 ```

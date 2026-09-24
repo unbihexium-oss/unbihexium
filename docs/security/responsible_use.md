@@ -92,7 +92,7 @@ Output:
 ```text
 ship_detector_tiny has untrained starter weights; its output is not meaningful
 {
-  "library_version": "2.0.0",
+  "library_version": "2.0.1",
   "catalog_version": "2.0.0",
   "model_id": "ship_detector_tiny",
   "weights_digest": "e278457bcbb75b891f2b0730889fab1a33a7f346fa695e33cc5545b5952e2899",

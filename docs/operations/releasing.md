@@ -140,10 +140,10 @@ print("consistent" if len(set(found.values())) == 1 else "MISMATCH")
 On the main branch at the date of review (Python 3.11 or newer, for `tomllib`) it prints:
 
 ```text
-pyproject.toml               2.0.0
-src/unbihexium/_version.py   2.0.0
-CITATION.cff                 2.0.0
-codemeta.json                2.0.0
+pyproject.toml               2.0.1
+src/unbihexium/_version.py   2.0.1
+CITATION.cff                 2.0.1
+codemeta.json                2.0.1
 consistent
 ```
 
@@ -177,7 +177,7 @@ python -m build
 python -m twine check --strict dist/*
 ```
 
-Run on 2026-09-24 against the main branch, `python -m build` reported `Successfully built unbihexium-2.0.0.tar.gz and unbihexium-2.0.0-py3-none-any.whl`, and `twine check --strict` reported `PASSED` for both files. The pull request MUST pass every required check before it is merged; the Package workflow repeats these checks and installs the wheel on CPython 3.10 and 3.14.
+Run on 2026-09-24 against the main branch, `python -m build` reported `Successfully built unbihexium-2.0.1.tar.gz and unbihexium-2.0.1-py3-none-any.whl`, and `twine check --strict` reported `PASSED` for both files. The pull request MUST pass every required check before it is merged; the Package workflow repeats these checks and installs the wheel on CPython 3.10 and 3.14.
 
 ## 5. Tagging
 
@@ -189,6 +189,8 @@ git pull --ff-only
 git tag -a v2.0.0 -m "Release v2.0.0"
 git push origin v2.0.0
 ```
+
+The tag MAY instead be created on the GitHub releases page (Draft a new release, a new tag `vX.Y.Z` on `main`, Publish release), as for v2.0.0 and v2.0.1; the release workflow then adds its assets and notes to that release. Such a tag is a lightweight tag, which the release workflow accepts.
 
 Tags MUST NOT be moved, deleted and recreated, or reused once pushed ([VERSIONING.md](../../VERSIONING.md), Section 2.3), because the signatures, attestations and PyPI files of a release are bound to the tagged commit. Only tags that match `v*` start the release workflow.
 
@@ -252,7 +254,8 @@ After the workflows have finished, the maintainer SHOULD:
 | --- | --- | --- |
 | `v1.0.0` | 2025-12-21 | GitHub release with the distributions and `SHA256SUMS.txt`; not on PyPI |
 | `v1.0.1` | 2025-12-21 | GitHub release with the distributions and `SHA256SUMS.txt`; PyPI |
-| `v2.0.0` | 2026-09-24 | GitHub release with the distributions, `SHA256SUMS.txt`, Sigstore bundles, SLSA provenance and the SPDX SBOM; PyPI with PEP 740 attestations; signed container image |
+| `v2.0.0` | 2026-09-24 | GitHub release with the distributions, `SHA256SUMS.txt`, Sigstore bundles, SLSA provenance and the SPDX SBOM; PyPI with PEP 740 attestations; container image pushed, but not signed or attested (see [CHANGELOG.md](../../CHANGELOG.md), 2.0.1) |
+| `v2.0.1` | 2026-09-24 | As v2.0.0, and a container image signed with cosign and attested with SLSA provenance and an SPDX SBOM |
 
 The releases v1.0.0 and v1.0.1 were built before signing and SLSA provenance assets were introduced and have neither. The files attached to the v1.0.1 GitHub release are not byte-identical to the files on PyPI, so the GitHub checksums do not match the PyPI files; PyPI downloads are verified against the digests that PyPI publishes. The first release built by the current workflow will be the first with the full set of signed artefacts. The detailed history is in [CHANGELOG.md](../../CHANGELOG.md).
 

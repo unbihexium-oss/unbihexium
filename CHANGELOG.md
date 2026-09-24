@@ -24,19 +24,20 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
-| Applies to | All tagged releases of Unbihexium (v1.0.0, v1.0.1 and v2.0.0) and the unreleased changes on the main branch |
+| Applies to | All tagged releases of Unbihexium (v1.0.0, v1.0.1, v2.0.0 and v2.0.1) and the unreleased changes on the main branch |
 
 ## Abstract
 
-This document records every notable change to Unbihexium, release by release, so that users can decide whether to upgrade, packagers can see what changed between versions, and auditors and citing researchers can relate a version number to the behaviour of the software. It follows the Keep a Changelog 1.1.0 format [1] and the versioning rules in [VERSIONING.md](VERSIONING.md), which are based on Semantic Versioning 2.0.0 [2]. The entries were compiled from the Git history of the repository: the annotated tags v1.0.0, v1.0.1 and v2.0.0, the commits between them, and every pull request merged into the main branch since v1.0.1. No entry describes a change that is not in that history.
+This document records every notable change to Unbihexium, release by release, so that users can decide whether to upgrade, packagers can see what changed between versions, and auditors and citing researchers can relate a version number to the behaviour of the software. It follows the Keep a Changelog 1.1.0 format [1] and the versioning rules in [VERSIONING.md](VERSIONING.md), which are based on Semantic Versioning 2.0.0 [2]. The entries were compiled from the Git history of the repository: the tags v1.0.0, v1.0.1, v2.0.0 and v2.0.1, the commits between them, and every pull request merged into the main branch since v1.0.1. No entry describes a change that is not in that history.
 
 ## Contents
 
 - [1. Scope and conventions](#1-scope-and-conventions)
 - [2. \[Unreleased\]](#2-unreleased)
-- [3. \[2.0.0\] - 2026-09-24](#3-200---2026-09-24)
-- [4. \[1.0.1\] - 2025-12-21](#4-101---2025-12-21)
-- [5. \[1.0.0\] - 2025-12-21](#5-100---2025-12-21)
+- [3. \[2.0.1\] - 2026-09-24](#3-201---2026-09-24)
+- [4. \[2.0.0\] - 2026-09-24](#4-200---2026-09-24)
+- [5. \[1.0.1\] - 2025-12-21](#5-101---2025-12-21)
+- [6. \[1.0.0\] - 2025-12-21](#6-100---2025-12-21)
 - [References](#references)
 
 ## 1. Scope and conventions
@@ -48,7 +49,7 @@ Each release has one section, newest first, headed by the version number and the
 ### 1.2 Sources of the entries
 
 - Tagged releases: the annotated tags `v1.0.0` (commit `314d1b0`) and `v1.0.1` (commit `ccfcb64`), both created on 2025-12-21, and the commits they contain.
-- Release 2.0.0: every pull request merged into `main` after `v1.0.1` up to and including #56, as listed by `git log --merges origin/main`, and the two documentation commits pushed directly to `main` on 2025-12-22. Pull request numbers are given in parentheses, for example (#39).
+- Release 2.0.0: every pull request merged into `main` after `v1.0.1` up to and including #57, as listed by `git log --merges origin/main`, and the two documentation commits pushed directly to `main` on 2025-12-22. Pull request numbers are given in parentheses, for example (#39).
 - Changes made before v1.0.0 were not recorded in a changelog and are not reconstructed here. Earlier versions of this file listed releases 0.1.0 and 0.5.0; no such tags or published packages exist, and those entries have been removed.
 
 ### 1.3 Conventions
@@ -64,11 +65,20 @@ The key words MUST, SHOULD and MAY in this subsection are to be interpreted as d
 
 No changes yet.
 
-## 3. [2.0.0] - 2026-09-24
+## 3. [2.0.1] - 2026-09-24
 
-Major release, the first since 1.0.1. It rewrites and extends every package, adds a model zoo of 520 trainable starter models with training, evaluation and ONNX export, a REST prediction service and support for CPython 3.10 to 3.14, relicenses the project from Apache-2.0 to MPL-2.0, and is the first release built, signed and attested by the current release workflow. Because it contains breaking changes (see [3.2 Changed](#32-changed)), it increases the major version; [docs/MIGRATION.md](docs/MIGRATION.md) describes the upgrade from 1.0.x.
+Patch release. The library, the model catalogue and the Python distributions are unchanged from 2.0.0; the release publishes the container image with its signature and attestations and records the release history.
 
-### 3.1 Added
+### 3.1 Fixed
+
+- The Docker workflow failed on the `v2.0.0` tag after pushing the image: the SBOM step also tried to attach the SBOM to the GitHub release, which the token of the job may not write ("Resource not accessible by integration"). The image `ghcr.io/unbihexium-oss/unbihexium:2.0.0` was therefore pushed without a cosign signature, SLSA provenance or SBOM attestation. The step now leaves the release alone, and the 2.0.1 image is signed and attested; users of the container image should use 2.0.1.
+- `docs/operations/releasing.md` describes creating the release tag on the GitHub releases page, and its release history records what v2.0.0 published.
+
+## 4. [2.0.0] - 2026-09-24
+
+Major release, the first since 1.0.1. It rewrites and extends every package, adds a model zoo of 520 trainable starter models with training, evaluation and ONNX export, a REST prediction service and support for CPython 3.10 to 3.14, relicenses the project from Apache-2.0 to MPL-2.0, and is the first release built, signed and attested by the current release workflow. Because it contains breaking changes (see [4.2 Changed](#42-changed)), it increases the major version; [docs/MIGRATION.md](docs/MIGRATION.md) describes the upgrade from 1.0.x.
+
+### 4.1 Added
 
 Model zoo and machine learning:
 
@@ -117,7 +127,7 @@ Platform, repository and continuous integration:
 - A Documentation Examples workflow (`.github/scripts/run_doc_examples.py`, `make doc-examples`) that runs the Python examples and the `unbihexium` commands of every controlled document in a fresh directory on every change and weekly; blocks that need network access or a running server are marked `<!-- doc-example: skip (reason) -->`.
 - A Deploy Files workflow that lints the Helm chart and validates the Kubernetes manifests, two renderings of the chart and the Compose file, and a hashed lock file of the container image, `.github/requirements/requirements-docker.txt`, maintained by `make lock`.
 
-### 3.2 Changed
+### 4.2 Changed
 
 Breaking changes:
 
@@ -148,14 +158,14 @@ Other changes:
 - The contact address in the package metadata, the citation files, the container image, the Helm chart and the security, privacy, conduct and support policies is `yunus.z.imanov@helsinki.fi` (#35).
 - Python files in the package, the tests, `.github/scripts/`, `scripts/` and `examples/` use `#` comments with a standard header and footer; configuration and data files carry the same header (#36, #37, #39, #42).
 - GitHub Actions dependencies were updated by Dependabot: `codecov/codecov-action` 4 to 5 (#12), `ossf/scorecard-action` 2.3.1 to 2.4.3 (#11), `slsa-framework/slsa-github-generator` 1.9.0 to 2.1.0 (#10), `actions/upload-pages-artifact` 3 to 4 (#9), `docker/build-push-action` 5 to 6 (#8), `actions/setup-python` 5 to 6 (#18), `softprops/action-gh-release` 1 to 2 (#17), `github/codeql-action` 3 to 4 (#16), `actions/checkout` 4 to 6 (#15) and `actions/attest-build-provenance` 1 to 3 (#14); the container base image moved from `python:3.12-slim` to `python:3.14-slim` (#13).
-- A model path lookup that searches the parent directories for `model_zoo` (#7) and Git LFS set-up instructions (direct commits on 2025-12-22) were added for the example material and the documentation. Both referred to the model files that were removed later in this cycle and were superseded by the removals in [3.3 Removed](#33-removed).
+- A model path lookup that searches the parent directories for `model_zoo` (#7) and Git LFS set-up instructions (direct commits on 2025-12-22) were added for the example material and the documentation. Both referred to the model files that were removed later in this cycle and were superseded by the removals in [4.3 Removed](#43-removed).
 - The documentation under `docs/` was rewritten to match the current code, in the same document layout as the root documents, with every code example and command executed against the current code.
 - Text files written by the library (predictions, training histories, evidence and pipeline records, products, world files and the model store) use LF line endings on every platform, so that their bytes and digests are the same on Windows, macOS and Linux.
 - Coverage is enforced: the Coverage workflow fails below 85 % of lines and branches (`fail_under`), and the Codecov project and patch statuses fail on a drop of more than one percentage point or on less than 80 % of the changed lines covered.
 - Document identifiers are numbered: `UBX-DOC-SNN`, with one series digit per area (1 project, 2 policies, 3 guides, 4 reference, 5 architecture, 6 capability domains, 7 model zoo, 8 security, 9 operations and reports), replacing the descriptive identifiers such as `UBX-DOC-SEC-SUPPLY-CHAIN`. The new [Document Register](docs/document_register.md) (UBX-DOC-302) defines the scheme, lists all 65 controlled documents and maps the previous identifiers; `.github/scripts/check_document_ids.py` enforces it in the Markdown workflow, in `make check` and as a pre-commit hook. The capability domain documents use one title form, `Capability Domain NN: Title`.
 - The package metadata, `CITATION.cff`, `codemeta.json` and `security-insights.yml` no longer name a home page address; the repository and PyPI links remain. The Helm chart and the Kubernetes manifest use the reserved placeholder host `unbihexium.example.com`.
 
-### 3.3 Removed
+### 4.3 Removed
 
 - The GPU profile of the Compose file, which reserved a GPU for an image without CUDA support, the `UNBIHEXIUM_HOME` variable, which nothing read, and the random arrays in `tests/fixtures/`, which no test used.
 - The 130 example notebooks under `examples/notebooks/`, which loaded the removed model files and could not run as written, together with their format check, `make notebooks` and the nbformat CI dependency.
@@ -166,7 +176,7 @@ Other changes:
 - The separate SLSA generator workflow; the release workflow now attaches the provenance of its attestation instead (#47).
 - The `LICENSES/` directory from version control (#32).
 
-### 3.4 Fixed
+### 4.4 Fixed
 
 - `unbihexium.ai` could not be imported because a module and a package were both named `super_resolution`, and `unbihexium.analysis.network` could not be imported for the same reason (#37, #39).
 - The detection, segmentation and super-resolution classes returned empty or interpolated placeholder results instead of running a model (#38).
@@ -192,7 +202,7 @@ Other changes:
 - Pipeline runs hashed their input files when the run ended, so a step that changed an input produced a provenance record of a file that was never read; inputs are hashed before the first step.
 - `examples/scripts/detect_ships.py` ignored `--model-id` and wrote pixel coordinates without a CRS; the example API returned 500 with internal messages for invalid input and left temporary uploads behind.
 
-### 3.5 Security
+### 4.5 Security
 
 - Dependency lower bounds exclude releases with known vulnerabilities in Pillow, PyTorch, Requests, PyArrow, Starlette, python-multipart, pytest, GeoPandas, Click and Ray (#33).
 - Model checkpoints are loaded with `torch.load(weights_only=True)`, which refuses arbitrary pickled objects, and weights are verified against their SHA-256 digests on load (#37).
@@ -217,7 +227,7 @@ Other changes:
 - Every pushed container image is signed with cosign in keyless mode and has SLSA build provenance and SBOM attestations in the registry.
 - A security self-assessment along the CNCF TAG Security outline, `docs/security/self_assessment.md` (UBX-DOC-806), referenced as `security.assessments.self` in `security-insights.yml`.
 
-### 3.6 Merged pull requests
+### 4.6 Merged pull requests
 
 | Pull request | Merged | Title |
 | --- | --- | --- |
@@ -247,35 +257,36 @@ Other changes:
 | #49 | 2026-09-24 | fix: remove unsupported artefacts, fix the review findings and enforce the CI gates |
 | #55 | 2026-09-24 | ci: numbered document IDs, macOS and Windows tests, trusted publishing, signing and doc examples |
 | #56 | 2026-09-24 | docs(security): add the security self-assessment and the Zenodo deposit metadata |
+| #57 | 2026-09-24 | chore(release): 2.0.0 |
 
-## 4. [1.0.1] - 2025-12-21
+## 5. [1.0.1] - 2025-12-21
 
 Patch release, tagged at commit `ccfcb64`. It was the only version on the Python Package Index until 2.0.0. It was built before release signing was introduced, so its artefacts have no Sigstore bundles or SLSA provenance assets.
 
-### 4.1 Added
+### 5.1 Added
 
 - Publication to the Python Package Index from the release workflow.
 
-### 4.2 Fixed
+### 5.2 Fixed
 
 - The Dockerfile referred to the wrong licence file name.
 - Badges in the README pointed to unrelated logos; the GDAL badge uses the official icon.
 
-## 5. [1.0.0] - 2025-12-21
+## 6. [1.0.0] - 2025-12-21
 
 First tagged release, at commit `314d1b0`, licensed under Apache-2.0 and declared for CPython 3.10 to 3.12. It was published as a GitHub release; no 1.0.0 package exists on the Python Package Index.
 
-### 5.1 Added
+### 6.1 Added
 
 - The `unbihexium` package with the subpackages `ai`, `analysis`, `cli`, `config`, `core`, `geostat`, `indices`, `io`, `metrics`, `postprocessing`, `preprocessing`, `registry`, `sar`, `serving`, `terrain`, `utils`, `visualization` and `zoo`.
 - The command line interface with `info`, `index`, `infer`, `pipeline` and `zoo` (`list`, `download`, `verify` and `where`) commands.
 - A FastAPI service with health, capability and inference endpoints.
-- A model zoo of 130 capabilities in four variants (520 ONNX files, stored with Git LFS under `model_zoo/assets/`), with manifests and SHA-256 checksums. These files were not the result of training on real data and were removed in 2.0.0 (see [3.3 Removed](#33-removed)).
+- A model zoo of 130 capabilities in four variants (520 ONNX files, stored with Git LFS under `model_zoo/assets/`), with manifests and SHA-256 checksums. These files were not the result of training on real data and were removed in 2.0.0 (see [4.3 Removed](#43-removed)).
 - 130 example notebooks, one per model zoo capability.
 - Documentation built with MkDocs, a Dockerfile, Kubernetes and Helm deployment files, and sample test fixtures (simulated Sentinel-2, DEM and segmentation mask arrays).
 - GitHub Actions workflows for CI, coverage, integration tests, CodeQL, OpenSSF Scorecard, security scanning, documentation, Docker images, SLSA provenance and releases.
 
-### 5.2 Fixed
+### 6.2 Fixed
 
 - The Dockerfile installs a GDAL library package that is available in the base image distribution.
 
@@ -289,7 +300,8 @@ First tagged release, at commit `314d1b0`, licensed under Apache-2.0 and declare
 
 [4] B. Leiba. RFC 8174: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words. IETF, 2017. <https://www.rfc-editor.org/rfc/rfc8174>
 
-[Unreleased]: https://github.com/unbihexium-oss/unbihexium/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/unbihexium-oss/unbihexium/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/unbihexium-oss/unbihexium/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/unbihexium-oss/unbihexium/compare/v1.0.1...v2.0.0
 [1.0.1]: https://github.com/unbihexium-oss/unbihexium/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.0

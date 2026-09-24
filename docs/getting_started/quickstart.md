@@ -49,10 +49,10 @@ This document is a guided first session with Unbihexium. Starting from an empty 
 
 ### 1.1 Requirements
 
-Sections 2 to 6 need only the core installation. Sections 7 to 10 build and train models and therefore need the `torch` extra; Section 10.4 also uses the `onnx` extra. Install release 2.0.0 with these extras (see [installation.md](installation.md#3-choosing-an-installation-method)):
+Sections 2 to 6 need only the core installation. Sections 7 to 10 build and train models and therefore need the `torch` extra; Section 10.4 also uses the `onnx` extra. Install release 2.0.1 with these extras (see [installation.md](installation.md#3-choosing-an-installation-method)):
 
 ```bash
-python -m pip install "unbihexium[torch,onnx]==2.0.0"
+python -m pip install "unbihexium[torch,onnx]==2.0.1"
 ```
 
 To follow the main branch instead, run `python -m pip install -e ".[torch,onnx]"` in a clone of the repository.
@@ -77,7 +77,7 @@ print(unbihexium.__version__)
 ```
 
 ```text
-2.0.0
+2.0.1
 ```
 
 Importing `unbihexium` loads only the version. Each subpackage (`unbihexium.io`, `unbihexium.indices` and so on) is imported when it is needed, and importing `unbihexium.ai` does not import PyTorch.
@@ -306,8 +306,8 @@ unbihexium index ndvi -i scene.tif -o ndvi_cli.tif --blue 1 --green 2 --red 3 --
 ```
 
 ```text
-unbihexium, version 2.0.0
-Unbihexium v2.0.0
+unbihexium, version 2.0.1
+Unbihexium v2.0.1
 Registered capabilities: 147
 Model zoo models: 520 (catalogue 2.0.0)
 Registered pipelines: 5
