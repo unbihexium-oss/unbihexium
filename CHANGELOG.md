@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-CHANGELOG |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | All tagged releases of Unbihexium (v1.0.0 and v1.0.1) and the unreleased changes on the main branch |
 
@@ -106,16 +106,24 @@ Platform, repository and continuous integration:
 - A Model Zoo workflow that checks the generated files and rebuilds the starter weights to prove that their digests are reproducible (#37).
 - Integration and end-to-end tests that run registered pipelines on GeoTIFFs, round-trip a model through the store, compare ONNX with PyTorch after training on a dataset folder, and run ship detection, burn severity, change detection and REST workflows, replacing empty placeholder tests (#41).
 - Throughput and memory measurements in the benchmark tests, replacing empty benchmarks (#39).
+- `unbihexium serve`, which starts the REST service with the host, port and log level of the configuration; `--host`, `--port`, `--config` and `--proxy-headers` override them.
+- A Deploy Files workflow that lints the Helm chart and validates the Kubernetes manifests, two renderings of the chart and the Compose file, and a hashed lock file of the container image, `.github/requirements/requirements-docker.txt`, maintained by `make lock`.
 
 ### 2.2 Changed
 
 Breaking changes:
+
+- The runtime dependencies no longer include tqdm and scikit-learn, and the extras `gpu`, `dask`, `ray`, `netcdf` and `stac` were removed, together with torchvision, python-multipart and pytest-asyncio in the remaining extras, because no code used them. STAC search needs no extra; GPU use requires installing a CUDA build of PyTorch before the `torch` extra.
 
 - The project was relicensed from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0); source files carry the MPL-2.0 notice (#20).
 - Rewritten modules changed their interfaces (#39): writers take the data before the path (the previous order is still accepted); `read_geotiff` returns the transform as six coefficients and the CRS as a string; SAR angles are in degrees by default; a zero denominator of a spectral index gives NaN instead of using a small epsilon; `aspect` returns compass degrees and `hillshade` returns floating point values; `Evidence` and `ProvenanceRecord` have new fields; pipeline steps must return a mapping; `ssim` uses a Gaussian window; model configuration defaults to the base variant on the CPU.
 - Task APIs take a catalogue model, a trained checkpoint or an ONNX file (`weights=`) and default to the base variant; `SuperResolution` uses the catalogue factor 4 unless `scale_factor` is given; `CropDetector` and `GreenhouseDetector` are detectors, as in the catalogue, and remain importable from `unbihexium.ai.segmentation` (#38).
 
 Other changes:
+
+- The container image contains the CPU build of PyTorch next to ONNX Runtime, so its REST service builds and runs catalogue models instead of failing on every prediction; Docker Compose starts it with `unbihexium serve`.
+- The Kubernetes manifests and the Helm chart run `unbihexium serve` with a hardened security context, an emptyDir model store, probes, an autoscaler and a disruption budget; the chart gained its templates (Deployment, Service, ServiceAccount, API key Secret, autoscaler, disruption budget, optional Ingress and a `helm test` pod).
+- Model weight files are ignored by Git and marked as binary instead of being routed to Git LFS.
 
 - `unbihexium zoo download` and `unbihexium infer` are kept as hidden aliases of `zoo build` and `predict` (#38).
 - `unbihexium index` computes the index and writes it as GeoTIFF (#38).
@@ -134,6 +142,7 @@ Other changes:
 
 ### 2.3 Removed
 
+- The GPU profile of the Compose file, which reserved a GPU for an image without CUDA support, the `UNBIHEXIUM_HOME` variable, which nothing read, and the random arrays in `tests/fixtures/`, which no test used.
 - The 130 example notebooks under `examples/notebooks/`, which loaded the removed model files and could not run as written, together with their format check, `make notebooks` and the nbformat CI dependency.
 - The model files stored with Git LFS under `model_zoo/assets/`, the 520 per-variant model cards and their metrics, which were not the result of training or evaluation on real data (#37).
 - Placeholder model classes in `unbihexium.ai.models`, `unbihexium.ai.change_detection`, `unbihexium.ai.super_resolution` and `unbihexium.ai.synthesis`, and the model zoo `cache` and `downloader` modules (#37).

@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-ROADMAP |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Planned work on the main branch after Unbihexium 1.0.1 |
 
@@ -55,7 +55,7 @@ Items are grouped by area, not by priority. Each item states the gap, the eviden
 
 ## 2. Current state
 
-As of 2026-09-23:
+As of 2026-09-24:
 
 - The latest release is 1.0.1 (2025-12-21), the only version on the Python Package Index. It predates the rewrite of the library, the model zoo and the release pipeline.
 - The main branch contains a large set of unreleased changes, including breaking changes, listed under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
@@ -68,7 +68,7 @@ As of 2026-09-23:
 
 - Gap: users who install from the Python Package Index receive 1.0.1, which does not contain the rewritten packages, the trainable models or the security fixes on `main`.
 - Evidence: `version = "1.0.1"` in `pyproject.toml`; the `[Unreleased]` section of [CHANGELOG.md](CHANGELOG.md); the PyPI release history.
-- Outcome: a new release. Because the unreleased changes break compatibility, [VERSIONING.md](VERSIONING.md) requires it to be a new major version (2.0.0). A migration guide from 1.0.x SHOULD accompany it; `docs/MIGRATION.md` does not yet describe these changes.
+- Outcome: a new release. Because the unreleased changes break compatibility, [VERSIONING.md](VERSIONING.md) requires it to be a new major version (2.0.0). [docs/MIGRATION.md](docs/MIGRATION.md) describes the migration from 1.0.x.
 
 ### 3.2 First signed release (planned)
 
@@ -96,25 +96,19 @@ As of 2026-09-23:
 - Evidence: `model_zoo/manifests/*.json`, `model_zoo/cards/*.md`, `src/unbihexium/zoo/catalog.yaml`.
 - Outcome: trained weights for selected families, beginning with families for which openly licensed training data exist. Each trained model is to be published with the licence and citation of its training data, the training configuration, and an evaluation on independent test data with the metrics that `unbihexium evaluate` computes. Until then, the model cards remain the authoritative statement that the models are untrained.
 
-### 4.2 Benchmarks backed by measurements (planned)
+### 4.2 Reproducible benchmark reports (under consideration)
 
-- Gap: `docs/benchmarks/BENCHMARKS.md` reports latencies, throughputs and accuracy figures (for example mIoU, PSNR and SSIM) that are not produced by any script in the repository, and accuracy figures cannot exist for untrained models.
-- Evidence: `docs/benchmarks/BENCHMARKS.md`; the throughput and memory measurements in `tests/benchmarks/`.
-- Outcome: replace the document with results that a published script reproduces, stating hardware, software versions and inputs, and report accuracy only for trained models.
+- Gap: `docs/benchmarks/BENCHMARKS.md` reports throughput and memory measurements of the benchmark tests from manual runs on one machine; no job publishes them regularly, and accuracy cannot be reported for untrained models.
+- Evidence: `docs/benchmarks/BENCHMARKS.md`; the tests in `tests/benchmarks/`.
+- Outcome: a scheduled job that runs the benchmark tests and publishes the results with the hardware and software versions, and accuracy figures for trained models only.
 
 ## 5. Examples and documentation
 
-### 5.1 Notebooks on the current API (planned)
+### 5.1 Documentation examples executed in CI (under consideration)
 
-- Gap: the 130 notebooks under `examples/notebooks/` load ONNX and TorchScript files from `model_zoo/assets/` and instruct users to run `git lfs pull`. Those files were removed from the repository, so the notebooks cannot run as written.
-- Evidence: the code cells of `examples/notebooks/*.ipynb`; the "Removed" entries in [CHANGELOG.md](CHANGELOG.md).
-- Outcome: notebooks that build models with `unbihexium.zoo`, train them on small synthetic or openly licensed data, and run them through the task APIs or `unbihexium.ai.inference.Predictor`, executed in CI. The Notebooks workflow currently validates the notebook format only and does not execute the notebooks.
-
-### 5.2 Documentation that predates the rewrite (planned)
-
-- Gap: parts of `docs/` describe earlier states of the project. For example, `docs/operations/releasing.md` refers to Poetry, which the project does not use; `docs/MIGRATION.md` lists versions 0.8.x and 0.9.x, which were never released; and `docs/model_zoo/model_catalog.md`, `docs/model_zoo/how_to_add_models.md` and `docs/architecture/model_zoo_architecture.md` refer to the removed `model_zoo/assets/` directory.
-- Evidence: the files named above.
-- Outcome: documentation that matches the code, with its commands executed in CI where practical.
+- Gap: the code examples and commands in the documentation were executed against the code when they were written, but no workflow runs them, so a later change of the library can make an example wrong without a failing check.
+- Evidence: the workflows under `.github/workflows/`, none of which extracts code blocks from Markdown files.
+- Outcome: a job that extracts the Python and shell blocks of the documentation and runs them against the current code.
 
 ## 6. Project sustainability and governance
 
