@@ -50,7 +50,7 @@ jobs:  # Jobs of the workflow.
     name: Bandit Security Scan  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the Bandit job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for Bandit.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
@@ -67,7 +67,7 @@ jobs:  # Jobs of the workflow.
     name: Dependency Audit  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the audit job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter for pip-audit.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
@@ -91,7 +91,7 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     if: github.event_name == 'pull_request'  # Needs a base and head to compare.
     steps:  # Steps of the review job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the configuration file.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the configuration file.
 
       - name: Dependency Review  # Compare the dependency manifests of base and head.
         uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48  # v4.9.0; Official dependency review action.

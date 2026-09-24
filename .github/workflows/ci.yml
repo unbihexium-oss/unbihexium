@@ -48,7 +48,7 @@ jobs:  # Jobs of the workflow; they run in parallel.
     name: Lint  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the lint job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter used by ruff.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
@@ -68,7 +68,7 @@ jobs:  # Jobs of the workflow; they run in parallel.
     name: Type Check  # Name of the status check.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     steps:  # Steps of the type check job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python  # Install the interpreter that pyright resolves imports against.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
@@ -97,7 +97,7 @@ jobs:  # Jobs of the workflow; they run in parallel.
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]  # All supported CPython releases.
 
     steps:  # Steps of the test job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
@@ -138,7 +138,7 @@ jobs:  # Jobs of the workflow; they run in parallel.
         shell: bash  # Git Bash on Windows, so that the steps are the same everywhere.
 
     steps:  # Steps of the platform job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the commit under test.
 
       - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
