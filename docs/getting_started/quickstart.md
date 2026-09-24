@@ -370,7 +370,7 @@ The training metrics are computed on synthetic validation chips and say nothing 
 
 ### 10.4 Exporting to ONNX
 
-An ONNX export runs without PyTorch, for example in the container image or the REST service. `zoo export` compares ONNX Runtime and PyTorch outputs before it reports success.
+An ONNX export runs without PyTorch, for example in a small deployment that installs only the `onnx` extra. `zoo export` compares ONNX Runtime and PyTorch outputs before it reports success.
 
 ```bash
 unbihexium zoo export runs/water_surface_detector_tiny/best.pt water.onnx

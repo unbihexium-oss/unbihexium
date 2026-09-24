@@ -72,7 +72,7 @@ Distributing weight files would also be impractical. The 520 models have 10,655,
 | Git repository ([github.com/unbihexium-oss/unbihexium](https://github.com/unbihexium-oss/unbihexium)) | The catalogue [src/unbihexium/zoo/catalog.yaml](../../src/unbihexium/zoo/catalog.yaml), the digests [src/unbihexium/zoo/digests.json](../../src/unbihexium/zoo/digests.json), the architecture code under `src/unbihexium/ai/models/`, and the generated metadata under [model_zoo/](../../model_zoo/README.md): model cards, manifests, inventory and checksums |
 | Wheel | The package, including `catalog.yaml` and `digests.json` as package data; enough to build and verify every model when PyTorch is installed |
 | Source distribution | The wheel content plus `model_zoo/`, the tests and the licence and notice files (see `[tool.hatch.build.targets.sdist]` in [pyproject.toml](../../pyproject.toml)) |
-| Container image `ghcr.io/unbihexium-oss/unbihexium` | The package with ONNX Runtime and the REST service; no PyTorch and no weights, so it runs exported ONNX models but cannot build catalogue models (see [../operations/docker.md](../operations/docker.md)) |
+| Container image `ghcr.io/unbihexium-oss/unbihexium` | The package with the REST service and the CPU builds of PyTorch and ONNX Runtime, but no weights: the service builds catalogue models on first use and verifies them against the published digests (see [../operations/docker.md](../operations/docker.md)) |
 
 Building a model requires the extra `torch` (`pip install "unbihexium[torch]"`). Running an exported ONNX model requires only the extra `onnx`.
 

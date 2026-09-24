@@ -308,7 +308,7 @@ OnnxBackend water_surface_detector_tiny ('blue', 'green', 'red', 'nir')
 (200, 300)
 ```
 
-This is how the container image `ghcr.io/unbihexium-oss/unbihexium`, which contains ONNX Runtime but not PyTorch, runs models (see [../operations/docker.md](../operations/docker.md)). Tile sizes of an ONNX model MUST remain multiples of the size multiple of its variant, which `Predictor` ensures.
+An environment with ONNX Runtime but without PyTorch runs models this way; the container image contains both (see [../operations/docker.md](../operations/docker.md)). Tile sizes of an ONNX model MUST remain multiples of the size multiple of its variant, which `Predictor` ensures.
 
 ## 7. Pipelines and the REST service
 
