@@ -37,6 +37,7 @@ from unbihexium.zoo import (
     Task,  # Task enumeration.
     Variant,  # Variant enumeration.
     all_model_ids,  # Every model id.
+    catalog_version,  # Catalogue version.
     get_model,  # Registry lookup.
     get_spec,  # Catalogue lookup.
     get_variant,  # Variant lookup.
@@ -147,6 +148,19 @@ def test_registry_entries() -> None:
     assert get_model("no_such_model") is None
     # Starter models need training; spectral indices do not.
     assert entry.requires_training and not get_model("ndvi_calculator_tiny").requires_training
+
+
+# Entry versions follow the catalogue version instead of a literal.
+def test_entry_version_follows_catalogue(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Registry module, whose lookup of the catalogue version is replaced.
+    import unbihexium.zoo.registry as registry
+
+    # Entries carry the current catalogue version.
+    assert get_model("ship_detector_base").version == catalog_version()
+    # A different catalogue version is reflected by new entries.
+    monkeypatch.setattr(registry, "catalog_version", lambda: "9.9.9")
+    # The entry reports the patched version.
+    assert get_model("ship_detector_base").version == "9.9.9"
 
 
 # =============================================================================

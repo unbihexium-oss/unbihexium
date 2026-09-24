@@ -270,10 +270,8 @@ class ChipDataset(Dataset):
         # Fixed per epoch.
         return self.length
 
-    # Cut, augment, normalise and encode chip `index`.
-    def __getitem__(self, index: int) -> dict[str, Any]:
-        # Generator per chip and epoch.
-        rng = np.random.default_rng([self.seed, self.epoch, index])
+    # Cut chip `index` before padding, augmentation and normalisation.
+    def _cut(self, index: int, rng: np.random.Generator) -> Sample:
         # Validation chips come from the grid.
         if self.mode == "grid":
             # Image and window of the chip.
@@ -306,6 +304,15 @@ class ChipDataset(Dataset):
             top, left = (sample.height - self.chip) // 2, (sample.width - self.chip) // 2
             # Crop the centre.
             sample = crop(sample, max(top, 0), max(left, 0), self.chip, self.chip)
+        # Return the chip; missing values are still NaN.
+        return sample
+
+    # Cut, augment, normalise and encode chip `index`.
+    def __getitem__(self, index: int) -> dict[str, Any]:
+        # Generator per chip and epoch.
+        rng = np.random.default_rng([self.seed, self.epoch, index])
+        # Chip of the image.
+        sample = self._cut(index, rng)
         # Pad chips at the image border to the full chip size.
         sample = pad(sample, self.chip, self.chip)
         # Random rotations, mirrors and radiometric jitter.
@@ -371,28 +378,22 @@ def collate(items: list[dict[str, Any]]) -> dict[str, Any]:
     return batch
 
 
-# Estimate normalisation statistics from chips of a dataset.
+# Estimate normalisation statistics from unpadded chips, ignoring NaN values.
 def estimate_normalization(
     dataset: ChipDataset,  # Chips to sample.
     images: int = NORMALIZATION_IMAGES,  # Number of chips.
 ) -> Normalization:  # Band statistics.
-    # Keep the current normalisation and augmentation.
-    saved = (dataset.normalization, dataset.augmenter)
-    # Raw, unaugmented chips.
-    dataset.normalization, dataset.augmenter = None, None
     # Evenly spaced chip indices.
     indices = np.linspace(0, len(dataset) - 1, min(images, len(dataset))).astype(int)
-    # Read the raw chips; missing values stay NaN.
+    # Raw chips without padding, augmentation or normalisation.
     raw = []
     # Load every selected chip.
     for i in indices:
-        # Sample of the chip before normalisation.
-        item = dataset[int(i)]
-        # Raw image.
-        raw.append(item["image"])
-    # Restore the dataset settings.
-    dataset.normalization, dataset.augmenter = saved
-    # Fit the statistics.
+        # Same generator as the chip of the first epoch.
+        rng = np.random.default_rng([dataset.seed, dataset.epoch, int(i)])
+        # Unpadded image; nodata and missing values stay NaN.
+        raw.append(dataset._cut(int(i), rng).image)
+    # Fit the statistics; Normalization.fit ignores non-finite values.
     return Normalization.fit(raw)
 
 

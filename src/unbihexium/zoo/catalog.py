@@ -365,7 +365,8 @@ def _load_catalog() -> dict[str, ModelSpec]:
     return specs
 
 
-# Version of the catalogue format and content.
+# Version of the catalogue format and content; the result is cached.
+@lru_cache(maxsize=1)
 def catalog_version() -> str:
     # Read the version field of catalog.yaml.
     text = resources.files("unbihexium.zoo").joinpath(CATALOG_FILE).read_text(encoding="utf-8")

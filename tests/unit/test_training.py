@@ -54,9 +54,13 @@ from unbihexium.ai.training import (  # noqa: E402 - imported after the skip che
     TrainConfig,  # Hyperparameters.
     Trainer,  # Optimisation loop.
     collate,  # Batch assembly.
+    estimate_normalization,  # Band statistics.
     evaluate,  # Evaluation entry point.
     train,  # Training entry point.
 )  # End of the training imports.
+
+# Sample records.
+from unbihexium.ai.transforms import Sample  # noqa: E402 - imported after the skip check
 
 # Checkpoint loading.
 from unbihexium.zoo.checkpoint import load_checkpoint, read_checkpoint  # noqa: E402
@@ -191,6 +195,24 @@ def test_folder_training(tmp_path: Path) -> None:
     metrics = evaluate(result.best_checkpoint, root, "val", chip_size=64, device="cpu")
     # Accuracy is a fraction.
     assert 0.0 <= metrics["accuracy"] <= 1.0 and metrics["pixels"] == 2 * 64 * 64
+
+
+# Normalisation statistics ignore NaN values and the padding of small images.
+def test_estimate_normalization_ignores_nan_and_padding() -> None:
+    # Tiny segmentation configuration.
+    config = build_model("water_surface_detector_tiny").config
+    # Image smaller than the chip, alternating values 10 and 20 per column.
+    image = np.tile(np.array([10.0, 20.0], np.float32), (config.in_channels, 40, 20))
+    # A block of missing values.
+    image[:, :10, :10] = np.nan
+    # One labelled sample.
+    sample = Sample(image=image, mask=np.zeros((40, 40), np.int64))
+    # Grid chips of 64 pixels, so the image is padded.
+    chips = ChipDataset([sample], config, 64, mode="grid")
+    # Estimated statistics.
+    norm = estimate_normalization(chips)
+    # Mean and standard deviation of the valid values only.
+    assert np.allclose(norm.mean.ravel(), 15.0) and np.allclose(norm.std.ravel(), 5.0)
 
 
 # =============================================================================

@@ -62,6 +62,7 @@ from unbihexium.zoo.catalog import (
     Variant,  # Size variant enumeration.
     VariantSpec,  # Variant hyperparameters.
     all_model_ids,  # Every model id of the zoo.
+    catalog_version,  # Version of the catalogue.
     get_spec,  # Look up a family.
     get_variant,  # Look up a variant.
     parse_model_id,  # Split a model id.
@@ -90,8 +91,8 @@ class ModelZooEntry:
     download_url: str | None = None
     # Path of a local checkpoint, for source "local".
     local_path: str | None = None
-    # Version of the entry.
-    version: str = "2.0.0"
+    # Version of the entry; defaults to the version of the catalogue.
+    version: str = field(default_factory=lambda: catalog_version())
     # Licence of the model.
     license: str = MODEL_LICENSE
     # Free-form metadata.

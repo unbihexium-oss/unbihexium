@@ -61,7 +61,7 @@ def compute_sha256(path: str | Path) -> str:
     return hasher.hexdigest()
 
 
-# Write a sha256sum-compatible checksum file for files in one directory.
+# Write a sha256sum-compatible checksum file; an unchanged file is not rewritten.
 def write_sha256_file(
     directory: str | Path,  # Directory holding the files.
     names: list[str],  # File names to include.
@@ -75,8 +75,12 @@ def write_sha256_file(
     lines = [f"{compute_sha256(directory / n)}  {n}" for n in present]
     # Path of the checksum file.
     target = directory / filename
-    # Write the lines with a final newline.
-    target.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # Contents with a final newline.
+    text = "\n".join(lines) + "\n"
+    # Write only when the contents changed, so read-only stores stay usable.
+    if not target.is_file() or target.read_text(encoding="utf-8") != text:
+        # Write the file.
+        target.write_text(text, encoding="utf-8")
     # Return the path.
     return target
 
