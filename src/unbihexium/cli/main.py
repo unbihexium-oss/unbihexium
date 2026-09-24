@@ -29,6 +29,8 @@
 #                                GeoTIFF or JSON depending on the task
 #   pipeline list|run            registered processing pipelines
 #   index NAME -i IN -o OUT      spectral index of a raster
+#   serve [--host H] [--port P]  REST service (unbihexium.serving) with
+#                                uvicorn; needs the serving extra
 #
 # Model arguments accept a catalogue family or model id (starter weights), a
 # checkpoint written by `train` (.pt) or an ONNX export (.onnx).
@@ -660,6 +662,57 @@ def index(index_name: str, input_path: str, output_path: str, **bands: int) -> N
     out.to_file(output_path)
     # Report the output.
     console.print(f"[green]Wrote:[/] {output_path} ({idx.name})")
+
+
+# Start the REST service.
+@main.command(help="Start the REST service with uvicorn (needs the serving extra).")
+@click.option("--host", help="Listen address; default from the serving configuration.")
+@click.option("--port", type=int, help="Port; default from the serving configuration.")
+@click.option(
+    "--config",  # Option name.
+    "config_path",  # Parameter name.
+    type=click.Path(exists=True, dir_okay=False),  # An existing YAML file.
+    help="YAML configuration file; default UNBIHEXIUM_CONFIG.",  # Help text.
+)
+@click.option("--proxy-headers", is_flag=True, help="Trust X-Forwarded-* headers from a proxy.")
+def serve(host: str | None, port: int | None, config_path: str | None, proxy_headers: bool) -> None:
+    # The server and the application need the serving extra.
+    try:
+        # ASGI server.
+        import uvicorn
+
+        # Application factory.
+        from unbihexium.serving import create_app
+    # Missing optional dependencies.
+    except ImportError:
+        # Explain how to install them.
+        fail("the REST service needs the serving extra: pip install 'unbihexium[serving]'")
+    # Environment access.
+    import os
+
+    # Layered configuration.
+    from unbihexium.config import get_settings, reset_settings
+
+    # A file given on the command line replaces UNBIHEXIUM_CONFIG.
+    if config_path is not None:
+        # Make every part of the service read the same file.
+        os.environ["UNBIHEXIUM_CONFIG"] = str(Path(config_path).resolve())
+        # Drop settings cached before.
+        reset_settings()
+    # Layered settings: defaults, file, environment.
+    settings = get_settings()
+    # Command line values win over the configuration.
+    bind_host = host if host is not None else settings.serving.host
+    # Port from the command line or the configuration.
+    bind_port = port if port is not None else settings.serving.port
+    # Serve until interrupted.
+    uvicorn.run(
+        create_app(config=settings.serving),  # Application with these settings.
+        host=bind_host,  # Listen address.
+        port=bind_port,  # Port.
+        proxy_headers=proxy_headers,  # Trust forwarded headers.
+        log_level=settings.log_level.lower(),  # Same level as the library.
+    )
 
 
 # Name used by earlier releases and the tests.

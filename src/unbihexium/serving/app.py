@@ -39,6 +39,7 @@
 #
 # Usage
 # -----
+#   unbihexium serve --host 0.0.0.0 --port 8000
 #   uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
 #
 #   from unbihexium.serving import create_app

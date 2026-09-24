@@ -236,6 +236,43 @@ def test_pipeline_list(runner: CliRunner) -> None:
     assert result.exit_code == 0 and "ship_detection" in result.output
 
 
+# `serve` starts uvicorn with the configured and the given address.
+def test_serve(runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # The serving extra is optional.
+    uvicorn = pytest.importorskip("uvicorn")
+    # Settings cache of the library.
+    from unbihexium.config import reset_settings
+
+    # Arguments of the uvicorn.run calls.
+    calls: list[dict[str, object]] = []
+    # Record the call instead of starting a server.
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kwargs: calls.append(kwargs))
+    # Configuration file with a port and a log level.
+    config = tmp_path / "serve.yaml"
+    # Serving section and top-level level.
+    config.write_text("log_level: INFO\nserving:\n  port: 9100\n", encoding="utf-8")
+    # `serve --config` sets UNBIHEXIUM_CONFIG; register it so that it is restored.
+    monkeypatch.setenv("UNBIHEXIUM_CONFIG", str(config))
+    # Forget cached settings.
+    reset_settings()
+    # Values from the file.
+    result = runner.invoke(cli, ["serve", "--config", str(config)])
+    # One call on the configured port and the default host.
+    assert result.exit_code == 0, result.output
+    # Port and host of the configuration.
+    assert calls[-1]["port"] == 9100 and calls[-1]["host"] == "127.0.0.1"
+    # Log level of the configuration.
+    assert calls[-1]["log_level"] == "info"
+    # Command line options win.
+    result = runner.invoke(cli, ["serve", "--host", "0.0.0.0", "--port", "8001", "--proxy-headers"])
+    # Second call with the given address.
+    assert calls[-1]["host"] == "0.0.0.0" and calls[-1]["port"] == 8001
+    # Forwarded headers are trusted on request.
+    assert calls[-1]["proxy_headers"] is True
+    # Leave no settings behind for other tests.
+    reset_settings()
+
+
 # =============================================================================
 # End of module tests/unit/test_cli.py
 # Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).

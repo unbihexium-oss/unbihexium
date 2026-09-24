@@ -255,7 +255,7 @@ unbihexium zoo verify ship_detector_tiny
 
 These recommendations address operators of Unbihexium. They are not vulnerabilities when ignored, but they reduce exposure.
 
-- **REST service authentication.** The service (`uvicorn unbihexium.serving.app:app`) has no API key by default. Operators exposing it beyond the local host SHOULD set one with `UNBIHEXIUM_SERVING__API_KEY`; clients then send it in the `X-API-Key` header, which is required on every route except `/health` and compared in constant time.
+- **REST service authentication.** The service (`unbihexium serve`) has no API key by default. Operators exposing it beyond the local host SHOULD set one with `UNBIHEXIUM_SERVING__API_KEY`; clients then send it in the `X-API-Key` header, which is required on every route except `/health` and compared in constant time.
 - **CORS.** The default CORS origin list is `*`. Operators SHOULD restrict it with `UNBIHEXIUM_SERVING__CORS_ORIGINS` to the origins that need browser access.
 - **Rate limiting.** The per-client rate limit is off by default (`0`). Operators SHOULD set `UNBIHEXIUM_SERVING__RATE_LIMIT_PER_MINUTE` for public deployments.
 - **Transport security.** The service speaks plain HTTP. Operators MUST place it behind a reverse proxy that terminates TLS when it is reachable over an untrusted network.

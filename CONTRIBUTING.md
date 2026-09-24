@@ -311,7 +311,7 @@ Every new source file MUST carry the MPL-2.0 Exhibit A notice. `.github/scripts/
 | Integration | `tests/integration/` | `pytest tests/integration` | Integration Tests workflow, Python 3.10 to 3.14 |
 | End-to-end | `tests/e2e/` | `pytest tests/e2e` | Integration Tests workflow, Python 3.14 |
 | Benchmarks | `tests/benchmarks/` | `pytest tests/benchmarks` | Part of `pytest tests/` in the CI and Coverage workflows |
-| REST API smoke test | `src/unbihexium/serving/` | `make docker-api` or `uvicorn unbihexium.serving.app:app` | Integration Tests workflow, job "API Integration" |
+| REST API smoke test | `src/unbihexium/serving/` | `make docker-api` or `unbihexium serve` | Integration Tests workflow, job "API Integration" |
 
 The CI job "Test" runs the whole suite (`pytest tests/`); the Coverage workflow runs it once more under pytest-cov and uploads the report to Codecov. Coverage statuses are informational (`codecov.yml`) and do not block a merge, but a change SHOULD NOT reduce coverage without a reason given in the pull request.
 

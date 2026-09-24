@@ -21,11 +21,12 @@
 #   integration  tests/integration/ on every supported CPython, with the
 #                GDAL system libraries installed on a best-effort basis
 #   e2e          tests/e2e/ on the newest CPython, after integration passed
-#   api-test     starts the FastAPI serving app with uvicorn on port 8000
-#                and polls GET /health until it answers, after integration
+#   api-test     starts the REST service with `unbihexium serve` on port
+#                8000, as the container image does, and polls GET /health
+#                until it answers, after integration
 #
 # The unit tests run in ci.yml. The API server is started in the background
-# with a 30 second lifetime, which bounds the health check window.
+# with a 60 second lifetime, which bounds the health check window.
 # =============================================================================
 
 name: Integration Tests  # Name shown in the Actions tab and in the status checks.
@@ -135,28 +136,26 @@ jobs:  # Jobs of the workflow.
 
       - name: Start API server  # Launch the server in the background.
         run: |  # Shell script run by bash.
-          # Run a small Python program that serves the app for at most 30 seconds.
-          timeout 30 python -c "
-          # Import the application factory of the package.
-          from unbihexium.serving import create_app
-          # Import the ASGI server.
-          import uvicorn
-          # Build the application with its default settings.
-          app = create_app()
-          # Serve on the loopback interface, port 8000, until the timeout stops it.
-          uvicorn.run(app, host='127.0.0.1', port=8000)
-          # Close the program text and send the server to the background.
-          " &
+          # Serve on the loopback interface, port 8000, for at most 60 seconds.
+          timeout 60 unbihexium serve --host 127.0.0.1 --port 8000 &
           # Give the server a head start before the next step polls it.
           sleep 5
 
-      # Wait up to 30 seconds for the server, then require a healthy answer.
+      # Wait up to 30 seconds for the server, require a healthy answer and run
+      # two models through the API: an exact spectral index model and a
+      # detector that the service builds with PyTorch on first use.
       - name: Test API endpoints
         run: |  # Shell script run by bash.
-          # Poll the health endpoint once per second and succeed on the first healthy answer.
-          for _ in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && exit 0; sleep 1; done
-          # No healthy answer within 30 seconds: fail the step.
-          exit 1
+          # Poll the health endpoint once per second until the first healthy answer.
+          for _ in $(seq 1 30); do curl -fs http://127.0.0.1:8000/health && break; sleep 1; done
+          # Fail the step when the server never answered.
+          curl -fs http://127.0.0.1:8000/health
+          # NDVI of a 2-band, 2 by 2 pixel image (red, nir).
+          curl -fsS -X POST http://127.0.0.1:8000/predict/ndvi_calculator_tiny -H 'Content-Type: application/json' -d '{"image": [[[0.1, 0.2], [0.3, 0.4]], [[0.5, 0.6], [0.7, 0.8]]]}'
+          # Detection on a 3-band, 32 by 32 pixel image of zeros (red, green, blue).
+          python -c 'import json; print(json.dumps({"image": [[[0.0] * 32] * 32] * 3}))' > detect.json
+          # The untrained starter detector must run; its detections are meaningless.
+          curl -fsS -X POST http://127.0.0.1:8000/predict/aircraft_detector_tiny -H 'Content-Type: application/json' -d @detect.json
 
 # =============================================================================
 # End of file .github/workflows/integration.yml
