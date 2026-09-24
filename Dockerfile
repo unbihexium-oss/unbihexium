@@ -16,11 +16,19 @@
 #
 # Abstract
 # --------
-# Builds the Unbihexium container image with the ONNX Runtime inference
-# backend and the FastAPI REST service, installed from the pinned versions in
-# requirements.txt, each wheel checked against its SHA-256 hash. Model weights are not included; they are downloaded into
-# the cache directory on first use and verified with SHA256. The first line
-# selects the Dockerfile syntax and must stay the first line of the file.
+# Builds the Unbihexium container image with the command line interface, the
+# FastAPI REST service, the CPU build of PyTorch and ONNX Runtime. The
+# dependencies come from two hashed lock files: .github/requirements/
+# requirements-docker.txt (runtime, onnx and serving extras and the
+# dependencies of PyTorch, from PyPI) and .github/requirements/
+# requirements-ci-torch.txt (PyTorch itself, from the PyTorch CPU index).
+# Every wheel is checked against its SHA-256 hash.
+#
+# Model weights are not part of the image. On first use of a model the
+# library builds its deterministic starter weights from the model catalogue,
+# checks them against the published SHA-256 digest and stores them in the
+# cache directory UNBIHEXIUM_CACHE; nothing is downloaded. The starter models
+# are untrained, except the spectral index models (see README.md).
 #
 # Base image
 #   python:3.14.7-slim-trixie: CPython 3.14.7 on Debian 13 (trixie), the
@@ -44,9 +52,9 @@
 #
 #   REST API on http://localhost:8000 (OpenAPI docs at /docs):
 #     docker run --rm -p 8000:8000 unbihexium:local \
-#       uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+#       unbihexium serve --host 0.0.0.0 --port 8000
 #
-#   Persist downloaded models between runs with a volume:
+#   Keep built models between runs with a volume:
 #     docker run --rm -v unbihexium-cache:/home/unbihexium/.cache/unbihexium ...
 #
 # Security
@@ -54,9 +62,9 @@
 #     image.
 #   - Only binary wheels are installed (--only-binary=:all:), so no code from
 #     source distributions is built or executed during the installation.
-#   - No system packages are installed: rasterio, pyproj, shapely and
-#     onnxruntime wheels bundle GDAL, PROJ, GEOS and their other native
-#     libraries.
+#   - No system packages are installed: the rasterio, pyproj, shapely,
+#     onnxruntime and torch wheels bundle GDAL, PROJ, GEOS and their other
+#     native libraries.
 #   - The container runs as the unprivileged user "unbihexium" (UID 1000).
 #   - The image is scanned with Grype by .github/workflows/container-scan.yml
 #     and an SBOM is attached by .github/workflows/docker.yml.
@@ -87,12 +95,15 @@ RUN python -m venv /opt/venv
 # Put the virtual environment first on PATH so that python and pip use it.
 ENV PATH="/opt/venv/bin:${PATH}"
 
-# Install the locked dependencies first. This layer is cached as long as
-# requirements.txt does not change, which keeps rebuilds after source changes
-# fast.
-COPY requirements.txt ./
-# Install binary wheels only, each checked against its hash in the lock file.
-RUN python -m pip install --only-binary=:all: --require-hashes -r requirements.txt
+# Install the locked dependencies first. This layer is cached as long as the
+# lock files do not change, which keeps rebuilds after source changes fast.
+COPY .github/requirements/requirements-docker.txt .github/requirements/requirements-ci-torch.txt ./
+# Install binary wheels only, each checked against its hash in the lock file:
+# first the runtime dependencies from PyPI, then the CPU build of PyTorch
+# without dependencies (they are in the first file) from the PyTorch index
+# named in requirements-ci-torch.txt.
+RUN python -m pip install --only-binary=:all: --require-hashes -r requirements-docker.txt \
+    && python -m pip install --only-binary=:all: --require-hashes --no-deps -r requirements-ci-torch.txt
 
 # Install Unbihexium itself without resolving dependencies again, so exactly
 # the locked versions are used. The licence files are required by the package
@@ -100,11 +111,13 @@ RUN python -m pip install --only-binary=:all: --require-hashes -r requirements.t
 COPY pyproject.toml README.md LICENSE.txt NOTICE NOTICE.md ./
 # Copy the package sources.
 COPY src/ ./src/
-# Build the wheel of the package, install it without dependencies and verify
-# that the installed requirements are consistent.
+# Build the wheel of the package, install it without dependencies, verify
+# that the installed requirements are consistent and that the REST service,
+# PyTorch and ONNX Runtime import.
 RUN python -m pip wheel --no-deps --wheel-dir /tmp/dist . \
     && python -m pip install --no-deps /tmp/dist/unbihexium-*.whl \
-    && python -m pip check
+    && python -m pip check \
+    && python -c "import torch, onnxruntime, unbihexium.serving.app"
 
 # -----------------------------------------------------------------------------
 # Stage 2: runtime
@@ -143,11 +156,10 @@ RUN groupadd --gid 1000 unbihexium \
 COPY --from=builder /opt/venv /opt/venv
 
 # Use the virtual environment, write logs unbuffered, skip .pyc files and
-# point Unbihexium at its home and model cache directories.
+# point Unbihexium at its model cache directory.
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    UNBIHEXIUM_HOME=/home/unbihexium \
     UNBIHEXIUM_CACHE=/home/unbihexium/.cache/unbihexium
 
 # Drop root privileges for everything that follows, including the container.
@@ -155,7 +167,7 @@ USER unbihexium
 # Start in the home directory of the unprivileged user.
 WORKDIR /home/unbihexium
 
-# Model cache. Mount a volume here to keep downloaded models between runs.
+# Model cache. Mount a volume here to keep built models between runs.
 RUN mkdir -p "${UNBIHEXIUM_CACHE}"
 # Declare the cache as a volume so that it survives container restarts.
 VOLUME ["/home/unbihexium/.cache/unbihexium"]

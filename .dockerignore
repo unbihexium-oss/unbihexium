@@ -17,8 +17,9 @@
 # --------
 # The Dockerfile copies only these paths into the image:
 #
-#   requirements.txt, pyproject.toml, README.md, LICENSE.txt, NOTICE,
-#   NOTICE.md and src/
+#   .github/requirements/requirements-docker.txt,
+#   .github/requirements/requirements-ci-torch.txt, pyproject.toml,
+#   README.md, LICENSE.txt, NOTICE, NOTICE.md and src/
 #
 # Everything else is excluded to keep the build context small, the layer cache
 # stable and secrets, credentials and data out of the image. Do not exclude
@@ -44,6 +45,10 @@
 .mailmap
 # GitHub workflows and repository scripts.
 .github/
+# Hashed lock file of the image dependencies, installed by the Dockerfile.
+!.github/requirements/requirements-docker.txt
+# Hashed lock file of the CPU build of PyTorch, installed by the Dockerfile.
+!.github/requirements/requirements-ci-torch.txt
 # GitLab CI configuration.
 .gitlab-ci.yml
 # pre-commit hook configuration.
@@ -207,7 +212,9 @@ deploy/
 Makefile
 # tox configuration.
 tox.ini
-# Development lock file; the image installs requirements.txt only.
+# Runtime lock file of users; the image installs its own lock files.
+requirements.txt
+# Development lock file.
 requirements-dev.txt
 # Codecov configuration.
 codecov.yml

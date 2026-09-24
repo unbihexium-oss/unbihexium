@@ -67,7 +67,8 @@ CI_REQ := .github/requirements
 
 # Every lock file that `make lock` writes and `make lock-check` compares.
 LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-test.txt \
-	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt
+	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt \
+	$(CI_REQ)/requirements-docker.txt
 
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
@@ -113,6 +114,11 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
 		--custom-compile-command "make lock" \
 		-o .requirements-ci-test.lock.tmp
+# Compile the hashed lock of the container image (runtime, onnx and serving extras
+# and the dependencies of PyTorch) into a temporary file.
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
+		--custom-compile-command "make lock" \
+		-o .requirements-docker.lock.tmp
 # Compile the hashed lock of the CI tools into a temporary file.
 	$(UV) pip compile $(CI_REQ)/requirements-ci-tools.in $(LOCK_FLAGS) --generate-hashes \
 		--custom-compile-command "make lock" \
@@ -127,9 +133,10 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 		requirements-dev.txt .requirements-dev.lock.tmp \
 		$(CI_REQ)/requirements-ci-test.txt .requirements-ci-test.lock.tmp \
 		$(CI_REQ)/requirements-ci-tools.txt .requirements-ci-tools.lock.tmp \
-		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp
+		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp \
+		$(CI_REQ)/requirements-docker.txt .requirements-docker.lock.tmp
 # Remove the temporary files.
-	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp
+	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp .requirements-docker.lock.tmp
 # Remind the maintainer to review the new pins.
 	@echo "Lock files regenerated. Review the diff before committing."
 
@@ -241,11 +248,11 @@ docker-run: ## Run the command line interface in the container
 docker-api: ## Run the REST API in the container on http://localhost:$(PORT)
 # Serve the API on port 8000 in the container, published on PORT of the host.
 	docker run --rm -p $(PORT):8000 $(IMAGE) \
-		uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+		unbihexium serve --host 0.0.0.0 --port 8000
 
 ##@ Model zoo and verification
 
-validate: ## Load and run every model (requires Git LFS weights)
+validate: ## Build, verify and run every model of the zoo (requires PyTorch)
 # Build, run and compare every model of the zoo.
 	$(PYTHON) scripts/validate_models.py
 

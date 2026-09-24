@@ -15,11 +15,10 @@
 #
 # Abstract
 # --------
-# Builds the image from the Dockerfile and runs the REST API with a
-# persistent model cache, a health check and a hardened container
-# configuration. The settings shared by both services live in the
-# `x-api-common` extension field and are merged into each service with the
-# YAML merge key `<<`.
+# Builds the image from the Dockerfile and runs the REST API
+# (`unbihexium serve`) with a persistent model cache, a health check and a
+# hardened container configuration. The image contains the CPU builds of
+# PyTorch and ONNX Runtime.
 #
 # Usage
 #   docker compose up --build            start the API on http://localhost:8000
@@ -31,15 +30,10 @@
 #   OpenAPI documentation: http://localhost:8000/docs
 #   Health endpoint:       http://localhost:8000/health
 #
-# GPU
-#   The `gpu` profile adds a service with an NVIDIA GPU reservation. It needs
-#   the NVIDIA Container Toolkit on the host and an image that contains a CUDA
-#   build of the inference backend:
-#     docker compose --profile gpu up --build api-gpu
-#
 # Configuration
 #   Variables are read from an optional .env file next to this file; see
-#   .env.example for every supported variable. The top-level `version` key is
+#   .env.example for the supported variables, for example an API key
+#   (UNBIHEXIUM_SERVING__API_KEY) or a rate limit. The top-level `version` key is
 #   obsolete in the Compose Specification and is therefore not set.
 #
 # Reference: https://docs.docker.com/reference/compose-file/
@@ -47,79 +41,60 @@
 
 name: unbihexium  # Project name; prefixes networks and volumes.
 
-# Settings shared by the CPU and GPU services, merged in with `<<`.
-x-api-common: &api-common
-  build:  # Build the image from this repository.
-    context: .  # Send the repository root as build context (see .dockerignore).
-    dockerfile: Dockerfile  # Multi-stage build at the root.
-  image: ghcr.io/unbihexium-oss/unbihexium:local  # Tag of the locally built image.
-  env_file:  # Optional environment file.
-    - path: .env  # Local settings copied from .env.example.
-      required: false  # Start without error when .env does not exist.
-  environment:  # Variables set in the container, overriding .env.
-    PYTHONUNBUFFERED: "1"  # Write log lines immediately.
-    UNBIHEXIUM_HOME: /home/unbihexium  # Home directory of the container user.
-    UNBIHEXIUM_CACHE: /home/unbihexium/.cache/unbihexium  # Model cache on the volume below.
-  command:  # Start the REST API instead of the default `unbihexium --help`.
-    - uvicorn  # ASGI server.
-    - unbihexium.serving.app:app  # FastAPI application object.
-    - --host  # Listen address follows.
-    - 0.0.0.0  # All interfaces inside the container, required for port publishing.
-    - --port  # Port follows.
-    - "8000"  # Port published in the services below.
-    - --proxy-headers  # Trust X-Forwarded-* headers from a reverse proxy.
-  volumes:  # Persistent storage.
-    - unbihexium-cache:/home/unbihexium/.cache/unbihexium  # Keep downloaded models between runs.
-  healthcheck:  # Replaces the import check of the Dockerfile.
-    test:  # Command run inside the container.
-      - CMD  # Run without a shell.
-      - python  # Interpreter of the virtual environment.
-      - -c  # Inline program follows.
-      - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"  # Request the health endpoint.
-    interval: 30s  # Time between checks.
-    timeout: 10s  # A check that takes longer fails.
-    start_period: 20s  # Failures during start-up do not count.
-    retries: 3  # Unhealthy after three failures in a row.
-  restart: unless-stopped  # Restart after crashes and reboots, not after `docker compose stop`.
-  # Hardening: no privilege escalation, no Linux capabilities and a read-only
-  # root file system. Only the model cache volume and /tmp are writable.
-  security_opt:
-    - no-new-privileges:true  # Block setuid binaries from gaining privileges.
-  cap_drop:  # Linux capabilities removed from the container.
-    - ALL  # The API needs none.
-  read_only: true  # Mount the root file system read-only.
-  tmpfs:  # In-memory writable directories.
-    - /tmp  # Temporary files of Python and GDAL.
-  logging:  # Log handling of the Docker daemon.
-    driver: json-file  # Default driver, readable with `docker compose logs`.
-    options:  # Log rotation.
-      max-size: "10m"  # Rotate after 10 MB.
-      max-file: "3"  # Keep three files per container.
-
 services:  # Containers of the project.
-  api:  # CPU service, started by default.
-    <<: *api-common  # Shared settings above.
+  api:  # The REST API.
+    build:  # Build the image from this repository.
+      context: .  # Send the repository root as build context (see .dockerignore).
+      dockerfile: Dockerfile  # Multi-stage build at the root.
+    image: ghcr.io/unbihexium-oss/unbihexium:local  # Tag of the locally built image.
     container_name: unbihexium-api  # Fixed name for `docker logs` and scripts.
+    env_file:  # Optional environment file.
+      - path: .env  # Local settings copied from .env.example.
+        required: false  # Start without error when .env does not exist.
+    environment:  # Variables set in the container, overriding .env.
+      PYTHONUNBUFFERED: "1"  # Write log lines immediately.
+      UNBIHEXIUM_CACHE: /home/unbihexium/.cache/unbihexium  # Model cache on the volume below.
+    command:  # Start the REST API instead of the default `unbihexium --help`.
+      - unbihexium  # Command line interface of the package.
+      - serve  # REST service with uvicorn.
+      - --host  # Listen address follows.
+      - 0.0.0.0  # All interfaces inside the container, required for port publishing.
+      - --port  # Port follows.
+      - "8000"  # Port published below.
+      - --proxy-headers  # Trust X-Forwarded-* headers from a reverse proxy.
     ports:  # Published ports.
       - "8000:8000"  # Host port 8000 to the API.
-
-  api-gpu:  # GPU service, started only with `--profile gpu`.
-    <<: *api-common  # Shared settings above.
-    container_name: unbihexium-api-gpu  # Fixed name for `docker logs` and scripts.
-    profiles:  # Profiles that enable the service.
-      - gpu  # Enabled with `docker compose --profile gpu`.
-    ports:  # Published ports.
-      - "8001:8000"  # Host port 8001, so that both services can run together.
-    deploy:  # Resource requests.
-      resources:  # Hardware reserved for the container.
-        reservations:  # Guaranteed resources.
-          devices:  # Devices passed into the container.
-            - driver: nvidia  # NVIDIA Container Toolkit.
-              count: 1  # One GPU.
-              capabilities: [gpu]  # Compute access to the GPU.
+    volumes:  # Persistent storage.
+      - unbihexium-cache:/home/unbihexium/.cache/unbihexium  # Keep built models between runs.
+    healthcheck:  # Replaces the import check of the Dockerfile.
+      test:  # Command run inside the container.
+        - CMD  # Run without a shell.
+        - python  # Interpreter of the virtual environment.
+        - -c  # Inline program follows.
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"  # Request the health endpoint.
+      interval: 30s  # Time between checks.
+      timeout: 10s  # A check that takes longer fails.
+      start_period: 20s  # Failures during start-up do not count.
+      retries: 3  # Unhealthy after three failures in a row.
+    restart: unless-stopped  # Restart after crashes and reboots, not after `docker compose stop`.
+    # Hardening: no privilege escalation, no Linux capabilities and a
+    # read-only root file system. Only the model cache volume and /tmp are
+    # writable.
+    security_opt:
+      - no-new-privileges:true  # Block setuid binaries from gaining privileges.
+    cap_drop:  # Linux capabilities removed from the container.
+      - ALL  # The API needs none.
+    read_only: true  # Mount the root file system read-only.
+    tmpfs:  # In-memory writable directories.
+      - /tmp  # Temporary files of Python and GDAL.
+    logging:  # Log handling of the Docker daemon.
+      driver: json-file  # Default driver, readable with `docker compose logs`.
+      options:  # Log rotation.
+        max-size: "10m"  # Rotate after 10 MB.
+        max-file: "3"  # Keep three files per container.
 
 volumes:  # Named volumes.
-  unbihexium-cache:  # Model cache shared by both services.
+  unbihexium-cache:  # Model cache of the API.
     driver: local  # Stored on the Docker host.
 
 # =============================================================================

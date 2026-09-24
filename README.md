@@ -129,13 +129,13 @@ python -m pip install "unbihexium[torch,onnx,serving]"
 
 ### 3.3 Container image
 
-The workflow `.github/workflows/docker.yml` builds the image from the [Dockerfile](https://github.com/unbihexium-oss/unbihexium/blob/main/Dockerfile) and pushes it to the GitHub Container Registry as `ghcr.io/unbihexium-oss/unbihexium`. Pushes to `main` are tagged `main`, version tags are tagged `<major>.<minor>.<patch>` and `<major>.<minor>`, and every image is also tagged with its commit (`sha-<short sha>`); there is no `latest` tag. The image contains the ONNX Runtime backend and the REST service, installed from the hashed lock file `requirements.txt`, runs as the unprivileged user `unbihexium` and does not contain model weights or PyTorch.
+The workflow `.github/workflows/docker.yml` builds the image from the [Dockerfile](https://github.com/unbihexium-oss/unbihexium/blob/main/Dockerfile) and pushes it to the GitHub Container Registry as `ghcr.io/unbihexium-oss/unbihexium`. Pushes to `main` are tagged `main`, version tags are tagged `<major>.<minor>.<patch>` and `<major>.<minor>`, and every image is also tagged with its commit (`sha-<short sha>`); there is no `latest` tag. The image contains the command line interface, the REST service and the CPU builds of PyTorch and ONNX Runtime, installed from the hashed lock files `.github/requirements/requirements-docker.txt` and `.github/requirements/requirements-ci-torch.txt`. It runs as the unprivileged user `unbihexium` and contains no model weights: the service builds each model on first use and checks it against its published digest.
 
 ```bash
 docker pull ghcr.io/unbihexium-oss/unbihexium:main
 docker run --rm ghcr.io/unbihexium-oss/unbihexium:main unbihexium info
 docker run --rm -p 8000:8000 ghcr.io/unbihexium-oss/unbihexium:main \
-    uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+    unbihexium serve --host 0.0.0.0 --port 8000
 ```
 
 To build the image locally, run `docker build -t unbihexium:local .` in the repository root. [docker-compose.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/docker-compose.yml) and the manifests under [deploy/](https://github.com/unbihexium-oss/unbihexium/tree/main/deploy) (a Helm chart and a Kubernetes deployment) start the REST service; see [docs/operations/docker.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/operations/docker.md).
@@ -304,6 +304,7 @@ The complete command set is:
 | `unbihexium evaluate` | Evaluate a model on a dataset split |
 | `unbihexium predict` | Run a model on a raster and write the result |
 | `unbihexium pipeline list`, `run` | List and run registered processing pipelines |
+| `unbihexium serve` | Start the REST service (extra `serving`; see Section 8) |
 
 Every command documents its options with `--help`; the full reference is [docs/reference/cli.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/cli.md). Bash completion is provided in [scripts/unbihexium-completion.bash](https://github.com/unbihexium-oss/unbihexium/blob/main/scripts/unbihexium-completion.bash).
 
@@ -368,10 +369,10 @@ As stated in Section 2.2, only the 28 spectral index models produce meaningful o
 
 ## 8. REST service
 
-`unbihexium.serving` provides a FastAPI application (extra `serving`). Start it with uvicorn; interactive OpenAPI documentation is then available at `/docs`.
+`unbihexium.serving` provides a FastAPI application (extra `serving`). Start it with `unbihexium serve`, which runs uvicorn with the host, port and log level of the configuration (`--host` and `--port` override them); interactive OpenAPI documentation is then available at `/docs`. The application object `unbihexium.serving.app:app` can also be passed to any ASGI server.
 
 ```bash
-uvicorn unbihexium.serving.app:app --host 127.0.0.1 --port 8000
+unbihexium serve --host 127.0.0.1 --port 8000
 ```
 
 | Method and path | Purpose |
