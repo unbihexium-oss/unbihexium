@@ -132,6 +132,7 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 | [Vulnerability Management](security/vulnerability_management.md) | UBX-DOC-803 |
 | [Secrets and Tokens](security/secrets_and_tokens.md) | UBX-DOC-804 |
 | [Responsible Use: Technical Guidance](security/responsible_use.md) | UBX-DOC-805 |
+| [Security Self-Assessment](security/self_assessment.md) | UBX-DOC-806 |
 
 ## 9. Operations
 
@@ -166,10 +167,10 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 | `docs/architecture/` | 5 |
 | `docs/capabilities/` | 13 |
 | `docs/model_zoo/` | 7 |
-| `docs/security/` | 5 |
+| `docs/security/` | 6 |
 | `docs/operations/` | 3 |
 | `docs/benchmarks/` | 1 |
-| **Total** | **46** |
+| **Total** | **47** |
 
 Documents outside `docs/`, such as the policies in the repository root and the README files of `model_zoo/` and `examples/`, are listed in [docs/index.md, Section 12](index.md#12-project-documents-outside-docs) and, with their identifiers, in the [Document Register](document_register.md).
 

@@ -71,7 +71,7 @@ The model zoo defines 520 models: 130 families in the variants tiny, base, large
 | Model trainer | [Model catalogue](model_zoo/model_catalog.md), [Training](model_zoo/training.md) | [Inference](model_zoo/inference.md), [Building and verifying models](model_zoo/download_and_verify.md) |
 | Contributor | [CONTRIBUTING.md](../CONTRIBUTING.md), [Architecture overview](architecture/overview.md) | [Adding models](model_zoo/how_to_add_models.md), [CI/CD](operations/ci_cd.md) |
 | Operator | [Container image and deployment](operations/docker.md), [Configuration](getting_started/configuration.md) | [Security model](architecture/security_model.md), [Secrets and tokens](security/secrets_and_tokens.md) |
-| Security reviewer or auditor | [SECURITY.md](../SECURITY.md), [Supply chain security](security/supply_chain_security.md) | [Model integrity](security/model_integrity.md), [Vulnerability management](security/vulnerability_management.md), [Releasing](operations/releasing.md) |
+| Security reviewer or auditor | [Security self-assessment](security/self_assessment.md), [SECURITY.md](../SECURITY.md), [Supply chain security](security/supply_chain_security.md) | [Model integrity](security/model_integrity.md), [Vulnerability management](security/vulnerability_management.md), [Releasing](operations/releasing.md) |
 
 ## 3. Getting started and tutorials
 
@@ -140,6 +140,7 @@ The twelve domain documents describe, for one application area each, the model f
 | [security/vulnerability_management.md](security/vulnerability_management.md) | How vulnerabilities in the code and its dependencies are found, assessed, fixed and disclosed |
 | [security/secrets_and_tokens.md](security/secrets_and_tokens.md) | Repository secrets, workflow token permissions, OIDC tokens and leak detection |
 | [security/responsible_use.md](security/responsible_use.md) | Technical guidance for applying [RESPONSIBLE_USE.md](../RESPONSIBLE_USE.md) with the features of the library |
+| [security/self_assessment.md](security/self_assessment.md) | Security self-assessment after the CNCF TAG Security outline: actors, goals, non-goals, controls, development practices and issue resolution |
 
 ## 9. Operations
 

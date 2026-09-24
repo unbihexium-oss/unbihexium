@@ -100,6 +100,7 @@ Platform, repository and continuous integration:
 - Issue forms for bug reports, feature requests, documentation, the model zoo, performance, compliance, build and packaging, and questions; a rewritten pull request template; CODEOWNERS; label definitions synchronised from `.github/labels.yml`; and release note categories in `.github/release.yml` (#23).
 - Workflows for package builds, licence compliance, the text policy, Markdown, model zoo integrity, repository configuration schemas, workflow linting (actionlint and shellcheck), secret scanning (TruffleHog), container scanning (Grype), conventional pull request titles, path labels, link checking, stale items and first-time contributors, and a dependency review policy (#30).
 - Root project files: AUTHORS.md, MAINTAINERS.md, ROADMAP.md, RESPONSIBLE_USE.md, `security-insights.yml` (OpenSSF Security Insights), `codemeta.json`, `codecov.yml`, `REUSE.toml`, `.mailmap`, `.env.example` and `.yamllint.yml`, with REUSE, Security Insights, Codecov, CodeMeta and yamllint checks in CI (#31).
+- `.zenodo.json`, the metadata of the Zenodo deposit for each GitHub release (title, description, creators, licence, keywords and related identifiers), for use once the Zenodo integration is enabled.
 - Locked dependency sets `requirements.txt` (runtime with the `onnx` and `serving` extras) and `requirements-dev.txt` (all extras), compiled with `uv pip compile --universal` for Python 3.10 to 3.14, with `make lock` and `make lock-check`; tox environments for the lowest supported dependency versions, formatting, security, the text policy and package builds (#33).
 - Codecov components per subpackage (#33).
 - A Python comment style check (`.github/scripts/check_python_style.py`), extended to every package (#37, #39), and a documentation style check for configuration and data files (`.github/scripts/check_config_style.py`) (#42).
@@ -209,6 +210,7 @@ Other changes:
 - The release workflow uploads to PyPI with trusted publishing from the GitHub environment `pypi` and PEP 740 attestations, instead of the long-lived `PYPI_API_TOKEN` secret; the trusted publisher is registered on PyPI, and the former secret is deleted and its token revoked (docs/operations/releasing.md, Section 2.1).
 - Each release carries an SPDX SBOM of the wheel installed with the locked runtime dependencies (`unbihexium-<tag>.spdx.json`), attested for the distributions.
 - Every pushed container image is signed with cosign in keyless mode and has SLSA build provenance and SBOM attestations in the registry.
+- A security self-assessment along the CNCF TAG Security outline, `docs/security/self_assessment.md` (UBX-DOC-806), referenced as `security.assessments.self` in `security-insights.yml`.
 
 ### 2.6 Merged pull requests
 

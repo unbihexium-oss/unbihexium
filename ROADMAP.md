@@ -75,12 +75,6 @@ As of 2026-09-24:
 - Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
 - Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
 
-### 3.3 Security self-assessment (planned)
-
-- Gap: no security self-assessment has been published.
-- Evidence: the `security.assessments.self` entry of [security-insights.yml](security-insights.yml).
-- Outcome: a self-assessment based on the threat model in `docs/architecture/security_model.md`, referenced from `security-insights.yml`.
-
 ## 4. Model zoo
 
 ### 4.1 Trained weights (planned)
@@ -103,11 +97,11 @@ As of 2026-09-24:
 - Evidence: [MAINTAINERS.md](MAINTAINERS.md); `core-team` in [security-insights.yml](security-insights.yml).
 - Outcome: at least one further maintainer with write access and a share of the security response, appointed under the rules in [GOVERNANCE.md](GOVERNANCE.md). Contributors interested in the role are invited to start with reviewed pull requests.
 
-### 5.2 Persistent identifiers for citation (under consideration)
+### 5.2 Persistent identifiers for citation (planned)
 
-- Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author.
-- Evidence: [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json).
-- Outcome: archive each release in a repository that assigns DOIs, for example through the GitHub integration of Zenodo, and add the DOI and ORCID to the citation metadata and [CITATION.md](CITATION.md).
+- Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author. `.zenodo.json` describes the deposit that Zenodo creates for each release, but the GitHub integration of Zenodo is not yet enabled for the repository.
+- Evidence: [CITATION.cff](CITATION.cff), [codemeta.json](codemeta.json) and `.zenodo.json`.
+- Outcome: the Zenodo integration is enabled, so that every GitHub release is archived with a version DOI under one concept DOI; the DOIs and the ORCID identifier are then added to the citation metadata and [CITATION.md](CITATION.md).
 
 ## 6. Platform support
 

@@ -40,8 +40,8 @@
 
 header:  # Metadata about this file.
   schema-version: 2.2.0  # Version of the Security Insights specification used.
-  last-updated: "2026-09-23"  # Date of the last change to any value.
-  last-reviewed: "2026-09-23"  # Date of the last full review, at most six months ago.
+  last-updated: "2026-09-24"  # Date of the last change to any value.
+  last-reviewed: "2026-09-24"  # Date of the last full review, at most six months ago.
   url: https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml  # Canonical location of this file.
   comment: |  # Scope of the security description.
     Security posture of the Unbihexium repository: the Python library, the
@@ -174,10 +174,14 @@ repository:  # This repository.
   security:  # Security assessments, contacts and tooling.
     assessments:  # Security assessments of the project.
       self:  # Assessment by the maintainers.
-        comment: |  # Status of the self-assessment.
-          No formal security self-assessment has been published yet. The
-          threat model and security controls are described in
-          docs/architecture/security_model.md.
+        name: Unbihexium Security Self-Assessment (UBX-DOC-806)  # Name of the assessment document.
+        evidence: https://github.com/unbihexium-oss/unbihexium/blob/main/docs/security/self_assessment.md  # Location of the assessment.
+        date: "2026-09-24"  # Date the assessment was published.
+        comment: |  # Scope of the self-assessment.
+          Internal self-assessment by the maintainers along the outline of the
+          CNCF TAG Security self-assessment guide. It is not an audit; no
+          external security audit has been performed. The threat model and
+          the controls are described in docs/architecture/security_model.md.
     champions:  # People who lead security work.
       - name: Olaf Yunus Laitinen Imanov  # Full name.
         affiliation: Unbihexium OSS Foundation  # Organisation the person acts for.
