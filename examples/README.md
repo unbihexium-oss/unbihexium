@@ -141,7 +141,7 @@ The mean is close to zero because the synthetic red and NIR bands are drawn from
 
 ### 4.1 Purpose
 
-Runs `unbihexium.ai.ShipDetector` on a GeoTIFF and writes the detections as a GeoJSON FeatureCollection [2], one rectangular polygon per detection with the properties `class_id`, `class_name` and `confidence`.
+Runs `unbihexium.ai.ShipDetector` with the model given by `--model-id` on a GeoTIFF and writes the detections as a GeoJSON FeatureCollection [2], one rectangular polygon per detection with the properties `class_id`, `class_name` and `confidence`. The polygons are in the map coordinates of a georeferenced input, and the CRS is recorded in the file.
 
 ### 4.2 Options
 
@@ -150,7 +150,7 @@ Runs `unbihexium.ai.ShipDetector` on a GeoTIFF and writes the detections as a Ge
 | `--input`, `-i` | required | Input GeoTIFF with the bands red, green and blue |
 | `--output`, `-o` | required | Output GeoJSON file |
 | `--threshold`, `-t` | 0.5 | Minimum detection score |
-| `--model-id` | `ship_detector_tiny` | Printed only; see Section 4.4 |
+| `--model-id` | `ship_detector_tiny` | Model zoo family or model id of a detection model |
 
 ### 4.3 Run
 
@@ -163,17 +163,17 @@ Loading: rgb.tif
 Using model: ship_detector_tiny
 Threshold: 0.3
 Found 0 ships
-Saving: ships.geojson
+Saving: ships.geojson (EPSG:32635)
 Done!
 ```
 
-`ships.geojson` then contains `{"type": "FeatureCollection", "features": []}`.
+`ships.geojson` then contains a FeatureCollection without features, the member `"crs": {"type": "name", "properties": {"name": "EPSG:32635"}}` and `"model_id": "ship_detector_tiny"`.
 
 ### 4.4 Behaviour and limitations
 
-- `--model-id` is printed but not used: `ShipDetector(threshold=...)` always runs its default model, `ship_detector_base`, which the library builds and verifies in memory on first use. The printed model name is therefore misleading.
-- `ship_detector_base` is an untrained starter model. Finding no ships, or finding boxes in arbitrary places, is the expected behaviour until the model is trained ([docs/model_zoo/training.md](../docs/model_zoo/training.md)). A trained checkpoint can be used by changing the constructor call to `ShipDetector(weights="runs/ship_detector_tiny/best.pt", threshold=...)`.
-- The polygons are built from `Detection.bbox`, which is in pixel coordinates (column, row), not in map coordinates, and the file has no CRS. Georeferenced output is available from the library: each detection carries `geo_bbox` in the CRS of the raster, `DetectionResult.to_geojson()` builds a FeatureCollection, and `unbihexium predict ship_detector_tiny rgb.tif ships.geojson` writes one directly.
+- The model given by `--model-id` is built and verified in memory on first use; a model of another task is rejected.
+- `ship_detector_tiny` is an untrained starter model. Finding no ships, or finding boxes in arbitrary places, is the expected behaviour until the model is trained ([docs/model_zoo/training.md](../docs/model_zoo/training.md)). A trained checkpoint can be used by changing the constructor call to `ShipDetector(weights="runs/ship_detector_tiny/best.pt", threshold=...)`.
+- For a georeferenced input the polygons are built from `Detection.geo_bbox` in the CRS of the raster, which is recorded in the named `crs` member of the GeoJSON 2008 specification; `unbihexium.io.reproject_geojson` converts such a file to longitude and latitude. Inputs without a CRS or with the identity transform are written in pixel coordinates (column, row) with `crs` set to `pixel`. `unbihexium predict ship_detector_tiny rgb.tif ships.geojson` writes the same kind of file.
 - Building the detector requires PyTorch (extra `torch`).
 
 ## 5. serving/api.py
@@ -185,14 +185,14 @@ A minimal FastAPI [3] application that accepts uploaded GeoTIFFs and returns shi
 | Method and path | Input | Response |
 | --- | --- | --- |
 | `GET /health` | none | `status` and library `version` |
-| `GET /info` | none | package name, version and a fixed description string |
+| `GET /info` | none | package name, version and a one-line description of the library |
 | `POST /detect/ships` | multipart field `file`; query `threshold` (default 0.5) | `count`, `model_id`, `detections` with `bbox`, `confidence`, `class_id`, `class_name` |
 | `POST /detect/buildings` | as above; the image must have 3 bands | as above |
 | `POST /index/ndvi` | multipart field `file`; query `nir_band` (default 4), `red_band` (default 3) | `index_name`, `min_value`, `max_value`, `mean_value`, `shape` |
 
 ### 5.2 Run
 
-The application needs the `serving` and `torch` extras and is started from the repository root, so that `examples.serving` can be imported:
+The application needs the `serving` and `torch` extras and `python-multipart`, which FastAPI uses to read file uploads (`python -m pip install python-multipart`). It is started from the repository root, so that `examples.serving` can be imported:
 
 ```bash
 cd "$REPO"
@@ -215,29 +215,28 @@ curl -s -F "file=@input.tif" "http://127.0.0.1:8000/detect/buildings"
 {"detail":"building_detector_base expects 3 bands (red, green, blue), got shape (4, 64, 64)"}
 ```
 
-curl prints no line break after a response; the responses are shown on separate lines. The last request fails with status 500 because the building detector expects three bands and `input.tif` has four. The interactive OpenAPI documentation is served at `/docs`.
+curl prints no line break after a response; the responses are shown on separate lines. The last request fails with status 422 because the building detector expects three bands and `input.tif` has four. The interactive OpenAPI documentation is served at `/docs`.
 
 ### 5.3 Behaviour and limitations
 
 The application is deliberately simple and MUST NOT be exposed to untrusted clients:
 
 - There is no authentication, no rate limit and no limit on the upload size; every upload is read completely into memory.
-- Every processing error is returned as status 500 with the internal error message as `detail`, including errors caused by invalid input (for example a non-GeoTIFF upload).
-- Uploads are written to a temporary file that is deleted only after successful processing; a failed request leaves its temporary file behind.
+- Invalid input (an upload that is not a raster, band numbers or band counts that do not fit) is answered with status 422; other failures are status 500 without internal details.
+- Uploads are written to a temporary file that is deleted after every request, whether it succeeds or fails.
 - The detectors use their default models `ship_detector_base` and `building_detector_base`, which are untrained starter models, and the boxes are returned in pixel coordinates.
-- The `/info` description is a fixed string in the example and makes no statement about the library.
 
-The maintained service is `unbihexium.serving` (`uvicorn unbihexium.serving.app:app`), which serves every zoo model through `POST /predict/{model_id}` with request size, pixel and value limits, optional API keys, rate limiting and CORS settings; see [README.md, Section 8](../README.md#8-rest-service) and the REST tutorial in [docs/tutorials/index.md](../docs/tutorials/index.md#5-tutorial-4-serve-models-over-http).
+The maintained service is `unbihexium.serving` (`unbihexium serve`), which serves every zoo model through `POST /predict/{model_id}` with request size, pixel and value limits, optional API keys, rate limiting and CORS settings; see [README.md, Section 8](../README.md#8-rest-service) and the REST tutorial in [docs/tutorials/index.md](../docs/tutorials/index.md#5-tutorial-4-serve-models-over-http).
 
 ## 6. Test status and known issues
 
 | Example | Runs on the main branch | Known issues |
 | --- | --- | --- |
 | `scripts/calculate_ndvi.py` | Yes | No no-data value in the output file |
-| `scripts/detect_ships.py` | Yes | `--model-id` ignored; the base variant is used; boxes in pixel coordinates; untrained model |
-| `serving/api.py` | Yes (all five routes answered as shown in Section 5.2) | No authentication or limits; internal errors exposed; temporary files kept on failure; untrained models |
+| `scripts/detect_ships.py` | Yes | Untrained starter model |
+| `serving/api.py` | Yes (all five routes answered as shown in Section 5.2) | No authentication or limits; needs python-multipart; untrained models |
 
-The runs were made on 24 September 2026 in a Linux container with CPython 3.13 and the CPU build of PyTorch, with the commands shown above. None of the examples is broken in the sense of failing to run, but the issues listed in the table mean that they SHOULD be read as illustrations. Improvements are welcome through the process in [CONTRIBUTING.md](../CONTRIBUTING.md).
+The runs were made on 24 September 2026 in a Linux container with CPython 3.13 and the CPU build of PyTorch, with the commands shown above. None of the examples fails to run; because of the limitations listed in the table they SHOULD be read as illustrations. Improvements are welcome through the process in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## 7. Licence
 

@@ -10,14 +10,19 @@
 # Affiliation : University of Helsinki
 # Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
 # Licence     : Mozilla Public License 2.0, see LICENSE.txt
-# Python      : CPython 3.10 to 3.14, requires unbihexium[serving]
+# Python      : CPython 3.10 to 3.14, requires unbihexium[serving] and
+#               python-multipart (file uploads)
 # =============================================================================
 #
 # Abstract
 # --------
 # A simple REST API for serving Unbihexium models. It demonstrates how to
 # expose detection and spectral index calculation over HTTP with FastAPI.
-# Uploaded images are written to a temporary file, processed and deleted.
+# Uploaded images are written to a temporary file, processed and deleted,
+# also when processing fails. Client errors get 4xx answers: 422 for files
+# that are not readable rasters, band numbers outside the image and images
+# that do not fit the model; other failures get 500 without internal
+# details.
 #
 # Endpoints
 # ---------
@@ -35,9 +40,9 @@
 #
 # Notes
 # -----
-# This is an example, not a hardened service: it has no authentication, no
-# upload size limit and returns internal error messages to the client. The
-# production service is unbihexium.serving (see docker-compose.yml).
+# This is an example, not a hardened service: it has no authentication and
+# no upload size limit. The service of the library is unbihexium.serving
+# (see docker-compose.yml).
 # Descriptions shown in the OpenAPI documentation are passed explicitly to
 # the decorators and model configurations below.
 # =============================================================================
@@ -46,26 +51,23 @@
 # every supported Python version.
 from __future__ import annotations
 
-# Imported by the original example for in-memory file handling (unused).
-import io
-
 # Temporary files for the uploaded images.
 import tempfile
+
+# Type of the generator of the upload context manager.
+from collections.abc import Iterator
+
+# Delete the temporary files whatever happens.
+from contextlib import contextmanager
 
 # Represent the temporary file path.
 from pathlib import Path
 
-# Type used by the original example for generic payloads (unused).
-from typing import Any
-
 # Compute summary statistics that ignore NaN pixels.
 import numpy as np
 
-# Web framework, file upload support and HTTP errors.
-from fastapi import FastAPI, File, HTTPException, UploadFile
-
-# Imported by the original example for custom JSON responses (unused).
-from fastapi.responses import JSONResponse
+# Web framework, file upload support, query validation and HTTP errors.
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 
 # Base class and configuration of the response models.
 from pydantic import BaseModel, ConfigDict
@@ -74,7 +76,7 @@ from pydantic import BaseModel, ConfigDict
 import unbihexium
 
 # Detection model wrappers of Unbihexium.
-from unbihexium.ai.detection import BuildingDetector, ShipDetector
+from unbihexium.ai.detection import BuildingDetector, ObjectDetector, ShipDetector
 
 # Spectral index calculator of Unbihexium.
 from unbihexium.core.index import compute_index
@@ -121,7 +123,7 @@ class Detection(BaseModel):
     # Description of the schema in the OpenAPI documentation.
     model_config = ConfigDict(json_schema_extra={"description": "Single detection."})
 
-    # Bounding box as (xmin, ymin, xmax, ymax).
+    # Bounding box in pixels as (xmin, ymin, xmax, ymax).
     bbox: tuple[float, float, float, float]
     # Model confidence between 0 and 1.
     confidence: float
@@ -161,6 +163,70 @@ class IndexResponse(BaseModel):
     shape: tuple[int, int]
 
 
+# Open an upload as a raster; the temporary file is deleted on every path.
+@contextmanager
+def uploaded_raster(file: UploadFile) -> Iterator[Raster]:
+    # Temporary GeoTIFF file that outlives the with block of its creation.
+    with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
+        # Copy the upload into it.
+        tmp.write(file.file.read())
+        # Keep the path.
+        tmp_path = Path(tmp.name)
+    # Read the raster and hand it to the caller.
+    try:
+        # Files that are not rasters are client errors.
+        try:
+            # Open the raster.
+            raster = Raster.from_file(tmp_path)
+            # Read the pixels while the file still exists.
+            raster.load()
+        # Any failure to read the upload.
+        except Exception as exc:
+            # Unprocessable content.
+            raise HTTPException(
+                status_code=422,  # Unprocessable content.
+                detail="the upload is not a readable raster",  # Explanation.
+            ) from exc  # Keep the read error as the cause.
+        # Processing by the caller.
+        yield raster
+    # Whatever happened.
+    finally:
+        # Delete the temporary file.
+        tmp_path.unlink(missing_ok=True)
+
+
+# Run a detector and convert its result, mapping errors to HTTP answers.
+def run_detector(detector: ObjectDetector, raster: Raster) -> DetectionResponse:
+    # Detection on the whole raster.
+    try:
+        # Result of the task API.
+        result = detector.predict(raster)
+    # Images that do not fit the model, for example a wrong band count.
+    except ValueError as exc:
+        # Unprocessable content with the reason.
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    # Anything else is a server error.
+    except Exception as exc:
+        # Internal error without internal details.
+        raise HTTPException(status_code=500, detail="detection failed") from exc
+    # Convert to response items.
+    detections = [
+        Detection(  # One response item per detection.
+            bbox=d.bbox,  # Bounding box.
+            confidence=d.confidence,  # Model confidence.
+            class_id=d.class_id,  # Numeric class identifier.
+            class_name=d.class_name,  # Human-readable class name.
+        )  # End of the response item.
+        for d in result.detections  # Iterate over the detections.
+    ]  # End of the list of detections.
+    # Build the response body.
+    return DetectionResponse(
+        count=result.count,  # Number of detections.
+        model_id=result.model_id,  # Model that produced them.
+        detections=detections,  # The converted detections.
+    )  # End of the response.
+
+
 # Endpoints
 # Health check: answers as long as the service runs.
 @app.get("/health", response_model=HealthResponse, description="Health check endpoint.")
@@ -179,7 +245,7 @@ async def info() -> InfoResponse:
         name="unbihexium",  # Package name.
         version=unbihexium.__version__,  # Library version.
         # One-line description of the library.
-        description="Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library",
+        description="Python library for Earth observation, geospatial, remote sensing and SAR",
     )  # End of the information response.
 
 
@@ -196,54 +262,15 @@ async def info() -> InfoResponse:
         "    DetectionResponse with ship detections"  # Response body.
     ),  # End of the description.
 )  # End of the route decorator.
-# Asynchronous handler of POST /detect/ships.
-async def detect_ships(
+# Plain handler, run in the thread pool because inference blocks.
+def detect_ships(
     file: UploadFile = File(...),  # Required multipart file upload.
-    threshold: float = 0.5,  # Minimum confidence, a query parameter.
+    threshold: float = Query(0.5, ge=0.0, le=1.0),  # Minimum confidence.
 ) -> DetectionResponse:  # The handler returns a DetectionResponse.
-    # Turn any processing error into an HTTP 500 response.
-    try:
-        # Save uploaded file temporarily
-        with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
-            # Read the whole upload into memory.
-            content = await file.read()
-            # Write it to the temporary file.
-            tmp.write(content)
-            # Keep the path; delete=False keeps the file after closing.
-            tmp_path = Path(tmp.name)
-
-        # Load and process
-        raster = Raster.from_file(tmp_path)
-        # Create the detector with the requested threshold.
-        detector = ShipDetector(threshold=threshold)
-        # Run the detection on the whole raster.
-        result = detector.predict(raster)
-
-        # Clean up
-        tmp_path.unlink()
-
-        # Convert to response
-        detections = [
-            Detection(  # One response item per detection.
-                bbox=d.bbox,  # Bounding box.
-                confidence=d.confidence,  # Model confidence.
-                class_id=d.class_id,  # Numeric class identifier.
-                class_name=d.class_name,  # Human-readable class name.
-            )  # End of the response item.
-            for d in result.detections  # Iterate over the detections.
-        ]  # End of the list of detections.
-
-        # Build the response body.
-        return DetectionResponse(
-            count=result.count,  # Number of detections.
-            model_id=result.model_id,  # Model that produced them.
-            detections=detections,  # The converted detections.
-        )  # End of the response.
-
-    # Report the error message to the client.
-    except Exception as e:
-        # HTTP 500 Internal Server Error with the message as detail.
-        raise HTTPException(status_code=500, detail=str(e))
+    # Open the upload; the temporary file is always deleted.
+    with uploaded_raster(file) as raster:
+        # Detect the ships.
+        return run_detector(ShipDetector(threshold=threshold), raster)
 
 
 # Building detection on an uploaded GeoTIFF.
@@ -252,54 +279,15 @@ async def detect_ships(
     response_model=DetectionResponse,  # Schema of the response body.
     description="Detect buildings in uploaded image.",  # OpenAPI description.
 )  # End of the route decorator.
-# Asynchronous handler of POST /detect/buildings.
-async def detect_buildings(
+# Plain handler, run in the thread pool because inference blocks.
+def detect_buildings(
     file: UploadFile = File(...),  # Required multipart file upload.
-    threshold: float = 0.5,  # Minimum confidence, a query parameter.
+    threshold: float = Query(0.5, ge=0.0, le=1.0),  # Minimum confidence.
 ) -> DetectionResponse:  # The handler returns a DetectionResponse.
-    # Turn any processing error into an HTTP 500 response.
-    try:
-        # Store the upload in a temporary GeoTIFF file.
-        with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
-            # Read the whole upload into memory.
-            content = await file.read()
-            # Write it to the temporary file.
-            tmp.write(content)
-            # Keep the path; delete=False keeps the file after closing.
-            tmp_path = Path(tmp.name)
-
-        # Open the uploaded raster.
-        raster = Raster.from_file(tmp_path)
-        # Create the detector with the requested threshold.
-        detector = BuildingDetector(threshold=threshold)
-        # Run the detection on the whole raster.
-        result = detector.predict(raster)
-
-        # Delete the temporary file.
-        tmp_path.unlink()
-
-        # Convert the detections to response items.
-        detections = [
-            Detection(  # One response item per detection.
-                bbox=d.bbox,  # Bounding box.
-                confidence=d.confidence,  # Model confidence.
-                class_id=d.class_id,  # Numeric class identifier.
-                class_name=d.class_name,  # Human-readable class name.
-            )  # End of the response item.
-            for d in result.detections  # Iterate over the detections.
-        ]  # End of the list of detections.
-
-        # Build the response body.
-        return DetectionResponse(
-            count=result.count,  # Number of detections.
-            model_id=result.model_id,  # Model that produced them.
-            detections=detections,  # The converted detections.
-        )  # End of the response.
-
-    # Report the error message to the client.
-    except Exception as e:
-        # HTTP 500 Internal Server Error with the message as detail.
-        raise HTTPException(status_code=500, detail=str(e))
+    # Open the upload; the temporary file is always deleted.
+    with uploaded_raster(file) as raster:
+        # Detect the buildings.
+        return run_detector(BuildingDetector(threshold=threshold), raster)
 
 
 # NDVI statistics of an uploaded multispectral GeoTIFF.
@@ -316,54 +304,49 @@ async def detect_buildings(
         "    IndexResponse with NDVI statistics"  # Response body.
     ),  # End of the description.
 )  # End of the route decorator.
-# Asynchronous handler of POST /index/ndvi.
-async def calculate_ndvi(
-    nir_band: int = 4,  # Near-infrared band number, counted from 1.
-    red_band: int = 3,  # Red band number, counted from 1.
+# Plain handler, run in the thread pool because reading blocks.
+def calculate_ndvi(
+    nir_band: int = Query(4, ge=1),  # Near-infrared band number, counted from 1.
+    red_band: int = Query(3, ge=1),  # Red band number, counted from 1.
     file: UploadFile = File(...),  # Required multipart file upload.
 ) -> IndexResponse:  # The handler returns an IndexResponse.
-    # Turn any processing error into an HTTP 500 response.
-    try:
-        # Store the upload in a temporary GeoTIFF file.
-        with tempfile.NamedTemporaryFile(suffix=".tif", delete=False) as tmp:
-            # Read the whole upload into memory.
-            content = await file.read()
-            # Write it to the temporary file.
-            tmp.write(content)
-            # Keep the path; delete=False keeps the file after closing.
-            tmp_path = Path(tmp.name)
-
-        # Open the uploaded raster.
-        raster = Raster.from_file(tmp_path)
-        # Read the pixel data into memory.
-        raster.load()
-
-        # Extract bands (convert to 0-indexed)
-        nir = raster.data[nir_band - 1]
-        # Red band, converted from a 1-based band number to a 0-based index.
-        red = raster.data[red_band - 1]
-
-        # Compute NDVI
-        bands = {"NIR": nir, "RED": red}
+    # Open the upload; the temporary file is always deleted.
+    with uploaded_raster(file) as raster:
+        # Pixels as (bands, rows, columns).
+        data = np.asarray(raster.data)
+        # Number of bands of the upload.
+        count = data.shape[0] if data.ndim == 3 else 1
+        # Band numbers must exist in the image.
+        if max(nir_band, red_band) > count:
+            # Unprocessable content.
+            raise HTTPException(
+                status_code=422,  # Unprocessable content.
+                detail=f"band numbers must be between 1 and {count}",  # Reason.
+            )  # End of the error.
+        # Single-band images have no band axis to index.
+        data = data if data.ndim == 3 else data[None]
+        # Bands converted from 1-based numbers to 0-based indices.
+        bands = {"NIR": data[nir_band - 1], "RED": data[red_band - 1]}
         # Per-pixel NDVI = (NIR - RED) / (NIR + RED).
-        ndvi = compute_index("NDVI", bands)
-
-        # Delete the temporary file.
-        tmp_path.unlink()
-
-        # Build the response body with NaN-aware statistics.
-        return IndexResponse(
-            index_name="NDVI",  # Name of the index.
-            min_value=float(np.nanmin(ndvi)),  # Minimum, as a JSON number.
-            max_value=float(np.nanmax(ndvi)),  # Maximum, as a JSON number.
-            mean_value=float(np.nanmean(ndvi)),  # Mean, as a JSON number.
-            shape=(ndvi.shape[0], ndvi.shape[1]),  # (rows, columns).
-        )  # End of the response.
-
-    # Report the error message to the client.
-    except Exception as e:
-        # HTTP 500 Internal Server Error with the message as detail.
-        raise HTTPException(status_code=500, detail=str(e))
+        try:
+            # Index values.
+            ndvi = np.asarray(compute_index("NDVI", bands), dtype=np.float64)
+        # Anything else is a server error.
+        except Exception as exc:
+            # Internal error without internal details.
+            raise HTTPException(status_code=500, detail="NDVI calculation failed") from exc
+    # Images without a single valid pixel have no statistics.
+    if not np.isfinite(ndvi).any():
+        # Unprocessable content.
+        raise HTTPException(status_code=422, detail="the image has no valid NDVI pixels")
+    # Build the response body with NaN-aware statistics.
+    return IndexResponse(
+        index_name="NDVI",  # Name of the index.
+        min_value=float(np.nanmin(ndvi)),  # Minimum, as a JSON number.
+        max_value=float(np.nanmax(ndvi)),  # Maximum, as a JSON number.
+        mean_value=float(np.nanmean(ndvi)),  # Mean, as a JSON number.
+        shape=(ndvi.shape[0], ndvi.shape[1]),  # (rows, columns).
+    )  # End of the response.
 
 
 # Run a development server when the file is executed as a script.
