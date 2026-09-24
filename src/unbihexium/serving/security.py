@@ -22,6 +22,9 @@
 #                                as they arrive, so the limit cannot be
 #                                bypassed
 #   validate_content_type        415 for unsupported media types
+#   require_json                 FastAPI dependency of the JSON routes: 415
+#                                unless the body is application/json (or a
+#                                +json type such as application/geo+json)
 #   APIKeyAuth                   optional API key in a header, compared in
 #                                constant time (hmac.compare_digest) to avoid
 #                                timing side channels
@@ -193,17 +196,34 @@ PayloadSizeMiddleware = RequestSizeLimitMiddleware
 
 
 # Reject unsupported media types with 415.
-def validate_content_type(content_type: str | None) -> None:
+def validate_content_type(
+    content_type: str | None,  # Content-Type header of the request.
+    allowed: set[str] | frozenset[str] | None = None,  # Accepted types; default the service.
+) -> None:  # Raises HTTPException(415) for other types.
     # Requests without a body have no type.
     if content_type is None:
         # Nothing to check.
         return
+    # Accepted media types.
+    accepted = ALLOWED_CONTENT_TYPES if allowed is None else allowed
     # Media type without parameters such as charset or boundary.
     base = content_type.split(";")[0].strip().lower()
+    # Structured syntax suffix of RFC 6839, for example application/geo+json.
+    json_suffix = base.startswith("application/") and base.endswith("+json")
     # Unsupported types.
-    if base not in ALLOWED_CONTENT_TYPES:
+    if base not in accepted and not (json_suffix and "application/json" in accepted):
         # Explain the problem.
         raise HTTPException(status_code=415, detail=f"unsupported content type: {content_type}")
+
+
+# Media types of the JSON routes.
+JSON_CONTENT_TYPES = frozenset({"application/json"})
+
+
+# FastAPI dependency of routes with a JSON body: 415 for other media types.
+def require_json(request: Request) -> None:
+    # Check the Content-Type header; requests without one are left to the body parser.
+    validate_content_type(request.headers.get("content-type"), JSON_CONTENT_TYPES)
 
 
 # Optional API key authentication as a FastAPI dependency.

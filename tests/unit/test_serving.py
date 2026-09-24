@@ -390,6 +390,26 @@ def test_api_key() -> None:
     assert APIKeyAuth(None)(None) is None  # type: ignore[arg-type]
 
 
+# JSON routes reject other media types with 415, as README.md states.
+def test_json_media_type(client: TestClient) -> None:
+    # A JSON body sent as plain text.
+    body = '{"image": [[[0.1, 0.2]], [[0.5, 0.6]]]}'
+    # Route of the prediction.
+    url = "/predict/ndvi_calculator_tiny"
+    # Plain text is refused before the body is parsed.
+    response = client.post(url, content=body, headers={"Content-Type": "text/plain"})
+    # Unsupported media type.
+    assert response.status_code == 415
+    # The same body as JSON is accepted.
+    response = client.post(url, content=body, headers={"Content-Type": "application/json"})
+    # Success.
+    assert response.status_code == 200
+    # Structured syntax suffixes such as application/geo+json count as JSON.
+    response = client.post(url, content=body, headers={"Content-Type": "application/geo+json"})
+    # Success.
+    assert response.status_code == 200
+
+
 # Token bucket: 60 requests per minute with bursts of 2.
 def test_rate_limiter() -> None:
     # Fake clock.
