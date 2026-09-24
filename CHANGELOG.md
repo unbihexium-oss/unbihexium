@@ -228,6 +228,7 @@ Other changes:
 | #45 | 2026-09-23 | ci: raise the OpenSSF Scorecard checks and fix the bugs found by fuzzing |
 | #46 | 2026-09-23 | fix: keep collinear rings stable in rewind and let Scorecard read the workflows |
 | #47 | 2026-09-23 | ci: pin PyTorch by hash and attach SLSA provenance to releases |
+| #48 | 2026-09-23 | docs: rewrite the root documents in a standardised academic layout |
 
 ## 3. [1.0.1] - 2025-12-21
 
