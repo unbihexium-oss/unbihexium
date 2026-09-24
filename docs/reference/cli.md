@@ -69,9 +69,9 @@ unbihexium zoo list [--task TASK] [--domain DOMAIN] [--variant VARIANT] [--json]
 unbihexium zoo info MODEL_ID
 unbihexium zoo build MODEL_ID [--onnx] [--force] [--cache-dir PATH]
 unbihexium zoo export MODEL OUTPUT [--no-verify]
-unbihexium zoo verify MODEL_ID
-unbihexium zoo where MODEL_ID
-unbihexium zoo clear [MODEL_ID] [--yes]
+unbihexium zoo verify MODEL_ID [--cache-dir PATH]
+unbihexium zoo where MODEL_ID [--cache-dir PATH]
+unbihexium zoo clear [MODEL_ID] [--yes] [--cache-dir PATH]
 unbihexium train MODEL (--data DIR | --synthetic N) [options]
 unbihexium evaluate MODEL --data DIR [options]
 unbihexium predict MODEL INPUT_PATH OUTPUT_PATH [options]
@@ -105,7 +105,7 @@ Commands:
 | Global option | Effect |
 | --- | --- |
 | `--version` | Prints `unbihexium, version 1.0.1` and exits with status 0 |
-| `-v`, `--verbose` | Accepted and stored for the subcommands; no command currently changes its output |
+| `-v`, `--verbose` | Log messages of the library at DEBUG level on standard error; without it, the level of `UNBIHEXIUM_LOG_LEVEL` (default WARNING) applies |
 | `--help` | Prints the help of the command or subcommand it follows |
 
 ## 3. Exit status and error reporting
@@ -128,7 +128,7 @@ Try 'unbihexium predict --help' for help.
 Error: Missing argument 'MODEL'.
 ```
 
-The first command exits with status 1 and the second with status 2. Exceptions that the command does not anticipate, for example a missing PyTorch installation in `predict` or a failure inside `zoo export`, end with a Python traceback and status 1.
+The first command exits with status 1 and the second with status 2. Anticipated problems, such as unknown models or pipelines, invalid pipeline parameters, a missing PyTorch installation, output names that do not suit the result or model ids with path separators, are reported as one `Error:` line with status 1; hints keep their square brackets, for example `pip install 'unbihexium[torch]'`. Only defects of the library itself end with a Python traceback. Warnings, such as the notice that an untrained starter model runs, are printed to standard error.
 
 ## 4. Model arguments and requirements
 
@@ -385,10 +385,11 @@ Usage: unbihexium zoo verify [OPTIONS] MODEL_ID
   Verify the files and weights digest of a cached model.
 
 Options:
-  --help  Show this message and exit.
+  --cache-dir PATH  Cache root directory.
+  --help            Show this message and exit.
 ```
 
-Loads the cached checkpoint, checks the weights digest stored in it and compares it with the published digest of the model. It prints `Verified: <model id>` with status 0, or reports that the model is not cached or does not verify with status 1. The command checks the weights, not the other files of the model directory; to check every file against `model.sha256`, run `sha256sum -c model.sha256` in the model directory.
+Checks every file listed in `model.sha256` of the model directory (`model.pt`, `config.json` and, when present, `model.onnx`), loads the checkpoint, checks the weights digest stored in it and compares it with the published digest of the model. It prints `Verified: <model id>` with status 0, or reports that the model is not cached or does not verify with status 1; a modified, missing or corrupt file makes verification fail.
 
 ### 7.6 zoo where
 
@@ -398,7 +399,8 @@ Usage: unbihexium zoo where [OPTIONS] MODEL_ID
   Print the checkpoint path of a cached model.
 
 Options:
-  --help  Show this message and exit.
+  --cache-dir PATH  Cache root directory.
+  --help            Show this message and exit.
 ```
 
 Prints the absolute path of `model.pt` of a cached model, or fails with status 1 when the model is not cached:
@@ -417,11 +419,12 @@ Usage: unbihexium zoo clear [OPTIONS] [MODEL_ID]
   Remove one or all models from the local store.
 
 Options:
-  --yes   Do not ask for confirmation.
-  --help  Show this message and exit.
+  --yes             Do not ask for confirmation.
+  --cache-dir PATH  Cache root directory.
+  --help            Show this message and exit.
 ```
 
-With `MODEL_ID`, removes that model; without it, asks for confirmation and removes every cached model. `--yes` skips the question, which is required in non-interactive use. The number of removed models is printed; declining the question prints `Aborted!` and exits with status 1.
+With `MODEL_ID`, removes that model; without it, asks for confirmation and removes every cached model. A model id must be a model of the catalogue or an entry of the store; ids with path separators or parent references such as `../x` are refused with status 1, and only directories inside the store are removed. `--yes` skips the question, which is required in non-interactive use. The number of removed models is printed; declining the question prints `Aborted!` and exits with status 1.
 
 ```text
 $ unbihexium zoo clear --yes
@@ -541,14 +544,16 @@ Options:
 
 The command opens the model, selects the task API that matches its task, checks that the input has the bands of the catalogue entry in the documented order (`zoo info` lists them), and runs tiled inference: tiles of `--tile-size` pixels (default: the tile size of the variant, 256 or 512) overlap by the fraction `--overlap`, dense outputs are blended across tiles and detections pass non-maximum suppression. `--threshold` overrides the default threshold of detection and binary segmentation tasks. With `--backend auto`, `.onnx` files run on ONNX Runtime and everything else on PyTorch; `--backend onnx` with a model id builds and exports the model into the store first. `--device` applies to PyTorch only; ONNX Runtime uses its CPU execution provider.
 
-The output format follows from the task, not from the file extension:
+The output format follows from the task, and the extension of `OUTPUT_PATH` must match it; a mismatch, such as detections written to `ships.tif`, is refused with status 1 before the model runs:
 
 | Task | Output |
 | --- | --- |
-| `detection` | GeoJSON [9] FeatureCollection of boxes in the coordinates of the input raster, whose CRS is recorded in a top-level `crs` member |
-| `segmentation`, `change_detection` | Single-band GeoTIFF of class labels |
-| `dense_regression`, `spectral_index`, `enhancement`, `super_resolution` | Multi-band float32 GeoTIFF |
-| `scene_regression` | JSON document with one value per output |
+| `detection` | GeoJSON [9] FeatureCollection of boxes in the coordinates of the input raster, whose CRS is recorded in a top-level `crs` member (`.geojson` or `.json`) |
+| `segmentation`, `change_detection` | Single-band GeoTIFF of class labels (`.tif` or `.tiff`) |
+| `dense_regression`, `spectral_index`, `enhancement`, `super_resolution` | Multi-band float32 GeoTIFF (`.tif` or `.tiff`) |
+| `scene_regression` | JSON document with one value per output (`.json`) |
+
+A bare family name such as `water_surface_detector` runs the variant given by `--variant`, otherwise `model.variant` of `unbihexium.config` (default `base`, for example set with `UNBIHEXIUM_MODEL__VARIANT=tiny`). When the model is an untrained starter model of the catalogue, the command prints a warning to standard error; checkpoints and ONNX files are not flagged. With `--backend onnx`, a checkpoint file is exported once into `$UNBIHEXIUM_CACHE/exports/`, named after its SHA-256 digest.
 
 Change detection models need a second acquisition with `--second`. A band mismatch is reported with status 1, for example `Error: ship_detector_tiny expects 3 bands (red, green, blue), got shape (4, 128, 128)`.
 
@@ -567,7 +572,7 @@ $ unbihexium predict water.onnx scene.tif water_onnx.tif --backend onnx
 Wrote: water_onnx.tif (water_surface_detector_tiny)
 ```
 
-The starter models in these examples are untrained, so their outputs demonstrate the file formats only; the untrained ship detector, for instance, returned an empty FeatureCollection.
+Standard output is shown; for the catalogue models each command also printed `Warning: <model id> is an untrained starter model; its output has no meaning until the model is trained (see unbihexium train)` to standard error. The outputs therefore demonstrate the file formats only; the untrained ship detector, for instance, returned an empty FeatureCollection.
 
 ## 11. unbihexium pipeline
 
@@ -633,7 +638,7 @@ $ unbihexium pipeline run change_detection -i rgb.tif --input2 rgb_later.tif -o 
 Completed: 45245f3f-dd64-4290-99c0-7875f958e9a9 -> change_pipeline.tif
 ```
 
-`weights` and `variant` SHOULD NOT be combined: the variant is then appended to the checkpoint path, which fails with an unknown model error.
+With `weights`, the checkpoint is used as given and `variant` is ignored for it. A parameter that the task API does not accept, for example `-p bogus=1`, is reported as `Error: invalid parameters for <pipeline>: ...` with status 1, and an unknown pipeline id as `Error: pipeline not found`. Pipelines that run a catalogue starter model print the same warning as `predict`, and the output extension must suit the result as described in Section 10.2.
 
 ## 12. unbihexium serve
 
@@ -676,7 +681,7 @@ New scripts SHOULD use `predict` and `zoo build`.
 
 ### 14.1 Environment variables
 
-The command reads `UNBIHEXIUM_CACHE`, the root of the model store (default `~/.cache/unbihexium`, models in its subdirectory `models/`). Only `unbihexium serve` also reads the settings of `unbihexium.config` (`UNBIHEXIUM_CONFIG`, `UNBIHEXIUM_<SECTION>__<KEY>` and `UNBIHEXIUM_LOG_LEVEL`); see [docs/getting_started/configuration.md](../getting_started/configuration.md). Terminal colours and table widths follow the terminal as detected by the `rich` library; `COLUMNS` sets the width of tables and wrapped messages.
+The command reads `UNBIHEXIUM_CACHE`, the root of the model store (default `~/.cache/unbihexium`, models in its subdirectory `models/`), and `UNBIHEXIUM_LOG_LEVEL`, the level of its log messages. `unbihexium serve` reads every setting of `unbihexium.config` (`UNBIHEXIUM_CONFIG` and `UNBIHEXIUM_<SECTION>__<KEY>`), and `train` and `predict` read `model.variant` as the default variant of bare family names; see [docs/getting_started/configuration.md](../getting_started/configuration.md). Terminal colours and table widths follow the terminal as detected by the `rich` library; `COLUMNS` sets the width of tables and wrapped messages.
 
 ### 14.2 Shell completion
 

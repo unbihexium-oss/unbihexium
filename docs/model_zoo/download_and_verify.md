@@ -63,7 +63,7 @@ The command examples were run on the main branch on 2026-09-24 in a directory wh
 
 The model zoo is only on the main branch; install from source as described in [README.md](../../README.md) until a release contains it.
 
-Models are stored under `$UNBIHEXIUM_CACHE/models/<model id>/`, or `~/.cache/unbihexium/models/<model id>/` when the variable is not set. `zoo build --cache-dir DIR` and the `cache_dir` argument of the Python functions select another root for one call. `zoo verify`, `zoo where` and `zoo clear` have no `--cache-dir` option and always use the default root, so a store in another location MUST be selected with `UNBIHEXIUM_CACHE` for those commands.
+Models are stored under `$UNBIHEXIUM_CACHE/models/<model id>/`, or `~/.cache/unbihexium/models/<model id>/` when the variable is not set. The option `--cache-dir DIR` of `zoo build`, `zoo verify`, `zoo where` and `zoo clear` and the `cache_dir` argument of the Python functions select another root for one call. `zoo verify`, `zoo where` and `zoo clear` have no `--cache-dir` option and always use the default root, so a store in another location MUST be selected with `UNBIHEXIUM_CACHE` for those commands.
 
 ## 3. Command line
 
@@ -143,7 +143,7 @@ unbihexium zoo verify ship_detector_tiny
 Verified: ship_detector_tiny
 ```
 
-The command loads the checkpoint, checks the digest recorded inside it, and compares the weights with the published digest (Section 5.3). It exits with status 1 and the message `ship_detector_tiny is not cached or does not verify` when the model is missing, damaged or different. It does not check `model.onnx` or `config.json`; use the checksum file for those:
+The command checks every file listed in `model.sha256`, loads the checkpoint, checks the digest recorded inside it, and compares the weights with the published digest (Section 5.3). It exits with status 1 and the message `ship_detector_tiny is not cached or does not verify` when the model is missing, damaged or different, including a modified `model.onnx` or `config.json`. The same file checksums can be checked without Python:
 
 ```bash
 cd ubx-cache/models/ship_detector_tiny && sha256sum -c model.sha256
@@ -205,7 +205,7 @@ The functions below are exported by `unbihexium.zoo`. All of them accept a `cach
 | `load_model(name, variant=None, verify=True)` | Build a catalogue model in memory and compare its digest with the published one, or load a `.pt` checkpoint |
 | `ensure_model(model_id, cache_dir=None, onnx=False, force=False)` | Build the model into the store and return its directory |
 | `download_model(model_id, cache_dir=None, force=False)` | Same as `ensure_model` without ONNX; returns the checkpoint path (the name is historical) |
-| `verify_model(model_id, cache_dir=None)` | `True` if the cached checkpoint loads, matches its recorded digest and matches the published digest |
+| `verify_model(model_id, cache_dir=None)` | `True` if every file matches `model.sha256`, the cached checkpoint loads, matches its recorded digest and matches the published digest; `False` otherwise, also for corrupt files |
 | `is_model_cached`, `get_cached_model_path`, `model_dir`, `list_cached`, `get_cache_dir` | Inspect the store |
 | `clear_cache(model_id=None, cache_dir=None)` | Remove one or all cached models; returns the number removed |
 | `verify_directory(directory)`, `verify_file(path, expected)`, `compute_sha256(path)` | File checksums in `sha256sum` format |
@@ -248,7 +248,7 @@ True
 | --- | --- | --- |
 | Weights digest against `digests.json` | `load_model`, `ensure_model`, `zoo build`, `verify_model`, `zoo verify` | A model that is not the published starter model (changed code, catalogue or numerical environment, altered weights) |
 | Digest recorded in the checkpoint | Every checkpoint load (`load_checkpoint`), `verify_model` | A checkpoint whose weights no longer match the digest written with them |
-| File checksums in `model.sha256` | `verify_directory`, `sha256sum -c` | A changed file in the store, including `model.onnx` and `config.json` |
+| File checksums in `model.sha256` | `verify_model`, `zoo verify`, `ensure_model` (which rebuilds a store entry that does not match), `verify_directory`, `sha256sum -c` | A changed file in the store, including `model.onnx` and `config.json` |
 | ONNX Runtime against PyTorch | `export_onnx` (`zoo build --onnx`, `zoo export`) | An export whose output shape differs from PyTorch, or whose largest absolute difference exceeds 0.001 times the larger of 1 and the largest absolute PyTorch output |
 
 ### 5.2 The weights digest
@@ -259,11 +259,11 @@ The weights digest is a SHA-256 hash [3] over the sorted state dictionary (key, 
 
 `verify_model` returns `True` only if all of the following hold:
 
-1. the checkpoint `model.pt` exists in the store;
-2. it is an Unbihexium checkpoint that `torch.load(weights_only=True)` can read, and the digest of its weights equals the digest recorded in it;
+1. `model.sha256` exists, lists `model.pt` and `config.json` (and `model.onnx` when it was exported), and every listed file exists and matches its SHA-256 digest;
+2. `model.pt` is an Unbihexium checkpoint that `torch.load(weights_only=True)` can read, and the digest of its weights equals the digest recorded in it;
 3. for a catalogue model that was not customised, the digest equals the published digest in `digests.json`, or, for a model registered by the user with a `weights_digest`, that digest.
 
-A checkpoint whose weights were modified therefore fails in step 2, and a checkpoint that was re-saved with a new recorded digest fails in step 3. The following example alters one tensor and re-saves the checkpoint with a new digest; `verify_model` rejects it:
+Any other outcome, including an unreadable or corrupt file, returns `False` instead of raising. A file changed in the store therefore fails in step 1, and a checkpoint that was re-saved together with a matching `model.sha256` and a new recorded digest fails in step 3. The following example alters one tensor and re-saves the checkpoint with a new digest; `verify_model` rejects it:
 
 ```python
 import torch
@@ -324,7 +324,7 @@ In a checkout of the repository with the development dependencies installed, the
 | `VerificationError: <id>: weights digest ... != published ...` | The rebuilt weights differ from the published ones. Check that the installed package matches the checkout that produced `digests.json`, and report a reproducible mismatch on a supported platform as an issue. Do not use the model as the published starter model. |
 | `CheckpointError: ... weights do not match the recorded digest` | The checkpoint was altered or damaged; delete it and rebuild with `zoo build --force`. |
 | `CheckpointError: ... was written by a newer Unbihexium` | The checkpoint format is newer than the installed library; upgrade. |
-| `zoo verify` reports "not cached" for a model built with `--cache-dir` | `zoo verify` uses the default root; set `UNBIHEXIUM_CACHE` to the other root. |
+| `zoo verify` reports "not cached" for a model built with `--cache-dir` | Pass the same `--cache-dir` to `zoo verify` (and to `zoo where` and `zoo clear`), or set `UNBIHEXIUM_CACHE`. |
 | `ExportError: ... ONNX differs from PyTorch` | ONNX Runtime disagrees with PyTorch beyond the tolerance; report it with the model identifier and the versions of `torch`, `onnx` and `onnxruntime`. |
 
 Security problems, such as a way to make a checkpoint load execute code, MUST be reported privately as described in [SECURITY.md](../../SECURITY.md), not in a public issue.

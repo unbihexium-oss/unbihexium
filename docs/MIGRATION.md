@@ -264,18 +264,18 @@ df750ac0baf6b63b 2026 True
 
 ### 5.7 Configuration
 
-`unbihexium.config` keeps `Config`, `ModelConfig`, `ProcessingConfig` and `get_default_config`, with these changes:
+`unbihexium.config` keeps `Config`, `ModelConfig` and `get_default_config`, with these changes:
 
 | Setting | 1.0.x default | New default |
 | --- | --- | --- |
 | `model.variant` | `large` | `base` |
 | `model.device` | `cuda:0` | `cpu` |
 | `model.backend` | did not exist | `auto` |
-| `processing.nodata`, `processing.seed` | did not exist | `None` |
+| `processing` section (`ProcessingConfig`) and `model.num_workers` | tile size, overlap, output format and training workers, read by nothing | removed; setting them is an error that names the key |
 | `serving` section | did not exist | host, port, request limits, API key, CORS origins, rate limit, model cache size |
 | `log_level` | did not exist | `WARNING` |
 
-Settings are now loaded in layers by `load_config`: defaults, a YAML file (argument or `UNBIHEXIUM_CONFIG`), environment variables `UNBIHEXIUM_<SECTION>__<KEY>`, then explicit overrides. Unknown keys are errors, whereas 1.0.x ignored them in `Config.update`. Code that relied on the old defaults MUST set them explicitly:
+Settings are now loaded in layers by `load_config`: defaults, a YAML file (argument or `UNBIHEXIUM_CONFIG`), environment variables `UNBIHEXIUM_<SECTION>__<KEY>`, then explicit overrides. Unknown keys are errors, whereas 1.0.x ignored them in `Config.update`. `to_dict()` and `to_yaml()` redact `serving.api_key` unless `include_secrets=True` is passed. Code that relied on the old defaults MUST set them explicitly:
 
 ```python
 from unbihexium.config import load_config

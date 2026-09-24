@@ -354,6 +354,7 @@ Adapters for the file formats of Earth observation workflows: GeoTIFF and Cloud 
 | `filter_items` | function | `filter_items(items, bbox=None, datetime_range=None, collections=None, ids=None, query=None, max_cloud_cover=None, limit=None) -> list[STACItem]` | Offline item search with the semantics of the STAC API. |
 | `geojson_bounds` | function | `geojson_bounds(obj) -> tuple[float, float, float, float]` | Bounding box (min x, min y, max x, max y) of every position. |
 | `geojson_crs` | function | `geojson_crs(obj) -> str` | CRS of a document as an authority string, for example "EPSG:32632". |
+| `geojson_problems` | function | `geojson_problems(obj) -> list[str]` | Structural problems of a document (RFC 7946 object types, positions and rings); an empty list means valid. GeometryCollections nested deeper than 64 levels are reported as a problem. |
 | `geometry_to_feature` | function | `geometry_to_feature(geometry, properties=None, feature_id=None) -> dict[str, Any]` | Feature object from a geometry. |
 | `geoparquet_bounds` | function | `geoparquet_bounds(path) -> tuple[float, float, float, float]` | Bounding box (min x, min y, max x, max y) of the primary geometry column. |
 | `geoparquet_metadata` | function | `geoparquet_metadata(path) -> dict[str, Any]` | Decoded "geo" metadata of a GeoParquet file. |
@@ -1055,7 +1056,7 @@ Every task API accepts `model` (a catalogue family, model id, checkpoint, ONNX f
 | `YieldPredictor` | class | `YieldPredictor(model=None, variant=None, weights=None, device='cpu', backend='auto', tile_size=None, overlap=0.25, batch_size=4)` | Crop yield per field. |
 | `predict` | function | `predict(model, image, **options) -> Result` | Run a model on an image, raster or raster file. |
 | `task_api` | function | `task_api(model, **options) -> ZooTask` | Task API for a model, with the model already opened. |
-| `write_result` | function | `write_result(result, path) -> Path` | Write a result to a file in the natural format of its task. |
+| `write_result` | function | `write_result(result, path) -> Path` | Write a result to a file in the natural format of its task: GeoJSON (`.geojson`, `.json`) for detections, JSON for scene values, GeoTIFF (`.tif`, `.tiff`) otherwise; other extensions raise `ValueError`. |
 
 ### 15.3 Members of the result classes
 
@@ -1209,7 +1210,7 @@ The model zoo offers 130 model families in the variants `tiny`, `base`, `large` 
 | `VerificationError` | exception | subclass of `RuntimeError` | Raised when a file or model does not match its expected checksum. |
 | `all_model_ids` | function | `all_model_ids() -> list[str]` | Return every model id of the zoo: families times variants. |
 | `catalog_version` | function | `catalog_version() -> str` | Version of the catalogue format and content. |
-| `clear_cache` | function | `clear_cache(model_id=None, cache_dir=None) -> int` | Remove one model or the whole cache; returns the number of removed models. |
+| `clear_cache` | function | `clear_cache(model_id=None, cache_dir=None) -> int` | Remove one model or the whole cache; returns the number of removed models. Ids with path separators or parent references raise `ValueError`. |
 | `compute_sha256` | function | `compute_sha256(path) -> str` | Compute the SHA-256 of a file. |
 | `download_model` | function | `download_model(model_id, cache_dir=None, force=False) -> Path` | Backwards-compatible name: obtain a model and return its checkpoint path. |
 | `ensure_model` | function | `ensure_model(model_id, cache_dir=None, onnx=False, force=False) -> Path` | Make sure a model exists in the cache and return its directory. |
@@ -1230,7 +1231,7 @@ The model zoo offers 130 model families in the variants `tiny`, `base`, `large` 
 | `unregister_model` | function | `unregister_model(model_id) -> bool` | Remove a user model from the registry. |
 | `verify_directory` | function | `verify_directory(directory, filename='model.sha256') -> dict[str, bool]` | Verify every file listed in a model.sha256 file. |
 | `verify_file` | function | `verify_file(path, expected) -> bool` | Verify a file against an expected SHA-256 digest. |
-| `verify_model` | function | `verify_model(model_id, cache_dir=None) -> bool` | Verify a cached model: file checksums and the published weights digest. |
+| `verify_model` | function | `verify_model(model_id, cache_dir=None) -> bool` | Verify a cached model: the checksums of every file listed in `model.sha256` and the published weights digest; `False` on any mismatch or unreadable file. |
 | `write_sha256_file` | function | `write_sha256_file(directory, names, filename='model.sha256') -> Path` | Write a sha256sum-compatible checksum file for files in one directory. |
 
 ### 16.3 Members of ModelZooEntry and ModelSpec
@@ -1407,15 +1408,14 @@ healthy
 
 ## 19. unbihexium.config
 
-`unbihexium.config` holds validated settings in the sections `model`, `processing` and `serving` plus `log_level`, loaded in layers from defaults, a YAML file, `UNBIHEXIUM_<SECTION>__<KEY>` environment variables and explicit overrides. Within the package only the REST service reads them. Every key, its default and its consumer are listed in [configuration.md](../getting_started/configuration.md#4-layered-settings-in-unbihexiumconfig).
+`unbihexium.config` holds validated settings in the sections `model` and `serving` plus `log_level`, loaded in layers from defaults, a YAML file, `UNBIHEXIUM_<SECTION>__<KEY>` environment variables and explicit overrides. Within the package the REST service, `unbihexium serve` and the default variant of `unbihexium train` and `predict` read them; `to_dict(include_secrets=False)` and `to_yaml(path, include_secrets=False)` redact the API key. Every key, its default and its consumer are listed in [configuration.md](../getting_started/configuration.md#4-layered-settings-in-unbihexiumconfig).
 
 | Name | Kind | Signature or value | Description |
 | --- | --- | --- | --- |
 | `CONFIG_ENV` | constant | `'UNBIHEXIUM_CONFIG'` | Variable with the path of a YAML file. |
 | `ENV_PREFIX` | constant | `'UNBIHEXIUM_'` | Prefix of the environment variables. |
-| `Config` | class | `Config(model=..., processing=..., serving=..., log_level='WARNING')` | Complete configuration of the library. |
-| `ModelConfig` | class | `ModelConfig(variant='base', device='cpu', backend='auto', batch_size=8, num_workers=4)` | Model selection and execution. |
-| `ProcessingConfig` | class | `ProcessingConfig(tile_size=512, overlap=64, output_format='GTiff', compression='DEFLATE', nodata=None, seed=None)` | Raster processing. |
+| `Config` | class | `Config(model=..., serving=..., log_level='WARNING')` | Complete configuration of the library. |
+| `ModelConfig` | class | `ModelConfig(variant='base', device='cpu', backend='auto', batch_size=8)` | Model selection and execution. |
 | `ServingConfig` | class | `ServingConfig(host='127.0.0.1', port=8000, max_request_bytes=10485760, max_pixels=4194304, max_values=16777216, api_key=None, cors_origins=..., rate_limit_per_minute=0, model_cache_size=4)` | REST service. |
 | `get_default_config` | function | `get_default_config() -> Config` | Default configuration. |
 | `get_settings` | function | `get_settings() -> Config` | Cached process-wide settings. |

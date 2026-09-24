@@ -219,8 +219,7 @@ intensity = scene * rng.exponential(1.0, size=scene.shape)
 area = (slice(20, 60), slice(10, 50))
 print(f"{'input':>12}: ENL {equivalent_number_of_looks(intensity[area]):5.2f}")
 for name in ("boxcar", "median", "lee", "kuan", "enhanced_lee", "frost", "gamma_map", "refined_lee"):
-    with np.errstate(invalid="ignore"):  # See the note on the enhanced Lee filter below.
-        out = speckle_filter(intensity, filter_type=name, window_size=7, looks=1.0)
+    out = speckle_filter(intensity, filter_type=name, window_size=7, looks=1.0)
     ratio = out[:, 70:120].mean() / out[:, 8:58].mean()
     print(f"{name:>12}: ENL {equivalent_number_of_looks(out[area]):5.2f}, contrast {ratio:4.2f}")
 
@@ -244,7 +243,7 @@ enhanced_lee: ENL 23.06, contrast 4.05
 (32, 128) 3.86
 ```
 
-These numbers describe one synthetic image and only show how the functions are called; they are not a comparison of the filters. The Frost filter smooths little with the default damping $K = 2$ on single-look data because the weights decay as $\exp(-2 C_i^2 \lVert t \rVert)$ with $C_i \approx 1$; a smaller `damping` smooths more. The median of exponential speckle is biased low, which explains the smaller contrast of the median filter. The enhanced Lee filter evaluates both branches of its piecewise formula before selecting one, and for pixels with $C_i \ge C_{\max}$ NumPy emits a `RuntimeWarning: invalid value encountered in add` although the returned values are correct; the example suppresses it with `np.errstate`.
+These numbers describe one synthetic image and only show how the functions are called; they are not a comparison of the filters. The Frost filter smooths little with the default damping $K = 2$ on single-look data because the weights decay as $\exp(-2 C_i^2 \lVert t \rVert)$ with $C_i \approx 1$; a smaller `damping` smooths more. The median of exponential speckle is biased low, which explains the smaller contrast of the median filter. Every filter keeps NaN pixels as NaN and ignores them in the window statistics.
 
 ## 5. Interferometry
 

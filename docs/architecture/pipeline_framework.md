@@ -131,8 +131,8 @@ The record follows the entity-activity structure of W3C PROV-DM [5]: files are e
 
 Two properties follow from the implementation and matter when the record is used as evidence:
 
-- The digests are computed **when the run ends**, not when it starts. An input file that a step modifies is recorded with its modified content, and any value in the input mapping that names a file existing at the end of the run is recorded as an input, including an output path passed in the inputs.
-- The record proves which bytes were present at the end of the run and which software versions were loaded. It does not prove that the recorded code produced the outputs.
+- Input digests are computed **when the run starts**, before the first step, and output digests when it ends. An input file that a step modifies is therefore recorded with the content that was read. A value of the input mapping that names a file that does not exist yet, such as an output path passed in the inputs, is recorded as text.
+- The record proves which input bytes were present when the run started, which output bytes were present when it ended and which software versions were loaded. It does not prove that the recorded code produced the outputs.
 
 ### 3.4 Example
 
@@ -178,6 +178,7 @@ print(run.status.value, pipeline.step_names, run.seed)
 print(run.outputs)
 evidence = run.provenance.outputs[0]
 print(evidence.evidence_type.value, evidence.source, evidence.verify())
+print([getattr(item, "source", item) for item in run.provenance.inputs])
 run.to_json("runs/ndvi.json")
 ```
 
@@ -187,9 +188,10 @@ Output:
 completed ['read', 'compute', 'write'] 0
 {'output': 'ndvi.tif'}
 output ndvi.tif True
+['scene.tif', 'output=ndvi.tif']
 ```
 
-`runs/ndvi.json` then contains the metrics `step.read.seconds`, `step.compute.seconds`, `step.write.seconds` and `run.seconds`. Because the input mapping also names `ndvi.tif`, which exists when the run ends, the provenance record lists it among the inputs as well, as explained in Section 3.3.
+`runs/ndvi.json` then contains the metrics `step.read.seconds`, `step.compute.seconds`, `step.write.seconds` and `run.seconds`. The input mapping also names `ndvi.tif`, which does not exist when the run starts, so the provenance record lists it among the inputs as text and among the outputs with its digest, as explained in Section 3.3.
 
 ## 4. Task pipelines
 
@@ -378,9 +380,7 @@ Blending with overlapping tiles reduces the seams that appear at tile borders of
 
 ## 7. Limitations
 
-- **Unknown `-p` parameters produce a traceback.** `unbihexium pipeline run ship_detection ... -p bogus=1` fails with an uncaught `TypeError` from the task API constructor instead of an `Error:` message, because the pipeline is created outside the error handling of the command.
 - **No persisted run records from the CLI.** `unbihexium pipeline run` discards the run record and provenance (Section 5.2).
-- **Provenance timing.** Digests are computed at the end of a run (Section 3.3).
 - **Sequential execution.** Steps and runs are executed sequentially in the calling thread; there is no scheduler, no distributed execution and no resumption of failed runs.
 - **Several tiling implementations.** The modules in Section 6.2 implement the same placement rule independently and differ in their blending weights; results of the same data can therefore differ slightly in the overlaps depending on the function used.
 

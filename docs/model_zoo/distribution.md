@@ -195,7 +195,7 @@ A user can register additional models at run time with `unbihexium.zoo.register_
 | `local` | Copy the checkpoint at `local_path` into the store |
 | `url` | Download the checkpoint from `download_url` with `requests`, streamed to a temporary file and aborted above 4 GiB |
 
-The `url` source is the only code path in the model zoo that downloads a file, and it is used only for entries a user registers; no catalogue entry has a URL. A downloaded checkpoint is checked against the digest recorded inside it when it is loaded, which detects a damaged file but not a replaced one. Users who register a URL SHOULD set `weights_digest` on the entry and run `verify_model`, which also compares the weights with that digest, and SHOULD obtain the digest through a channel other than the download itself. An example of registering a local checkpoint is in [how_to_add_models.md](how_to_add_models.md).
+The `url` source is the only code path in the model zoo that downloads a file, and it is used only for entries a user registers; no catalogue entry has a URL. A downloaded checkpoint is checked against the digest recorded inside it when it is loaded, which detects a damaged file, and against the entry's `weights_digest` when the entry has one, which also detects a replaced file: `ensure_model` deletes a download that does not match and `load_model` raises `VerificationError`. Users who register a URL SHOULD therefore set `weights_digest` and SHOULD obtain it through a channel other than the download itself. An example of registering a local checkpoint is in [how_to_add_models.md](how_to_add_models.md).
 
 ## 7. Sharing trained models
 

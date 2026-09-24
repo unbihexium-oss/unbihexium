@@ -61,12 +61,12 @@ Unbihexium has no global configuration file that every function reads. Most func
 | Mechanism | Configures | Read by |
 | --- | --- | --- |
 | `UNBIHEXIUM_CACHE` | Root of the local model store | `unbihexium.zoo.store.get_cache_dir`, used by every model zoo function and command |
-| `unbihexium.config` (YAML file, `UNBIHEXIUM_CONFIG`, `UNBIHEXIUM_<SECTION>__<KEY>`, overrides) | Validated settings in the sections `model`, `processing` and `serving`, plus `log_level` | Your code through `load_config` or `get_settings`; the REST service and `unbihexium serve` through `get_settings` |
-| `UNBIHEXIUM_LOG_LEVEL` | Level of the `unbihexium` logger | `unbihexium.utils.configure_logging`, and `log_level` of `unbihexium.config` |
-| Command line options | Each command individually | The `unbihexium` command; only `unbihexium serve` also reads `unbihexium.config` |
+| `unbihexium.config` (YAML file, `UNBIHEXIUM_CONFIG`, `UNBIHEXIUM_<SECTION>__<KEY>`, overrides) | Validated settings in the sections `model` and `serving`, plus `log_level` | Your code through `load_config` or `get_settings`; the REST service, `unbihexium serve` and the default variant of the other commands through `get_settings` |
+| `UNBIHEXIUM_LOG_LEVEL` | Level of the `unbihexium` logger | `unbihexium.utils.configure_logging`, which every `unbihexium` command calls, and `log_level` of `unbihexium.config` |
+| Command line options | Each command individually | The `unbihexium` command; `unbihexium serve` also reads `unbihexium.config`, and `train` and `predict` take `model.variant` as the default variant of bare family names |
 | Variables of GDAL, OpenMP, CUDA and HTTP clients | Behaviour of the dependencies | rasterio and GDAL, NumPy, PyTorch, ONNX Runtime, requests |
 
-The only consumer of `unbihexium.config` inside the package is the REST service: `create_app()` uses the `serving` section and the keys `model.device`, `model.backend` and `model.batch_size`, and `unbihexium serve` additionally uses `serving.host`, `serving.port` and `log_level` (as the log level of uvicorn). The keys `model.variant`, `model.num_workers` and the `processing` section are validated and available to applications, but no function of the package reads them; setting them, for example `UNBIHEXIUM_MODEL__VARIANT` in the Helm chart, has no effect on the package. In particular, the task APIs default to the `base` variant and the other commands have their own defaults (Section 7), independent of `unbihexium.config`.
+Every setting of `unbihexium.config` is read by the package. The REST service (`create_app()`) uses the `serving` section and the keys `model.device`, `model.backend` and `model.batch_size`; `unbihexium serve` additionally uses `serving.host`, `serving.port` and `log_level` (as the log level of uvicorn); `unbihexium train` and `unbihexium predict` use `model.variant` as the variant of a bare family name such as `ship_detector` when `--variant` is not given. The Python task APIs are configured by their arguments and default to the `base` variant. Settings of earlier releases that nothing read, `model.num_workers` and the `processing` section, were removed; a file or variable that still sets them is rejected with a message naming the key (Section 4.4).
 
 ## 3. Environment variables read by the package
 
@@ -81,7 +81,7 @@ The following table is complete for the main branch: no other variable is read b
 
 Variables named in documentation or deployment files of earlier releases, such as `UNBIHEXIUM_HOME`, `UNBIHEXIUM_CACHE_DIR`, `UNBIHEXIUM_MODEL_DIR`, `UNBIHEXIUM_DEVICE` and `UNBIHEXIUM_BATCH_SIZE`, are **not** read. Use `UNBIHEXIUM_CACHE` for the model store and `UNBIHEXIUM_MODEL__DEVICE` or `UNBIHEXIUM_MODEL__BATCH_SIZE` for the model settings of the REST service.
 
-Variables with the prefix `UNBIHEXIUM_` whose name contains no `__` separator, or whose section is not `model`, `processing` or `serving`, are ignored by `unbihexium.config`; a misspelt key inside a known section is an error (Section 4.4).
+Variables with the prefix `UNBIHEXIUM_` whose name contains no `__` separator, or whose section is not `model` or `serving`, are ignored by `unbihexium.config`, except that the removed `UNBIHEXIUM_PROCESSING__*` variables and `UNBIHEXIUM_MODEL__NUM_WORKERS` are errors; a misspelt key inside a known section is an error too (Section 4.4).
 
 ## 4. Layered settings in unbihexium.config
 
@@ -105,22 +105,10 @@ Section `model` (class `ModelConfig`):
 
 | Key | Type | Default | Accepted values | Used by |
 | --- | --- | --- | --- | --- |
-| `variant` | str | `base` | `tiny`, `base`, `large`, `mega` | Not used by the package |
+| `variant` | str | `base` | `tiny`, `base`, `large`, `mega` | `unbihexium train` and `predict`: variant of bare family names |
 | `device` | str | `cpu` | `cpu`, `cuda`, `cuda:<n>`, `mps` | REST service |
 | `backend` | str | `auto` | `auto`, `torch`, `onnx` | REST service |
 | `batch_size` | int | 8 | 1 or more | REST service (tiles per forward pass) |
-| `num_workers` | int | 4 | 0 or more | Not used by the package |
-
-Section `processing` (class `ProcessingConfig`); none of these keys is read by the package, they are provided for applications:
-
-| Key | Type | Default | Accepted values |
-| --- | --- | --- | --- |
-| `tile_size` | int | 512 | 1 or more |
-| `overlap` | int | 64 | 0 to `tile_size - 1` |
-| `output_format` | str | `GTiff` | `GTiff`, `COG`, `Zarr` |
-| `compression` | str | `DEFLATE` | `NONE`, `LZW`, `DEFLATE`, `ZSTD`, `LZMA`, `PACKBITS` (case-insensitive) |
-| `nodata` | float or null | null | any number |
-| `seed` | int or null | null | 0 to 2^32 - 1 |
 
 Section `serving` (class `ServingConfig`), used by the REST service (Section 8):
 
@@ -144,14 +132,15 @@ YAML files are read with `yaml.safe_load`. Values from environment variables are
 
 ### 4.4 Validation
 
-Unknown sections and unknown keys raise `ValueError`, and so do values that cannot be converted. After all layers are applied, `validate()` checks the ranges of Section 4.2 and reports every violation in a single `ValueError`:
+Unknown sections and unknown keys raise `ValueError`, and so do values that cannot be converted and the removed settings `model.num_workers` and `processing.*`. After all layers are applied, `validate()` checks the ranges of Section 4.2 and reports every violation in a single `ValueError`:
 
 ```python
 from unbihexium.config import load_config
 
 for environ in ({"UNBIHEXIUM_MODEL__BATCHSIZE": "4"},
                 {"UNBIHEXIUM_MODEL__BATCH_SIZE": "four"},
-                {"UNBIHEXIUM_SERVING__PORT": "70000", "UNBIHEXIUM_MODEL__VARIANT": "huge"}):
+                {"UNBIHEXIUM_SERVING__PORT": "70000", "UNBIHEXIUM_MODEL__VARIANT": "huge"},
+                {"UNBIHEXIUM_PROCESSING__TILE_SIZE": "256"}):
     try:
         load_config(environ=environ)
     except ValueError as exc:
@@ -159,9 +148,10 @@ for environ in ({"UNBIHEXIUM_MODEL__BATCHSIZE": "4"},
 ```
 
 ```text
-unknown setting model.batchsize; known: variant, device, backend, batch_size, num_workers
+unknown setting model.batchsize; known: variant, device, backend, batch_size
 model.batch_size must be an integer, got 'four'
 invalid configuration: model.variant must be one of tiny, base, large, mega; serving.port must be in [1, 65535]
+setting processing.tile_size was removed because nothing in the library read it; delete it from the configuration file or the environment
 ```
 
 ### 4.5 Defaults
@@ -175,8 +165,7 @@ for section, values in config.to_dict().items():
 ```
 
 ```text
-model {'variant': 'base', 'device': 'cpu', 'backend': 'auto', 'batch_size': 8, 'num_workers': 4}
-processing {'tile_size': 512, 'overlap': 64, 'output_format': 'GTiff', 'compression': 'DEFLATE', 'nodata': None, 'seed': None}
+model {'variant': 'base', 'device': 'cpu', 'backend': 'auto', 'batch_size': 8}
 serving {'host': '127.0.0.1', 'port': 8000, 'max_request_bytes': 10485760, 'max_pixels': 4194304, 'max_values': 16777216, 'api_key': None, 'cors_origins': ['*'], 'rate_limit_per_minute': 0, 'model_cache_size': 4}
 log_level WARNING
 ```
@@ -190,9 +179,6 @@ model:
   variant: tiny
   device: cpu
   batch_size: 4
-processing:
-  tile_size: 256
-  overlap: 32
 serving:
   port: 9000
   rate_limit_per_minute: 120
@@ -207,21 +193,22 @@ environ = {
     "UNBIHEXIUM_MODEL__BATCH_SIZE": "16",
     "UNBIHEXIUM_SERVING__API_KEY": "change-me",
     "UNBIHEXIUM_SERVING__CORS_ORIGINS": "https://a.example.org, https://b.example.org",
-    "UNBIHEXIUM_PROCESSING__SEED": "none",
 }
 config = load_config("unbihexium.yaml", environ=environ, overrides={"serving": {"port": 9100}})
-print(config.model.variant, config.model.batch_size, config.processing.tile_size, config.processing.seed)
+print(config.model.variant, config.model.batch_size)
 print(config.serving.port, config.serving.rate_limit_per_minute, config.serving.cors_origins)
 print(config.serving.api_key is not None, config.log_level)
+print(config.to_dict()["serving"]["api_key"])
 ```
 
 ```text
-tiny 16 256 None
+tiny 16
 9100 120 ['https://a.example.org', 'https://b.example.org']
 True INFO
+***
 ```
 
-The file sets the variant, the tile size and the rate limit; the environment overrides the batch size and the CORS origins and adds an API key; the override sets the port. The same file is used by `get_settings()` when its path is exported:
+The file sets the variant and the rate limit; the environment overrides the batch size and the CORS origins and adds an API key; the override sets the port. `to_dict()` and `to_yaml()` replace the API key with `***` unless they are called with `include_secrets=True`, so that a written configuration does not leak the key. The same file is used by `get_settings()` when its path is exported:
 
 ```bash
 UNBIHEXIUM_CONFIG=unbihexium.yaml python -c \
@@ -292,7 +279,7 @@ print(get_cache_dir().name, get_cache_dir().parent == Path(os.environ["UNBIHEXIU
 models True
 ```
 
-The variable is read on every call, so it can be changed while a process runs. Functions that take a `cache_dir` argument (`ensure_model`, `download_model`, `clear_cache`, `verify_model`, `get_cached_model_path`, `list_cached`, `model_dir`, `is_model_cached`) and the option `--cache-dir` of `unbihexium zoo build` use the given directory directly as the model root instead of `$UNBIHEXIUM_CACHE/models`. In the container image `UNBIHEXIUM_CACHE` is `/home/unbihexium/.cache/unbihexium`, a declared volume. When several workers share one store, build the models once before the workers start, for example at deployment time.
+The variable is read on every call, so it can be changed while a process runs. Functions that take a `cache_dir` argument (`ensure_model`, `download_model`, `clear_cache`, `verify_model`, `get_cached_model_path`, `list_cached`, `model_dir`, `is_model_cached`) and the option `--cache-dir` of `unbihexium zoo build`, `verify`, `where` and `clear` use the given directory directly as the model root instead of `$UNBIHEXIUM_CACHE/models`. In the container image `UNBIHEXIUM_CACHE` is `/home/unbihexium/.cache/unbihexium`, a declared volume. When several workers share one store, build the models once before the workers start, for example at deployment time.
 
 ## 6. Logging
 
@@ -315,23 +302,23 @@ Run with `UNBIHEXIUM_LOG_LEVEL=INFO`:
 unbihexium 20
 ```
 
-Time stamps are UTC in ISO 8601 format. Calling `configure_logging()` again replaces its earlier handler instead of adding a second one. The `unbihexium` command does not call `configure_logging()`, so `UNBIHEXIUM_LOG_LEVEL` does not change the output of its commands, and its global option `--verbose` is accepted but currently has no effect. The exception is `unbihexium serve`, which passes `log_level` (and therefore `UNBIHEXIUM_LOG_LEVEL`) to uvicorn as the level of the server log. In your own code, `log_level` of `unbihexium.config` is not applied automatically; pass it on explicitly, for example `configure_logging(get_settings().log_level)`.
+Time stamps are UTC in ISO 8601 format. Calling `configure_logging()` again replaces its earlier handler instead of adding a second one. The `unbihexium` command calls `configure_logging()` before every subcommand, so `UNBIHEXIUM_LOG_LEVEL` sets the level of its log messages on standard error, and the global option `--verbose` raises it to DEBUG. `unbihexium serve` also passes `log_level` (and therefore `UNBIHEXIUM_LOG_LEVEL`) to uvicorn as the level of the server log. In your own code, `log_level` of `unbihexium.config` is not applied automatically; pass it on explicitly, for example `configure_logging(get_settings().log_level)`.
 
 ## 7. Command line options
 
-Apart from `unbihexium serve` (Section 8), the commands read no configuration file and no `UNBIHEXIUM_<SECTION>__<KEY>` variable; apart from `UNBIHEXIUM_CACHE`, they are configured only by their options. The defaults most often changed are:
+Apart from `unbihexium serve` (Section 8) and the default variant `model.variant`, the commands read no configuration file and no `UNBIHEXIUM_<SECTION>__<KEY>` variable; apart from `UNBIHEXIUM_CACHE` and `UNBIHEXIUM_LOG_LEVEL`, they are configured by their options. The defaults most often changed are:
 
 | Command | Option | Default |
 | --- | --- | --- |
 | `train` | `--device` | `auto` (CUDA, then Apple `mps`, then CPU) |
 | `train` | `--epochs`, `--batch-size`, `--lr`, `--weight-decay` | 50, 8, 0.001, 0.0001 |
 | `train` | `--output` | `runs` |
-| `train`, `predict` | `--variant` | the suffix of the model id, otherwise `base` |
+| `train`, `predict` | `--variant` | the suffix of the model id; for a bare family name `model.variant` of `unbihexium.config` (`base`) |
 | `evaluate` | `--device`, `--batch-size`, `--threshold` | `auto`, 8, 0.3 |
 | `predict` | `--device`, `--backend`, `--overlap` | `cpu`, `auto`, 0.25 |
 | `predict` | `--tile-size` | the tile size of the variant (256 or 512 px) |
 | `index` | `--blue`, `--green`, `--red`, `--nir`, ... | band numbers of the 13-band Sentinel-2 Level-1C order |
-| `zoo build` | `--cache-dir` | `$UNBIHEXIUM_CACHE/models` |
+| `zoo build`, `verify`, `where`, `clear` | `--cache-dir` | `$UNBIHEXIUM_CACHE/models` |
 | `serve` | `--host`, `--port` | `serving.host` and `serving.port` of `unbihexium.config` (127.0.0.1 and 8000) |
 
 The complete list, with exit codes, is in [docs/reference/cli.md](../reference/cli.md).

@@ -108,7 +108,7 @@ Models written to disk are kept under `$UNBIHEXIUM_CACHE/models/<model_id>/`; `U
 
 ### 3.2 The Role of `model.sha256`
 
-`model.sha256` is rewritten from the current files every time `ensure_model` (and therefore `unbihexium zoo build`) runs on the directory, even when the model was already cached. It is a record of the state of the directory at that moment, not a reference value from an independent source: it detects accidental corruption between two points in time if it is checked with `sha256sum --check` or `unbihexium.zoo.verify_directory`, but it cannot detect a modification made before it was last written, and it is not consulted by `verify_model` or `unbihexium zoo verify` (Section 7.2).
+`model.sha256` is written when `ensure_model` (and therefore `unbihexium zoo build`) builds or rebuilds a model, and only when its content changes. Every later call of `ensure_model` reuses the directory only when all listed files match it and `config.json` describes the entry, and rebuilds it otherwise; the ONNX backend uses a cached `model.onnx` only when `model.sha256` lists it and it matches. `verify_model` and `unbihexium zoo verify` check the same checksums before the weights digest. Because unchanged files are not rewritten, a verified store can be mounted read-only. The file is a record written by the library, not a reference value from an independent source: it detects corruption and modification after it was written, but not a modification of both the files and the checksum file (Section 7.2).
 
 ### 3.3 User-Registered Models
 
@@ -154,9 +154,9 @@ unbihexium zoo build ship_detector_tiny --onnx
 unbihexium zoo verify ship_detector_tiny
 ```
 
-`zoo build` prints `Cached:` followed by the model directory. `zoo verify` prints `Verified: ship_detector_tiny` and exits with status 0 when the cached checkpoint loads, its internal digest matches its weights and its weights match the published digest; otherwise it prints `Error: ship_detector_tiny is not cached or does not verify` and exits with status 1. `unbihexium zoo export <model_id or checkpoint> <file.onnx>` exports and checks an ONNX file as described in Section 5.1.
+`zoo build` prints `Cached:` followed by the model directory. `zoo verify` prints `Verified: ship_detector_tiny` and exits with status 0 when every file matches `model.sha256`, the cached checkpoint loads, its internal digest matches its weights and its weights match the published digest; otherwise it prints `Error: ship_detector_tiny is not cached or does not verify` and exits with status 1. `unbihexium zoo export <model_id or checkpoint> <file.onnx>` exports and checks an ONNX file as described in Section 5.1.
 
-To check the file checksums of a cached model independently, run `sha256sum --check model.sha256` in its directory (the directory is printed by `zoo build`).
+The file checksums can also be checked without Python by running `sha256sum --check model.sha256` in the model directory (the directory is printed by `zoo build`).
 
 ### 6.2 Python
 
@@ -213,6 +213,8 @@ For models that users train themselves there is no published digest. The digest 
 | Code execution through a crafted `model.pt` | `torch.load(weights_only=True)` in `read_checkpoint` |
 | Corrupted or naively edited checkpoint tensors | Internal digest check in `load_checkpoint` |
 | Catalogue checkpoint replaced by other weights, including a rewritten internal digest | `verify_model` and `unbihexium zoo verify` compare with `digests.json` |
+| Modified or damaged files in the store (`model.pt`, `config.json`, `model.onnx`) | `verify_model`, `unbihexium zoo verify` and `ensure_model` check `model.sha256`; `ensure_model` rebuilds a mismatching entry and the ONNX backend uses only a verified `model.onnx` |
+| Registered checkpoints that differ from their registered digest | `load_model` and `ensure_model` compare models from a `local` or `url` source with the entry's `weights_digest` |
 | Starter weights that differ between platforms or after a code change | Digest check in `load_model`; rebuild in the Model Zoo workflow |
 | Unbounded downloads of registered models | 4 GiB limit, HTTPS verification, atomic rename |
 | Silent export defects | ONNX Runtime comparison in `export_onnx` |
@@ -221,9 +223,8 @@ For models that users train themselves there is no published digest. The digest 
 
 The following gaps exist in the current code. They are listed so that operators can compensate for them (Section 8).
 
-- **Authenticity of registered models.** A `ModelZooEntry` has no field for an expected file checksum, and `load_model` does not compare a model loaded from a `local` or `url` source with the entry's `weights_digest`; only `verify_model` does. Whoever controls the URL or the file controls the model.
-- **ONNX files in the store.** `model.onnx` and `config.json` are not checked by `verify_model` or `unbihexium zoo verify`, and the ONNX backend uses a cached `model.onnx` without verifying it. A modified ONNX file in the store is therefore used silently.
-- **`model.sha256` as a reference.** The checksum file is regenerated from the current files by every `ensure_model` call (Section 3.2) and is written by the same process that could be compromised.
+- **Registered models without a digest.** A model registered with a `local` or `url` source but without `weights_digest` is checked only against the digest recorded in its own checkpoint, which detects damage but not replacement. Whoever controls the URL or the file then controls the model.
+- **`model.sha256` as a reference.** The checksum file is written by the library itself (Section 3.2). An attacker who can write to the store can replace a file and its checksum together; for catalogue models the published weights digest still detects a replaced `model.pt`, but not a replaced `model.onnx` with a matching checksum file.
 - **Signatures.** Models and checkpoints are not signed. Trust in the published digests derives from the integrity of the repository and of the release artefacts.
 - **Model quality and poisoning.** Verification cannot tell whether trained weights were learned from poisoned or biased data, and it does not make starter models meaningful.
 - **Executable formats.** TorchScript and `torch.export` archives opened with `ModelWrapper` are not sandboxed.
@@ -231,8 +232,8 @@ The following gaps exist in the current code. They are listed so that operators 
 ## 8. Recommendations
 
 - Users SHOULD run `unbihexium zoo verify <model_id>` after building or copying a model store, and SHOULD rebuild with `unbihexium zoo build <model_id> --force` when verification fails.
-- Operators of the REST service with the ONNX backend SHOULD keep a copy of `model.sha256` outside the store after the models have been built and checked, and check the files against that copy with `sha256sum --check` before start-up. The store cannot currently be mounted read-only, because `ensure_model`, which the ONNX backend calls, rewrites `config.json` and `model.sha256` on every call; access to it SHOULD therefore be limited to the service account.
-- Users who register trained models SHOULD distribute the checkpoint digest through a channel independent of the download location, and SHOULD call `verify_model` (not only `load_model`) after registering.
+- Operators of the REST service with the ONNX backend SHOULD keep a copy of `model.sha256` outside the store after the models have been built and checked, and check the files against that copy with `sha256sum --check` before start-up. After the models have been built and verified, the store MAY be mounted read-only, because `ensure_model` writes nothing when every file matches.
+- Users who register trained models SHOULD set `weights_digest` on the entry and distribute it through a channel independent of the download location; `load_model`, `ensure_model` and `verify_model` then reject other weights.
 - Users MUST NOT open TorchScript, `torch.export` or ONNX files from untrusted sources, and SHOULD apply the resource limits of the REST service described in [SECURITY.md](../../SECURITY.md), Section 8.
 - Suspected weaknesses in these controls MUST be reported privately as described in [SECURITY.md](../../SECURITY.md).
 

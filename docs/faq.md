@@ -199,7 +199,7 @@ Model ids have the form `<family>_<variant>`, for example `water_surface_detecto
 
 ### 6.4 `unbihexium zoo verify` fails
 
-The checkpoint in the store no longer matches the published weights digest, for example because it was modified or partly written. Rebuild it with `unbihexium zoo build <model_id> --force`. `zoo verify` checks the weights digest stored in and computed from the checkpoint; it does not verify trained checkpoints, which have no published digest.
+A file in the store no longer matches `model.sha256`, or the checkpoint no longer matches the published weights digest, for example because it was modified or partly written. Rebuild it with `unbihexium zoo build <model_id> --force`; `zoo build` also rebuilds an entry that does not match on its own. `zoo verify` checks the checksums of every stored file and the weights digest; a trained checkpoint of your own has no published digest and is verified against its recorded digest only, unless you register it with a `weights_digest`.
 
 ### 6.5 Results differ between machines
 

@@ -263,13 +263,13 @@ $UNBIHEXIUM_CACHE/models/<model_id>/
 | Function | Command | Behaviour |
 | --- | --- | --- |
 | `load_model(name, variant=None, verify=True)` | (used by all commands) | Returns a model in memory. A path ending in `.pt` is loaded as a checkpoint. Catalogue models are built in memory and nothing is written to disk |
-| `ensure_model(model_id, cache_dir=None, onnx=False, force=False)` | `unbihexium zoo build [--onnx] [--force]` | Builds, downloads or copies the checkpoint into the store unless it exists, optionally exports ONNX, writes `config.json` and `model.sha256`, returns the directory |
+| `ensure_model(model_id, cache_dir=None, onnx=False, force=False)` | `unbihexium zoo build [--onnx] [--force]` | Reuses a store entry only when every file matches `model.sha256` and `config.json` describes the entry; otherwise builds, downloads or copies the checkpoint (checking registered checkpoints against their registered digest), optionally exports ONNX, and writes `config.json` and `model.sha256` only when they change; returns the directory |
 | `download_model(model_id, ...)` | hidden alias `unbihexium zoo download` | `ensure_model` without ONNX; returns the checkpoint path |
-| `verify_model(model_id)` | `unbihexium zoo verify` | Loads the cached `model.pt` (which checks the digest recorded in it) and compares the weights with the entry's published digest; returns false when the checkpoint is missing, unreadable or does not match. It does not check `model.onnx`, `config.json` or `model.sha256` |
+| `verify_model(model_id)` | `unbihexium zoo verify` | Checks every file listed in `model.sha256` (`model.pt`, `config.json` and, when present, `model.onnx`), loads the cached `model.pt` (which checks the digest recorded in it) and compares the weights with the entry's published digest; returns false when a file is missing, modified, unreadable or does not match |
 | `verify_directory(directory)` | | Compares every file listed in `model.sha256` with its SHA-256 digest and returns a dictionary of results |
 | `get_cached_model_path(model_id)` | `unbihexium zoo where` | Path of `model.pt`, or `None` |
 | `list_cached()`, `is_model_cached(model_id)` | | Identifiers present in the store |
-| `clear_cache(model_id=None)` | `unbihexium zoo clear [MODEL_ID] [--yes]` | Removes one model directory, or all of them (the CLI asks for confirmation unless `--yes`) |
+| `clear_cache(model_id=None)` | `unbihexium zoo clear [MODEL_ID] [--yes]` | Removes one model directory, or all of them (the CLI asks for confirmation unless `--yes`); identifiers with path separators or parent references are refused |
 
 ### 7.3 Downloads
 
@@ -394,8 +394,7 @@ unbihexium zoo list --task spectral_index --variant tiny
 ## 12. Limitations
 
 - **Starter models only.** The zoo provides architectures and reproducible initial weights, not trained models (Section 1.1).
-- **Registered checkpoints and published digests.** For entries registered with `source="local"` or `source="url"`, `load_model` checks only the digest recorded inside the checkpoint, not the `weights_digest` of the registered entry. `verify_model`, applied after `ensure_model`, does compare with the entry's digest; call it when the registered digest matters.
-- **ONNX files in the store are not verified by `zoo verify`.** `verify_model` checks only the checkpoint. Use `unbihexium.zoo.verify_directory` to compare `model.onnx` and `config.json` with `model.sha256`. In a test, a modified `model.onnx` still gave `Verified: ship_detector_tiny`, while `verify_directory` reported `'model.onnx': False`.
+- **Registered checkpoints without a digest.** For entries registered with `source="local"` or `source="url"`, `load_model`, `ensure_model` and `verify_model` compare the weights with the entry's `weights_digest` when it is set; without it, only the digest recorded inside the checkpoint is checked, which detects damage but not replacement.
 - **Local checksum files are not signatures.** `model.sha256` and `config.json` detect accidental modification of the store; someone who can write to the store can also rewrite them. The weights digest check against the packaged `digests.json` is the stronger control for catalogue models.
 - **ONNX verification is a spot check.** The export is compared with PyTorch on one random input, which detects export errors but does not prove equivalence for every input.
 

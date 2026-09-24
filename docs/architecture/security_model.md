@@ -179,7 +179,7 @@ The service is created by `create_app()` in [src/unbihexium/serving/app.py](../.
 
 ### 6.2 Properties to be aware of
 
-- **Media types.** A body that is not JSON is rejected with 422 by request validation. `validate_content_type` in [src/unbihexium/serving/security.py](../../src/unbihexium/serving/security.py), which would answer 415, is defined but not used by any route.
+- **Media types.** The routes with a JSON body depend on `require_json` in [src/unbihexium/serving/security.py](../../src/unbihexium/serving/security.py), which answers 415 when the `Content-Type` is neither `application/json` nor a `+json` type such as `application/geo+json`; a request without the header is left to request validation (422).
 - **Documentation routes.** `/docs` and `/openapi.json` are served without an API key even when one is configured. They describe the API but return no data.
 - **Client identity for rate limiting.** The application keys the rate limit by `request.client.host` and does not read `X-Forwarded-For` itself. That address is the socket peer unless the ASGI server rewrites it from proxy headers (uvicorn does so only for proxy addresses it is configured to trust). Behind a reverse proxy without such configuration all clients share the proxy's address, so rate limiting SHOULD then be done at the proxy.
 - **Transport.** The service speaks plain HTTP.
@@ -195,7 +195,7 @@ Unbihexium has no telemetry and no update check ([PRIVACY.md](../../PRIVACY.md),
 | Download of a registered checkpoint | `zoo.store._download` for entries with `source="url"` | `requests` with certificate verification, timeout 60 s, 4 GiB limit, `.part` file renamed on completion, checkpoint loaded with `weights_only=True` |
 | Remote raster paths | rasterio and GDAL, when the caller passes a URL instead of a path (including resolved STAC hrefs) | GDAL's own configuration |
 
-The STAC client follows the `next` links returned by the API, with the method and body those links specify, **to whatever URL the API returns, including other hosts, and sends the configured `headers` (for example an `Authorization` token) with every request**. Only APIs trusted with those headers SHOULD be queried with credentials.
+The STAC client follows the `next` links returned by the API, with the method and body those links specify; relative links are resolved against the current page. The configured `headers` (for example an `Authorization` token) are sent only to URLs with the same origin (scheme, host and port, as defined by RFC 6454) as the API URL; pages on other hosts are requested without them.
 
 ## 8. Fuzzing and security testing
 
@@ -227,23 +227,24 @@ Static analysis (CodeQL, Bandit, ruff security rules), dependency auditing, secr
 
 ## 9. Known gaps
 
-The following gaps were found while preparing this document and are reproducible with the current code. They have low severity in the default deployment, but integrators who pass untrusted values to the functions concerned SHOULD take them into account.
+The review for this document found five weaknesses, all of which have been fixed on the main branch and are covered by unit tests:
 
-1. **`clear_cache` does not validate the model identifier.** `unbihexium zoo clear ../victim` removes the directory `$UNBIHEXIUM_CACHE/victim`, outside the model store, without asking for confirmation (the confirmation applies only to clearing all models). Pass only identifiers from `list_cached()` to `clear_cache`.
-2. **Deeply nested GeometryCollections raise `RecursionError`.** `geojson_problems`, and therefore `validate_geojson`, `read_geojson` and `STACItem.from_dict`, recurse once per nesting level; a document with 2000 nested `GeometryCollection` objects raised `RecursionError` instead of returning a problem. RFC 7946 advises against nested geometry collections [3]. Catch `RecursionError` when validating untrusted documents.
-3. **STAC credentials follow `next` links to any host** (Section 7).
-4. **Rate limiter state is unbounded.** `RateLimiter` keeps one bucket per client address for the lifetime of the process.
-5. **`unbihexium zoo verify` checks only the checkpoint.** A modified `model.onnx` in the store is not detected by it; `unbihexium.zoo.verify_directory` compares all files with `model.sha256`.
+| Weakness | Fix |
+| --- | --- |
+| `clear_cache` accepted identifiers such as `../victim` and removed directories outside the model store | Identifiers with path separators or parent references raise `ValueError`, and only directories inside the store are removed (`unbihexium zoo clear` reports the error) |
+| Deeply nested GeometryCollections raised `RecursionError` in `geojson_problems` | Collections nested deeper than 64 levels are reported as a problem |
+| STAC credentials followed `next` links to any host | Headers are sent only to the origin of the API (Section 7) |
+| `RateLimiter` kept one bucket per client address for the lifetime of the process | Buckets that have refilled completely are dropped |
+| `unbihexium zoo verify` checked only the checkpoint | Every file listed in `model.sha256` is checked as well |
 
-Report other weaknesses privately as described in [SECURITY.md](../../SECURITY.md), through a [GitHub private security advisory](https://github.com/unbihexium-oss/unbihexium/security/advisories/new).
+Two properties remain by design and are described in Section 6.2: the OpenAPI documentation routes are served without an API key, and the service speaks plain HTTP, so TLS is terminated in front of it. Report other weaknesses privately as described in [SECURITY.md](../../SECURITY.md), through a [GitHub private security advisory](https://github.com/unbihexium-oss/unbihexium/security/advisories/new).
 
 ## 10. Requirements for deployers
 
 1. Operators exposing the REST service beyond the local host MUST terminate TLS in front of it and SHOULD set `UNBIHEXIUM_SERVING__API_KEY`, restrict `UNBIHEXIUM_SERVING__CORS_ORIGINS` and set `UNBIHEXIUM_SERVING__RATE_LIMIT_PER_MINUTE` or an equivalent limit at the proxy ([SECURITY.md](../../SECURITY.md), Section 8).
 2. Integrators MUST NOT load TorchScript or `torch.export` files from untrusted sources, and SHOULD load checkpoints and ONNX files only from sources they trust.
-3. Integrators processing untrusted GeoJSON or STAC documents SHOULD catch `ValueError` and `RecursionError`, and SHOULD review asset hrefs before loading them.
-4. Integrators MUST NOT pass unvalidated input as a model identifier to `clear_cache`.
-5. Deployers processing imagery of people MUST meet their data protection obligations ([PRIVACY.md](../../PRIVACY.md), Section 8, which is not legal advice).
+3. Integrators processing untrusted GeoJSON or STAC documents SHOULD catch `ValueError`, and SHOULD review asset hrefs before loading them.
+4. Deployers processing imagery of people MUST meet their data protection obligations ([PRIVACY.md](../../PRIVACY.md), Section 8, which is not legal advice).
 
 ## 11. Related documents
 
