@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-SECURITY |
+| Document | UBX-DOC-201 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-23 |
@@ -192,21 +192,22 @@ Releases are built only by [.github/workflows/release.yml](.github/workflows/rel
 
 1. builds the source distribution and the wheel with hashed, locked build tools;
 2. writes `SHA256SUMS.txt` for the distributions;
-3. creates GitHub artifact attestations with SLSA build provenance v1 [9] for every distribution (`actions/attest-build-provenance`);
-4. signs every distribution with Sigstore [10] in keyless mode, bound to the workflow identity, producing a `.sigstore.json` bundle per file;
-5. exports the signed provenance as the release asset `unbihexium-<tag>.intoto.jsonl`;
-6. creates the GitHub release with the distributions, the bundles, the provenance and the checksums;
-7. uploads the distributions to PyPI with an API token stored as a repository secret.
+3. installs the wheel with the hashed runtime lock in a clean environment, writes its SPDX SBOM `unbihexium-<tag>.spdx.json` and attests it for the distributions (`actions/attest-sbom`);
+4. creates GitHub artifact attestations with SLSA build provenance v1 [9] for every distribution (`actions/attest-build-provenance`);
+5. signs every distribution with Sigstore [10] in keyless mode, bound to the workflow identity, producing a `.sigstore.json` bundle per file;
+6. exports the signed provenance as the release asset `unbihexium-<tag>.intoto.jsonl`;
+7. creates the GitHub release with the distributions, the bundles, the provenance, the SBOM and the checksums;
+8. uploads the distributions to PyPI with trusted publishing: PyPI accepts the short-lived OIDC token of the job in the environment `pypi`, so no upload token is stored, and PEP 740 attestations are uploaded with the files.
 
 The signing, attestation and provenance steps were added to the workflow after the 1.0.1 release. The existing releases v1.0.0 and v1.0.1 therefore carry only `SHA256SUMS.txt`, and the checksums in the v1.0.1 GitHub release do not match the files on PyPI; verify PyPI downloads against the SHA-256 digests that PyPI publishes. Every release built from now on carries the full set of signed artefacts described above.
 
 ### 6.5 Container Image
 
-- The [Dockerfile](Dockerfile) pins the base image by digest, installs the runtime dependencies from the hashed [requirements.txt](requirements.txt) with binary wheels only, and runs as the unprivileged user `unbihexium` (UID 1000).
-- [.github/workflows/docker.yml](.github/workflows/docker.yml) pushes the image to `ghcr.io/unbihexium-oss/unbihexium` on pushes to main and on version tags, and stores an SPDX SBOM of each pushed image as a workflow artifact. The image itself is not signed.
+- The [Dockerfile](Dockerfile) pins the base image by digest, installs the dependencies from the hashed [requirements-docker.txt](.github/requirements/requirements-docker.txt) and the CPU build of PyTorch from [requirements-ci-torch.txt](.github/requirements/requirements-ci-torch.txt) with binary wheels only, builds the wheel with the hash-pinned backend of [requirements-build.txt](.github/requirements/requirements-build.txt), and runs as the unprivileged user `unbihexium` (UID 1000).
+- [.github/workflows/docker.yml](.github/workflows/docker.yml) pushes the image to `ghcr.io/unbihexium-oss/unbihexium` on pushes to main and on version tags. For every pushed digest it stores an SPDX SBOM as a workflow artifact, attests the build provenance and the SBOM in the registry and signs the digest with cosign in keyless mode, bound to the workflow identity. Images pushed before these steps were added are neither signed nor attested.
 - Grype scans the image when the Dockerfile or dependencies change, weekly and on demand, fails on critical vulnerabilities that have a released fix, and uploads its SARIF report to code scanning ([.github/workflows/container-scan.yml](.github/workflows/container-scan.yml)).
 
-No SBOM is currently produced for the Python distributions.
+Each release built by the current workflow carries the SPDX SBOM of the distributions (Section 6.4).
 
 ### 6.6 Model Zoo Integrity
 
@@ -242,6 +243,15 @@ Verify the GitHub artifact attestation and its SLSA provenance (requires the Git
 
 ```bash
 gh attestation verify <file> --repo unbihexium-oss/unbihexium
+```
+
+A container image is verified by its keyless signature and its provenance attestation:
+
+```bash
+cosign verify ghcr.io/unbihexium-oss/unbihexium:<tag> \
+  --certificate-identity-regexp '^https://github.com/unbihexium-oss/unbihexium/.github/workflows/docker.yml@refs/(heads/main|tags/v.+)$' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+gh attestation verify oci://ghcr.io/unbihexium-oss/unbihexium:<tag> --repo unbihexium-oss/unbihexium
 ```
 
 A locally built model zoo model is verified with:

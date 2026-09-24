@@ -685,7 +685,7 @@ def main(argv: list[str] | None = None) -> int:
         # Create the parent directory.
         path.parent.mkdir(parents=True, exist_ok=True)
         # Write the content.
-        path.write_text(files[path], encoding="utf-8")
+        path.write_text(files[path], encoding="utf-8", newline="\n")
     # Summary.
     print(f"{len(files)} model zoo files, {len(stale)} written.")
     # Success.

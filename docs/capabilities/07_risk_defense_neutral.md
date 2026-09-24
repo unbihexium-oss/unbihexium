@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-07-RISK-MONITORING |
+| Document | UBX-DOC-607 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

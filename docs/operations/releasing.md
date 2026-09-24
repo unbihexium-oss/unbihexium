@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-OPS-RELEASING |
+| Document | UBX-DOC-903 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -52,7 +52,7 @@ The key words MUST, MUST NOT, SHOULD, SHOULD NOT and MAY in this document are to
 
 ### 1.2 Roles
 
-Releases are made by the lead maintainer, who holds administrator rights on the repository and controls the `PYPI_API_TOKEN` secret ([GOVERNANCE.md](../../GOVERNANCE.md)). The project has no fixed release schedule; security fixes are released as described in [vulnerability_management.md](../security/vulnerability_management.md).
+Releases are made by the lead maintainer, who holds administrator rights on the repository and administers the `unbihexium` project on PyPI, including its trusted publisher ([GOVERNANCE.md](../../GOVERNANCE.md)). The project has no fixed release schedule; security fixes are released as described in [vulnerability_management.md](../security/vulnerability_management.md).
 
 ### 1.3 Overview
 
@@ -67,11 +67,11 @@ sequenceDiagram
     GH-->>M: All checks pass, merge
     M->>GH: Push annotated tag vX.Y.Z
     GH->>R: Tag push starts the release job
-    R->>R: Build, checksums, attestations, Sigstore, provenance
+    R->>R: Build, checksums, SBOM, attestations, Sigstore, provenance
     R->>GH: GitHub release with assets
-    R->>P: Upload sdist and wheel
+    R->>P: Upload sdist and wheel (trusted publishing)
     GH->>D: Tag push starts the image build
-    D->>GH: Push image to ghcr.io, store SBOM
+    D->>GH: Push, sign and attest the image on ghcr.io
     M->>M: Verify the published artefacts
 ```
 
@@ -83,7 +83,16 @@ Before starting, the maintainer MUST make sure that:
 2. the `[Unreleased]` section of [CHANGELOG.md](../../CHANGELOG.md) is complete, and every merged pull request with user-visible changes has an entry;
 3. no open security advisory is waiting for this release, or, if one is, the fix is included and the advisory is ready to be published with the release;
 4. the lock files are current (`make lock-check`), and the Torch Lock workflow reports no difference;
-5. the `PYPI_API_TOKEN` repository secret is valid and scoped to the `unbihexium` project on PyPI.
+5. the trusted publisher of Section 2.1 is registered on PyPI.
+
+### 2.1 Trusted Publisher (One-Time Set-Up)
+
+The release workflow uploads to PyPI with trusted publishing [8] and holds no PyPI token. Before the first release that uses it, the lead maintainer MUST:
+
+1. open <https://pypi.org/manage/project/unbihexium/settings/publishing/> and add a GitHub publisher with the owner `unbihexium-oss`, the repository `unbihexium`, the workflow name `release.yml` and the environment name `pypi`;
+2. delete the repository secret `PYPI_API_TOKEN` (Settings, Secrets and variables, Actions) and revoke that token on PyPI, since no workflow uses it any more.
+
+The GitHub environment `pypi` is created by the first run of the release job. Required reviewers and a deployment rule that allows only tags matching `v*` MAY be added to it (Settings, Environments), so that every upload waits for an approval and cannot start from a branch.
 
 ## 3. Choosing the Version Number
 
@@ -108,6 +117,7 @@ The release is prepared in a pull request to `main`, from a branch such as `rele
 
 The first step of the release workflow after the checkout, [.github/scripts/check_release_version.py](../../.github/scripts/check_release_version.py), compares the tag with the version in `pyproject.toml`, `_version.py`, `CITATION.cff` (version and release URL) and `codemeta.json`, and stops the release before the build when any of them differs. Run it before tagging, for example `python .github/scripts/check_release_version.py v1.0.1`. The following check, run from the repository root, prints the version recorded in the four metadata files that define the package and its citation:
 
+<!-- doc-example: skip (reads the metadata files of the repository checkout) -->
 ```python
 import json
 import re
@@ -190,16 +200,20 @@ The tag push starts [.github/workflows/release.yml](../../.github/workflows/rele
 | --- | --- | --- |
 | Check out | `actions/checkout` at the tagged commit | Source tree |
 | Set up Python | `actions/setup-python`, CPython 3.14 | Interpreter |
+| Check the tag against the version | `.github/scripts/check_release_version.py` | Stops the run when the tag differs from the recorded version |
 | Install build tools | `pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt` | Hash-pinned `build` |
 | Build package | `python -m build --no-isolation` (hatchling from the hashed tools lock) | `dist/unbihexium-<version>.tar.gz`, `dist/unbihexium-<version>-py3-none-any.whl` |
 | Generate checksums | `sha256sum` over `dist/` | `checksums/SHA256SUMS.txt` |
+| Install the release into a clean environment | `pip --python sbom-env/bin/python install` of `requirements.txt` (hashed) and of the wheel | Environment described by the SBOM |
+| Generate the SBOM | `anchore/sbom-action` (Syft) on the environment | `sbom/unbihexium-<tag>.spdx.json` (SPDX 2.3) |
+| Attest the SBOM | `actions/attest-sbom` on `dist/*` | GitHub artifact attestation with the SBOM |
 | Generate attestations | `actions/attest-build-provenance` on `dist/*` | GitHub artifact attestation with SLSA provenance v1 [5] |
 | Copy and sign | `sigstore/gh-action-sigstore-python` on copies in `signed/` | `<file>.sigstore.json` per distribution [6] |
 | Export provenance | `jq -c '.dsseEnvelope'` on the attestation bundle | `signed/unbihexium-<tag>.intoto.jsonl` |
-| Create GitHub release | `softprops/action-gh-release` with generated notes | Release with distributions, bundles, provenance and checksums |
-| Publish to PyPI | `pypa/gh-action-pypi-publish` with `PYPI_API_TOKEN` | Files on <https://pypi.org/project/unbihexium/> |
+| Create GitHub release | `softprops/action-gh-release` with generated notes | Release with distributions, bundles, provenance, SBOM and checksums |
+| Publish to PyPI | `pypa/gh-action-pypi-publish` with trusted publishing in the environment `pypi` | Files and PEP 740 attestations on <https://pypi.org/project/unbihexium/> |
 
-The signing and the attestation use the short-lived OIDC identity of the job, so no key is stored anywhere; see [secrets_and_tokens.md](../security/secrets_and_tokens.md). PyPI publication uses the long-lived API token; trusted publishing is not configured.
+The signing, the attestations and the PyPI upload use the short-lived OIDC identity of the job, so no key or upload token is stored anywhere; see [secrets_and_tokens.md](../security/secrets_and_tokens.md).
 
 ### 6.2 Release Notes
 
@@ -207,28 +221,28 @@ The release notes are generated by GitHub from the pull requests merged since th
 
 ## 7. Container Image
 
-The same tag push starts [.github/workflows/docker.yml](../../.github/workflows/docker.yml), which pushes `ghcr.io/unbihexium-oss/unbihexium` with the tags `MAJOR.MINOR.PATCH`, `MAJOR.MINOR` and `sha-<short commit>`, and stores an SPDX SBOM of the pushed image as a workflow artifact. The image is not signed. Building, tagging and running the image are described in [docker.md](docker.md).
+The same tag push starts [.github/workflows/docker.yml](../../.github/workflows/docker.yml), which pushes `ghcr.io/unbihexium-oss/unbihexium` with the tags `MAJOR.MINOR.PATCH`, `MAJOR.MINOR` and `sha-<short commit>`, stores an SPDX SBOM of the pushed image as a workflow artifact, attests its build provenance and SBOM in the registry and signs its digest with cosign in keyless mode. Building, tagging, running and verifying the image are described in [docker.md](docker.md).
 
 ## 8. Post-Release Checks
 
 After the workflows have finished, the maintainer SHOULD:
 
-1. confirm that the GitHub release lists the sdist, the wheel, one `.sigstore.json` per distribution, `unbihexium-<tag>.intoto.jsonl` and `SHA256SUMS.txt`;
+1. confirm that the GitHub release lists the sdist, the wheel, one `.sigstore.json` per distribution, `unbihexium-<tag>.intoto.jsonl`, `unbihexium-<tag>.spdx.json` and `SHA256SUMS.txt`;
 2. download the files and verify them as described in [supply_chain_security.md](../security/supply_chain_security.md), Section 9: `sha256sum --check --ignore-missing SHA256SUMS.txt`, `python -m sigstore verify github --cert-identity https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag> <file>` and `gh attestation verify <file> --repo unbihexium-oss/unbihexium`;
 3. compare the SHA-256 digests shown on PyPI with `SHA256SUMS.txt`; they MUST be identical, because both come from the same build;
 4. install the release in a clean virtual environment with `python -m pip install unbihexium==<version>` and run `unbihexium --version` and `unbihexium info`;
 5. publish any security advisory that waited for the release, as described in [vulnerability_management.md](../security/vulnerability_management.md);
-6. check that the Docker workflow pushed the version tags of the image.
+6. check that the Docker workflow pushed the version tags of the image and that `cosign verify` and `gh attestation verify` succeed for it ([supply_chain_security.md](../security/supply_chain_security.md), Section 9.5).
 
 ## 9. Handling Failures
 
 | Situation | Action |
 | --- | --- |
 | The workflow fails before "Create GitHub Release" | Nothing was published. Fix the cause on `main` with a pull request. Because a pushed tag must not be moved, release the fix under the next PATCH version with a new tag, and delete the unused tag only if nothing was published from it. |
-| The GitHub release exists but "Publish to PyPI" failed | Find the cause in the job log (for example an expired token). Once it is fixed, delete the assets of the existing GitHub release and re-run the job from the Actions tab. A re-run builds and signs the distributions again, so the release assets and the PyPI files then come from the same run; confirm this with item 3 of Section 8. If the cause requires a code change, release a new PATCH version instead. |
+| The GitHub release exists but "Publish to PyPI" failed | Find the cause in the job log (for example a trusted publisher that is missing or does not match the repository, workflow or environment). Once it is fixed, delete the assets of the existing GitHub release and re-run the job from the Actions tab. A re-run builds and signs the distributions again, so the release assets and the PyPI files then come from the same run; confirm this with item 3 of Section 8. If the cause requires a code change, release a new PATCH version instead. |
 | The version in `pyproject.toml` was not bumped | The step "Check the tag against the version" fails and nothing is published. Treat as above: bump the version in a pull request and release it under a new tag. |
 | A defect is found after publication | PyPI does not allow a file to be replaced. Release a fixed PATCH version; a broken release MAY be yanked on PyPI [7], which keeps it installable only for exact pins. |
-| The PyPI token leaked | Revoke it on PyPI first, then replace the repository secret, as described in [secrets_and_tokens.md](../security/secrets_and_tokens.md). |
+| An unexpected upload appears on PyPI | Check the publishing history of the project on PyPI and the runs of release.yml. Remove or restrict the trusted publisher on PyPI first, then investigate as described in [secrets_and_tokens.md](../security/secrets_and_tokens.md). |
 
 ## 10. Release History
 
@@ -254,6 +268,8 @@ Both releases were built before signing and SLSA provenance assets were introduc
 [6] Sigstore. Sigstore documentation. 2026. <https://docs.sigstore.dev/>
 
 [7] Python Packaging Authority. PEP 592: Adding "Yank" Support to the Simple API. 2019. <https://peps.python.org/pep-0592/>
+
+[8] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
 
 <!--
 =============================================================================

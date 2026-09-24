@@ -149,8 +149,10 @@ def test_predict(runner: CliRunner, tmp_path: Path) -> None:
     out = tmp_path / "ships.geojson"
     # Run the detector.
     result = runner.invoke(cli, ["predict", "ship_detector_tiny", str(image), str(out)])
-    # Success and a feature collection.
-    assert result.exit_code == 0 and json.loads(out.read_text())["type"] == "FeatureCollection"
+    # Success.
+    assert result.exit_code == 0
+    # A feature collection.
+    assert json.loads(out.read_text(encoding="utf-8"))["type"] == "FeatureCollection"
     # Change detection with two dates.
     out = tmp_path / "change.tif"
     # Run the change detector.
@@ -392,7 +394,7 @@ def test_predict_checkpoint_with_onnx_backend(runner: CliRunner, tmp_path: Path)
     # Success and a feature collection.
     assert result.exit_code == 0, result.output
     # GeoJSON output.
-    assert json.loads(out.read_text())["type"] == "FeatureCollection"
+    assert json.loads(out.read_text(encoding="utf-8"))["type"] == "FeatureCollection"
 
 
 # =============================================================================

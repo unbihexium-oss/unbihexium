@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/10_satellite_imagery_features.md
-Title       : Capability 10: Satellite Imagery Features
+Title       : Capability Domain 10: Satellite Imagery Features
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability 10: Satellite Imagery Features
+# Capability Domain 10: Satellite Imagery Features
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-10-IMAGERY |
+| Document | UBX-DOC-610 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

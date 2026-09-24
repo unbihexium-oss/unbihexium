@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-TUTORIALS |
+| Document | UBX-DOC-306 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -376,6 +376,7 @@ curl prints no line break after a response; the three responses are shown on sep
 
 For larger images, send the array as a base64-encoded NumPy `.npy` file and ask for the output values. File `client.py` uses only the standard library and NumPy:
 
+<!-- doc-example: skip (needs the service started in Section 5.2) -->
 ```python
 import base64
 import io

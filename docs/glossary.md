@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-GLOSSARY |
+| Document | UBX-DOC-310 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -278,7 +278,7 @@ Two interfaces exist. The functions of `unbihexium.indices` take bands as keywor
 | OpenSSF Scorecard | Automated assessment of the security practices of a repository [68]. | `.github/workflows/scorecard.yml` |
 | PEP 440 | Python's version specification; release versions of the project are `MAJOR.MINOR.PATCH` [69]. | [VERSIONING.md](../VERSIONING.md) |
 | REUSE | Specification for declaring the copyright and licence of every file [70]. | `REUSE.toml` |
-| SBOM (software bill of materials) | Inventory of the components of a software artefact. An SPDX [71] SBOM is generated for every pushed container image. | `.github/workflows/docker.yml` |
+| SBOM (software bill of materials) | Inventory of the components of a software artefact. An SPDX [71] SBOM is generated for every release and for every pushed container image, and attested with a signed attestation. | `.github/workflows/release.yml`, `.github/workflows/docker.yml` |
 | Security Insights | Machine-readable security metadata of the project in the OpenSSF Security Insights format. | `security-insights.yml` |
 | Semantic Versioning | Version scheme in which the major number changes for incompatible changes [72]. | [VERSIONING.md](../VERSIONING.md) |
 | Sigstore | Keyless signing of artefacts with short-lived certificates bound to an identity and a public transparency log [73]. Release distributions are signed; the `.sigstore.json` bundle holds the signature, certificate and log entry. | `.github/workflows/release.yml`, [SECURITY.md](../SECURITY.md) |

@@ -336,7 +336,7 @@ class Product:
         # Metadata file.
         json_path = folder / "product.json"
         # Write it.
-        json_path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+        json_path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8", newline="\n")
         # Return its path.
         return json_path
 

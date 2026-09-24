@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/09_benefits_narrative.md
-Title       : Capability 09: Benefits Narrative and Reportable Outputs
+Title       : Capability Domain 09: Benefits Narrative and Reportable Outputs
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability 09: Benefits Narrative and Reportable Outputs
+# Capability Domain 09: Benefits Narrative and Reportable Outputs
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-09-BENEFITS |
+| Document | UBX-DOC-609 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-08-VALUE-ADDED-IMAGERY |
+| Document | UBX-DOC-608 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

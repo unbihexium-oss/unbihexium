@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CONTRIBUTING |
+| Document | UBX-DOC-108 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -134,8 +134,10 @@ make install-dev
 | `make licence` | REUSE lint and `.github/scripts/check_license_headers.py` |
 | `make text-policy` | `.github/scripts/check_text_policy.py` |
 | `make md-lint` | markdownlint with `.markdownlint.yaml` |
+| `make doc-ids` | `.github/scripts/check_document_ids.py` (document identifiers and register) |
+| `make doc-examples` | `.github/scripts/run_doc_examples.py` (the code examples of the documentation) |
 | `make model-zoo` | `.github/scripts/check_model_zoo.py` |
-| `make check` | Lint, format check, type check, tests, licence, text policy, YAML lint and model zoo |
+| `make check` | Lint, format check, type check, tests, licence, text policy, document identifiers, YAML lint and model zoo |
 | `make pre-commit` | Every pre-commit hook on all files |
 | `make check-dist` | Builds the sdist and wheel and runs `twine check --strict` |
 
@@ -284,6 +286,8 @@ YAML files are additionally linted with yamllint (`.yamllint.yml`), and workflow
 ### 5.4 Markdown
 
 - Markdown MUST pass markdownlint with `.markdownlint.yaml` (`make md-lint`; Markdown workflow). The root documents follow a common layout: an HTML comment with the licence notice and header block, one H1 heading, a document control table, an abstract, a contents list, numbered sections, references and a closing HTML comment.
+- Every controlled document carries an identifier `UBX-DOC-SNN` in the `Document` row of its control table, assigned under the rules of the [Document Register](docs/document_register.md): a new document takes the next free number of its series and is added to the register (and, under `docs/`, to `docs/toc.md` and `docs/index.md`) in the same pull request; identifiers are never changed or reused. `make doc-ids` runs `.github/scripts/check_document_ids.py`, which the Markdown workflow also runs.
+- Code examples MUST run as written. The Documentation Examples workflow (`make doc-examples`) runs every `python` block and every `bash` block that consists of `unbihexium` commands, in document order, in a fresh temporary directory; an example that needs files MUST create them in an earlier block. A block that cannot run there (network access, a running server, the repository checkout) is marked with `<!-- doc-example: skip (reason) -->` on the line before its fence.
 - Relative links MUST point to files that exist. The Links workflow checks links on a schedule with lychee (`.github/lychee.toml`).
 
 ### 5.5 Text policy
@@ -312,7 +316,7 @@ Every new source file MUST carry the MPL-2.0 Exhibit A notice. `.github/scripts/
 | Benchmarks | `tests/benchmarks/` | `pytest tests/benchmarks` | Part of `pytest tests/` in the CI and Coverage workflows |
 | REST API smoke test | `src/unbihexium/serving/` | `make docker-api` or `unbihexium serve` | Integration Tests workflow, job "API Integration" |
 
-The CI job "Test" runs the whole suite (`pytest tests/`); the Coverage workflow runs it once more under pytest-cov and uploads the report to Codecov. Coverage statuses are informational (`codecov.yml`) and do not block a merge, but a change SHOULD NOT reduce coverage without a reason given in the pull request.
+The CI job "Test" runs the whole suite (`pytest tests/`); the Coverage workflow runs it once more under pytest-cov and uploads the report to Codecov. The Coverage workflow fails when the coverage of lines and branches falls below 85 % (`fail_under` in `pyproject.toml`); the Codecov statuses (`codecov.yml`) fail when a pull request lowers the project coverage by more than one percentage point or covers less than 80 % of the changed lines. A change SHOULD NOT reduce coverage; where it has to, the pull request explains why.
 
 ### 6.2 Writing tests
 
@@ -462,13 +466,13 @@ The following workflows run on pull requests that target `main`. A pull request 
 
 | Workflow | What it checks |
 | --- | --- |
-| CI | Ruff lint and format check, pyright and the test suite on Python 3.10 to 3.14 |
+| CI | Ruff lint and format check, pyright and the test suite on Python 3.10 to 3.14 (Linux) and on Python 3.10 and 3.14 (macOS and Windows) |
 | Integration Tests | Integration tests on Python 3.10 to 3.14, end-to-end tests and a REST API smoke test |
 | Coverage | Test suite under pytest-cov with upload to Codecov |
 | Package | Builds the sdist and wheel, validates the metadata and installs the wheel |
 | Text Policy | Text policy of the files, Python and configuration file documentation style, and commit messages |
 | PR Title | Conventional Commits format of the title |
-| Markdown | markdownlint (when Markdown files change) |
+| Markdown | markdownlint and the document identifier check (when Markdown files change) |
 | Model Zoo | Consistency of the model zoo (when it changes) |
 | Fuzzing | atheris fuzz targets (when the parsers or targets change) |
 | License Compliance | MPL-2.0 notices, REUSE and the licences of the dependencies |

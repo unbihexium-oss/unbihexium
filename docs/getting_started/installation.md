@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-GS-INSTALLATION |
+| Document | UBX-DOC-303 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -289,11 +289,11 @@ python -m pytest tests/ -n auto
 
 ### 9.1 Linux
 
-All CI workflows run on GitHub-hosted Ubuntu runners (x86_64); this is the tested platform. The container image is built on the same runners and therefore for `linux/amd64` only.
+Every CI workflow runs on GitHub-hosted Ubuntu runners (x86_64), and the unit, integration and end-to-end tests run there on CPython 3.10 to 3.14. The container image is built on the same runners and therefore for `linux/amd64` only.
 
 ### 9.2 macOS and Windows
 
-The package is pure Python and its dependencies publish wheels for macOS and Windows, and the lock files resolve for both. These platforms are not exercised by CI, so problems SHOULD be reported through the issue tracker (see [SUPPORT.md](../../SUPPORT.md)). On Windows, activate a virtual environment with `.venv\Scripts\activate` and quote extras with double quotes in `cmd.exe`, for example `python -m pip install "unbihexium[onnx]"`. On macOS with Apple silicon, PyTorch's `mps` device can be passed to `unbihexium train` and `unbihexium evaluate`.
+The package is pure Python, its dependencies publish wheels for macOS and Windows, and the lock files resolve for both. The CI job `platforms` runs the whole test suite on macOS (arm64) and Windows (x86_64) with CPython 3.10 and 3.14, installed from the same hashed lock files as on Linux; the other Python versions are tested on Linux only. Problems on these platforms SHOULD be reported through the issue tracker (see [SUPPORT.md](../../SUPPORT.md)). On Windows, activate a virtual environment with `.venv\Scripts\activate` and quote extras with double quotes in `cmd.exe`, for example `python -m pip install "unbihexium[onnx]"`. On macOS with Apple silicon, PyTorch's `mps` device can be passed to `unbihexium train` and `unbihexium evaluate`.
 
 ### 9.3 Python 3.10
 

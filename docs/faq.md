@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-FAQ |
+| Document | UBX-DOC-309 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -213,7 +213,7 @@ Privately, through a GitHub security advisory (<https://github.com/unbihexium-os
 
 ### 7.2 How can I verify a release?
 
-Releases built by the current `.github/workflows/release.yml` carry `SHA256SUMS.txt`, a Sigstore bundle (`.sigstore.json`) for each distribution [5], the SLSA provenance `unbihexium-<tag>.intoto.jsonl` [6] and GitHub artifact attestations. Releases v1.0.0 and v1.0.1 predate signing and have none of these. The verification commands are in [SECURITY.md](../SECURITY.md), Section 7.
+Releases built by the current `.github/workflows/release.yml` carry `SHA256SUMS.txt`, a Sigstore bundle (`.sigstore.json`) for each distribution [5], the SLSA provenance `unbihexium-<tag>.intoto.jsonl` [6], the SPDX SBOM `unbihexium-<tag>.spdx.json` and GitHub artifact attestations. Releases v1.0.0 and v1.0.1 predate signing and have none of these. The verification commands are in [SECURITY.md](../SECURITY.md), Section 7.
 
 ### 7.3 Does the library send telemetry?
 

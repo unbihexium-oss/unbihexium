@@ -131,8 +131,9 @@ repository:  # This repository.
     expression: MPL-2.0  # SPDX licence expression.
 
   # Releases are built by the Release workflow when a version tag is pushed,
-  # uploaded to PyPI, signed with Sigstore and attested with GitHub artifact
-  # attestations, whose SLSA provenance is attached to the release.
+  # uploaded to PyPI with trusted publishing, signed with Sigstore and
+  # attested with GitHub artifact attestations (SLSA provenance and SBOM),
+  # whose provenance and SBOM are attached to the release.
   release:  # How releases are produced.
     changelog: https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md  # Release history.
     automated-pipeline: true  # Releases are built by a workflow, not by hand.
@@ -152,13 +153,20 @@ repository:  # This repository.
           attached to each GitHub release as unbihexium-<tag>.intoto.jsonl
           next to the Sigstore bundles (.sigstore.json) of the
           distributions.
+      - name: SBOM of the distributions  # Attestation name.
+        predicate-uri: https://spdx.dev/Document/v2.3  # In-toto predicate type of the attestation.
+        location: https://github.com/unbihexium-oss/unbihexium/attestations  # Where the attestations are published.
+        comment: |  # How the attestation is made and verified.
+          SPDX SBOM of the wheel installed with the locked runtime
+          dependencies, attested by actions/attest-sbom for every file in
+          dist/ and attached to the release as unbihexium-<tag>.spdx.json.
     distribution-points:  # Where released artefacts can be obtained.
       - uri: pkg:pypi/unbihexium  # Package URL or web address.
-        comment: Python Package Index, uploaded by the Release workflow  # What is published there.
+        comment: Python Package Index, uploaded by the Release workflow with trusted publishing and PEP 740 attestations  # What is published there.
       - uri: https://github.com/unbihexium-oss/unbihexium/releases  # Package URL or web address.
-        comment: GitHub releases with SHA256SUMS.txt, Sigstore signatures and SLSA provenance  # What is published there.
+        comment: GitHub releases with SHA256SUMS.txt, Sigstore signatures, SLSA provenance and the SPDX SBOM  # What is published there.
       - uri: pkg:docker/ghcr.io/unbihexium-oss/unbihexium  # Package URL or web address.
-        comment: Container image on the GitHub Container Registry; the Docker workflow stores an SPDX SBOM of each pushed image as a workflow artifact  # What is published there.
+        comment: Container image on the GitHub Container Registry, signed with cosign (keyless) and attested with SLSA provenance and an SPDX SBOM  # What is published there.
     license:  # Licence of the released artefacts.
       url: https://github.com/unbihexium-oss/unbihexium/blob/main/LICENSE.txt  # Licence text.
       expression: MPL-2.0  # SPDX licence expression.

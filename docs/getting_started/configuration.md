@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-GS-CONFIGURATION |
+| Document | UBX-DOC-305 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -174,6 +174,7 @@ log_level WARNING
 
 A configuration file contains any subset of the sections; omitted keys keep their defaults. Save the following as `unbihexium.yaml`:
 
+<!-- doc-example: write unbihexium.yaml -->
 ```yaml
 model:
   variant: tiny

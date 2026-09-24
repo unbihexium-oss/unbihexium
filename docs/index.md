@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-INDEX |
+| Document | UBX-DOC-300 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -163,6 +163,7 @@ The twelve domain documents describe, for one application area each, the model f
 | [glossary.md](glossary.md) | Terms and abbreviations used in the code and the documentation, with the formulas of the spectral indices |
 | [MIGRATION.md](MIGRATION.md) | Moving code, scripts, clients and deployments from 1.0.x to the main branch (the upcoming 2.0.0) |
 | [toc.md](toc.md) | The complete table of contents of `docs/` |
+| [document_register.md](document_register.md) | The numbering scheme of the document identifiers and the register of every controlled document, including those outside `docs/` |
 
 ## 12. Project documents outside docs/
 
@@ -197,11 +198,11 @@ The twelve domain documents describe, for one application area each, the model f
 
 ### 13.1 Layout
 
-Every document under `docs/` follows the same layout: a licence and header comment, one title, a document control table (identifier, version, status, review date, owner, scope), an abstract, a list of contents, numbered sections, a numbered list of references for every external standard, publication or tool cited, and a footer comment. Documents are Markdown in CommonMark with the GitHub Flavored Markdown extensions [2], checked with markdownlint using [.markdownlint.yaml](../.markdownlint.yaml), with a link checker, and with the project text policy (`.github/scripts/check_text_policy.py`). Where a document states obligations, the key words MUST, SHOULD and MAY are used as defined in RFC 2119 [3] and RFC 8174 [4].
+Every document under `docs/` follows the same layout: a licence and header comment, one title, a document control table (identifier, version, status, review date, owner, scope; the identifiers are numbered as defined in the [Document Register](document_register.md)), an abstract, a list of contents, numbered sections, a numbered list of references for every external standard, publication or tool cited, and a footer comment. Documents are Markdown in CommonMark with the GitHub Flavored Markdown extensions [2], checked with markdownlint using [.markdownlint.yaml](../.markdownlint.yaml), with a link checker, and with the project text policy (`.github/scripts/check_text_policy.py`). Where a document states obligations, the key words MUST, SHOULD and MAY are used as defined in RFC 2119 [3] and RFC 8174 [4].
 
 ### 13.2 Accuracy
 
-Documents describe the code of the main branch at their review date. Code examples and commands were executed against that code, and shown outputs are real outputs; numbers such as timings state how and where they were measured. Documents do not contain performance, accuracy or compliance claims that the repository cannot support.
+Documents describe the code of the main branch at their review date. Code examples and commands were executed against that code, and shown outputs are real outputs; the Documentation Examples workflow runs the Python examples and the `unbihexium` commands again on every change, so an example that the code no longer supports fails a check; numbers such as timings state how and where they were measured. Documents do not contain performance, accuracy or compliance claims that the repository cannot support.
 
 ### 13.3 Reporting problems
 

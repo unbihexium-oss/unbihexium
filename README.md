@@ -28,7 +28,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-README |
+| Document | UBX-DOC-100 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -402,11 +402,11 @@ Settings are layered, later layers winning: the built-in defaults, a YAML file (
 
 - **Locked dependencies.** `requirements.txt` (runtime with `onnx` and `serving`), `requirements-dev.txt` (all extras) and the CI lock files in `.github/requirements/` pin every package with SHA-256 hashes; CI installs with `--require-hashes`. The container image installs binary wheels only from `requirements.txt`, and its base image is pinned by digest.
 - **Deterministic models.** Starter weights are derived from the model id and verified by digest (Section 7.3). Training takes a `seed`, and the normalisation statistics estimated from the training data are stored with the checkpoint, so inference and ONNX exports apply exactly the same scaling.
-- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
+- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14 on Linux, and pytest on macOS and Windows with CPython 3.10 and 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
 
 ### 10.2 Release integrity
 
-Releases are built by [.github/workflows/release.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/.github/workflows/release.yml) when a version tag is pushed. With the current workflow, each GitHub release contains the sdist and wheel, `SHA256SUMS.txt`, a Sigstore signature bundle (`.sigstore.json`) for each distribution [3], and the signed SLSA provenance of the build as `unbihexium-<tag>.intoto.jsonl` [2]; GitHub artifact attestations are created for the distributions. Earlier releases were produced by earlier versions of the workflow and may not carry every one of these files. A downloaded distribution is verified with:
+Releases are built by [.github/workflows/release.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/.github/workflows/release.yml) when a version tag is pushed. With the current workflow, each GitHub release contains the sdist and wheel, `SHA256SUMS.txt`, a Sigstore signature bundle (`.sigstore.json`) for each distribution [3], the signed SLSA provenance of the build as `unbihexium-<tag>.intoto.jsonl` [2] and an SPDX SBOM as `unbihexium-<tag>.spdx.json`; GitHub artifact attestations of the provenance and the SBOM are created for the distributions, and PyPI receives the files through trusted publishing with PEP 740 attestations. Earlier releases were produced by earlier versions of the workflow and may not carry every one of these files. A downloaded distribution is verified with:
 
 ```bash
 python -m pip install sigstore
@@ -424,7 +424,7 @@ gh attestation verify <file> --repo unbihexium-oss/unbihexium
 | Fuzzing | atheris targets for the GeoJSON and STAC parsers in [fuzz/](https://github.com/unbihexium-oss/unbihexium/tree/main/fuzz) |
 | Dependencies | Dependabot (pip, GitHub Actions, Docker), pip-audit, dependency review with a licence policy |
 | Secrets | TruffleHog on pushes and pull requests |
-| Container | Grype scan of the image, SPDX SBOM of every pushed image |
+| Container | Grype scan of the image; SPDX SBOM, provenance and SBOM attestations and a keyless cosign signature for every pushed image |
 | Repository posture | OpenSSF Scorecard [4], [security-insights.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/security-insights.yml) |
 | Licensing | REUSE compliance [5], licence headers, licence check of all runtime dependencies |
 | Pinning | Every GitHub Action is pinned by commit SHA |

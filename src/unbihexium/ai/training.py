@@ -649,8 +649,10 @@ class Trainer:
             "best_metrics": _jsonable(result.best_metrics),  # Best metrics.
             "history": _jsonable(result.history),  # Every epoch.
         }  # End of the document.
-        # Write the file.
-        (self.output_dir / "history.json").write_text(json.dumps(data, indent=2), encoding="utf-8")
+        # JSON text of the history.
+        text = json.dumps(data, indent=2)
+        # Write the file with LF line endings on every platform.
+        (self.output_dir / "history.json").write_text(text, encoding="utf-8", newline="\n")
 
 
 # Convert NaN and infinities to None for strict JSON.

@@ -123,7 +123,7 @@ def test_ship_detection_workflow(tmp_path: Path, isolated_cache: Path) -> None:
     # Success.
     assert result.exit_code == 0, result.output
     # Parse the GeoJSON.
-    collection = json.loads(out.read_text())
+    collection = json.loads(out.read_text(encoding="utf-8"))
     # Feature collection in the scene CRS.
     assert collection["type"] == "FeatureCollection" and collection["crs"] == "EPSG:32635"
     # Every box lies inside the scene footprint.

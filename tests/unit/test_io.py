@@ -544,8 +544,10 @@ def test_stac_items_and_filter(tmp_path: Path) -> None:
     path = tmp_path / "items" / "a.json"
     # Directory of the item.
     path.parent.mkdir()
+    # JSON text of the item.
+    text = json.dumps(make_item("a", [0, 0, 1, 1], "2024-01-01T00:00:00Z"))
     # Write the item.
-    path.write_text(json.dumps(make_item("a", [0, 0, 1, 1], "2024-01-01T00:00:00Z")))
+    path.write_text(text, encoding="utf-8")
     # Parse the file.
     item = read_stac_item(path)
     # Absolute path next to the item.
@@ -586,15 +588,15 @@ def test_walk_catalog(tmp_path: Path) -> None:
     # Collection directory.
     (tmp_path / "col").mkdir()
     # Root file.
-    (tmp_path / "catalog.json").write_text(json.dumps(root))
+    (tmp_path / "catalog.json").write_text(json.dumps(root), encoding="utf-8")
     # Collection file.
-    (tmp_path / "col" / "collection.json").write_text(json.dumps(collection))
+    (tmp_path / "col" / "collection.json").write_text(json.dumps(collection), encoding="utf-8")
     # Item files.
     for name in ("i1", "i2"):
         # Item with the file name as id.
         text = json.dumps(make_item(name, [0, 0, 1, 1], "2024-01-01T00:00:00Z"))
         # Write the item file.
-        (tmp_path / "col" / f"{name}.json").write_text(text)
+        (tmp_path / "col" / f"{name}.json").write_text(text, encoding="utf-8")
     # Items in link order; the cycle does not repeat them.
     assert [i.id for i in walk_catalog(tmp_path / "catalog.json")] == ["i1", "i2"]
     # Collection extent.

@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-SEC-SUPPLY-CHAIN |
+| Document | UBX-DOC-801 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -64,15 +64,17 @@ flowchart LR
     D --> E[SHA256SUMS.txt]
     D --> F[GitHub attestation<br/>SLSA provenance v1]
     D --> G[Sigstore bundles]
+    D --> S[SPDX SBOM<br/>and SBOM attestation]
     F --> H[unbihexium-tag.intoto.jsonl]
     D --> I[GitHub release]
     E --> I
     G --> I
     H --> I
-    D --> J[PyPI]
+    S --> I
+    D -->|trusted publishing| J[PyPI]
     B -->|push and tag| K[docker.yml]
     K --> L[ghcr.io image]
-    K --> M[SPDX SBOM artifact]
+    L --> M[cosign signature,<br/>provenance and SBOM<br/>attestations]
 ```
 
 ## 2. Source and Workflow Integrity
@@ -196,12 +198,15 @@ Releases are built only by [.github/workflows/release.yml](../../.github/workflo
 | GitHub artifact attestation, SLSA build provenance v1 [9] | `actions/attest-build-provenance` | GitHub attestations API of the repository |
 | `<file>.sigstore.json`, one per distribution | `sigstore/gh-action-sigstore-python`, keyless [10] | GitHub release |
 | `unbihexium-<tag>.intoto.jsonl` | the DSSE envelope of the attestation bundle, exported with `jq` | GitHub release |
+| `unbihexium-<tag>.spdx.json`, SPDX 2.3 SBOM [12] | Syft (`anchore/sbom-action`) over a clean environment that holds the wheel and the locked runtime dependencies of `requirements.txt` | GitHub release |
+| SBOM attestation of the distributions | `actions/attest-sbom` with the SPDX SBOM | GitHub attestations API of the repository |
+| PEP 740 attestations of the uploaded files | `pypa/gh-action-pypi-publish` with trusted publishing | PyPI |
 
 The Sigstore signatures and the attestation are bound to the workflow identity `https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag>` through the OIDC token of the job (see [secrets_and_tokens.md](secrets_and_tokens.md), Section 4), and are recorded in the public Rekor transparency log. The `.intoto.jsonl` file contains the signed in-toto statement [11] with the SHA-256 digests of the distributions as subjects and the SLSA provenance predicate (builder, workflow, commit) for archival and inspection; the attestation itself is verified with the GitHub CLI (Section 9.3).
 
 ### 6.3 Publication
 
-The workflow creates the GitHub release with the assets above and release notes generated from the merged pull requests (categories in [.github/release.yml](../../.github/release.yml)), then uploads the distributions to PyPI with `pypa/gh-action-pypi-publish` and the `PYPI_API_TOKEN` repository secret.
+The workflow creates the GitHub release with the assets above and release notes generated from the merged pull requests (categories in [.github/release.yml](../../.github/release.yml)), then uploads the distributions to PyPI with `pypa/gh-action-pypi-publish` and trusted publishing [16]: the job runs in the GitHub environment `pypi`, PyPI exchanges its OIDC token for a short-lived upload token, and the action uploads PEP 740 attestations with the files. No PyPI credential is stored in the repository. The trusted publisher MUST be registered on PyPI for the repository `unbihexium-oss/unbihexium`, the workflow `release.yml` and the environment `pypi` before the first release that uses it ([releasing.md](../operations/releasing.md)).
 
 ### 6.4 Releases Without Signatures
 
@@ -222,7 +227,16 @@ The image is built from the [Dockerfile](../../Dockerfile) in the repository roo
 
 ### 7.2 Publication and SBOM
 
-[docker.yml](../../.github/workflows/docker.yml) builds the image on pull requests (without pushing) and pushes it to `ghcr.io/unbihexium-oss/unbihexium` on pushes to `main` and on version tags. For every pushed image, `anchore/sbom-action` (Syft) generates an SPDX [12] software bill of materials of the image by digest and stores it as the workflow artifact `sbom-docker.spdx.json`. The SBOM is kept with the workflow run under GitHub's artifact retention; it is not attached to the image or to the release.
+[docker.yml](../../.github/workflows/docker.yml) builds the image on pull requests (without pushing) and pushes it to `ghcr.io/unbihexium-oss/unbihexium` on pushes to `main` and on version tags. For every pushed image, by digest:
+
+| Step | Tool | Where the result is stored |
+| --- | --- | --- |
+| SPDX [12] software bill of materials | `anchore/sbom-action` (Syft) | Workflow artifact `sbom-docker.spdx.json` |
+| SLSA build provenance attestation | `actions/attest-build-provenance` with `push-to-registry` | GHCR, next to the image, and the GitHub attestations API |
+| SBOM attestation | `actions/attest-sbom` with the SPDX SBOM | GHCR, next to the image, and the GitHub attestations API |
+| Signature | `cosign sign` in keyless mode [17] | GHCR, next to the image, and the Rekor transparency log |
+
+The attestations and the signature are bound to the identity of `docker.yml` on `refs/heads/main` or `refs/tags/v*` through the OIDC token of the job; no signing key exists. Images pushed before these steps were added are neither signed nor attested.
 
 ### 7.3 Vulnerability Scan
 
@@ -277,19 +291,32 @@ gh attestation verify <file> --repo unbihexium-oss/unbihexium
 
 The command fetches the attestations for the file's digest from GitHub, verifies their Sigstore signatures and checks that they were issued for this repository; it fails when no valid attestation exists. This works for the PyPI files as well as for the GitHub release assets of the same release, since both come from the same build.
 
-### 9.5 Status of These Commands
+### 9.5 Container Image
 
-At the date of review no release has yet been built by the current workflow, so the commands in Sections 9.3 and 9.4 have not been exercised against a real Unbihexium release; the options of the Sigstore command were checked against sigstore 4.5.0, and the GitHub CLI command follows the GitHub documentation [15]. The commands in Sections 9.1 and 9.2 were run as shown, the latter against distributions built locally with `python -m build`.
+Verify the signature of an image and its build provenance with cosign and the GitHub CLI:
+
+```bash
+cosign verify ghcr.io/unbihexium-oss/unbihexium:<tag> \
+  --certificate-identity-regexp '^https://github.com/unbihexium-oss/unbihexium/.github/workflows/docker.yml@refs/(heads/main|tags/v.+)$' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+gh attestation verify oci://ghcr.io/unbihexium-oss/unbihexium:<tag> --repo unbihexium-oss/unbihexium
+gh attestation verify oci://ghcr.io/unbihexium-oss/unbihexium:<tag> --repo unbihexium-oss/unbihexium \
+  --predicate-type https://spdx.dev/Document/v2.3
+```
+
+The first command checks the keyless signature against the workflow identity and the transparency log, the second the SLSA provenance, the third the SBOM attestation. Pull the image by the digest that the commands report, not by a tag.
+
+### 9.6 Status of These Commands
+
+At the date of review no release has yet been built by the current workflow and no image has yet been signed, so the commands in Sections 9.3 to 9.5 have not been exercised against a real Unbihexium release or image; the options of the Sigstore command were checked against sigstore 4.5.0, and the GitHub CLI command follows the GitHub documentation [15]. The commands in Sections 9.1 and 9.2 were run as shown, the latter against distributions built locally with `python -m build`.
 
 ## 10. Known Gaps
 
 The following controls are not in place at the date of review. They are listed so that users can take them into account and so that progress can be tracked in [ROADMAP.md](../../ROADMAP.md).
 
 - **Unsigned 1.0.x releases.** v1.0.0 and v1.0.1 have no signatures or provenance, and the v1.0.1 GitHub checksums do not match PyPI (Section 6.4). The first signed release is planned in [ROADMAP.md](../../ROADMAP.md).
-- **Long-lived PyPI token.** Uploads use `PYPI_API_TOKEN`; PyPI trusted publishing is under consideration.
+- **Trusted publisher registration.** The release workflow uses PyPI trusted publishing; the trusted publisher has to be registered on PyPI before the next release, and the old `PYPI_API_TOKEN` repository secret has to be deleted and its token revoked ([releasing.md](../operations/releasing.md)).
 - **Some CI tools pinned by version only.** markdownlint-cli (through `npx`), the cue binary and the Security Insights schema in repo-config.yml, and the pre-commit hooks (by tag) are pinned by version, not by digest.
-- **Container image.** The image is not signed and has no attestation; its SBOM is only a workflow artifact.
-- **No SBOM for the Python distributions.**
 - **Package smoke test.** package.yml installs the built wheel with ordinary dependency resolution, deliberately like a user would, so that job is not hash-pinned.
 - **No external audit.**
 
@@ -324,6 +351,10 @@ The following controls are not in place at the date of review. They are listed s
 [14] OpenSSF. OpenSSF Scorecard. 2026. <https://scorecard.dev/>
 
 [15] GitHub. Using artifact attestations to establish provenance for builds. 2026. <https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds>
+
+[16] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
+
+[17] Sigstore. Signing Containers. 2026. <https://docs.sigstore.dev/cosign/signing/signing_with_containers/>
 
 <!--
 =============================================================================

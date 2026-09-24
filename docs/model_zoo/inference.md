@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-MZ-INFERENCE |
+| Document | UBX-DOC-703 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -52,7 +52,7 @@ A catalogue model identifier such as `ship_detector_base` runs the model with it
 
 The key words MUST, SHOULD and MAY in this document are to be interpreted as described in RFC 2119 [1] and RFC 8174 [2] when, and only when, they appear in capitals.
 
-The examples were run on 2026-09-24 in a container with 4 vCPUs, CPython 3.13, PyTorch 2.14 and ONNX Runtime on the CPU. The file `runs/water_surface_detector_tiny/best.pt` is the checkpoint trained in [training.md](training.md) on toy data, and `scene_rgb.tif`, `scene_rgb_2025.tif`, `scene_rgbn.tif` and `scene_red_nir.tif` are synthetic GeoTIFFs of 300 by 200 pixels with 3, 3, 4 and 2 bands of reflectance. Printed values from starter models or toy models only illustrate the format.
+The examples were run on 2026-09-24 in a container with 4 vCPUs, CPython 3.13, PyTorch 2.14 and ONNX Runtime on the CPU, with the checkpoint `runs/water_surface_detector_tiny/best.pt` trained in [training.md](training.md) on toy data. Section 1.4 creates the files of the examples. Printed values from starter models or toy models only illustrate the format.
 
 ### 1.3 Requirements
 
@@ -62,6 +62,28 @@ The examples were run on 2026-09-24 in a container with 4 vCPUs, CPython 3.13, P
 | ONNX export (`.onnx`) | Extra `onnx` only; PyTorch is not needed |
 
 The model zoo is only on the main branch; install from source as described in [README.md](../../README.md) until a release contains it.
+
+### 1.4 Example data
+
+The examples use a trained checkpoint, its ONNX export and four synthetic GeoTIFFs of 300 by 200 pixels with 3, 3, 4 and 2 bands of reflectance. A short training run on synthetic data gives a checkpoint of the same layout as the one of [training.md](training.md); it only checks the setup, and its printed values differ from those shown:
+
+```bash
+unbihexium train water_surface_detector_tiny --synthetic 16 --epochs 2 --chip-size 64
+unbihexium zoo export runs/water_surface_detector_tiny/best.pt water.onnx
+```
+
+```python
+import numpy as np
+from rasterio.transform import from_origin
+
+from unbihexium.io import write_geotiff
+
+rng = np.random.default_rng(0)
+transform = from_origin(500000, 6700000, 10, 10)
+for name, bands in [("scene_rgb.tif", 3), ("scene_rgb_2025.tif", 3), ("scene_rgbn.tif", 4), ("scene_red_nir.tif", 2)]:
+    data = rng.uniform(0, 0.3, (bands, 200, 300)).astype("float32")
+    write_geotiff(data, name, crs="EPSG:32635", transform=transform)
+```
 
 ## 2. Model sources and backends
 

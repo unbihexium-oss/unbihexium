@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-MZ-TRAINING |
+| Document | UBX-DOC-704 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -404,6 +404,19 @@ The options are `--split`, `--chip-size` (default: the tile size of the model), 
 Every result also contains `loss`, the mean task loss on the split.
 
 ## 9. Using a trained model
+
+The example scene `scene_rgbn.tif` is a synthetic 4-band image of reflectance in the model input order `blue, green, red, nir`:
+
+```python
+import numpy as np
+from rasterio.transform import from_origin
+
+from unbihexium.io import write_geotiff
+
+rng = np.random.default_rng(0)
+scene = rng.uniform(0, 0.3, (4, 200, 300)).astype("float32")
+write_geotiff(scene, "scene_rgbn.tif", crs="EPSG:32635", transform=from_origin(500000, 6700000, 10, 10))
+```
 
 ```bash
 unbihexium predict runs/water_surface_detector_tiny/best.pt scene_rgbn.tif water.tif

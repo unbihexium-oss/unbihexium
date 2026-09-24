@@ -179,8 +179,8 @@ def test_create_run(sample_config: PipelineConfig) -> None:
     run = pipeline.create_run(inputs={"image": Path("/data/image.tif")})
     # Pipeline, state and inputs.
     assert run.pipeline_id == "test_pipeline" and run.status == "pending"
-    # Paths become text.
-    assert run.inputs == {"image": "/data/image.tif"}
+    # Paths become text in the notation of the operating system.
+    assert run.inputs == {"image": str(Path("/data/image.tif"))}
     # Configuration snapshot.
     assert run.config_snapshot["parameters"] == {"threshold": 0.5}
     # The run is kept in the history.

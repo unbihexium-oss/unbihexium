@@ -241,7 +241,9 @@ def test_predict_and_write(tmp_path: Path) -> None:
     # Detection result type.
     assert isinstance(boxes, DetectionResult)
     # Written as GeoJSON.
-    assert write_result(boxes, tmp_path / "ships.geojson").read_text().startswith("{")
+    written = write_result(boxes, tmp_path / "ships.geojson")
+    # JSON object text.
+    assert written.read_text(encoding="utf-8").startswith("{")
     # Segmentation result written as GeoTIFF.
     seg = predict("water_surface_detector_tiny", raster(4))
     # Write the class map.
@@ -253,7 +255,7 @@ def test_predict_and_write(tmp_path: Path) -> None:
     # Scene values written as JSON.
     scene = write_result(predict("yield_predictor_tiny", raster(10)), tmp_path / "y.json")
     # The output name is in the file.
-    assert "yield" in scene.read_text()
+    assert "yield" in scene.read_text(encoding="utf-8")
 
 
 # The ONNX Runtime backend reproduces the PyTorch backend.

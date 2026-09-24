@@ -372,6 +372,9 @@ parallel = true  # Write one data file per process for pytest-xdist.
 # Coverage report.
 [tool.coverage.report]
 show_missing = true  # List the line numbers that were not executed.
+# Fail a run under coverage (pytest --cov, the Coverage workflow) below this
+# percentage of lines and branches; measured at 87 % on 2026-09-24.
+fail_under = 85
 skip_covered = false  # Also list files with full coverage.
 exclude_lines = [  # Lines matching these patterns do not count as missed.
     "pragma: no cover",  # Explicit exclusion.

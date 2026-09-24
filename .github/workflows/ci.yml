@@ -24,6 +24,9 @@
 #              the SciPy type stubs; any type error fails the run
 #   test       pytest over tests/ on every supported CPython from 3.10 to
 #              3.14, with CPU-only PyTorch and the optional backends
+#   platforms  the same tests on macOS (arm64) and Windows (x86_64) with the
+#              oldest and the newest supported CPython, so that the
+#              "OS Independent" classifier of pyproject.toml is tested
 #
 # Keep the Python versions of the test matrix in step with the classifiers
 # and requires-python in pyproject.toml.
@@ -107,6 +110,44 @@ jobs:  # Jobs of the workflow; they run in parallel.
         run: |  # Shell script run by bash.
           # Install the locked, hashed CPU-only PyTorch build from the PyTorch index;
           # its dependencies come from the hashed test lock.
+          python -m pip install --require-hashes --no-deps -r .github/requirements/requirements-ci-torch.txt
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
+
+      - name: Run tests  # Run the whole test suite.
+        run: pytest tests/ --tb=short  # Short tracebacks keep the log readable.
+
+  platforms:  # Unit tests on macOS and Windows.
+    name: Test (${{ matrix.label }}, ${{ matrix.python-version }})  # Name of the status check.
+    runs-on: ${{ matrix.os }}  # GitHub-hosted macOS or Windows runner.
+    timeout-minutes: 45  # Cancel a hung job after 45 minutes.
+    strategy:  # Matrix over the operating systems and Python versions.
+      fail-fast: false  # Let the other combinations finish when one fails.
+      matrix:  # Values of the matrix.
+        os: [macos-latest, windows-latest]  # macOS on arm64 and Windows on x86_64.
+        python-version: ["3.10", "3.14"]  # Oldest and newest supported CPython.
+        include:  # Readable name of each operating system.
+          - os: macos-latest  # macOS runner.
+            label: macOS  # Name in the status check.
+          - os: windows-latest  # Windows runner.
+            label: Windows  # Name in the status check.
+    defaults:  # Settings of every run step.
+      run:  # Shell of the run steps.
+        shell: bash  # Git Bash on Windows, so that the steps are the same everywhere.
+
+    steps:  # Steps of the platform job.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+
+      - name: Set up Python ${{ matrix.python-version }}  # Install the matrix Python.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: ${{ matrix.python-version }}  # Version from the matrix.
+
+      - name: Install dependencies  # Same hashed environment as the Linux test job.
+        run: |  # Shell script run by bash.
+          # Install the locked, hashed PyTorch build for this platform from the PyTorch index.
           python -m pip install --require-hashes --no-deps -r .github/requirements/requirements-ci-torch.txt
           # Install the locked, hashed test environment (runtime, test and backend extras).
           python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
