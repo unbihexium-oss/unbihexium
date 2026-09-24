@@ -191,7 +191,7 @@ The tag push starts [.github/workflows/release.yml](../../.github/workflows/rele
 | Check out | `actions/checkout` at the tagged commit | Source tree |
 | Set up Python | `actions/setup-python`, CPython 3.14 | Interpreter |
 | Install build tools | `pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt` | Hash-pinned `build` |
-| Build package | `python -m build` | `dist/unbihexium-<version>.tar.gz`, `dist/unbihexium-<version>-py3-none-any.whl` |
+| Build package | `python -m build --no-isolation` (hatchling from the hashed tools lock) | `dist/unbihexium-<version>.tar.gz`, `dist/unbihexium-<version>-py3-none-any.whl` |
 | Generate checksums | `sha256sum` over `dist/` | `checksums/SHA256SUMS.txt` |
 | Generate attestations | `actions/attest-build-provenance` on `dist/*` | GitHub artifact attestation with SLSA provenance v1 [5] |
 | Copy and sign | `sigstore/gh-action-sigstore-python` on copies in `signed/` | `<file>.sigstore.json` per distribution [6] |

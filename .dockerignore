@@ -18,7 +18,8 @@
 # The Dockerfile copies only these paths into the image:
 #
 #   .github/requirements/requirements-docker.txt,
-#   .github/requirements/requirements-ci-torch.txt, pyproject.toml,
+#   .github/requirements/requirements-ci-torch.txt,
+#   .github/requirements/requirements-build.txt, pyproject.toml,
 #   README.md, LICENSE.txt, NOTICE, NOTICE.md and src/
 #
 # Everything else is excluded to keep the build context small, the layer cache
@@ -49,6 +50,8 @@
 !.github/requirements/requirements-docker.txt
 # Hashed lock file of the CPU build of PyTorch, installed by the Dockerfile.
 !.github/requirements/requirements-ci-torch.txt
+# Hashed lock file of the build backend, used by the Dockerfile.
+!.github/requirements/requirements-build.txt
 # GitLab CI configuration.
 .gitlab-ci.yml
 # pre-commit hook configuration.

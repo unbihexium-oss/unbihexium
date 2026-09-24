@@ -110,12 +110,14 @@ Every workflow sets `permissions: contents: read` (the Scorecard workflow `read-
 
 | Lock file | Content | Consumers |
 | --- | --- | --- |
-| [requirements.txt](../../requirements.txt) | Runtime with the `onnx` and `serving` extras | Container image, pip-audit, licence check, type check |
+| [requirements.txt](../../requirements.txt) | Runtime with the `onnx` and `serving` extras | pip-audit, licence check, type check |
 | [requirements-dev.txt](../../requirements-dev.txt) | All extras, for development | `make install-dev` |
+| [.github/requirements/requirements-docker.txt](../../.github/requirements/requirements-docker.txt) | Runtime with the `onnx` and `serving` extras and the dependencies of PyTorch | Container image |
+| [.github/requirements/requirements-build.txt](../../.github/requirements/requirements-build.txt) | The build backend hatchling | Container image (wheel build without isolation) |
 | [.github/requirements/requirements-ci-test.txt](../../.github/requirements/requirements-ci-test.txt) | Test environment, including the dependencies of PyTorch | CI, Coverage, Integration, Model Zoo |
 | [.github/requirements/requirements-ci-tools.txt](../../.github/requirements/requirements-ci-tools.txt) | ruff, pyright, bandit, pip-audit, build, twine, reuse, pip-licenses, check-jsonschema, yamllint, uv and their dependencies | Lint, security, release, packaging and configuration jobs |
 | [.github/requirements/requirements-ci-fuzz.txt](../../.github/requirements/requirements-ci-fuzz.txt) | atheris and NumPy | Fuzzing |
-| [.github/requirements/requirements-ci-torch.txt](../../.github/requirements/requirements-ci-torch.txt) | CPU build of PyTorch only | CI, Coverage, Integration, Model Zoo |
+| [.github/requirements/requirements-ci-torch.txt](../../.github/requirements/requirements-ci-torch.txt) | CPU build of PyTorch only | Container image, CI, Coverage, Integration, Model Zoo |
 
 `make lock-check` compares the committed files with a fresh compilation.
 
@@ -181,7 +183,7 @@ The job `bandit` in [security.yml](../../.github/workflows/security.yml) runs `b
 
 ### 6.1 Build
 
-Releases are built only by [.github/workflows/release.yml](../../.github/workflows/release.yml), on GitHub-hosted runners, when a tag matching `v*` is pushed. The job installs `build` from the hashed tools lock and runs `python -m build`, which produces the sdist and the wheel in `dist/`. The procedure for maintainers is in [docs/operations/releasing.md](../operations/releasing.md).
+Releases are built only by [.github/workflows/release.yml](../../.github/workflows/release.yml), on GitHub-hosted runners, when a tag matching `v*` is pushed. The job installs the build frontend `build` and the backend hatchling from the hashed tools lock and runs `python -m build --no-isolation`, so no unpinned package is fetched, which produces the sdist and the wheel in `dist/`. The procedure for maintainers is in [docs/operations/releasing.md](../operations/releasing.md).
 
 ### 6.2 Outputs
 
@@ -214,7 +216,7 @@ Users of 1.0.x MUST verify PyPI downloads against the digests that PyPI publishe
 
 ### 7.1 Build
 
-The image is built from the [Dockerfile](../../Dockerfile) in the repository root, with the base image pinned by digest and the runtime dependencies installed from the hashed [requirements.txt](../../requirements.txt). The build, the runtime user and the deployment options are described in [docs/operations/docker.md](../operations/docker.md).
+The image is built from the [Dockerfile](../../Dockerfile) in the repository root, with the base image pinned by digest and the dependencies installed from the hashed [requirements-docker.txt](../../.github/requirements/requirements-docker.txt) and [requirements-ci-torch.txt](../../.github/requirements/requirements-ci-torch.txt). The build, the runtime user and the deployment options are described in [docs/operations/docker.md](../operations/docker.md).
 
 ### 7.2 Publication and SBOM
 
@@ -284,7 +286,6 @@ The following controls are not in place at the date of review. They are listed s
 - **Unsigned 1.0.x releases.** v1.0.0 and v1.0.1 have no signatures or provenance, and the v1.0.1 GitHub checksums do not match PyPI (Section 6.4). The first signed release is planned in [ROADMAP.md](../../ROADMAP.md).
 - **Long-lived PyPI token.** Uploads use `PYPI_API_TOKEN`; PyPI trusted publishing is under consideration.
 - **No check that the tag matches the version.** The distribution version is the static version in `pyproject.toml`; release.yml does not compare it with the tag.
-- **Unpinned build backend.** `python -m build` in release.yml and package.yml builds in an isolated environment that installs the build backend `hatchling>=1.27.0` from PyPI without a hash. The frontend `build` is hash-pinned; the backend is not.
 - **Some CI tools pinned by version only.** markdownlint-cli (through `npx`), the cue binary and the Security Insights schema in repo-config.yml, and the pre-commit hooks (by tag) are pinned by version, not by digest.
 - **Informational audits.** pip-audit, Bandit and pyright never fail a build; findings require a human to read the logs.
 - **Container image.** The image is not signed and has no attestation; its SBOM is only a workflow artifact.

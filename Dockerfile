@@ -111,10 +111,16 @@ RUN python -m pip install --only-binary=:all: --require-hashes -r requirements-d
 COPY pyproject.toml README.md LICENSE.txt NOTICE NOTICE.md ./
 # Copy the package sources.
 COPY src/ ./src/
-# Build the wheel of the package, install it without dependencies, verify
-# that the installed requirements are consistent and that the REST service,
-# PyTorch and ONNX Runtime import.
-RUN python -m pip wheel --no-deps --wheel-dir /tmp/dist . \
+# Separate build environment with the hash-pinned build backend, so that
+# building the wheel fetches nothing unpinned.
+COPY .github/requirements/requirements-build.txt ./
+# Create it and install the backend, each file checked against its hash.
+RUN python -m venv /opt/build \
+    && /opt/build/bin/python -m pip install --only-binary=:all: --require-hashes -r requirements-build.txt
+# Build the wheel of the package with that backend, install it without
+# dependencies, verify that the installed requirements are consistent and
+# that the REST service, PyTorch and ONNX Runtime import.
+RUN /opt/build/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir /tmp/dist . \
     && python -m pip install --no-deps /tmp/dist/unbihexium-*.whl \
     && python -m pip check \
     && python -c "import torch, onnxruntime, unbihexium.serving.app"

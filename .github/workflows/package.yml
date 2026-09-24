@@ -64,7 +64,7 @@ jobs:  # Jobs of the workflow.
         run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools: build creates, twine checks.
 
       - name: Build sdist and wheel  # Create both distributions in dist/.
-        run: python -m build  # Builds in an isolated environment.
+        run: python -m build --no-isolation  # Uses the hash-pinned hatchling of the tools lock.
 
       - name: Check distribution metadata  # Validate the metadata and the README rendering.
         run: python -m twine check --strict dist/*  # Warnings count as errors.

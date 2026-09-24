@@ -1,0 +1,35 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/requirements/requirements-build.in
+# Title       : Input of the lock file of the build backend
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : pip requirements, compiled by uv into requirements-build.txt
+# =============================================================================
+#
+# Abstract
+# --------
+# The build backend of pyproject.toml ([build-system] requires). The
+# Dockerfile builds the wheel of the package with
+#   pip wheel --no-deps --no-build-isolation
+# in a separate environment that holds only this lock, so the backend is
+# pinned by hash like every other dependency instead of being fetched from
+# PyPI by an isolated build (OpenSSF Scorecard, Pinned-Dependencies). The
+# release and package workflows install the same backend from
+# requirements-ci-tools.txt and run `python -m build --no-isolation`. Keep
+# the lower bound in step with pyproject.toml.
+# =============================================================================
+
+hatchling>=1.27.0  # Build backend; 1.27 is the first release with PEP 639 licence expressions.
+
+# =============================================================================
+# End of file .github/requirements/requirements-build.in
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

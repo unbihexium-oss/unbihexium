@@ -111,7 +111,7 @@ make install-dev
 
 `make install-dev` runs three steps:
 
-1. `pip install -r requirements-dev.txt` installs the locked development environment: the runtime dependencies and the `all` extra (ONNX Runtime, PyTorch, serving, Zarr, Parquet, test and development tools) at exact versions. PyTorch comes from PyPI; to use a GPU, install the CUDA build of PyTorch from the PyTorch index afterwards.
+1. `pip install --require-hashes -r requirements-dev.txt` installs the locked development environment: the runtime dependencies and the `all` extra (ONNX Runtime, PyTorch, serving, Zarr, Parquet, test and development tools) at exact versions. PyTorch comes from PyPI; to use a GPU, install the CUDA build of PyTorch from the PyTorch index afterwards.
 2. `pip install --no-deps -e .` installs the package in editable mode without resolving the dependencies again.
 3. `pre-commit install` installs the Git hooks defined in `.pre-commit-config.yaml`.
 
@@ -355,7 +355,7 @@ Dependencies are declared with version ranges in `pyproject.toml`: runtime depen
 | File | Content | Hashes |
 | --- | --- | --- |
 | `requirements.txt` | Runtime dependencies with the `onnx` and `serving` extras | Yes |
-| `requirements-dev.txt` | Runtime dependencies with the `all` extra, for development | No |
+| `requirements-dev.txt` | Runtime dependencies with the `all` extra, for development | Yes |
 | `.github/requirements/requirements-ci-test.txt` | Test environment of the CI, from `requirements-ci-test.in` | Yes |
 | `.github/requirements/requirements-ci-tools.txt` | Linters and CI tools, from `requirements-ci-tools.in` | Yes |
 | `.github/requirements/requirements-ci-fuzz.txt` | atheris and NumPy for fuzzing, from `requirements-ci-fuzz.in` | Yes |

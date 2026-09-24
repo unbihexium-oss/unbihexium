@@ -134,7 +134,7 @@ For a GPU, install the CUDA build of PyTorch that matches the driver in the same
 | File | Content | Hashes | Used by |
 | --- | --- | --- | --- |
 | `requirements.txt` | Runtime dependencies with the `onnx` and `serving` extras | SHA-256 for every package | `make install`, deployments without PyTorch |
-| `requirements-dev.txt` | Runtime dependencies with the `all` extra (everything except `gpu`) | None | `make install-dev` |
+| `requirements-dev.txt` | Runtime dependencies with the `all` extra | SHA-256 for every package | `make install-dev` |
 | `.github/requirements/requirements-docker.txt` | Runtime dependencies with the `onnx` and `serving` extras and the dependencies of PyTorch | SHA-256 for every package | The Dockerfile |
 | `.github/requirements/requirements-ci-torch.txt` | The CPU build of PyTorch from the PyTorch package index | SHA-256 for every package | The Dockerfile, CI workflows |
 | Other `.github/requirements/*.txt` | Test, tool and fuzzing environments of the CI workflows | SHA-256 for every package | GitHub Actions |
@@ -153,17 +153,17 @@ python -m pip install --no-deps .
 python -m pip check
 ```
 
-These commands were run in a fresh CPython 3.11 environment on Linux x86_64; `pip check` reported `No broken requirements found.` The resulting environment has no PyTorch: it runs the core functions, ONNX exports and the REST service with ONNX files, but it cannot build or train zoo models. `make install` runs the two installation commands without `--require-hashes`; pip still enforces the hashes because the file contains them.
+These commands were run in a fresh CPython 3.11 environment on Linux x86_64; `pip check` reported `No broken requirements found.` The resulting environment has no PyTorch: it runs the core functions, ONNX exports and the REST service with ONNX files, but it cannot build or train zoo models. `make install` runs the same two installation commands.
 
 ### 5.3 Locked development environment
 
 ```bash
-python -m pip install -r requirements-dev.txt
+python -m pip install --require-hashes -r requirements-dev.txt
 python -m pip install --no-deps -e .
 pre-commit install
 ```
 
-This is what `make install-dev` runs. Because `requirements-dev.txt` carries no hashes, it MUST NOT be combined with `--require-hashes`.
+This is what `make install-dev` runs. On Linux x86_64 the PyTorch wheel from PyPI pulls in the NVIDIA CUDA runtime wheels, which are several gigabytes; for a CPU-only environment, install the CPU build of PyTorch as described in Section 4.3 instead.
 
 ## 6. Container image
 
@@ -215,7 +215,7 @@ python -m pip install -e ".[torch,onnx,serving]"
 unbihexium --version
 ```
 
-The build backend is hatchling 1.27 or newer (PEP 517 [7]); pip installs it automatically in an isolated build environment. The package uses the `src/` layout, and the wheel contains `src/unbihexium` including the model catalogue `zoo/catalog.yaml` and the published weight digests `zoo/digests.json`.
+The build backend is hatchling 1.27 or newer (PEP 517 [7]); pip installs it automatically in an isolated build environment. The release workflow and the Dockerfile instead install the hash-pinned hatchling of `.github/requirements/` and build without isolation, so no unpinned backend is fetched. The package uses the `src/` layout, and the wheel contains `src/unbihexium` including the model catalogue `zoo/catalog.yaml` and the published weight digests `zoo/digests.json`.
 
 ### 7.2 Development environment
 
@@ -327,7 +327,7 @@ The model store is the directory `models` below `UNBIHEXIUM_CACHE` (default `~/.
 | `Error: No module named 'torch'; install PyTorch with pip install ...` from `unbihexium zoo build` or `unbihexium train` | The `torch` extra is not installed | `python -m pip install "unbihexium[torch]"` (Section 4.3) |
 | `ModuleNotFoundError: No module named 'torch'` from `unbihexium predict <model id>` | Model ids and checkpoints need PyTorch | Install the `torch` extra, or predict with an ONNX export and `--backend onnx` |
 | `ImportError` for zarr, pyarrow or fastapi | The corresponding extra is missing | Install the extra listed in Section 4.2 |
-| `ERROR: Hashes are required in --require-hashes mode` | `--require-hashes` used with `requirements-dev.txt` | Omit the option for the development lock file (Section 5.3) |
+| `ERROR: Hashes are required in --require-hashes mode` | A requirements file without hashes, or an additional requirement given on the command line, in hash-checking mode | Install such packages in a separate command without `--require-hashes` |
 | `unbihexium --help` does not list `infer` or `zoo download` | Both are hidden aliases kept for compatibility; they still work | Prefer `unbihexium predict` and `unbihexium zoo build`; see [docs/reference/cli.md](../reference/cli.md) |
 | Commands or functions described in `docs/` are missing | PyPI 1.0.1 predates the main branch | Install from source (Section 7) |
 | `pip` tries to compile rasterio, pyproj or onnxruntime | No wheel for the interpreter or platform, for example an unsupported Python version | Use CPython 3.10 to 3.14 on a platform with wheels |

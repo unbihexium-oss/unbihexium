@@ -130,7 +130,7 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 | Integration Tests, `e2e` | `pytest tests/e2e/` on CPython 3.14, after `integration` | Yes |
 | Integration Tests, `api-test` | Starts `create_app()` with uvicorn on 127.0.0.1:8000 for at most 30 seconds and polls `GET /health` until it answers | Yes |
 | Coverage, `coverage` | `pytest tests/ --cov=src/unbihexium` and upload of `coverage.xml` to Codecov (flag `unittests`) with the `CODECOV_TOKEN` secret | Only if the tests fail; upload errors are ignored, and the Codecov statuses in [codecov.yml](../../codecov.yml) are informational |
-| Package, `build` | `python -m build`, `twine check --strict`, and that `LICENSE.txt` and `NOTICE` are shipped in the wheel and the sdist; uploads `dist/` as the artifact `dist` (7 days) | Yes |
+| Package, `build` | `python -m build --no-isolation` with the hash-pinned hatchling of the tools lock, `twine check --strict`, and that `LICENSE.txt` and `NOTICE` are shipped in the wheel and the sdist; uploads `dist/` as the artifact `dist` (7 days) | Yes |
 | Package, `smoke-test` | Installs the wheel into a fresh virtual environment on CPython 3.10 and 3.14, imports the package and runs `unbihexium --help` outside the checkout | Yes |
 
 ### 4.2 Model Zoo

@@ -68,7 +68,7 @@ CI_REQ := .github/requirements
 # Every lock file that `make lock` writes and `make lock-check` compares.
 LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-test.txt \
 	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt \
-	$(CI_REQ)/requirements-docker.txt
+	$(CI_REQ)/requirements-docker.txt $(CI_REQ)/requirements-build.txt
 
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
@@ -88,13 +88,13 @@ help: ## Show this help
 
 install: ## Install the package with the locked runtime dependencies
 # Install the exact runtime versions from the lock file.
-	$(PIP) install -r requirements.txt
+	$(PIP) install --require-hashes -r requirements.txt
 # Install the package itself without resolving dependencies again.
 	$(PIP) install --no-deps .
 
 install-dev: ## Install the locked development environment and pre-commit hooks
 # Install the exact development versions from the lock file.
-	$(PIP) install -r requirements-dev.txt
+	$(PIP) install --require-hashes -r requirements-dev.txt
 # Install the package in editable mode without resolving dependencies again.
 	$(PIP) install --no-deps -e .
 # Register the Git hooks of .pre-commit-config.yaml.
@@ -105,9 +105,9 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
 		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving -o requirements.txt" \
 		-o .requirements.lock.tmp
-# Compile the development lock with every extra into a temporary file.
-	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --extra all \
-		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --extra all -o requirements-dev.txt" \
+# Compile the development lock with every extra and hashes into a temporary file.
+	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra all \
+		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra all -o requirements-dev.txt" \
 		-o .requirements-dev.lock.tmp
 # Compile the hashed lock of the CI test environment (the dependencies of PyTorch, not
 # PyTorch itself) into a temporary file.
@@ -119,6 +119,10 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
 		--custom-compile-command "make lock" \
 		-o .requirements-docker.lock.tmp
+# Compile the hashed lock of the build backend into a temporary file.
+	$(UV) pip compile $(CI_REQ)/requirements-build.in $(LOCK_FLAGS) --generate-hashes \
+		--custom-compile-command "make lock" \
+		-o .requirements-build.lock.tmp
 # Compile the hashed lock of the CI tools into a temporary file.
 	$(UV) pip compile $(CI_REQ)/requirements-ci-tools.in $(LOCK_FLAGS) --generate-hashes \
 		--custom-compile-command "make lock" \
@@ -134,9 +138,10 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 		$(CI_REQ)/requirements-ci-test.txt .requirements-ci-test.lock.tmp \
 		$(CI_REQ)/requirements-ci-tools.txt .requirements-ci-tools.lock.tmp \
 		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp \
-		$(CI_REQ)/requirements-docker.txt .requirements-docker.lock.tmp
+		$(CI_REQ)/requirements-docker.txt .requirements-docker.lock.tmp \
+		$(CI_REQ)/requirements-build.txt .requirements-build.lock.tmp
 # Remove the temporary files.
-	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp .requirements-docker.lock.tmp
+	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp .requirements-docker.lock.tmp .requirements-build.lock.tmp
 # Remind the maintainer to review the new pins.
 	@echo "Lock files regenerated. Review the diff before committing."
 
