@@ -217,6 +217,8 @@ def register_task_pipeline(
         pipeline = Pipeline(config)
         # Task API configured with the parameters.
         task = factory(**kwargs)
+        # Keep the task API, so that callers can tell which model runs.
+        pipeline.task = task  # type: ignore[attr-defined]
 
         # Single step: read the inputs and run the task.
         def run_task(values: dict[str, Any]) -> dict[str, Any]:

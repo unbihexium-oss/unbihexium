@@ -154,8 +154,14 @@ def open_backend(
     if path.suffix.lower() == ".onnx" and path.is_file():
         # ONNX Runtime backend.
         return OnnxBackend(path)
+    # Checkpoint files; a variant only applies to catalogue names.
+    checkpoint = path.suffix.lower() == ".pt" and path.is_file()
     # Checkpoints and model ids need PyTorch unless ONNX was requested.
     if backend == "onnx":
+        # Checkpoint files are exported once, next to the model store.
+        if checkpoint:
+            # ONNX Runtime backend of the export.
+            return OnnxBackend(_export_checkpoint(path))
         # Imported lazily: the store builds the ONNX file with PyTorch once.
         from unbihexium.zoo.store import ONNX_NAME, ensure_model
 
@@ -167,7 +173,31 @@ def open_backend(
     from unbihexium.zoo.store import load_model
 
     # Checkpoint file or catalogue model.
-    return TorchBackend(load_model(source, variant), device)
+    return TorchBackend(load_model(source, None if checkpoint else variant), device)
+
+
+# ONNX export of a checkpoint file, cached by the SHA-256 of the checkpoint.
+def _export_checkpoint(path: Path) -> Path:
+    # PyTorch-dependent modules imported lazily.
+    from unbihexium.zoo.checkpoint import load_checkpoint  # Reads checkpoint files.
+    from unbihexium.zoo.export import export_onnx  # Writes ONNX files.
+    from unbihexium.zoo.store import get_cache_dir  # Root of the model store.
+    from unbihexium.zoo.verify import compute_sha256  # Content digest.
+
+    # One export per checkpoint content, beside the model store.
+    target = get_cache_dir().parent / "exports" / f"{compute_sha256(path)}.onnx"
+    # Export once; the digest in the name ties the file to the checkpoint.
+    if not target.is_file():
+        # Create the directory.
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # Temporary name, so that a failed export is never reused.
+        partial = target.with_name(target.stem + ".partial.onnx")
+        # Export and compare with PyTorch.
+        export_onnx(load_checkpoint(path), partial)
+        # Publish the finished file atomically.
+        partial.replace(target)
+    # Path of the export.
+    return target
 
 
 # Start positions of tiles of length `tile` with step `step` covering `size`.

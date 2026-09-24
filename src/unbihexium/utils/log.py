@@ -24,7 +24,10 @@
 #   get_logger          logger in the "unbihexium" hierarchy
 #   configure_logging   add (or replace) one stream handler with a UTC ISO
 #                       8601 time stamp; the level defaults to the
-#                       UNBIHEXIUM_LOG_LEVEL environment variable
+#                       UNBIHEXIUM_LOG_LEVEL environment variable, and the
+#                       default stream is the standard error of the moment
+#                       of each record (so replaced streams, for example in
+#                       tests, are followed)
 #   parse_level         level name or number to a logging level
 # =============================================================================
 
@@ -37,6 +40,9 @@ import logging
 
 # Environment variables.
 import os
+
+# Current standard error stream.
+import sys
 
 # UTC time stamps.
 import time
@@ -106,6 +112,21 @@ class UTCFormatter(logging.Formatter):
         return f"{stamp}.{int(record.msecs):03d}Z"
 
 
+# Stream handler that writes to the current sys.stderr.
+class _StderrHandler(logging.StreamHandler):  # type: ignore[type-arg]
+    # Resolve the stream at every record instead of at creation.
+    @property  # type: ignore[override]
+    def stream(self) -> TextIO:
+        # Current standard error.
+        return sys.stderr
+
+    # The stream cannot be replaced; the property always follows sys.stderr.
+    @stream.setter
+    def stream(self, value: TextIO) -> None:
+        # Nothing to store.
+        pass
+
+
 # Install one stream handler on the library logger and set its level.
 def configure_logging(
     level: str | int | None = None,  # Level; default from UNBIHEXIUM_LOG_LEVEL or WARNING.
@@ -124,8 +145,8 @@ def configure_logging(
         if getattr(handler, _HANDLER_MARK, False):
             # Detach it.
             logger.removeHandler(handler)
-    # New stream handler.
-    handler = logging.StreamHandler(stream)
+    # New stream handler; the default follows the current standard error.
+    handler = logging.StreamHandler(stream) if stream is not None else _StderrHandler()
     # Mark it as ours.
     setattr(handler, _HANDLER_MARK, True)
     # Format with UTC time stamps.

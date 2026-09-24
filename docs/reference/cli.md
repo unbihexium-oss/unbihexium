@@ -686,7 +686,7 @@ Click generates completion scripts for Bash, Zsh and Fish from the command defin
 eval "$(_UNBIHEXIUM_COMPLETE=bash_source unbihexium)"
 ```
 
-Use `zsh_source` or `fish_source` for the other shells. The hand-written file `scripts/unbihexium-completion.bash` in the repository still lists commands and options of earlier releases (for example `detect`, `segment` and `analyze`) and does not match the current command set.
+Use `zsh_source` or `fish_source` for the other shells. The file `scripts/unbihexium-completion.bash` in the repository contains the same Bash function with comments; because it asks the installed command for its candidates, it always matches the installed version.
 
 ## References
 
