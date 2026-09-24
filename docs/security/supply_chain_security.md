@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch, the release workflow and the container image |
+| Applies to | Unbihexium 2.0.0 and the main branch, the release workflow and the container image |
 
 ## Abstract
 
@@ -314,7 +314,7 @@ At the date of review no release has yet been built by the current workflow and 
 
 The following controls are not in place at the date of review. They are listed so that users can take them into account and so that progress can be tracked in [ROADMAP.md](../../ROADMAP.md).
 
-- **Unsigned 1.0.x releases.** v1.0.0 and v1.0.1 have no signatures or provenance, and the v1.0.1 GitHub checksums do not match PyPI (Section 6.4). The first signed release is planned in [ROADMAP.md](../../ROADMAP.md).
+- **Unsigned 1.0.x releases.** v1.0.0 and v1.0.1 have no signatures or provenance, and the v1.0.1 GitHub checksums do not match PyPI (Section 6.4). 2.0.0 is the first release built with signatures and provenance; users of 1.0.x should upgrade.
 - **Some CI tools pinned by version only.** markdownlint-cli (through `npx`), the cue binary and the Security Insights schema in repo-config.yml, and the pre-commit hooks (by tag) are pinned by version, not by digest.
 - **Package smoke test.** package.yml installs the built wheel with ordinary dependency resolution, deliberately like a user would, so that job is not hash-pinned.
 - **No external audit.**

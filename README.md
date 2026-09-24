@@ -85,7 +85,7 @@ The model zoo contains 520 models: 130 families, each in the variants tiny, base
 
 ### 2.3 Release status
 
-The version declared in `pyproject.toml` is 1.0.1. The distribution published on PyPI as version 1.0.1 was built from the tag `v1.0.1` (21 December 2025). The main branch has changed substantially since that tag (among other things: model training and evaluation, the `predict` and `zoo build` commands, the REST prediction route, the licence change from Apache-2.0 to MPL-2.0 and the classifiers for Python 3.13 and 3.14) and has not yet been released under a new version number. **The examples in this document are tested against the main branch.** Until the next release, install from source (Section 3.4) to use them. Release notes are kept in [CHANGELOG.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md), and the versioning and support policy in [VERSIONING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md).
+The latest release is 2.0.0 (24 September 2026, tag `v2.0.0`), published on PyPI. It is a major release: compared with 1.0.1 it adds model training and evaluation, the `predict` and `zoo build` commands, the REST prediction route and support for Python 3.10 to 3.14, changes the licence from Apache-2.0 to MPL-2.0, and contains breaking changes described in [docs/MIGRATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/MIGRATION.md). **The examples in this document are tested against the main branch**, which matches 2.0.0 apart from changes listed under `[Unreleased]` in the changelog. Release notes are kept in [CHANGELOG.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CHANGELOG.md), and the versioning and support policy in [VERSIONING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/VERSIONING.md).
 
 ### 2.4 Out of scope
 
@@ -487,20 +487,20 @@ Do not report vulnerabilities in public issues. Use a [GitHub private security a
 
 ## 15. Citation
 
-If you use Unbihexium in research or in a product, cite the version you used. [CITATION.cff](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.cff), in the Citation File Format [6], is the authoritative metadata; GitHub renders it as "Cite this repository", and [CITATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.md) explains how to cite in text. The project has no DOI at present. The following entry matches CITATION.cff for version 1.0.1:
+If you use Unbihexium in research or in a product, cite the version you used. [CITATION.cff](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.cff), in the Citation File Format [6], is the authoritative metadata; GitHub renders it as "Cite this repository", and [CITATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CITATION.md) explains how to cite in text. The project has no DOI at present. The following entry matches CITATION.cff for version 2.0.0:
 
 ```bibtex
-@software{unbihexium_1_0_1,
+@software{unbihexium_2_0_0,
   author  = {{Unbihexium OSS Foundation} and Laitinen Imanov, Olaf Yunus},
   title   = {Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python},
-  version = {1.0.1},
-  date    = {2025-12-21},
-  url     = {https://github.com/unbihexium-oss/unbihexium},
+  version = {2.0.0},
+  date    = {2026-09-24},
+  url     = {https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0},
   license = {MPL-2.0}
 }
 ```
 
-APA style: Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2025). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Version 1.0.1) [Computer software]. <https://github.com/unbihexium-oss/unbihexium>
+APA style: Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2026). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Version 2.0.0) [Computer software]. <https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0>
 
 Please also cite GDAL, PROJ and ONNX Runtime where your results depend on them directly; their references are listed in CITATION.cff.
 

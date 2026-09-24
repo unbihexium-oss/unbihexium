@@ -64,7 +64,8 @@ Security fixes are made on the main branch and released as a new patch version o
 | Version | Status | Security fixes |
 | --- | --- | --- |
 | main branch | Development | Yes, fixes land here first |
-| 1.0.x (latest: 1.0.1) | Current release series | Yes, in the next 1.0.x patch release |
+| 2.0.x (latest: 2.0.0) | Current release series | Yes, in the next 2.0.x patch release |
+| 1.0.x | Previous release series | No; upgrade to 2.0.x ([docs/MIGRATION.md](docs/MIGRATION.md)) |
 | Earlier than 1.0.0 | Not released on PyPI | No |
 
 The package supports CPython 3.10 to 3.14. A vulnerability that exists only on a Python version that is past its upstream end of life is out of scope; the Python support policy is described in [VERSIONING.md](VERSIONING.md).
@@ -199,7 +200,7 @@ Releases are built only by [.github/workflows/release.yml](.github/workflows/rel
 7. creates the GitHub release with the distributions, the bundles, the provenance, the SBOM and the checksums;
 8. uploads the distributions to PyPI with trusted publishing: PyPI accepts the short-lived OIDC token of the job in the environment `pypi`, so no upload token is stored, and PEP 740 attestations are uploaded with the files.
 
-The signing, attestation and provenance steps were added to the workflow after the 1.0.1 release. The existing releases v1.0.0 and v1.0.1 therefore carry only `SHA256SUMS.txt`, and the checksums in the v1.0.1 GitHub release do not match the files on PyPI; verify PyPI downloads against the SHA-256 digests that PyPI publishes. Every release built from now on carries the full set of signed artefacts described above.
+The signing, attestation and provenance steps were added to the workflow after the 1.0.1 release. The existing releases v1.0.0 and v1.0.1 therefore carry only `SHA256SUMS.txt`, and the checksums in the v1.0.1 GitHub release do not match the files on PyPI; verify PyPI downloads against the SHA-256 digests that PyPI publishes. Release 2.0.0 is the first to carry the full set of signed artefacts described above, and every later release does too.
 
 ### 6.5 Container Image
 

@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch, releases built by .github/workflows/release.yml |
+| Applies to | Unbihexium 2.0.0 and the main branch, releases built by .github/workflows/release.yml |
 
 ## Abstract
 
@@ -140,10 +140,10 @@ print("consistent" if len(set(found.values())) == 1 else "MISMATCH")
 On the main branch at the date of review (Python 3.11 or newer, for `tomllib`) it prints:
 
 ```text
-pyproject.toml               1.0.1
-src/unbihexium/_version.py   1.0.1
-CITATION.cff                 1.0.1
-codemeta.json                1.0.1
+pyproject.toml               2.0.0
+src/unbihexium/_version.py   2.0.0
+CITATION.cff                 2.0.0
+codemeta.json                2.0.0
 consistent
 ```
 
@@ -177,7 +177,7 @@ python -m build
 python -m twine check --strict dist/*
 ```
 
-Run on 2026-09-24 against the main branch, `python -m build` reported `Successfully built unbihexium-1.0.1.tar.gz and unbihexium-1.0.1-py3-none-any.whl`, and `twine check --strict` reported `PASSED` for both files. The pull request MUST pass every required check before it is merged; the Package workflow repeats these checks and installs the wheel on CPython 3.10 and 3.14.
+Run on 2026-09-24 against the main branch, `python -m build` reported `Successfully built unbihexium-2.0.0.tar.gz and unbihexium-2.0.0-py3-none-any.whl`, and `twine check --strict` reported `PASSED` for both files. The pull request MUST pass every required check before it is merged; the Package workflow repeats these checks and installs the wheel on CPython 3.10 and 3.14.
 
 ## 5. Tagging
 
@@ -252,8 +252,9 @@ After the workflows have finished, the maintainer SHOULD:
 | --- | --- | --- |
 | `v1.0.0` | 2025-12-21 | GitHub release with the distributions and `SHA256SUMS.txt`; not on PyPI |
 | `v1.0.1` | 2025-12-21 | GitHub release with the distributions and `SHA256SUMS.txt`; PyPI |
+| `v2.0.0` | 2026-09-24 | GitHub release with the distributions, `SHA256SUMS.txt`, Sigstore bundles, SLSA provenance and the SPDX SBOM; PyPI with PEP 740 attestations; signed container image |
 
-Both releases were built before signing and SLSA provenance assets were introduced and have neither. The files attached to the v1.0.1 GitHub release are not byte-identical to the files on PyPI, so the GitHub checksums do not match the PyPI files; PyPI downloads are verified against the digests that PyPI publishes. The first release built by the current workflow will be the first with the full set of signed artefacts. The detailed history is in [CHANGELOG.md](../../CHANGELOG.md).
+The releases v1.0.0 and v1.0.1 were built before signing and SLSA provenance assets were introduced and have neither. The files attached to the v1.0.1 GitHub release are not byte-identical to the files on PyPI, so the GitHub checksums do not match the PyPI files; PyPI downloads are verified against the digests that PyPI publishes. The first release built by the current workflow will be the first with the full set of signed artefacts. The detailed history is in [CHANGELOG.md](../../CHANGELOG.md).
 
 ## References
 

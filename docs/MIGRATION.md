@@ -24,11 +24,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../MAINTAINERS.md)) |
-| Applies to | Upgrades from Unbihexium 1.0.0 and 1.0.1 to the main branch, to be released as 2.0.0 |
+| Applies to | Upgrades from Unbihexium 1.0.0 and 1.0.1 to Unbihexium 2.0.0 |
 
 ## Abstract
 
-This guide explains how to move code, command line scripts, REST clients, model files and deployments from Unbihexium 1.0.0 or 1.0.1 to the current main branch, which will be released as version 2.0.0 because it contains breaking changes ([VERSIONING.md](../VERSIONING.md), Section 4). It is written for users who maintain code against the 1.0.x API, for operators of the command line and the REST service, and for packagers. Every change listed here was derived from the `[Unreleased]` section of [CHANGELOG.md](../CHANGELOG.md) and checked against the source code of the tag `v1.0.1` and of the main branch; for each breaking change the guide states what changed and what to do. All code examples on the new side were executed against the main branch on 24 September 2026. The guide does not repeat the complete list of additions, which is in the changelog.
+This guide explains how to move code, command line scripts, REST clients, model files and deployments from Unbihexium 1.0.0 or 1.0.1 to version 2.0.0, a major release because it contains breaking changes ([VERSIONING.md](../VERSIONING.md), Section 4). It is written for users who maintain code against the 1.0.x API, for operators of the command line and the REST service, and for packagers. Every change listed here was derived from the 2.0.0 section of [CHANGELOG.md](../CHANGELOG.md) and checked against the source code of the tags `v1.0.1` and `v2.0.0`; for each breaking change the guide states what changed and what to do. All code examples on the new side were executed against the main branch on 24 September 2026. The guide does not repeat the complete list of additions, which is in the changelog.
 
 ## Contents
 
@@ -51,10 +51,10 @@ This guide explains how to move code, command line scripts, REST clients, model 
 | Version | Status | Tag and date | Distribution |
 | --- | --- | --- | --- |
 | 1.0.0 | Released | `v1.0.0`, 2025-12-21 | GitHub release only; Apache-2.0 |
-| 1.0.1 | Released, latest | `v1.0.1`, 2025-12-21 | PyPI and GitHub; Apache-2.0 |
-| main | Unreleased, next release 2.0.0 | none | install from source; MPL-2.0 |
+| 1.0.1 | Released | `v1.0.1`, 2025-12-21 | PyPI and GitHub; Apache-2.0 |
+| 2.0.0 | Released, latest | `v2.0.0`, 2026-09-24 | PyPI, GitHub and the container registry; MPL-2.0 |
 
-No version older than 1.0.0 was ever released. The main branch still declares version 1.0.1 in `pyproject.toml` until the release ([VERSIONING.md](../VERSIONING.md), Section 2.4), so `unbihexium --version` prints 1.0.1 on both sides of this migration; record the commit hash to tell them apart. Until 2.0.0 is published, install the new code from source as described in [docs/getting_started/installation.md](getting_started/installation.md).
+No version older than 1.0.0 was ever released. `unbihexium --version` prints the installed version, so it tells the two sides of this migration apart. Install 2.0.0 from PyPI with `python -m pip install "unbihexium==2.0.0"` or as described in [docs/getting_started/installation.md](getting_started/installation.md).
 
 ### 1.2 Conventions
 

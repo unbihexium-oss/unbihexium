@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | The main branch of Unbihexium, model zoo catalogue version 2.0.0 (not part of release 1.0.1) |
+| Applies to | Unbihexium 2.0.0 and the main branch, model zoo catalogue version 2.0.0 |
 
 ## Abstract
 
@@ -47,7 +47,7 @@ This document describes how the models of the Unbihexium model zoo reach a user.
 
 The model zoo defines 520 models: 130 families in the variants `tiny`, `base`, `large` and `mega` (see [model_catalog.md](model_catalog.md)). This document covers how those models are obtained. Building, verifying and exporting them in practice is described in [download_and_verify.md](download_and_verify.md), and the licence of the resulting weights in [licensing_and_provenance.md](licensing_and_provenance.md).
 
-The model zoo is merged into the main branch and listed under `[Unreleased]` in [CHANGELOG.md](../../CHANGELOG.md). Release 1.0.1 on the Python Package Index does not contain it; install from source as described in [README.md](../../README.md) to use it.
+The model zoo was introduced in release 2.0.0 and is listed in the 2.0.0 section of [CHANGELOG.md](../../CHANGELOG.md). Release 1.0.1 and earlier do not contain it.
 
 ### 1.2 Status of the models
 

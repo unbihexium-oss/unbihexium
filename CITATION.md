@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1, development versions from the main branch, and the metadata in CITATION.cff and codemeta.json |
+| Applies to | Unbihexium 2.0.0, development versions from the main branch, and the metadata in CITATION.cff and codemeta.json |
 
 ## Abstract
 
@@ -63,12 +63,12 @@ The table lists every citation field recorded in [CITATION.cff](CITATION.cff) an
 | Author 1 | Unbihexium OSS Foundation (organisation, copyright holder) | Unbihexium OSS Foundation (Organization) |
 | Author 2 | Olaf Yunus Laitinen Imanov, University of Helsinki | Olaf Yunus Laitinen Imanov, University of Helsinki (Person) |
 | Contact | Olaf Yunus Laitinen Imanov, <yunus.z.imanov@helsinki.fi> | Maintainer: Olaf Yunus Laitinen Imanov, <yunus.z.imanov@helsinki.fi> |
-| Version | 1.0.1 | `version` and `softwareVersion`: 1.0.1 |
-| Release date | `date-released`: 2025-12-21 | `datePublished`: 2025-12-18 (first publication); `dateModified`: 2026-09-23 (last change of the metadata) |
+| Version | 2.0.0 | `version` and `softwareVersion`: 2.0.0 |
+| Release date | `date-released`: 2026-09-24 | `datePublished`: 2025-12-18 (first publication); `dateModified`: 2026-09-24 (last change of the metadata) |
 | Licence | MPL-2.0 | <https://spdx.org/licenses/MPL-2.0> |
 | Repository | <https://github.com/unbihexium-oss/unbihexium> | `codeRepository`: same address |
 | Package | <https://pypi.org/project/unbihexium/> | `installUrl`: same address |
-| Release identifier | <https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1> | Not recorded |
+| Release identifier | <https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0> | Not recorded |
 | DOI | None | None |
 | ORCID of the personal author | None | None |
 
@@ -78,9 +78,9 @@ Unbihexium has no DOI. Until one is assigned, the release page URL of the versio
 
 ### 3.1 Recommended reference
 
-Cite the exact version you used. For version 1.0.1, the latest release, the recommended reference is:
+Cite the exact version you used. For version 2.0.0, the latest release, the recommended reference is:
 
-> Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2025). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Version 1.0.1) [Computer software]. <https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1>
+> Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2026). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Version 2.0.0) [Computer software]. <https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0>
 
 This reference follows the APA 7th edition pattern for software [6]; adapt it to the style your publisher requires, keeping the authors, title, version, year and URL.
 
@@ -89,17 +89,17 @@ This reference follows the APA 7th edition pattern for software [6]; adapt it to
 For BibLaTeX, which supports the `@software` entry type:
 
 ```bibtex
-@software{unbihexium_1_0_1,
+@software{unbihexium_2_0_0,
   author  = {{Unbihexium OSS Foundation} and Laitinen Imanov, Olaf Yunus},
   title   = {Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python},
-  version = {1.0.1},
-  date    = {2025-12-21},
-  url     = {https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1},
+  version = {2.0.0},
+  date    = {2026-09-24},
+  url     = {https://github.com/unbihexium-oss/unbihexium/releases/tag/v2.0.0},
   license = {MPL-2.0},
 }
 ```
 
-For classic BibTeX styles, which do not know `@software`, use `@misc` with `year = {2025}`, `month = {dec}` and `note = {Version 1.0.1}` instead of `version` and `date`. The double braces around the organisation name keep it from being split into given and family names.
+For classic BibTeX styles, which do not know `@software`, use `@misc` with `year = {2026}`, `month = {sep}` and `note = {Version 2.0.0}` instead of `version` and `date`. The double braces around the organisation name keep it from being split into given and family names.
 
 ### 3.3 Other formats
 
@@ -107,11 +107,11 @@ GitHub shows a "Cite this repository" button on the repository page that exports
 
 ### 3.4 In-text mention
 
-When the software is mentioned in the text, give its name and version, for example "processed with Unbihexium 1.0.1 [ref]". Authors SHOULD also state the Python version and the operating system in the methods section when numerical results are reported.
+When the software is mentioned in the text, give its name and version, for example "processed with Unbihexium 2.0.0 [ref]". Authors SHOULD also state the Python version and the operating system in the methods section when numerical results are reported.
 
 ## 4. Citing a development version
 
-Version 1.0.1 is the only version on the Python Package Index. The main branch contains substantial unreleased changes (see [CHANGELOG.md](CHANGELOG.md)) while still reporting version 1.0.1, because the version number changes only at a release (see [VERSIONING.md](VERSIONING.md)). If you used an installation from the main branch or from any commit that is not a tagged release, you SHOULD cite the commit instead of the release:
+Between releases, the main branch can contain unreleased changes (listed under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md)) while still reporting the version of the last release, because the version number changes only at a release (see [VERSIONING.md](VERSIONING.md)). If you used an installation from the main branch or from any commit that is not a tagged release, you SHOULD cite the commit instead of the release:
 
 > Unbihexium OSS Foundation, & Laitinen Imanov, O. Y. (2026). *Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python* (Development version, commit 0123abc) [Computer software]. <https://github.com/unbihexium-oss/unbihexium/tree/0123abc>
 

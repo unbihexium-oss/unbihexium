@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
-| Applies to | Planned work on the main branch after Unbihexium 1.0.1 |
+| Applies to | Planned work on the main branch after Unbihexium 2.0.0 |
 
 ## Abstract
 
@@ -56,24 +56,17 @@ Items are grouped by area, not by priority. Each item states the gap, the eviden
 
 As of 2026-09-24:
 
-- The latest release is 1.0.1 (2025-12-21), the only version on the Python Package Index. It predates the rewrite of the library, the model zoo and the release pipeline.
-- The main branch contains a large set of unreleased changes, including breaking changes, listed under `[Unreleased]` in [CHANGELOG.md](CHANGELOG.md).
+- The latest release is 2.0.0 (2026-09-24), the first release built, signed and attested by the current release workflow. It contains the rewrite of the library, the model zoo and the release pipeline; the changes since 1.0.1 are listed in [CHANGELOG.md](CHANGELOG.md).
 - The model zoo defines 520 untrained starter models (130 families in four variants); only the 28 models of the 7 spectral index families compute results without training.
 - The project has one maintainer, listed in [MAINTAINERS.md](MAINTAINERS.md).
 
 ## 3. Release and supply chain
 
-### 3.1 Release the unreleased changes (planned)
+### 3.1 Verification of the first signed release (planned)
 
-- Gap: users who install from the Python Package Index receive 1.0.1, which does not contain the rewritten packages, the trainable models or the security fixes on `main`.
-- Evidence: `version = "1.0.1"` in `pyproject.toml`; the `[Unreleased]` section of [CHANGELOG.md](CHANGELOG.md); the PyPI release history.
-- Outcome: a new release. Because the unreleased changes break compatibility, [VERSIONING.md](VERSIONING.md) requires it to be a new major version (2.0.0). [docs/MIGRATION.md](docs/MIGRATION.md) describes the migration from 1.0.x.
-
-### 3.2 First signed release (planned)
-
-- Gap: the release workflow signs distributions with Sigstore, attests their build provenance and attaches SLSA provenance (`unbihexium-<tag>.intoto.jsonl`), but no release has been published since these steps were added. The GitHub releases v1.0.0 and v1.0.1 have no signatures or provenance.
-- Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
-- Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
+- Gap: 2.0.0 is the first release whose distributions are signed with Sigstore and carry SLSA provenance and an SBOM, and the first whose container image is signed with cosign. The verification commands in [SECURITY.md](SECURITY.md), Section 7, were written before any such release existed. The GitHub releases v1.0.0 and v1.0.1 have no signatures or provenance.
+- Evidence: `.github/workflows/release.yml` and `.github/workflows/docker.yml`; the assets of the GitHub release v2.0.0.
+- Outcome: the verification commands are run against the assets of v2.0.0 and its container image, and [SECURITY.md](SECURITY.md) and [docs/security/supply_chain_security.md](docs/security/supply_chain_security.md) record the result.
 
 ## 4. Model zoo
 

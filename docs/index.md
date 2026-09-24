@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch (model catalogue 2.0.0) |
+| Applies to | Unbihexium 2.0.0 and the main branch (model catalogue 2.0.0) |
 
 ## Abstract
 
@@ -51,7 +51,7 @@ This is the entry point of the documentation of Unbihexium, the open source Pyth
 
 ### 1.1 What the documentation describes
 
-The documentation describes the main branch of the repository <https://github.com/unbihexium-oss/unbihexium>. The latest published release is 1.0.1 on PyPI (<https://pypi.org/project/unbihexium/>), tagged `v1.0.1` on 21 December 2025. The main branch has changed substantially since that release and will be released as 2.0.0; until then it still declares version 1.0.1, and its examples require an installation from source. Differences between 1.0.x and the main branch are listed in [MIGRATION.md](MIGRATION.md) and in [CHANGELOG.md](../CHANGELOG.md).
+The documentation describes the main branch of the repository <https://github.com/unbihexium-oss/unbihexium>. The latest published release is 2.0.0 on PyPI (<https://pypi.org/project/unbihexium/>), tagged `v2.0.0` on 24 September 2026; the main branch matches it apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). Differences between 1.0.x and 2.0.0 are listed in [MIGRATION.md](MIGRATION.md) and in the changelog.
 
 ### 1.2 What the software is
 

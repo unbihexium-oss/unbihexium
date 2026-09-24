@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch |
+| Applies to | Unbihexium 2.0.0 and the main branch |
 
 ## Abstract
 
@@ -349,7 +349,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -H "X-API-Key: change-me" http://127.0.
 ```
 
 ```text
-{"status":"healthy","version":"1.0.1","ready":true,"models_available":520,"models_loaded":0}
+{"status":"healthy","version":"2.0.0","ready":true,"models_available":520,"models_loaded":0}
 401
 200
 ```

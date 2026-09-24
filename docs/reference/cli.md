@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch |
+| Applies to | Unbihexium 2.0.0 and the main branch |
 
 ## Abstract
 
@@ -104,7 +104,7 @@ Commands:
 
 | Global option | Effect |
 | --- | --- |
-| `--version` | Prints `unbihexium, version 1.0.1` and exits with status 0 |
+| `--version` | Prints `unbihexium, version 2.0.0` and exits with status 0 |
 | `-v`, `--verbose` | Log messages of the library at DEBUG level on standard error; without it, the level of `UNBIHEXIUM_LOG_LEVEL` (default WARNING) applies |
 | `--help` | Prints the help of the command or subcommand it follows |
 
@@ -171,7 +171,7 @@ Prints the version, the number of registered capabilities, the number of models 
 
 ```text
 $ unbihexium info
-Unbihexium v1.0.1
+Unbihexium v2.0.0
 Registered capabilities: 147
 Model zoo models: 520 (catalogue 2.0.0)
 Registered pipelines: 5
@@ -661,7 +661,7 @@ Starts the FastAPI application of `unbihexium.serving` with uvicorn and serves u
 ```text
 $ unbihexium serve --port 8791 &
 $ curl -s http://127.0.0.1:8791/health
-{"status":"healthy","version":"1.0.1","ready":true,"models_available":520,"models_loaded":0}
+{"status":"healthy","version":"2.0.0","ready":true,"models_available":520,"models_loaded":0}
 ```
 
 The service has no API key, no rate limit and allows every CORS origin by default; before it is reachable beyond a trusted network, `UNBIHEXIUM_SERVING__API_KEY` and `UNBIHEXIUM_SERVING__RATE_LIMIT_PER_MINUTE` SHOULD be set.
