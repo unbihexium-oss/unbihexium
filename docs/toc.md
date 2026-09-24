@@ -136,7 +136,7 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 | Document | Identifier |
 | --- | --- |
 | [Continuous Integration and Delivery](operations/ci_cd.md) | UBX-DOC-OPS-CICD |
-| [Docker Operations](operations/docker.md) | UBX-DOC-OPS-DOCKER |
+| [Container Image and Deployment](operations/docker.md) | UBX-DOC-OPS-DOCKER |
 | [Release Procedure](operations/releasing.md) | UBX-DOC-OPS-RELEASING |
 
 ## 10. Benchmarks
@@ -169,7 +169,7 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 | `docs/benchmarks/` | 1 |
 | **Total** | **45** |
 
-Documents outside `docs/`, such as the policies in the repository root and the README files of `model_zoo/`, `examples/` and `tests/fixtures/`, are listed in [docs/index.md, Section 12](index.md#12-project-documents-outside-docs).
+Documents outside `docs/`, such as the policies in the repository root and the README files of `model_zoo/` and `examples/`, are listed in [docs/index.md, Section 12](index.md#12-project-documents-outside-docs).
 
 ## References
 

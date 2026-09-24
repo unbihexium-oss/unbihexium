@@ -135,7 +135,7 @@ ARG BUILD_DATE=unknown
 # Open Container Initiative image annotations.
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
 LABEL org.opencontainers.image.title="Unbihexium" \
-      org.opencontainers.image.description="Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library" \
+      org.opencontainers.image.description="Earth observation, geospatial, remote sensing and SAR library for Python: command line interface and REST service" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${VCS_REF}" \
       org.opencontainers.image.created="${BUILD_DATE}" \

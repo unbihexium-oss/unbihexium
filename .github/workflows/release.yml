@@ -55,7 +55,7 @@ jobs:  # Jobs of the workflow.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
     permissions:  # Token permissions of the release job.
       contents: write  # Create the GitHub release and upload its assets.
-      id-token: write  # Request the OIDC token for the attestations and PyPI trusted publishing.
+      id-token: write  # Request the OIDC token for Sigstore signing and the attestations.
       attestations: write  # Store the build provenance attestations.
     steps:  # Steps of the release job.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the tagged commit.

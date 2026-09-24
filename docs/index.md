@@ -70,7 +70,7 @@ The model zoo defines 520 models: 130 families in the variants tiny, base, large
 | Researcher | [Capability domains](capabilities/index.md), [Glossary](glossary.md) | The domain documents of Section 6, [Model zoo architecture](architecture/model_zoo_architecture.md), [CITATION.md](../CITATION.md) |
 | Model trainer | [Model catalogue](model_zoo/model_catalog.md), [Training](model_zoo/training.md) | [Inference](model_zoo/inference.md), [Building and verifying models](model_zoo/download_and_verify.md) |
 | Contributor | [CONTRIBUTING.md](../CONTRIBUTING.md), [Architecture overview](architecture/overview.md) | [Adding models](model_zoo/how_to_add_models.md), [CI/CD](operations/ci_cd.md) |
-| Operator | [Docker operations](operations/docker.md), [Configuration](getting_started/configuration.md) | [Security model](architecture/security_model.md), [Secrets and tokens](security/secrets_and_tokens.md) |
+| Operator | [Container image and deployment](operations/docker.md), [Configuration](getting_started/configuration.md) | [Security model](architecture/security_model.md), [Secrets and tokens](security/secrets_and_tokens.md) |
 | Security reviewer or auditor | [SECURITY.md](../SECURITY.md), [Supply chain security](security/supply_chain_security.md) | [Model integrity](security/model_integrity.md), [Vulnerability management](security/vulnerability_management.md), [Releasing](operations/releasing.md) |
 
 ## 3. Getting started and tutorials
@@ -192,7 +192,6 @@ The twelve domain documents describe, for one application area each, the model f
 | [model_zoo/README.md](../model_zoo/README.md) | The model zoo directory: model cards and manifests per family, inventory, family-to-model mapping, weights digests and the manifest schema |
 | [model_zoo/MODEL_CARDS.md](../model_zoo/MODEL_CARDS.md) | Index of the 130 family model cards |
 | [examples/README.md](../examples/README.md) | The example scripts and the example FastAPI application, with their test status and limitations |
-| [tests/fixtures/README.md](../tests/fixtures/README.md) | The sample arrays in `tests/fixtures/` and their provenance |
 
 ## 13. Documentation conventions
 
