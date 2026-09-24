@@ -94,7 +94,7 @@ jobs:  # Jobs of the workflow.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the configuration file.
 
       - name: Dependency Review  # Compare the dependency manifests of base and head.
-        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48  # v4.9.0; Official dependency review action.
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294  # v4.9.0; Official dependency review action.
         with:  # Inputs of the review action.
           config-file: ./.github/dependency-review-config.yml  # Severity and licence rules.
 
