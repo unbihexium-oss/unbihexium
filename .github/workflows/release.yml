@@ -16,16 +16,24 @@
 # Abstract
 # --------
 # Runs when a version tag (v*) is pushed. It builds the sdist and the wheel,
-# writes SHA256SUMS.txt, creates GitHub build provenance attestations for the
-# distributions, signs them with Sigstore (keyless, bound to this workflow
-# through its OIDC identity), creates the GitHub release with the
-# distributions, their .sigstore.json signature bundles, the signed SLSA
-# provenance as unbihexium-<tag>.intoto.jsonl, the checksum file
-# and generated release notes (categories in .github/release.yml), and
-# finally uploads the distributions to PyPI with the PYPI_API_TOKEN
-# repository secret. The distribution version is the static version in
-# pyproject.toml, not the tag, so bump it before tagging: the first step
-# after the checkout runs .github/scripts/check_release_version.py and stops
+# writes SHA256SUMS.txt, installs the wheel with the locked runtime
+# dependencies into a clean environment and writes its SPDX SBOM
+# (unbihexium-<tag>.spdx.json), creates GitHub build provenance and SBOM
+# attestations for the distributions, signs them with Sigstore (keyless,
+# bound to this workflow through its OIDC identity), creates the GitHub
+# release with the distributions, their .sigstore.json signature bundles,
+# the signed SLSA provenance as unbihexium-<tag>.intoto.jsonl, the SBOM, the
+# checksum file and generated release notes (categories in
+# .github/release.yml), and finally uploads the distributions to PyPI with
+# trusted publishing: PyPI accepts the OIDC token of this job in the
+# environment "pypi", so no upload token is stored in the repository, and
+# the publish action adds PEP 740 attestations. The trusted publisher must
+# be registered on PyPI for this repository, release.yml and the environment
+# "pypi" (docs/operations/releasing.md).
+#
+# The distribution version is the static version in pyproject.toml, not the
+# tag, so bump it before tagging: the first step after the checkout runs
+# .github/scripts/check_release_version.py and stops
 # the release when the tag differs from the version in pyproject.toml,
 # _version.py, CITATION.cff or codemeta.json.
 #
@@ -55,10 +63,13 @@ permissions:  # Least-privilege default token; the job widens only what it needs
 jobs:  # Jobs of the workflow.
   release:  # Build, attest and publish.
     runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    environment:  # Deployment environment; the PyPI trusted publisher is bound to it.
+      name: pypi  # Environment name registered for the trusted publisher on PyPI.
+      url: https://pypi.org/project/unbihexium/  # Project page shown with the deployment.
     permissions:  # Token permissions of the release job.
       contents: write  # Create the GitHub release and upload its assets.
-      id-token: write  # Request the OIDC token for Sigstore signing and the attestations.
-      attestations: write  # Store the build provenance attestations.
+      id-token: write  # OIDC token for trusted publishing, Sigstore signing and the attestations.
+      attestations: write  # Store the build provenance and SBOM attestations.
     steps:  # Steps of the release job.
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the tagged commit.
 
@@ -87,6 +98,31 @@ jobs:  # Jobs of the workflow.
           cd dist
           # Write one SHA-256 line per distribution.
           sha256sum -- * > ../checksums/SHA256SUMS.txt
+
+      - name: Install the release into a clean environment  # The environment that the SBOM describes.
+        run: |  # Shell script run by bash.
+          # Output directory of the SBOM, outside dist/.
+          mkdir -p sbom
+          # Environment without pip, so that it holds only the release and its dependencies.
+          python -m venv --without-pip sbom-env
+          # Locked, hashed runtime dependencies (onnx and serving extras), as users install them.
+          python -m pip --python sbom-env/bin/python install --require-hashes -r requirements.txt
+          # The built wheel on top, without resolving dependencies again.
+          python -m pip --python sbom-env/bin/python install --no-deps dist/*.whl
+
+      - name: Generate the SBOM  # SPDX SBOM of the installed release, written by Syft.
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26  # v0.24.2; Syft-based SBOM action.
+        with:  # Inputs of the SBOM action.
+          path: sbom-env  # Catalogue the packages installed in the clean environment.
+          format: spdx-json  # SPDX 2.3 JSON.
+          output-file: sbom/unbihexium-${{ github.ref_name }}.spdx.json  # Release asset name.
+          upload-release-assets: false  # The release step below attaches it.
+
+      - name: Attest the SBOM  # The SBOM as a signed attestation of the distributions.
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e  # v4.1.0; Official SBOM attestation action.
+        with:  # Inputs of the attestation action.
+          subject-path: dist/*  # Both distributions.
+          sbom-path: sbom/unbihexium-${{ github.ref_name }}.spdx.json  # SBOM of the previous step.
 
       - name: Generate attestations  # Sign build provenance for the distributions.
         id: provenance  # Identifier for reading the bundle path.
@@ -123,13 +159,14 @@ jobs:  # Jobs of the workflow.
             dist/*
             signed/*.sigstore.json
             signed/*.intoto.jsonl
+            sbom/*.spdx.json
             checksums/SHA256SUMS.txt
           generate_release_notes: true  # Build the notes from merged pull requests.
 
-      - name: Publish to PyPI  # Upload the distributions to PyPI.
+      # Trusted publishing: the action exchanges the OIDC token of this job for
+      # a short-lived PyPI upload token, and uploads PEP 740 attestations.
+      - name: Publish to PyPI  # Upload the distributions in dist/ to PyPI.
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # v1.14.2; Official PyPA publish action.
-        with:  # Inputs of the publish action.
-          password: ${{ secrets.PYPI_API_TOKEN }}  # PyPI API token from the repository secrets.
 
 # =============================================================================
 # End of file .github/workflows/release.yml

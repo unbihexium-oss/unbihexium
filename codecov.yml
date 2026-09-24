@@ -27,10 +27,13 @@
 #
 # Policy
 # ------
-# Coverage statuses are informational: they are shown on every pull request
-# but never block a merge. Reviewers use the patch coverage and the
-# per-component breakdown to decide whether new code needs more tests.
-# The targets below record the direction of travel, not a gate.
+# Two gates apply. The Coverage workflow fails when the total coverage of
+# lines and branches falls below `fail_under` in pyproject.toml (85 %). The
+# Codecov project status fails when a pull request lowers the coverage of
+# the project by more than one percentage point, and the patch status fails
+# when less than 80 % of the changed lines are covered. The statuses of the
+# components are informational: reviewers use them to see where coverage
+# changed.
 # =============================================================================
 
 codecov:  # Behaviour of the Codecov service.
@@ -57,13 +60,13 @@ coverage:  # How coverage is shown and judged.
       default:  # Single status for the whole project.
         target: auto  # Compare with the coverage of the base commit.
         threshold: 1%  # Allow a drop of up to one percentage point.
-        informational: true  # Report only; never fail the status.
+        informational: false  # Fail the status on a larger drop.
         only_pulls: false  # Also report on pushes to branches.
     # Coverage of the lines changed by a pull request.
     patch:
       default:  # Single status for the changed lines.
-        target: 80%  # Aim for four in five changed lines covered.
-        informational: true  # Report only; never fail the status.
+        target: 80%  # Require four in five changed lines to be covered.
+        informational: false  # Fail the status below the target.
         only_pulls: true  # Patch coverage only makes sense for pull requests.
     # The "changes" status (coverage changes not explained by the diff) is
     # left at its default, disabled.
