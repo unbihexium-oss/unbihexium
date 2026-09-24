@@ -1,0 +1,66 @@
+{{- /*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : deploy/helm/unbihexium/templates/ingress.yaml
+Title       : Ingress of the REST API
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Kubernetes manifest template (Go text/template), rendered by Helm 3
+=============================================================================
+
+Abstract
+--------
+Routes every path of the host names in ingress.hosts to the Service when
+ingress.enabled is true. Rendering fails when the Ingress is enabled
+without a host name.
+=============================================================================
+*/ -}}
+{{- if .Values.ingress.enabled }}
+{{- if not .Values.ingress.hosts }}
+{{- fail "ingress.enabled is true, but ingress.hosts is empty: give at least one host name" }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "unbihexium.fullname" . }}
+  labels:
+    {{- include "unbihexium.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- with .Values.ingress.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "unbihexium.fullname" $ }}
+                port:
+                  name: http
+    {{- end }}
+{{- end }}
+{{- /*
+=============================================================================
+End of file deploy/helm/unbihexium/templates/ingress.yaml
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+*/ -}}

@@ -1,0 +1,109 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/deploy.yml
+# Title       : Validate the deployment files
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Checks that the deployment files render and match the Kubernetes API:
+#
+#   helm lint --strict   of deploy/helm/unbihexium with the default values
+#                        and with the Ingress enabled
+#   kubeconform -strict  of the plain manifests in deploy/kubernetes/ and of
+#                        the chart rendered with the default values and with
+#                        every optional resource enabled
+#   docker compose       `docker compose config` resolves docker-compose.yml
+#
+# Helm and kubeconform are built with the Go toolchain of the runner from
+# pinned module versions, which the Go checksum database verifies. The image
+# itself is built by docker.yml, and the REST service that the manifests
+# start (`unbihexium serve`) is exercised by the API job of integration.yml.
+# The workflow starts only when the deployment files or this file change.
+# =============================================================================
+
+name: Deploy Files  # Name shown in the Actions tab and in the status checks.
+
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when the deployment files change.
+      - "deploy/**"  # Helm chart and Kubernetes manifests.
+      - "docker-compose.yml"  # Compose file.
+      - ".env.example"  # Example settings read by Compose.
+      - ".github/workflows/deploy.yml"  # This workflow.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "deploy/**"  # Helm chart and Kubernetes manifests.
+      - "docker-compose.yml"  # Compose file.
+      - ".env.example"  # Example settings read by Compose.
+      - ".github/workflows/deploy.yml"  # This workflow.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
+
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only reads the repository.
+
+jobs:  # Jobs of the workflow.
+  validate:  # Render and validate every deployment file.
+    name: Helm chart, manifests and Compose file  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner with Go and Docker.
+    timeout-minutes: 15  # Cancel a hung job after fifteen minutes.
+    env:  # Pinned tool versions and the Kubernetes release to validate against.
+      HELM_VERSION: v3.22.0  # Release of Helm.
+      KUBECONFORM_VERSION: v0.8.0  # Release of kubeconform.
+      KUBE_VERSION: 1.31.0  # Kubernetes release of the schemas.
+    steps:  # Steps of the validation job.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Build Helm and kubeconform  # Compile the pinned releases.
+        run: |  # Shell script run by bash.
+          # Install the binaries into a directory of the runner.
+          export GOBIN="${RUNNER_TEMP}/bin"
+          # Helm command line, verified by the Go checksum database.
+          go install "helm.sh/helm/v3/cmd/helm@${HELM_VERSION}"
+          # kubeconform, verified by the Go checksum database.
+          go install "github.com/yannh/kubeconform/cmd/kubeconform@${KUBECONFORM_VERSION}"
+          # Make both tools available to the next steps.
+          echo "${GOBIN}" >> "${GITHUB_PATH}"
+
+      - name: Lint the Helm chart  # Chart structure and templates.
+        run: |  # Shell script run by bash.
+          # Default values.
+          helm lint --strict deploy/helm/unbihexium --kube-version "${KUBE_VERSION}"
+          # With the Ingress enabled, which needs a host name.
+          helm lint --strict deploy/helm/unbihexium --kube-version "${KUBE_VERSION}" --set ingress.enabled=true --set 'ingress.hosts={api.example.org}'
+
+      - name: Validate the plain manifests  # deploy/kubernetes against the API schemas.
+        run: kubeconform -strict -summary -kubernetes-version "${KUBE_VERSION}" deploy/kubernetes/  # Every document of every file.
+
+      - name: Validate the rendered chart  # Chart output against the API schemas.
+        run: |  # Shell script run by bash.
+          # Default values: Deployment, Service, ServiceAccount, autoscaler, budget and test pod.
+          helm template unbihexium deploy/helm/unbihexium --kube-version "${KUBE_VERSION}" > "${RUNNER_TEMP}/default.yaml"
+          # Every optional resource: Ingress with TLS, API key Secret, pinned digest, shared cache claim.
+          helm template unbihexium deploy/helm/unbihexium --kube-version "${KUBE_VERSION}" --set ingress.enabled=true --set ingress.className=nginx --set 'ingress.hosts={api.example.org}' --set 'ingress.tls[0].secretName=unbihexium-tls' --set 'ingress.tls[0].hosts={api.example.org}' --set server.apiKey.value=test-key --set 'server.corsOrigins={https://app.example.org}' --set image.digest=sha256:0000000000000000000000000000000000000000000000000000000000000000 --set autoscaling.enabled=false --set cache.persistentVolumeClaim=unbihexium-cache > "${RUNNER_TEMP}/full.yaml"
+          # Validate both renderings.
+          kubeconform -strict -summary -kubernetes-version "${KUBE_VERSION}" "${RUNNER_TEMP}/default.yaml" "${RUNNER_TEMP}/full.yaml"
+          # The chart must refuse an Ingress without a host name.
+          if helm template unbihexium deploy/helm/unbihexium --kube-version "${KUBE_VERSION}" --set ingress.enabled=true > /dev/null 2>&1; then echo "::error::an Ingress without hosts was rendered"; exit 1; fi
+
+      - name: Validate the Compose file  # Resolve docker-compose.yml.
+        run: docker compose -f docker-compose.yml config --quiet  # Fails on syntax or schema errors.
+
+# =============================================================================
+# End of file .github/workflows/deploy.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

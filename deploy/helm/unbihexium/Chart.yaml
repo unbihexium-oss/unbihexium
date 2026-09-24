@@ -15,31 +15,37 @@
 #
 # Abstract
 # --------
-# Describes the Helm chart that deploys the Unbihexium REST API on
-# Kubernetes. The default settings of the chart are in values.yaml next to
-# this file. `version` is the version of the chart itself and `appVersion`
-# the version of Unbihexium it deploys; raise both together on a release so
-# that they match pyproject.toml.
+# Describes the Helm chart that deploys the Unbihexium REST API
+# (`unbihexium serve`) on Kubernetes. The default settings are in
+# values.yaml and the manifests in templates/. `version` is the version of
+# the chart itself and `appVersion` the version of Unbihexium it deploys;
+# raise both together on a release so that they match pyproject.toml.
+#
+# Check and install the chart from the repository root:
+#
+#   helm lint deploy/helm/unbihexium
+#   helm install unbihexium deploy/helm/unbihexium
+#   helm test unbihexium
 # =============================================================================
 
 apiVersion: v2  # Chart API version of Helm 3.
 name: unbihexium  # Chart name, also the default release name prefix.
-description: Production-Grade Geospatial AI Library for Earth Observation  # Shown by `helm search`.
+description: REST API of Unbihexium, the Earth observation, geospatial, remote sensing and SAR library  # Shown by `helm search`.
 type: application  # Deployable chart, not a library chart.
 version: 1.0.1  # Version of the chart (SemVer).
 appVersion: "1.0.1"  # Version of Unbihexium deployed by the chart.
+kubeVersion: ">=1.25.0-0"  # First release with policy/v1 disruption budgets and autoscaling/v2.
 keywords:  # Search terms for chart repositories.
   - geospatial  # Geographic data.
-  - ai  # Machine learning inference.
-  - machine-learning  # Model zoo.
   - earth-observation  # Satellite imagery.
-  - remote-sensing  # Optical and SAR data.
-  - onnx  # Inference backend of the image.
+  - remote-sensing  # Optical imagery.
+  - sar  # Synthetic aperture radar.
+  - machine-learning  # Model zoo.
 home: https://github.com/unbihexium-oss/unbihexium  # Source repository of the project.
 sources:  # Source code locations.
   - https://github.com/unbihexium-oss/unbihexium  # Main repository.
 maintainers:  # Contacts for the chart.
-  - name: Unbihexium OSS  # Maintainer organisation.
+  - name: Olaf Yunus Laitinen Imanov  # Maintainer of the project.
     email: yunus.z.imanov@helsinki.fi  # Contact address.
 
 # =============================================================================

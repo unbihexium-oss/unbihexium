@@ -1,0 +1,61 @@
+{{- /*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : deploy/helm/unbihexium/templates/tests/test-connection.yaml
+Title       : Helm test of the REST API
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Kubernetes manifest template (Go text/template), rendered by Helm 3
+=============================================================================
+
+Abstract
+--------
+Pod run by `helm test`: it requests GET /health through the Service with
+the Python interpreter of the same image and succeeds when the API
+answers with status 200.
+=============================================================================
+*/ -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "unbihexium.fullname" . }}-test-connection
+  labels:
+    {{- include "unbihexium.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  containers:
+    - name: health
+      image: {{ include "unbihexium.image" . | quote }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command:
+        - python
+        - -c
+        - "import sys, urllib.request; sys.exit(urllib.request.urlopen(sys.argv[1], timeout=30).status != 200)"
+        - http://{{ include "unbihexium.fullname" . }}:{{ .Values.service.port }}/health
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+{{- /*
+=============================================================================
+End of file deploy/helm/unbihexium/templates/tests/test-connection.yaml
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+*/ -}}

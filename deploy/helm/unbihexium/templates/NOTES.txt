@@ -1,0 +1,52 @@
+{{- /*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : deploy/helm/unbihexium/templates/NOTES.txt
+Title       : Message shown after installing the chart
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Helm notes template (Go text/template), printed by Helm 3
+=============================================================================
+
+Abstract
+--------
+Tells the user how to reach the REST API of the release and how to run
+the chart test.
+=============================================================================
+*/ -}}
+Unbihexium {{ .Chart.AppVersion }} REST API: release {{ .Release.Name }} in namespace {{ .Release.Namespace }}.
+
+Wait for the pods:
+  kubectl --namespace {{ .Release.Namespace }} rollout status deployment/{{ include "unbihexium.fullname" . }}
+
+{{- if .Values.ingress.enabled }}
+
+The API is routed to:
+{{- range .Values.ingress.hosts }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ . }}/health
+{{- end }}
+{{- else }}
+
+Reach the API from this workstation:
+  kubectl --namespace {{ .Release.Namespace }} port-forward service/{{ include "unbihexium.fullname" . }} 8000:{{ .Values.service.port }}
+  curl http://127.0.0.1:8000/health
+{{- end }}
+
+Check the release:
+  helm test {{ .Release.Name }} --namespace {{ .Release.Namespace }}
+
+The models of the zoo are untrained starter models, except the spectral
+index models; see the README of the project before relying on results.
+{{- /*
+=============================================================================
+End of file deploy/helm/unbihexium/templates/NOTES.txt
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+*/ -}}

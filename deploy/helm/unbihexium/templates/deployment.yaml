@@ -1,0 +1,160 @@
+{{- /*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : deploy/helm/unbihexium/templates/deployment.yaml
+Title       : Deployment of the REST API
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Kubernetes manifest template (Go text/template), rendered by Helm 3
+=============================================================================
+
+Abstract
+--------
+Pods that run `unbihexium serve` with the settings of values.yaml: the
+serving options become UNBIHEXIUM_* environment variables read by
+unbihexium.config, the model store is an emptyDir volume (or an existing
+claim) and the root file system is read-only.
+=============================================================================
+*/ -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "unbihexium.fullname" . }}
+  labels:
+    {{- include "unbihexium.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "unbihexium.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- /* Restart the pods when the API key Secret of the chart changes. */}}
+        checksum/api-key: {{ .Values.server.apiKey.value | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "unbihexium.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "unbihexium.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: api
+          image: {{ include "unbihexium.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - unbihexium
+            - serve
+            - --host
+            - 0.0.0.0
+            - --port
+            - {{ .Values.server.port | quote }}
+            {{- if .Values.server.proxyHeaders }}
+            - --proxy-headers
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          env:
+            - name: UNBIHEXIUM_CACHE
+              value: {{ .Values.cache.mountPath | quote }}
+            - name: UNBIHEXIUM_LOG_LEVEL
+              value: {{ .Values.server.logLevel | quote }}
+            - name: UNBIHEXIUM_SERVING__RATE_LIMIT_PER_MINUTE
+              value: {{ .Values.server.rateLimitPerMinute | quote }}
+            - name: UNBIHEXIUM_SERVING__MAX_REQUEST_BYTES
+              value: {{ .Values.server.maxRequestBytes | int64 | quote }}
+            - name: UNBIHEXIUM_SERVING__MODEL_CACHE_SIZE
+              value: {{ .Values.server.modelCacheSize | quote }}
+            {{- with .Values.server.corsOrigins }}
+            - name: UNBIHEXIUM_SERVING__CORS_ORIGINS
+              value: {{ join "," . | quote }}
+            {{- end }}
+            {{- with (include "unbihexium.apiKeySecret" .) }}
+            - name: UNBIHEXIUM_SERVING__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: {{ $.Values.server.apiKey.secretKey }}
+            {{- end }}
+            {{- with .Values.server.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          volumeMounts:
+            - name: cache
+              mountPath: {{ .Values.cache.mountPath }}
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: cache
+          {{- if .Values.cache.persistentVolumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.cache.persistentVolumeClaim }}
+          {{- else }}
+          emptyDir:
+            sizeLimit: {{ .Values.cache.sizeLimit }}
+          {{- end }}
+        - name: tmp
+          emptyDir:
+            sizeLimit: {{ .Values.tmp.sizeLimit }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- /*
+=============================================================================
+End of file deploy/helm/unbihexium/templates/deployment.yaml
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+*/ -}}
