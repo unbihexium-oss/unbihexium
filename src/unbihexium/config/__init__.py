@@ -16,7 +16,7 @@
 # Abstract
 # --------
 # Public interface of the configuration (see settings.py): the Config
-# dataclass with its model, processing and serving sections, layered
+# dataclass with its model and serving sections, layered
 # loading from defaults, YAML and UNBIHEXIUM_* environment variables, and
 # the cached process-wide settings.
 #
@@ -24,7 +24,7 @@
 # -----
 #   from unbihexium.config import load_config
 #   config = load_config("unbihexium.yaml")
-#   config.processing.tile_size
+#   config.serving.port
 # =============================================================================
 
 # Postpone the evaluation of annotations so that modern type syntax works on
@@ -37,7 +37,6 @@ from unbihexium.config.settings import (
     ENV_PREFIX,  # Prefix of the environment variables.
     Config,  # Complete configuration.
     ModelConfig,  # Model section.
-    ProcessingConfig,  # Processing section.
     ServingConfig,  # Serving section.
     get_default_config,  # Defaults.
     get_settings,  # Cached process-wide settings.
@@ -51,7 +50,6 @@ __all__ = [
     "ENV_PREFIX",  # Prefix of the environment variables.
     "Config",  # Complete configuration.
     "ModelConfig",  # Model section.
-    "ProcessingConfig",  # Processing section.
     "ServingConfig",  # Serving section.
     "get_default_config",  # Defaults.
     "get_settings",  # Cached process-wide settings.

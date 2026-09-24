@@ -15,10 +15,11 @@
 #
 # Abstract
 # --------
-# Config groups the settings of the library in three sections:
+# Config groups the settings of the library in two sections:
 #
-#   model        model zoo variant, device, backend, batch size, workers
-#   processing   tile size and overlap, output format, compression, seed
+#   model        default variant of catalogue families (read by the command
+#                line), device, backend and batch size (read by the REST
+#                service)
 #   serving      REST service: bind address, request limits, API key, CORS,
 #                rate limit and model cache size
 #
@@ -35,7 +36,12 @@
 # the field: integers, floats, booleans (true/false, yes/no, on/off, 1/0),
 # comma-separated lists and "none" or "null" for optional fields. Unknown
 # sections or keys are errors, which catches misspelt settings early.
+# Settings of earlier releases that nothing read (model.num_workers and the
+# processing section) are rejected with a message naming the key.
 # validate() reports every problem at once in a single ValueError.
+#
+# to_dict() and to_yaml() replace serving.api_key with "***" unless
+# include_secrets=True is passed; the loaded objects keep the real key.
 #
 # References
 # ----------
@@ -83,11 +89,14 @@ VARIANTS = ("tiny", "base", "large", "mega")
 # Inference backends of the model zoo.
 BACKENDS = ("auto", "torch", "onnx")
 
-# Output raster formats.
-OUTPUT_FORMATS = ("GTiff", "COG", "Zarr")
+# Settings of earlier releases that nothing read; setting them is an error.
+REMOVED_SETTINGS = (
+    "model.num_workers",  # Training workers; use `unbihexium train --workers`.
+    "processing",  # Tile size, overlap, output format, compression, nodata, seed.
+)  # End of the removed settings.
 
-# GDAL GeoTIFF compression methods that are lossless.
-COMPRESSIONS = ("NONE", "LZW", "DEFLATE", "ZSTD", "LZMA", "PACKBITS")
+# Text that replaces secrets in to_dict() and to_yaml().
+REDACTED = "***"
 
 # Logging levels.
 LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
@@ -102,7 +111,7 @@ FALSE_WORDS = ("0", "false", "no", "off")
 # Model selection and execution.
 @dataclass
 class ModelConfig:
-    # Size variant of catalogue models.
+    # Variant of catalogue family names without a suffix (command line).
     variant: str = "base"
     # Torch device: cpu, cuda, cuda:<n> or mps.
     device: str = "cpu"
@@ -110,25 +119,6 @@ class ModelConfig:
     backend: str = "auto"
     # Tiles per forward pass.
     batch_size: int = 8
-    # Data loader workers for training.
-    num_workers: int = 4
-
-
-# Raster processing.
-@dataclass
-class ProcessingConfig:
-    # Tile side in pixels.
-    tile_size: int = 512
-    # Overlap of neighbouring tiles in pixels.
-    overlap: int = 64
-    # Raster output format.
-    output_format: str = "GTiff"
-    # GeoTIFF compression.
-    compression: str = "DEFLATE"
-    # No-data value of written rasters, None for none.
-    nodata: float | None = None
-    # Seed of random operations, None for non-reproducible runs.
-    seed: int | None = None
 
 
 # REST service.
@@ -157,9 +147,21 @@ class ServingConfig:
 # Sections of the configuration and their classes.
 SECTIONS: dict[str, type] = {
     "model": ModelConfig,  # Model selection.
-    "processing": ProcessingConfig,  # Raster processing.
     "serving": ServingConfig,  # REST service.
 }  # End of the sections.
+
+
+# Reject a setting of earlier releases that was removed.
+def _check_removed(name: str) -> None:
+    # Removed keys and every key of a removed section.
+    for removed in REMOVED_SETTINGS:
+        # Exact key or a key inside a removed section.
+        if name == removed or name.startswith(removed + "."):
+            # Name the key and explain why it is gone.
+            raise ValueError(
+                f"setting {name} was removed because nothing in the library read it; "
+                "delete it from the configuration file or the environment"
+            )  # End of the error.
 
 
 # Whether an annotation accepts None.
@@ -258,6 +260,8 @@ def _section(section: str, values: Mapping[str, Any], base: Any = None) -> Any:
     current = dataclasses.asdict(base) if base is not None else dataclasses.asdict(cls())
     # Apply every value.
     for key, value in values.items():
+        # Removed keys have their own message.
+        _check_removed(f"{section}.{key}")
         # Unknown keys are errors.
         if key not in hints:
             # List the accepted keys.
@@ -273,8 +277,6 @@ def _section(section: str, values: Mapping[str, Any], base: Any = None) -> Any:
 class Config:
     # Model selection and execution.
     model: ModelConfig = field(default_factory=ModelConfig)
-    # Raster processing.
-    processing: ProcessingConfig = field(default_factory=ProcessingConfig)
     # REST service.
     serving: ServingConfig = field(default_factory=ServingConfig)
     # Level of the library logger.
@@ -285,7 +287,7 @@ class Config:
         # Collected problems.
         found: list[str] = []
         # Short names of the sections.
-        m, p, s = self.model, self.processing, self.serving
+        m, s = self.model, self.serving
         # Known variant.
         if m.variant not in VARIANTS:
             # Report it.
@@ -302,30 +304,6 @@ class Config:
         if m.batch_size < 1:
             # Report it.
             found.append("model.batch_size must be at least 1")
-        # Non-negative worker count.
-        if m.num_workers < 0:
-            # Report it.
-            found.append("model.num_workers must not be negative")
-        # Positive tile size.
-        if p.tile_size < 1:
-            # Report it.
-            found.append("processing.tile_size must be at least 1")
-        # Overlap below the tile size.
-        if not 0 <= p.overlap < max(p.tile_size, 1):
-            # Report it.
-            found.append("processing.overlap must be in [0, tile_size)")
-        # Known output format.
-        if p.output_format not in OUTPUT_FORMATS:
-            # Report it.
-            found.append(f"processing.output_format must be one of {', '.join(OUTPUT_FORMATS)}")
-        # Known lossless compression, case-insensitive.
-        if p.compression.upper() not in COMPRESSIONS:
-            # Report it.
-            found.append(f"processing.compression must be one of {', '.join(COMPRESSIONS)}")
-        # Seed range of NumPy.
-        if p.seed is not None and not 0 <= p.seed < 2**32:
-            # Report it.
-            found.append("processing.seed must be in [0, 2**32)")
         # Valid TCP port.
         if not 1 <= s.port <= 65535:
             # Report it.
@@ -362,10 +340,16 @@ class Config:
         # Allow chaining.
         return self
 
-    # Plain dictionary of the configuration.
-    def to_dict(self) -> dict[str, Any]:
+    # Plain dictionary of the configuration; secrets are redacted by default.
+    def to_dict(self, include_secrets: bool = False) -> dict[str, Any]:
         # Recursive conversion of the dataclasses.
-        return dataclasses.asdict(self)
+        data = dataclasses.asdict(self)
+        # Hide the API key unless the caller asks for it.
+        if not include_secrets and data["serving"]["api_key"] is not None:
+            # Placeholder in place of the key.
+            data["serving"]["api_key"] = REDACTED
+        # Return the dictionary.
+        return data
 
     # Configuration from a nested dictionary; missing values keep their defaults.
     @classmethod
@@ -381,6 +365,12 @@ class Config:
         log_level = self.log_level
         # Apply every entry.
         for key, value in data.items():
+            # Removed sections have their own message.
+            if key in REMOVED_SETTINGS:
+                # Name the first key of the section, or the section itself.
+                first = next(iter(value), None) if isinstance(value, Mapping) else None
+                # Explain the problem.
+                _check_removed(f"{key}.{first}" if first is not None else key)
             # Sections need a mapping.
             if key in SECTIONS:
                 # Reject scalars in place of sections.
@@ -414,10 +404,12 @@ class Config:
         # Build and validate.
         return cls.from_dict(data).validate()
 
-    # Write the configuration as YAML.
-    def to_yaml(self, path: str | Path) -> Path:
+    # Write the configuration as YAML; secrets are redacted unless requested.
+    def to_yaml(self, path: str | Path, include_secrets: bool = False) -> Path:
+        # Dictionary with or without the API key.
+        data = self.to_dict(include_secrets=include_secrets)
         # Block-style YAML with the field order of the dataclasses.
-        text = yaml.safe_dump(self.to_dict(), default_flow_style=False, sort_keys=False)
+        text = yaml.safe_dump(data, default_flow_style=False, sort_keys=False)
         # Write atomically.
         return atomic_write_text(path, text)
 
@@ -437,6 +429,10 @@ class Config:
             key = name[len(ENV_PREFIX) :].lower()
             # Section variables use a double underscore.
             section, sep, item = key.partition("__")
+            # Removed settings are errors, not silently ignored.
+            if sep:
+                # Raises for removed keys and sections.
+                _check_removed(f"{section}.{item}")
             # Section settings.
             if sep and section in SECTIONS:
                 # Record the value.
@@ -468,6 +464,12 @@ class Config:
                 data["log_level"] = value
                 # Next key.
                 continue
+            # Removed keys given without their section.
+            for removed in REMOVED_SETTINGS:
+                # Keys of the form section.key.
+                if removed.endswith("." + key):
+                    # Raises with the qualified name.
+                    _check_removed(removed)
             # Sections that define the key; the first one wins.
             owner = next((n for n, c in SECTIONS.items() if key in get_type_hints(c)), None)
             # Unknown keys are errors.
@@ -479,9 +481,9 @@ class Config:
         # Updated copy.
         updated = self.merged(data).validate()
         # Change this object in place, as earlier releases did.
-        self.model, self.processing = updated.model, updated.processing
-        # Remaining fields.
-        self.serving, self.log_level = updated.serving, updated.log_level
+        self.model, self.serving = updated.model, updated.serving
+        # Top-level level.
+        self.log_level = updated.log_level
         # Allow chaining.
         return self
 
