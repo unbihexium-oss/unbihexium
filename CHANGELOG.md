@@ -206,7 +206,7 @@ Other changes:
 - Bandit and pip-audit fail the Security workflow on any finding, and pip-audit also audits `requirements-dev.txt`; before, both only reported in the job log.
 - The release workflow stops before the build when the tag differs from the version recorded in `pyproject.toml`, `_version.py`, `CITATION.cff` or `codemeta.json` (`.github/scripts/check_release_version.py`).
 - `security-insights.yml` lists CodeQL and the atheris fuzzing.
-- The release workflow uploads to PyPI with trusted publishing from the GitHub environment `pypi` and PEP 740 attestations, instead of the long-lived `PYPI_API_TOKEN` secret; the trusted publisher has to be registered on PyPI before the next release (docs/operations/releasing.md, Section 2.1).
+- The release workflow uploads to PyPI with trusted publishing from the GitHub environment `pypi` and PEP 740 attestations, instead of the long-lived `PYPI_API_TOKEN` secret; the trusted publisher is registered on PyPI, and the former secret is deleted and its token revoked (docs/operations/releasing.md, Section 2.1).
 - Each release carries an SPDX SBOM of the wheel installed with the locked runtime dependencies (`unbihexium-<tag>.spdx.json`), attested for the distributions.
 - Every pushed container image is signed with cosign in keyless mode and has SLSA build provenance and SBOM attestations in the registry.
 

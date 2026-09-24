@@ -75,13 +75,7 @@ As of 2026-09-24:
 - Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
 - Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
 
-### 3.3 Trusted publisher registration on PyPI (planned)
-
-- Gap: the release workflow uploads with PyPI trusted publishing [3] from the GitHub environment `pypi`, but the trusted publisher still has to be registered on PyPI, and the former `PYPI_API_TOKEN` repository secret still has to be deleted and its token revoked.
-- Evidence: the "Publish to PyPI" step and the `environment` of `.github/workflows/release.yml`; the publishing settings of the project on PyPI.
-- Outcome: the publisher is registered for `release.yml` and the environment `pypi` as described in [docs/operations/releasing.md](docs/operations/releasing.md), Section 2.1, before the next release, so that no upload credential is stored anywhere.
-
-### 3.4 Security self-assessment (planned)
+### 3.3 Security self-assessment (planned)
 
 - Gap: no security self-assessment has been published.
 - Evidence: the `security.assessments.self` entry of [security-insights.yml](security-insights.yml).
@@ -119,13 +113,13 @@ As of 2026-09-24:
 
 ### 6.1 Python 3.10 end of life (planned)
 
-- Gap: Python 3.10 reaches its upstream end of life in October 2026 [4].
+- Gap: Python 3.10 reaches its upstream end of life in October 2026 [3].
 - Evidence: the Python version support policy in [VERSIONING.md](VERSIONING.md).
 - Outcome: under that policy, support for Python 3.10 is removed in the first minor release after its end of life, together with the Python 3.10 specific dependency bounds and lock entries.
 
 ### 6.2 Python 3.15 (planned)
 
-- Gap: Python 3.15 is scheduled for release in October 2026 [4] and is not yet tested.
+- Gap: Python 3.15 is scheduled for release in October 2026 [3] and is not yet tested.
 - Evidence: the CI test matrix and the classifiers in `pyproject.toml`.
 - Outcome: support for Python 3.15 once the runtime dependencies publish wheels for it, following the dependency policy in `pyproject.toml`.
 
@@ -147,9 +141,7 @@ Proposals are made in an issue opened with the feature request form at <https://
 
 [2] B. Leiba. RFC 8174: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words. IETF, 2017. <https://www.rfc-editor.org/rfc/rfc8174>
 
-[3] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
-
-[4] Python Software Foundation. Status of Python versions, Python Developer's Guide. 2026. <https://devguide.python.org/versions/>
+[3] Python Software Foundation. Status of Python versions, Python Developer's Guide. 2026. <https://devguide.python.org/versions/>
 
 <!--
 =============================================================================

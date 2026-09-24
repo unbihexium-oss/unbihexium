@@ -70,7 +70,7 @@ The key words MUST, MUST NOT, SHOULD, SHOULD NOT and MAY in this document are to
 
 No other secret is referenced by any workflow. There are no cloud provider credentials, no registry passwords other than `GITHUB_TOKEN` for the GitHub Container Registry, no PyPI credentials, no signing keys and no deployment keys.
 
-The release job runs in the GitHub environment `pypi` and publishes with PyPI trusted publishing [8]: PyPI checks the OIDC token of the job against the trusted publisher registered for the project (repository `unbihexium-oss/unbihexium`, workflow `release.yml`, environment `pypi`) and returns an upload token that expires after the upload. The lead maintainer, who administers the project on PyPI ([GOVERNANCE.md](../../GOVERNANCE.md)), registers the trusted publisher once, then deletes the former `PYPI_API_TOKEN` repository secret and revokes that token on PyPI. Required reviewers MAY be added to the `pypi` environment in the repository settings, so that every upload waits for an approval.
+The release job runs in the GitHub environment `pypi` and publishes with PyPI trusted publishing [8]: PyPI checks the OIDC token of the job against the trusted publisher registered for the project (repository `unbihexium-oss/unbihexium`, workflow `release.yml`, environment `pypi`) and returns an upload token that expires after the upload. The lead maintainer, who administers the project on PyPI ([GOVERNANCE.md](../../GOVERNANCE.md)), registered the trusted publisher on 2026-09-24, deleted the former `PYPI_API_TOKEN` repository secret and revoked that token on PyPI. Required reviewers MAY be added to the `pypi` environment in the repository settings, so that every upload waits for an approval.
 
 ## 3. GITHUB_TOKEN Permissions per Workflow
 
