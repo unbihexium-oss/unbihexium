@@ -1,614 +1,484 @@
-# Capability 02: Tourism and Data Processing
+<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-## Executive Summary
+=============================================================================
+Project     : Unbihexium
+File        : docs/capabilities/02_tourism_data_processing.md
+Title       : Capability domain 02: tourism and data processing
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
+=============================================================================
+-->
 
-This document provides comprehensive documentation for the Tourism and Data Processing capability domain within the Unbihexium framework. This domain encompasses geospatial analytics for tourism planning, route optimization, mobility analysis, and spatial data processing workflows essential for location-based services and geographic information systems.
+# Capability domain 02: tourism and data processing
 
-The domain comprises 10 base model architectures with 40 total variants, serving applications in transportation planning, accessibility analysis, destination management, and spatial data science workflows.
+| Field | Value |
+| --- | --- |
+| Document | UBX-DOC-CAP-02 |
+| Version | 2.0 |
+| Status | Active |
+| Last reviewed | 2026-09-24 |
+| Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
+| Applies to | The main branch of Unbihexium (declared version 1.0.1, model catalogue 2.0.0) |
 
----
+## Abstract
 
-## Domain Overview
+This document describes capability domain 02, "tourism and data processing". It covers the model families of the catalogue domains `tourism` and `analysis` and the deterministic spatial analysis functions that the registry files under the domain `analysis`: terrain derivatives and visibility (`unbihexium.terrain`), geostatistics (`unbihexium.geostat`), multi-criteria suitability, cost surfaces, network routing and zonal statistics (`unbihexium.analysis`), and accuracy assessment (`unbihexium.metrics`). It is intended for analysts who need to know which of these tools compute a published method exactly and which are learned starter models, for contributors, and for reviewers. For every function it states the inputs, the outputs and the formula implemented, with its primary source; the twelve model families are listed in tables generated from the catalogue; all examples were executed. The twelve model families are untrained starter models, and the domain describes intended applications, not validated products.
 
-### Scope and Objectives
+## Contents
 
-The Tourism and Data Processing capability domain addresses the following primary objectives:
+1. [Scope and status](#1-scope-and-status)
+2. [Place in the registry and the catalogue](#2-place-in-the-registry-and-the-catalogue)
+3. [Model families](#3-model-families)
+4. [Terrain analysis](#4-terrain-analysis)
+5. [Geostatistics](#5-geostatistics)
+6. [Spatial analysis](#6-spatial-analysis)
+7. [Accuracy assessment](#7-accuracy-assessment)
+8. [Examples](#8-examples)
+9. [Limitations and responsible use](#9-limitations-and-responsible-use)
+10. [Related documents](#10-related-documents)
+11. [References](#references)
 
-1. **Route Optimization**: Calculate optimal paths between locations considering multiple constraints including distance, time, terrain, and accessibility requirements.
+## 1. Scope and status
 
-2. **Accessibility Analysis**: Evaluate geographic accessibility to services, amenities, and infrastructure using network-based and distance-based metrics.
+### 1.1 What the domain covers
 
-3. **Spatial Analysis**: Perform advanced spatial analytics including viewshed analysis, network analysis, and geostatistical modeling.
+Domain 02 combines two groups of capabilities that serve the same kind of question, "where is something accessible, visible, suitable or dense, and how certain is the map":
 
-4. **Mobility Pattern Analysis**: Understand movement patterns, transportation flows, and temporal dynamics of human mobility.
+- **deterministic functions** that implement published algorithms: slope, aspect, hillshade, curvature and ruggedness measures, line-of-sight viewsheds, empirical variograms, ordinary and universal kriging, inverse distance weighting, global and local spatial autocorrelation, the Analytic Hierarchy Process with weighted overlay, raster cost distance and least-cost paths, graph routing, zonal statistics, and error matrix and area estimation measures;
+- **learned model families** of the catalogue domains `tourism` (4 families) and `analysis` (8 families) that are designed to learn a surface or a scene value (travel time, visibility, suitability, density, economic indicators) from imagery and covariates.
 
-5. **Destination Monitoring**: Track changes in tourist destinations, recreational areas, and points of interest over time.
+### 1.2 Status of the models and the functions
 
-### Domain Statistics
+The functions of Sections 4 to 7 are deterministic, need no training and are covered by the unit tests in `tests/`. The twelve model families of Section 3 are **untrained starter models**: complete, trainable networks with deterministic initial weights that have not been fitted to any data. Their output is meaningless until they are trained on reference data (Section 8.5 shows the output of an untrained model). Several families are learned counterparts of a function of this document, for example `viewshed_analyzer` (Section 4.3), `geostatistical_analyzer` (Section 5) and `zonal_statistics` (Section 6.4); the function is exact for its inputs, whereas the family is meant to approximate its result from imagery after training. The only models of the zoo that need no training are the spectral index families of [domain 03](03_indices_flood_water.md).
 
-| Metric | Value |
-| -------- | ------- |
-| Base Model Architectures | 10 |
-| Total Model Variants | 40 |
-| Minimum Parameters (tiny) | 67,969 |
-| Maximum Parameters (mega) | 4,107,010 |
-| Primary Tasks | Regression, Segmentation |
-| Production Status | Fully Production Ready |
+### 1.3 Changes from the previous version
 
----
+Version 1 of this document listed ten "production" models with accuracy tables, an MLP architecture, a Siamese change detector, gravity and distance-decay accessibility models and a time series model. There is no code for gravity models or distance-decay functions; the architectures are U-Net regressors and encoder regressors (Section 3.2); the time series family `timeseries_analyzer` belongs to the agriculture domain ([domain 06](06_urban_agriculture.md)) and `mobility_analyzer` to the urban domain. These parts were removed and replaced by the functions that the library implements.
 
-## Model Inventory
+## 2. Place in the registry and the catalogue
 
-### Complete Model Listing
+The enumeration `unbihexium.registry.CapabilityDomain` has the members `TOURISM = "tourism"` and `ANALYSIS = "analysis"`. The capability registry holds:
 
-| Model ID | Task | Architecture | Input Features | Variants | Parameter Range |
-| ---------- | ------ | -------------- | ---------------- | ---------- | ----------------- |
-| route_planner | Regression | MLP | 8 | 4 | 68,225 - 1,059,329 |
-| accessibility_analyzer | Regression | MLP | 10 | 4 | 68,481 - 1,060,353 |
-| mobility_analyzer | Regression | MLP | 8 | 4 | 68,225 - 1,059,329 |
-| spatial_analyzer | Regression | MLP | 10 | 4 | 68,481 - 1,060,353 |
-| spatial_relationship | Regression | MLP | 8 | 4 | 68,225 - 1,059,329 |
-| viewshed_analyzer | Regression | MLP | 6 | 4 | 67,969 - 1,058,305 |
-| geostatistical_analyzer | Regression | MLP | 10 | 4 | 68,481 - 1,060,353 |
-| timeseries_analyzer | Regression | MLP | 12 | 4 | 68,737 - 1,061,377 |
-| zonal_statistics | Regression | MLP | 6 | 4 | 67,969 - 1,058,305 |
-| tourist_destination_monitor | Segmentation | Siamese | 2 classes | 4 | 258,754 - 4,107,010 |
+| Registry domain | Model capabilities (families) | Library capabilities | Total |
+| --- | --- | --- | --- |
+| `tourism` | 4, maturity `beta` | none | 4 |
+| `analysis` | 8, maturity `beta` | `terrain_analysis` (`unbihexium.terrain`), `geostatistics` (`unbihexium.geostat`), `spatial_analysis` (`unbihexium.analysis`), `accuracy_metrics` (`unbihexium.metrics`, `unbihexium.ai.evaluation`), all `stable` | 12 |
 
-### Variant Specifications
+None of the twelve families has a registered pipeline; each is run with `unbihexium predict <family>_<variant> INPUT OUTPUT` or `unbihexium.ai.predict`. The hydrological part of `terrain_analysis` (depression filling, flow direction, flow accumulation, watersheds, streams and the topographic wetness index) is described with the water capabilities in [domain 03](03_indices_flood_water.md), and the image quality measures of `unbihexium.metrics` with the imaging capabilities in [domain 04](04_environment_forestry_image_processing.md).
 
-| Variant | Hidden Dimensions | Layers | Dropout | Use Case |
-| --------- | ------------------- | -------- | --------- | ---------- |
-| tiny | 128 | 4 | 0.2 | Edge devices, real-time |
-| base | 256 | 4 | 0.2 | Standard production |
-| large | 384 | 4 | 0.2 | High accuracy |
-| mega | 512 | 4 | 0.2 | Maximum quality |
+## 3. Model families
 
----
+### 3.1 Inventory
 
-## Performance Metrics and Benchmarks
+The tables were generated from the catalogue and the model registry of the installed package with the script of [index.md, Section 4](index.md#4-regenerating-the-family-tables), run with the arguments `tourism analysis`. Units are given in brackets after the outputs; `1` means dimensionless.
 
-### Regression Performance
+| Family | Domain | Task | Input bands | Outputs | Parameters (tiny / base / large / mega) |
+| --- | --- | --- | --- | --- | --- |
+| `tourist_destination_monitor` | tourism | segmentation | red, green, blue | background, beach, built_up, vegetation, water | 732,997 / 7,058,565 / 22,059,269 / 60,450,821 |
+| `accessibility_analyzer` | tourism | dense_regression | B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance | travel_time [min] | 733,937 / 7,060,449 / 22,062,097 / 60,454,593 |
+| `route_planner` | tourism | dense_regression | B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance | travel_cost [s m-1] | 733,937 / 7,060,449 / 22,062,097 / 60,454,593 |
+| `viewshed_analyzer` | tourism | dense_regression | elevation | visible_fraction [1] | 732,641 / 7,057,857 / 22,058,209 / 60,449,409 |
+| `site_suitability` | analysis | dense_regression | B02, B03, B04, B08, B11, B12, elevation, slope, population, road_distance | suitability [1] | 733,937 / 7,060,449 / 22,062,097 / 60,454,593 |
+| `spatial_analyzer` | analysis | dense_regression | blue, green, red, nir | density [ha-1] | 733,073 / 7,058,721 / 22,059,505 / 60,451,137 |
+| `geostatistical_analyzer` | analysis | dense_regression | B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12, elevation, slope | value [user defined] | 734,225 / 7,061,025 / 22,062,961 / 60,455,745 |
+| `spatial_relationship` | analysis | dense_regression | blue, green, red, nir | distance [m] | 733,073 / 7,058,721 / 22,059,505 / 60,451,137 |
+| `business_valuation` | analysis | scene_regression | blue, green, red, nir | activity_index [1] | 494,625 / 3,745,345 / 14,606,497 / 37,762,945 |
+| `economic_spatial_assessor` | analysis | scene_regression | red, green, blue | median_value [currency m-2] | 494,481 / 3,745,057 / 14,606,065 / 37,762,369 |
+| `resource_allocation` | analysis | scene_regression | blue, green, red, nir | population, service_demand [persons, 1] | 494,658 / 3,745,410 / 14,606,594 / 37,763,074 |
+| `zonal_statistics` | analysis | scene_regression | B02, B03, B04, B05, B06, B07, B08, B8A, B11, B12 | vegetation_fraction, water_fraction, built_up_fraction [1, 1, 1] | 495,555 / 3,747,203 / 14,609,283 / 37,766,659 |
 
-Regression models are evaluated using coefficient of determination (R-squared) and Root Mean Square Error (RMSE):
+| Family | Name | Intended application | Reference data needed for training |
+| --- | --- | --- | --- |
+| `tourist_destination_monitor` | Tourist Destination Monitor | Maps beaches, built-up areas, vegetation and water around tourist destinations. | Masks of the land cover classes. |
+| `accessibility_analyzer` | Accessibility Analyser | Estimates travel time to the nearest service centre per pixel. | Travel time rasters from network analysis or surveys. |
+| `route_planner` | Route Cost Surface | Estimates a travel cost surface for least-cost routing. | Travel cost rasters from speed models. |
+| `viewshed_analyzer` | Visibility Estimator | Estimates the fraction of the surrounding area visible from each pixel. | Visibility rasters from viewshed analysis. |
+| `site_suitability` | Site Suitability | Scores general site suitability for development. | Suitability scores from multi-criteria analysis. |
+| `spatial_analyzer` | Spatial Density Estimator | Estimates the density of a mapped phenomenon, for example buildings per hectare. | Density rasters derived from reference vector data. |
+| `geostatistical_analyzer` | Geostatistical Surface Estimator | Learns a continuous surface of a sampled variable from covariates, as a learned alternative to kriging. | Point samples rasterised as sparse targets. |
+| `spatial_relationship` | Proximity Estimator | Estimates the distance to the nearest mapped feature of interest. | Distance rasters derived from reference vector data. |
+| `business_valuation` | Economic Activity Estimator | Estimates an economic activity index of an area from imagery. | Economic indicators aggregated to chips. |
+| `economic_spatial_assessor` | Property Value Estimator | Estimates median property value of an area. | Property transaction statistics aggregated to chips. |
+| `resource_allocation` | Service Demand Estimator | Estimates population and service demand of an area for resource allocation. | Census population and service statistics per chip. |
+| `zonal_statistics` | Zonal Cover Estimator | Estimates the fractional cover of vegetation, water and built-up area in a chip. | Cover fractions per chip from reference land cover maps. |
 
-$$
-R^2 = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}{\sum_{i=1}^{n}(y_i - \bar{y})^2}
-$$
+"Intended application" is the catalogue description of what a model does once it has been trained. Several families take auxiliary layers (population, road distance, elevation, slope) as input bands; the user supplies them co-registered with the imagery. The deterministic functions of Sections 4 and 6 can produce several of the training targets, for example travel cost rasters with `cost_distance`, visibility rasters with `viewshed` and suitability scores with `weighted_overlay`.
 
-$$
-\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2}
-$$
+### 3.2 Architectures and outputs
 
-| Model | Metric | Tiny | Base | Large | Mega | Test Dataset |
-| ------- | -------- | ------ | ------ | ------- | ------ | -------------- |
-| route_planner | R-squared | 0.75 | 0.82 | 0.88 | 0.92 | OSM-Routes |
-| accessibility_analyzer | R-squared | 0.73 | 0.80 | 0.86 | 0.90 | Urban-Access |
-| mobility_analyzer | R-squared | 0.70 | 0.78 | 0.84 | 0.89 | Taxi-GPS |
-| viewshed_analyzer | Accuracy | 0.82 | 0.88 | 0.92 | 0.95 | DEM-Viewshed |
-| timeseries_analyzer | R-squared | 0.72 | 0.79 | 0.85 | 0.90 | Temporal-GIS |
+Dense regression families (`unet_regression`) return a tensor $(N, K, H, W)$ with one channel per target in the listed units; families whose catalogue entry has a value range of $[0, 1]$ (`viewshed_analyzer`, `site_suitability`, `zonal_statistics`) end in a sigmoid. Scene regression families (`encoder_regressor`) return $(N, K)$, one value per target and image chip, and are written as JSON by `unbihexium predict`. The segmentation family `tourist_destination_monitor` (`unet`) returns class logits $(N, K, H, W)$.
 
-### Change Detection Performance
+## 4. Terrain analysis
 
-| Model | Metric | Tiny | Base | Large | Mega | Test Dataset |
-| ------- | -------- | ------ | ------ | ------- | ------ | -------------- |
-| tourist_destination_monitor | F1 | 0.68 | 0.77 | 0.84 | 0.90 | POI-Changes |
-| tourist_destination_monitor | IoU | 0.65 | 0.74 | 0.82 | 0.88 | POI-Changes |
+`unbihexium.terrain` works on gridded digital elevation models (DEM) whose first row is the northern edge; NaN marks nodata. `resolution` is the cell size (one number or `(x size, y size)`) in the units of the elevations, and `z_factor` converts elevation units when they differ.
 
----
+### 4.1 Derivatives
 
-## Mathematical Foundations
-
-### Accessibility Score Computation
-
-The accessibility score for location $i$ is computed using a gravity-based model:
-
-$$
-A_i = \sum_{j=1}^{n} \frac{S_j}{d_{ij}^\beta}
-$$
-
-Where:
-
-- $A_i$ = Accessibility score for location $i$
-- $S_j$ = Attractiveness or size of destination $j$
-- $d_{ij}$ = Distance or travel time between $i$ and $j$
-- $\beta$ = Distance decay parameter (typically 1-2)
-
-### Extended Gravity Model
-
-For more complex accessibility analysis:
-
-$$
-A_i = \sum_{j=1}^{n} S_j^\alpha \cdot f(d_{ij}) \cdot g(c_{ij})
-$$
-
-Where:
-
-- $\alpha$ = Attractiveness elasticity
-- $f(d_{ij})$ = Distance decay function (exponential or power)
-- $g(c_{ij})$ = Competition factor
-
-### Distance Decay Functions
-
-Power function:
-$$
-f(d) = d^{-\beta}
-$$
-
-Exponential function:
-$$
-f(d) = e^{-\beta d}
-$$
-
-Gaussian function:
-$$
-f(d) = e^{-\frac{d^2}{2\sigma^2}}
-$$
-
-### Network Analysis
-
-Shortest path using Dijkstra's algorithm:
+With the $3 \times 3$ window numbered $z_1, z_2, z_3$ (north row), $z_4, z_5, z_6$, $z_7, z_8, z_9$ (south row) and cell sizes $\Delta x$, $\Delta y$, the gradient is the finite difference of Horn [1]:
 
 $$
-d(v) = \min_{u \in N(v)} \{d(u) + w(u, v)\}
+\frac{\partial z}{\partial x} = \frac{(z_3 + 2 z_6 + z_9) - (z_1 + 2 z_4 + z_7)}{8\,\Delta x}, \qquad
+\frac{\partial z}{\partial y} = \frac{(z_1 + 2 z_2 + z_3) - (z_7 + 2 z_8 + z_9)}{8\,\Delta y}
 $$
 
-Where $N(v)$ is the set of neighbors of vertex $v$ and $w(u, v)$ is the edge weight.
+with $y$ pointing north. The DEM is extended by one cell with linear extrapolation, so a plane keeps its exact slope up to the border.
 
-### Viewshed Analysis
+| Function | Output | Formula and source |
+| --- | --- | --- |
+| `gradient(dem, resolution, z_factor)` | $(\partial z/\partial x, \partial z/\partial y)$ | Horn [1] |
+| `slope(dem, resolution, units, z_factor)` | slope in `degrees`, `percent` or `radians` | $S = \arctan \lvert \nabla z \rvert$ |
+| `aspect(dem, resolution)` | downslope direction, degrees clockwise from north, NaN on flat cells | $A = \operatorname{atan2}(-\partial z/\partial x, -\partial z/\partial y)$ |
+| `hillshade(dem, resolution, azimuth=315, altitude=45, z_factor)` | brightness 0 to 255 | $255 \max(0, \cos Z \cos S + \sin Z \sin S \cos(\phi - A))$ with zenith $Z = 90$ degrees minus the altitude and light azimuth $\phi$ [1] |
+| `curvature(dem, resolution)` | profile and plan curvature | quadratic surface of Zevenbergen and Thorne [2], positive on convex forms |
+| `total_curvature(dem, resolution)` | total curvature | $-2(D + E)$ of the same surface |
+| `tpi(dem, radius=1)` | topographic position index | $z_5$ minus the mean of the square neighbourhood without the centre [3] |
+| `tri(dem, method="riley")` | terrain ruggedness index | $\sqrt{\sum_{i \ne 5} (z_i - z_5)^2}$ (Riley et al. [4]) or the mean absolute difference (`"wilson"`, [5]) |
+| `roughness(dem)` | range of elevations in the window | [5] |
+| `vrm(dem, resolution, window_size=3)` | vector ruggedness measure, 0 (flat) to 1 | one minus the length of the mean unit surface normal (Sappington et al. [6]) |
 
-Visibility from observer point $O$ to target point $T$:
+### 4.2 Hydrology
 
-$$
-\text{Visible}(O, T) = \begin{cases} 1 & \text{if } \forall P \in \text{LOS}(O, T): \text{elev}(P) < \text{line}(O, T, P) \\ 0 & \text{otherwise} \end{cases}
-$$
+`fill_depressions`, `flow_direction_d8`, `flow_accumulation`, `watershed`, `extract_streams` and `twi` belong to the same registry capability but are documented, with their formulas, in [domain 03, Section 5](03_indices_flood_water.md#5-hydrological-terrain-analysis).
 
-Total viewshed area:
+### 4.3 Visibility
 
-$$
-V = \sum_{i=1}^{n} \sum_{j=1}^{m} \text{Visible}(O, (i, j)) \cdot \Delta x \cdot \Delta y
-$$
+`viewshed(dem, observer, resolution, observer_height=1.7, target_height=0.0, max_distance=None, earth_curvature=False, refraction=0.13)` returns a boolean grid of the cells visible from the observer cell `(row, column)`. For every target cell the line of sight from the observer's eye to the target is sampled once per crossed row or column, the terrain is interpolated bilinearly, and the target is visible when the tangent of its elevation angle is at least the largest tangent of the intermediate samples (the exact "R3" test of Franklin and Ray [7] on an interpolated surface). With `earth_curvature=True` elevations are lowered by $\Delta z = (1 - k)\, d^2 / (2R)$ with the refraction coefficient $k$ and $R = 6\,371\,000$ m. The cost is $O(N D)$ for $N$ cells and lines of $D$ cells; `max_distance` limits it.
 
-### Spatial Autocorrelation
+## 5. Geostatistics
 
-Moran's I statistic:
+`unbihexium.geostat` analyses and interpolates point data given as coordinates `(n, 2)` and values `(n,)`.
 
-$$
-I = \frac{n}{\sum_{i}\sum_{j} w_{ij}} \cdot \frac{\sum_{i}\sum_{j} w_{ij}(x_i - \bar{x})(x_j - \bar{x})}{\sum_{i}(x_i - \bar{x})^2}
-$$
+### 5.1 Variograms
 
-Where $w_{ij}$ is the spatial weight between locations $i$ and $j$.
-
-### Geostatistical Interpolation
-
-Kriging predictor:
-
-$$
-\hat{Z}(x_0) = \sum_{i=1}^{n} \lambda_i Z(x_i)
-$$
-
-Where weights $\lambda_i$ are determined by minimizing the estimation variance:
+`empirical_variogram(coordinates, values, n_lags=15, max_lag=None, estimator="matheron")` bins the pairs by distance and estimates the semivariance with the classical estimator of Matheron [8] or the robust estimator of Cressie and Hawkins [9]:
 
 $$
-\text{Var}[\hat{Z}(x_0) - Z(x_0)]
+\hat\gamma_M(h) = \frac{1}{2 N(h)} \sum_{N(h)} (z_i - z_j)^2, \qquad
+\hat\gamma_{CH}(h) = \frac{\left(\frac{1}{N(h)} \sum_{N(h)} \lvert z_i - z_j \rvert^{1/2}\right)^4}{2\,(0.457 + 0.494 / N(h))} .
 $$
 
-Subject to unbiasedness constraint:
+`Variogram(n_lags, max_lag, model, estimator, shape).fit(coordinates, values)` fits a model by least squares weighted with the pair counts $N(h)$ [10] and returns a `VariogramResult` (lags, semivariance, nugget $c_0$, partial sill $c$, range parameter $a$, fitted values, counts). The models of `variogram_function` are, for $h > 0$ and $r = h/a$ ($\gamma(0) = 0$):
+
+| Model | $\gamma(h)$ |
+| --- | --- |
+| `spherical` | $c_0 + c\,(1.5 r - 0.5 r^3)$ for $r < 1$, else $c_0 + c$ |
+| `exponential` | $c_0 + c\,(1 - e^{-r})$, practical range $3a$ |
+| `gaussian` | $c_0 + c\,(1 - e^{-r^2})$, practical range $\sqrt{3}\,a$ |
+| `matern` | $c_0 + c\left(1 - \frac{2^{1-\nu}}{\Gamma(\nu)} r^\nu K_\nu(r)\right)$, smoothness $\nu$ (`shape`) |
+| `linear` | $c_0 + c\,r$ (no sill) |
+| `power` | $c_0 + c\,r^\nu$, $0 < \nu < 2$ (no sill) |
+
+### 5.2 Kriging and inverse distance weighting
+
+`OrdinaryKriging(variogram, n_neighbors=None)` and `UniversalKriging(variogram, drift_terms=1, n_neighbors=None)` solve the kriging system [11]
 
 $$
-\sum_{i=1}^{n} \lambda_i = 1
+\begin{bmatrix} \Gamma & F \\ F^\top & 0 \end{bmatrix}
+\begin{bmatrix} \lambda \\ \mu \end{bmatrix} =
+\begin{bmatrix} \gamma_0 \\ f_0 \end{bmatrix}, \qquad
+\hat z(x_0) = \lambda^\top z, \qquad
+\sigma^2_K(x_0) = \lambda^\top \gamma_0 + \mu^\top f_0 ,
 $$
 
-### Semivariogram
+where $\Gamma_{ij} = \gamma(\lvert x_i - x_j \rvert)$, $F$ is a column of ones (ordinary kriging) or the linear ($1, x, y$) or quadratic drift terms (universal kriging). The predictor is exact at data locations. For universal kriging the variogram is fitted to the residuals of an ordinary least squares trend. `predict` returns a `KrigingResult` (predictions and kriging variances), `predict_grid(x, y)` a surface, and `cross_validate(k_folds=None)` leave-one-out or k-fold statistics (RMSE, MAE, bias and the mean standardised squared error `msse`). With `n_neighbors` only the nearest points enter each prediction. `idw(coordinates, values, targets, power=2, n_neighbors=None)` is inverse distance weighting after Shepard [12].
+
+### 5.3 Spatial autocorrelation
+
+With deviations $z_i = x_i - \bar x$, weights $w_{ij}$ and $S_0 = \sum_{ij} w_{ij}$:
 
 $$
-\gamma(h) = \frac{1}{2N(h)} \sum_{i=1}^{N(h)} [Z(x_i) - Z(x_i + h)]^2
+I = \frac{n}{S_0} \frac{\sum_{ij} w_{ij} z_i z_j}{\sum_i z_i^2} \;\;\text{(Moran [13])}, \qquad
+C = \frac{(n - 1) \sum_{ij} w_{ij} (x_i - x_j)^2}{2 S_0 \sum_i z_i^2} \;\;\text{(Geary [14])} .
 $$
 
-Common semivariogram models:
+`morans_i` and `gearys_c` return the statistic with its expectation, the variance under normality or randomisation (Cliff and Ord [15]), a z-score, a two-sided normal p-value and, with `permutations > 0`, a pseudo p-value. `grid_morans_i` computes Moran's I of a raster with rook or queen contiguity, `getis_ord_gi_star` the local Gi* z-scores of hot and cold spots [16], and `local_morans_i` the local indicators of spatial association [17]. Weights come from `distance_band_weights`, `knn_weights`, `contiguity_weights` and `row_standardize`.
 
-Spherical:
-$$
-\gamma(h) = \begin{cases} c_0 + c_1 \left[\frac{3h}{2a} - \frac{h^3}{2a^3}\right] & h \leq a \\ c_0 + c_1 & h > a \end{cases}
-$$
+## 6. Spatial analysis
 
-Exponential:
-$$
-\gamma(h) = c_0 + c_1 \left[1 - e^{-h/a}\right]
-$$
+### 6.1 Multi-criteria suitability
 
-Gaussian:
-$$
-\gamma(h) = c_0 + c_1 \left[1 - e^{-(h/a)^2}\right]
-$$
+`unbihexium.analysis.suitability` follows the three steps of GIS multi-criteria evaluation [18]:
 
----
+1. standardise the factor layers to $[0, 1]$ with `rescale_linear(values, low, high, increasing)`, `fuzzy_membership(values, a, b, shape)` (linear or sine-squared sigmoidal) or `reclassify(values, breaks, scores)`;
+2. derive criterion weights with the Analytic Hierarchy Process, `AHP` [19]: from a reciprocal pairwise comparison matrix $A$ on the 1 to 9 scale, the weights are its normalised principal eigenvector $w$ (or the row geometric means with `method="geometric_mean"`, Crawford and Williams [29]), the consistency index is $CI = (\lambda_{\max} - n)/(n - 1)$ and the consistency ratio $CR = CI / RI$ with the random index $RI$ of matrices of the same size; judgements with $CR < 0.1$ are usually accepted (`is_consistent`);
+3. combine the layers by weighted linear combination $S = \sum_k w_k x_k$ and set cells that fail a Boolean constraint to zero: `weighted_overlay(layers, weights, normalize=True, constraints=None)` returns a `SuitabilityResult`.
 
-## Architecture Specifications
+### 6.2 Cost surfaces
 
-### MLP Architecture (Regression Tasks)
+A friction raster gives the cost of crossing one unit of distance in each cell. Moving between neighbouring cells $a$ and $b$ costs $\tfrac{1}{2}(c_a + c_b)$ times the step length (one cell size, or the diagonal). `cost_distance(cost, sources, resolution, connectivity=8)` runs Dijkstra's algorithm [20] and returns the least accumulated cost to the nearest source and that source's index; `least_cost_path(cost, start, end, resolution, connectivity)` returns the cells of the cheapest path and its cost [21]. Cells with NaN, infinite or negative cost are barriers.
 
-The Multi-Layer Perceptron architecture is used for all regression tasks in this domain.
+### 6.3 Network analysis
 
-```mermaid
-graph LR
-    A[Input Features] --> B[Linear + BN + ReLU]
-    B --> C[Dropout 0.2]
-    C --> D[Linear + BN + ReLU]
-    D --> E[Dropout 0.2]
-    E --> F[Linear + BN + ReLU]
-    F --> G[Linear]
-    G --> H[Output]
-```
+`NetworkAnalyzer` holds a weighted graph with node coordinates, for example a road network with lengths or travel times as edge costs. It provides `shortest_path` (Dijkstra [20], or A* [22] with a Euclidean, Manhattan or haversine heuristic), `shortest_costs`, `service_area`, `accessibility`, `closest_facility`, `od_cost_matrix` and `nearest_node`. Edge costs must be non-negative.
 
-#### Layer Configuration
+### 6.4 Zonal statistics
 
-| Layer | Input Size | Output Size | Activation | Regularization |
-| ------- | ------------ | ------------- | ------------ | ---------------- |
-| FC1 | N_features | hidden | ReLU | BatchNorm, Dropout(0.2) |
-| FC2 | hidden | 2*hidden | ReLU | BatchNorm, Dropout(0.2) |
-| FC3 | 2*hidden | hidden | ReLU | BatchNorm |
-| FC4 | hidden | 1 | Linear | None |
+`zonal_table(values, zones, stats, percentiles, nodata, zone_nodata)`, `zonal_statistics(raster, zones, ...)` and `ZonalStatistics.calculate` compute, for every zone of a zone raster of the same shape, the statistics `count`, `sum`, `mean`, `std` (population), `min`, `max`, `range`, `median`, `majority`, `minority`, `variety` and arbitrary percentiles [23]. Values that are NaN or equal to `nodata` are ignored. `rasterize_zones` burns polygons into a zone raster.
 
-#### Parameter Count Formula
+## 7. Accuracy assessment
 
-$$
-P_{MLP} = N_f \cdot H + H + 2H + 2H^2 + 2H + 4H + 2H^2 + H + 2H + H + 1
-$$
+`unbihexium.metrics` implements the accuracy measures used to validate map products, including the outputs of the families of Section 3 once they are trained. Every error matrix has the **reference** classes in its rows and the **map** classes in its columns.
 
-Simplified:
-$$
-P_{MLP} = N_f \cdot H + 4H^2 + 12H + 1
-$$
+- `confusion_matrix`, `accuracy_assessment` and `cohen_kappa`: with proportions $p_{ij}$, overall accuracy $OA = \sum_i p_{ii}$, producer's and user's accuracies, F1, IoU, Cohen's $\kappa = (OA - p_e)/(1 - p_e)$ with $p_e = \sum_i p_{i+} p_{+i}$ [24], and the quantity and allocation disagreement of Pontius and Millones, $Q + A = 1 - OA$ [25].
+- `stratified_area_estimate`, `estimated_error_matrix` and `sample_allocation`: unbiased class areas and accuracies with standard errors and confidence intervals under stratified random sampling with the map classes as strata, $\hat p_{\cdot j} = \sum_i W_i\, n_{ij} / n_{i\cdot}$ with the mapped area proportions $W_i$ (Olofsson et al. [26]).
+- `bias`, `mae`, `rmse`, `ubrmse`, `r_squared` (against the 1:1 line), `pearson_r` and `regression_report` for continuous products.
+- `change_detection_metrics`, `transition_matrix` and `transition_summary` for change maps.
 
-Where $N_f$ is the number of input features and $H$ is the hidden dimension.
+## 8. Examples
 
-### Siamese Network (Change Detection)
+The examples were executed on 24 September 2026 against the main branch with CPython 3.13 on a CPU. They share one Python session and use small synthetic data.
 
-Used for tourist destination monitoring to detect changes between bi-temporal imagery.
+### 8.1 Terrain derivatives and a viewshed
 
-```mermaid
-graph TB
-    subgraph "Temporal Inputs"
-        I1[Image T1] --> C[Concatenate 6ch]
-        I2[Image T2] --> C
-    end
-
-    subgraph "Encoder"
-        C --> E1[Conv Block 1]
-        E1 --> E2[Conv Block 2]
-        E2 --> E3[Conv Block 3]
-    end
-
-    subgraph "Decoder"
-        E3 --> D1[UpConv Block 1]
-        D1 --> D2[UpConv Block 2]
-        D2 --> D3[Output Conv]
-    end
-```
-
----
-
-## Usage Examples
-
-### CLI Usage
-
-```bash
-# List Tourism and Data Processing models
-unbihexium zoo list --domain tourism_data
-
-# Route planning
-unbihexium infer route_planner_large \
-    --input route_features.csv \
-    --output optimal_routes.json \
-    --origin "40.7128,-74.0060" \
-    --destinations waypoints.csv
-
-# Accessibility analysis
-unbihexium infer accessibility_analyzer_mega \
-    --input locations.csv \
-    --output accessibility_scores.csv \
-    --poi-data points_of_interest.geojson \
-    --decay-function exponential \
-    --decay-beta 0.5
-
-# Viewshed analysis
-unbihexium infer viewshed_analyzer_large \
-    --input dem.tif \
-    --output viewshed.tif \
-    --observer-height 2.0 \
-    --max-distance 10000
-
-# Tourist destination change detection
-unbihexium infer tourist_destination_monitor_mega \
-    --input-t1 destination_2020.tif \
-    --input-t2 destination_2024.tif \
-    --output changes.geojson \
-    --threshold 0.5
-
-# Geostatistical interpolation
-unbihexium infer geostatistical_analyzer_large \
-    --input sample_points.csv \
-    --output interpolated.tif \
-    --method kriging \
-    --variogram spherical
-
-# Time series analysis
-unbihexium infer timeseries_analyzer_mega \
-    --input temporal_data.csv \
-    --output forecast.csv \
-    --periods 12 \
-    --confidence 0.95
-```
-
-### Python API Usage
+A cone with a slope of 2 m per 10 m cell ($\arctan 0.2 = 11.3$ degrees) is observed from its western edge; the summit hides the eastern flank.
 
 ```python
-from unbihexium import Pipeline, Config
-from unbihexium.zoo import get_model
-import pandas as pd
-import geopandas as gpd
+import numpy as np
+from unbihexium.terrain import aspect, hillshade, slope, viewshed
 
-# Route Optimization
-route_model = get_model("route_planner_large")
+y, x = np.mgrid[0:21, 0:21]
+dem = 100.0 - 2.0 * np.hypot(x - 10, y - 10)  # cone, 10 m cells
 
-# Prepare input features
-route_features = pd.DataFrame({
-    'origin_lat': [40.7128],
-    'origin_lon': [-74.0060],
-    'dest_lat': [34.0522],
-    'dest_lon': [-118.2437],
-    'road_type': [1],  # Highway
-    'traffic_factor': [0.8],
-    'time_of_day': [14],  # 2 PM
-    'day_of_week': [2]  # Tuesday
-})
-
-# Predict optimal route score
-route_score = route_model.predict(route_features)
-print(f"Route optimality score: {route_score[0]:.4f}")
-
-# Accessibility Analysis
-accessibility_model = get_model("accessibility_analyzer_mega")
-
-# Calculate accessibility for multiple locations
-locations = gpd.read_file("locations.geojson")
-pois = gpd.read_file("points_of_interest.geojson")
-
-# Compute accessibility features
-access_features = []
-for idx, loc in locations.iterrows():
-    distances = loc.geometry.distance(pois.geometry)
-    poi_types = pois['type'].value_counts()
-    features = {
-        'nearest_hospital': distances[pois['type'] == 'hospital'].min(),
-        'nearest_school': distances[pois['type'] == 'school'].min(),
-        'nearest_transit': distances[pois['type'] == 'transit'].min(),
-        'poi_count_500m': (distances < 500).sum(),
-        'poi_count_1km': (distances < 1000).sum(),
-        'road_density': loc['road_density'],
-        'population_density': loc['pop_density'],
-        'elevation': loc['elevation'],
-        'slope': loc['slope'],
-        'land_use_diversity': loc['lu_diversity']
-    }
-    access_features.append(features)
-
-access_df = pd.DataFrame(access_features)
-accessibility_scores = accessibility_model.predict(access_df)
-
-locations['accessibility_score'] = accessibility_scores
-locations.to_file("accessibility_results.geojson", driver='GeoJSON')
-
-# Viewshed Analysis
-viewshed_model = get_model("viewshed_analyzer_mega")
-
-config = Config(
-    observer_height=2.0,
-    target_height=0.0,
-    max_distance=10000,
-    refraction=0.13
-)
-
-viewshed_pipeline = Pipeline.from_config(
-    capability="viewshed_analysis",
-    variant="mega",
-    config=config
-)
-
-viewshed = viewshed_pipeline.run("dem.tif", observer_points="towers.geojson")
-viewshed.save("cumulative_viewshed.tif")
-
-print(f"Visible area: {viewshed.visible_area_km2:.2f} km^2")
-print(f"Visibility percentage: {viewshed.visibility_percentage:.2f}%")
-
-# Geostatistical Interpolation
-geostats_model = get_model("geostatistical_analyzer_large")
-
-# Sample point data
-samples = pd.read_csv("soil_samples.csv")
-
-config = Config(
-    method="ordinary_kriging",
-    variogram_model="spherical",
-    nugget=0.1,
-    sill=1.0,
-    range=1000,
-    output_resolution=10
-)
-
-interpolation_pipeline = Pipeline.from_config(
-    capability="geostatistical_interpolation",
-    variant="large",
-    config=config
-)
-
-interpolated = interpolation_pipeline.run(samples)
-interpolated.save("interpolated_surface.tif")
-
-# Time Series Forecasting
-timeseries_model = get_model("timeseries_analyzer_mega")
-
-# Historical visitor data
-visitor_data = pd.read_csv("visitor_counts.csv", parse_dates=['date'])
-visitor_data.set_index('date', inplace=True)
-
-# Feature engineering
-visitor_data['month'] = visitor_data.index.month
-visitor_data['day_of_week'] = visitor_data.index.dayofweek
-visitor_data['is_weekend'] = visitor_data['day_of_week'].isin([5, 6]).astype(int)
-visitor_data['is_holiday'] = visitor_data['holiday_flag']
-
-# Prepare features for prediction
-forecast_features = prepare_forecast_features(
-    historical_data=visitor_data,
-    forecast_periods=30
-)
-
-# Generate forecasts
-forecasts = timeseries_model.predict(forecast_features)
-print(f"30-day forecast range: {forecasts.min():.0f} - {forecasts.max():.0f}")
+print(round(float(slope(dem, 10.0)[10, 15]), 2), round(float(aspect(dem, 10.0)[10, 15]), 1))
+print(round(float(hillshade(dem, 10.0)[10, 15]), 1))
+visible = viewshed(dem, observer=(10, 0), resolution=10.0, observer_height=1.7)
+print(int(visible.sum()), bool(visible[10, 10]), bool(visible[10, 20]))
 ```
 
----
+```text
+11.2 90.0
+152.1
+59 True False
+```
 
-## Technical Requirements
-
-### Hardware Requirements
-
-| Component | Minimum | Recommended | Optimal |
-| ----------- | --------- | ------------- | --------- |
-| CPU | 4 cores | 8 cores | 16+ cores |
-| RAM | 4 GB | 8 GB | 16 GB |
-| GPU | None | GTX 1660 | RTX 3080 |
-| Storage | 5 GB | 20 GB | 50 GB |
-
-### Memory Consumption
-
-| Variant | Model Size | Inference Memory | Batch 1 | Batch 64 |
-| --------- | ------------ | ------------------ | --------- | ---------- |
-| tiny | 0.3 MB | 20 MB | 50 MB | 150 MB |
-| base | 1 MB | 40 MB | 100 MB | 400 MB |
-| large | 2.5 MB | 80 MB | 200 MB | 800 MB |
-| mega | 4 MB | 150 MB | 400 MB | 1.5 GB |
-
-### Throughput Benchmarks
-
-| Variant | CPU (samples/sec) | GPU (samples/sec) |
-| --------- | ------------------- | ------------------- |
-| tiny | 10,000 | 100,000 |
-| base | 5,000 | 50,000 |
-| large | 2,000 | 20,000 |
-| mega | 1,000 | 10,000 |
-
----
-
-## Input/Output Specifications
-
-### Input Requirements
-
-| Data Type | Format | Required Fields |
-| ----------- | -------- | ----------------- |
-| Point Locations | CSV, GeoJSON | lat, lon, attributes |
-| Network Data | Shapefile, GeoPackage | geometry, weights |
-| Raster Data | GeoTIFF | elevation, cost surfaces |
-| Time Series | CSV, Parquet | timestamp, values |
-
-### Output Specifications
-
-| Product | Format | Contents |
-| --------- | -------- | ---------- |
-| Accessibility Scores | CSV, GeoJSON | location, score, components |
-| Route Paths | GeoJSON | geometry, cost, waypoints |
-| Interpolated Surfaces | GeoTIFF | continuous values |
-| Viewshed Maps | GeoTIFF | binary visibility |
-| Forecasts | CSV | date, prediction, confidence |
-
----
-
-## Integration Guidelines
-
-### GIS Integration
+### 8.2 Variogram, kriging and Moran's I
 
 ```python
-# QGIS Integration
-from qgis.core import QgsProject, QgsVectorLayer
-from unbihexium.integrations import QGISAdapter
+import numpy as np
+from unbihexium.geostat import OrdinaryKriging, Variogram, knn_weights, morans_i
 
-adapter = QGISAdapter(QgsProject.instance())
+rng = np.random.default_rng(42)
+xy = rng.uniform(0, 100, size=(80, 2))
+z = np.sin(xy[:, 0] / 12.0) + np.cos(xy[:, 1] / 12.0) + rng.normal(0, 0.1, 80)
 
-# Get active layer
-layer = adapter.get_active_vector_layer()
+variogram = Variogram(n_lags=10, max_lag=50.0, model="spherical")
+fit = variogram.fit(xy, z)
+print(round(fit.nugget, 3), round(fit.sill, 3), round(fit.range_param, 1))
 
-# Run accessibility analysis
-results = adapter.run_model(
-    model="accessibility_analyzer_mega",
-    input_layer=layer,
-    poi_layer=adapter.get_layer_by_name("POIs")
-)
+kriging = OrdinaryKriging(variogram).fit(xy, z)
+result = kriging.predict(np.array([[50.0, 50.0], xy[0]]))
+print(result.predictions.round(3), result.variance.round(4), round(float(z[0]), 3))
+print({k: round(v, 3) for k, v in kriging.cross_validate().items()})
 
-# Add results to map
-adapter.add_result_layer(results, "Accessibility Scores")
+moran = morans_i(z, knn_weights(xy, k=6))
+print(round(moran.statistic, 3), round(moran.expected, 4), round(moran.z_score, 2))
 ```
 
-### Database Integration
+```text
+0.0 1.444 58.1
+[-1.166 -0.606] [0.1042 0.    ] -0.606
+{'rmse': 0.187, 'mae': 0.131, 'bias': 0.001, 'msse': 0.108}
+0.75 -0.0127 13.13
+```
+
+The prediction at the first sample reproduces the datum with zero variance, as expected of an exact interpolator.
+
+### 8.3 Suitability, cost paths, zonal statistics and routing
 
 ```python
-from unbihexium.io import PostgreSQLReader, PostGISWriter
-import geopandas as gpd
-
-# Read from PostGIS
-reader = PostgreSQLReader(
-    host="localhost",
-    database="gis_db",
-    user="analyst",
-    password="secret"
+import numpy as np
+from unbihexium.analysis import (
+    AHP, NetworkAnalyzer, least_cost_path, rescale_linear, weighted_overlay, zonal_table,
 )
 
-locations = reader.read_table(
-    table="sample_locations",
-    geometry_column="geom",
-    columns=["id", "name", "category"]
+ahp = AHP.from_judgements(
+    ["slope", "access", "view"],
+    {("access", "slope"): 3, ("access", "view"): 5, ("slope", "view"): 2},
 )
+weights = ahp.weights_dict()
+print({k: round(v, 3) for k, v in weights.items()}, round(ahp.consistency_ratio(), 4))
 
-# Process with model
-model = get_model("spatial_analyzer_large")
-results = model.predict(extract_features(locations))
-
-# Write back to PostGIS
-writer = PostGISWriter(connection=reader.connection)
-writer.write_geodataframe(
-    gdf=results,
-    table="analysis_results",
-    if_exists="replace"
+rng = np.random.default_rng(1)
+slope_deg = rng.uniform(0, 30, (4, 4))
+road_m = rng.uniform(0, 2000, (4, 4))
+view = rng.uniform(0, 1, (4, 4))
+layers = [
+    rescale_linear(slope_deg, 0, 30, increasing=False),
+    rescale_linear(road_m, 0, 2000, increasing=False),
+    view,
+]
+result = weighted_overlay(
+    layers, [weights["slope"], weights["access"], weights["view"]], constraints=[slope_deg < 25]
 )
+print(result.suitability.round(2))
+
+cost = np.ones((5, 5))
+cost[1:4, 2] = 10.0  # expensive wall with a gap at both ends
+path, total = least_cost_path(cost, (2, 0), (2, 4))
+print(path, round(total, 3))
+
+values = np.arange(16, dtype=float).reshape(4, 4)
+zones = np.array([[1, 1, 2, 2]] * 4)
+print(zonal_table(values, zones, stats=["count", "mean", "max"]))
+
+net = NetworkAnalyzer()
+for node, (nx, ny) in enumerate([(0, 0), (1, 0), (2, 0), (1, 1)]):
+    net.add_node(node, nx, ny)
+net.add_edge(0, 1, 1.0)
+net.add_edge(1, 2, 1.0)
+net.add_edge(0, 3, 1.5)
+net.add_edge(3, 2, 1.5)
+print(net.shortest_path(0, 2).nodes, net.service_area(0, 1.5), net.od_cost_matrix([0], [2, 3]))
 ```
 
----
+```text
+{'slope': 0.23, 'access': 0.648, 'view': 0.122} 0.0032
+[[0.83 0.   0.86 0.  ]
+ [0.33 0.72 0.46 0.14]
+ [0.2  0.53 0.46 0.66]
+ [0.88 0.11 0.57 0.87]]
+[(2, 0), (3, 1), (4, 2), (3, 3), (2, 4)] 5.657
+{'count': {1: 8.0, 2: 8.0}, 'mean': {1: 6.5, 2: 8.5}, 'max': {1: 13.0, 2: 15.0}}
+[0, 1, 2] [0, 1, 3] [[2.  1.5]]
+```
 
-## Quality Assurance
+The two cells with a slope of 25 degrees or more fail the constraint and score 0; the cheapest path goes around the wall with four diagonal steps ($4\sqrt{2} = 5.657$).
 
-### Validation Methodology
+### 8.4 Accuracy and area estimation
 
-| Test Type | Description | Pass Criteria |
-| ----------- | ------------- | --------------- |
-| Unit Tests | Individual function testing | 100% coverage |
-| Integration Tests | End-to-end pipeline testing | All pipelines pass |
-| Accuracy Tests | Comparison with ground truth | R^2 > 0.85 |
-| Performance Tests | Throughput and latency | Within benchmarks |
+The error matrix below is illustrative (reference classes in rows, map classes in columns); the mapped areas are 3000 ha of forest and 7000 ha of non-forest.
 
-### Known Limitations
+```python
+import numpy as np
+from unbihexium.metrics import accuracy_assessment, stratified_area_estimate
 
-1. **Network Data Quality**: Route optimization accuracy depends on network completeness
-2. **Temporal Resolution**: Time series models require consistent sampling intervals
-3. **Spatial Resolution**: Viewshed accuracy limited by DEM resolution
-4. **Extrapolation**: Models may underperform outside training data distribution
+counts = np.array([[90, 10], [5, 95]])
+acc = accuracy_assessment(counts, classes=["forest", "non_forest"])
+print(round(acc.overall_accuracy, 3), round(acc.kappa, 3),
+      round(acc.quantity_disagreement, 3), round(acc.allocation_disagreement, 3))
 
----
+estimate = stratified_area_estimate(counts, mapped_area=[3000.0, 7000.0],
+                                    classes=["forest", "non_forest"])
+print(estimate.area.round(1), estimate.area_ci.round(1))
+```
+
+```text
+0.925 0.85 0.025 0.05
+[3508.8 6491.2] [417.5 417.5]
+```
+
+The map shows 3000 ha of forest, but the sample-based estimate is $10\,000 \times (0.3 \cdot 90/95 + 0.7 \cdot 10/105) = 3508.8$ ha, with a 95 % confidence interval of $\pm 417.5$ ha.
+
+### 8.5 A tiny starter model
+
+The untrained `viewshed_analyzer` ends in a sigmoid and, before training, returns values close to 0.5 everywhere, unrelated to the terrain. Compare it with the exact `viewshed` of Section 8.1.
+
+```python
+import numpy as np
+from unbihexium.ai import predict
+
+y, x = np.mgrid[0:64, 0:64]
+dem = (100.0 - 2.0 * np.hypot(x - 32, y - 32)).astype("float32")
+result = predict("viewshed_analyzer_tiny", dem)
+print(result.names, result.units, result.values.shape)
+print(round(float(result.values.min()), 3), round(float(result.values.max()), 3))
+```
+
+```text
+['visible_fraction'] ['1'] (1, 64, 64)
+0.498 0.503
+```
+
+## 9. Limitations and responsible use
+
+### 9.1 Conventions
+
+The key words MUST, SHOULD and MAY in this section are to be interpreted as described in RFC 2119 and RFC 8174 [27], [28] when, and only when, they appear in capitals.
+
+### 9.2 Limitations
+
+- The twelve model families are untrained. Their outputs MUST NOT be used before the model has been trained and validated against independent reference data; Section 7 provides the measures.
+- Estimates of property values, economic activity, population or service demand (`economic_spatial_assessor`, `business_valuation`, `resource_allocation`) can affect people. Users MUST read [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md) before deploying such a model, and SHOULD publish the uncertainty of the results.
+- The deterministic functions are exact for their inputs, but their results inherit the errors of those inputs (DEM accuracy, sample design, friction values, AHP judgements). Viewsheds on a DEM without buildings and vegetation overestimate visibility; a digital surface model SHOULD be used where obstacles matter.
+- Kriging variances assume that the fitted variogram is correct; the cross-validation statistics (`msse` close to 1) SHOULD be checked before the variances are reported.
+
+## 10. Related documents
+
+- [Capability index](index.md), [domain 03](03_indices_flood_water.md) (hydrology) and [domain 04](04_environment_forestry_image_processing.md) (image quality measures).
+- [Model catalogue](../model_zoo/model_catalog.md) and [training](../model_zoo/training.md).
+- [API reference](../reference/api.md) and [command line reference](../reference/cli.md).
+- [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md).
 
 ## References
 
-1. Tobler, W. (1970). A Computer Movie Simulating Urban Growth in the Detroit Region. Economic Geography.
-2. Dijkstra, E.W. (1959). A Note on Two Problems in Connexion with Graphs. Numerische Mathematik.
-3. Matheron, G. (1963). Principles of Geostatistics. Economic Geology.
-4. Hansen, W.G. (1959). How Accessibility Shapes Land Use. Journal of the American Institute of Planners.
-5. Fisher, P.F. (1996). Extending the Applicability of Viewsheds in Landscape Planning. Photogrammetric Engineering and Remote Sensing.
+[1] Horn, B. K. P. Hill shading and the reflectance map. Proceedings of the IEEE 69(1), 14-47. 1981. <https://doi.org/10.1109/PROC.1981.11918>
+
+[2] Zevenbergen, L. W., Thorne, C. R. Quantitative analysis of land surface topography. Earth Surface Processes and Landforms 12(1), 47-56. 1987. <https://doi.org/10.1002/esp.3290120107>
+
+[3] Weiss, A. Topographic position and landforms analysis. Poster, ESRI User Conference, San Diego. 2001.
+
+[4] Riley, S. J., DeGloria, S. D., Elliot, R. A terrain ruggedness index that quantifies topographic heterogeneity. Intermountain Journal of Sciences 5(1-4), 23-27. 1999.
+
+[5] Wilson, M. F. J., O'Connell, B., Brown, C., Guinan, J. C., Grehan, A. J. Multiscale terrain analysis of multibeam bathymetry data for habitat mapping on the continental slope. Marine Geodesy 30(1-2), 3-35. 2007. <https://doi.org/10.1080/01490410701295962>
+
+[6] Sappington, J. M., Longshore, K. M., Thompson, D. B. Quantifying landscape ruggedness for animal habitat analysis: a case study using bighorn sheep in the Mojave Desert. Journal of Wildlife Management 71(5), 1419-1426. 2007. <https://doi.org/10.2193/2005-723>
+
+[7] Franklin, W. R., Ray, C. K. Higher isn't necessarily better: visibility algorithms and experiments. Proceedings of the 6th International Symposium on Spatial Data Handling, Edinburgh, 751-770. 1994.
+
+[8] Matheron, G. Principles of geostatistics. Economic Geology 58(8), 1246-1266. 1963. <https://doi.org/10.2113/gsecongeo.58.8.1246>
+
+[9] Cressie, N., Hawkins, D. M. Robust estimation of the variogram: I. Mathematical Geology 12(2), 115-125. 1980. <https://doi.org/10.1007/BF01035243>
+
+[10] Cressie, N. Fitting variogram models by weighted least squares. Mathematical Geology 17(5), 563-586. 1985. <https://doi.org/10.1007/BF01032109>
+
+[11] Cressie, N. Statistics for Spatial Data, revised edition. Wiley, New York. 1993. <https://doi.org/10.1002/9781119115151>
+
+[12] Shepard, D. A two-dimensional interpolation function for irregularly-spaced data. Proceedings of the 23rd ACM National Conference, 517-524. 1968. <https://doi.org/10.1145/800186.810616>
+
+[13] Moran, P. A. P. Notes on continuous stochastic phenomena. Biometrika 37(1-2), 17-23. 1950. <https://doi.org/10.2307/2332142>
+
+[14] Geary, R. C. The contiguity ratio and statistical mapping. The Incorporated Statistician 5(3), 115-145. 1954. <https://doi.org/10.2307/2986645>
+
+[15] Cliff, A. D., Ord, J. K. Spatial Processes: Models and Applications. Pion, London. 1981.
+
+[16] Getis, A., Ord, J. K. The analysis of spatial association by use of distance statistics. Geographical Analysis 24(3), 189-206. 1992. <https://doi.org/10.1111/j.1538-4632.1992.tb00261.x>
+
+[17] Anselin, L. Local indicators of spatial association: LISA. Geographical Analysis 27(2), 93-115. 1995. <https://doi.org/10.1111/j.1538-4632.1995.tb00338.x>
+
+[18] Malczewski, J. GIS-based land-use suitability analysis: a critical overview. Progress in Planning 62(1), 3-65. 2004. <https://doi.org/10.1016/j.progress.2003.09.002>
+
+[19] Saaty, T. L. A scaling method for priorities in hierarchical structures. Journal of Mathematical Psychology 15(3), 234-281. 1977. <https://doi.org/10.1016/0022-2496(77)90033-5>
+
+[20] Dijkstra, E. W. A note on two problems in connexion with graphs. Numerische Mathematik 1(1), 269-271. 1959. <https://doi.org/10.1007/BF01386390>
+
+[21] Douglas, D. H. Least-cost path in GIS using an accumulated cost surface and slopelines. Cartographica 31(3), 37-51. 1994. <https://doi.org/10.3138/D327-0323-2JUT-016M>
+
+[22] Hart, P. E., Nilsson, N. J., Raphael, B. A formal basis for the heuristic determination of minimum cost paths. IEEE Transactions on Systems Science and Cybernetics 4(2), 100-107. 1968. <https://doi.org/10.1109/TSSC.1968.300136>
+
+[23] Tomlin, C. D. Geographic Information Systems and Cartographic Modeling. Prentice Hall, Englewood Cliffs NJ. 1990.
+
+[24] Cohen, J. A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37-46. 1960. <https://doi.org/10.1177/001316446002000104>
+
+[25] Pontius, R. G., Millones, M. Death to kappa: birth of quantity disagreement and allocation disagreement for accuracy assessment. International Journal of Remote Sensing 32(15), 4407-4429. 2011. <https://doi.org/10.1080/01431161.2011.552923>
+
+[26] Olofsson, P., Foody, G. M., Herold, M., Stehman, S. V., Woodcock, C. E., Wulder, M. A. Good practices for estimating area and assessing accuracy of land change. Remote Sensing of Environment 148, 42-57. 2014. <https://doi.org/10.1016/j.rse.2014.02.015>
+
+[27] Bradner, S. Key words for use in RFCs to indicate requirement levels. RFC 2119. 1997. <https://www.rfc-editor.org/rfc/rfc2119>
+
+[28] Leiba, B. Ambiguity of uppercase vs lowercase in RFC 2119 key words. RFC 8174. 2017. <https://www.rfc-editor.org/rfc/rfc8174>
+
+[29] Crawford, G., Williams, C. A note on the analysis of subjective judgment matrices. Journal of Mathematical Psychology 29(4), 387-405. 1985. <https://doi.org/10.1016/0022-2496(85)90002-1>
+
+<!--
+=============================================================================
+End of file docs/capabilities/02_tourism_data_processing.md
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+-->
