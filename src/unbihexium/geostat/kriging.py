@@ -245,12 +245,20 @@ class OrdinaryKriging:
         x: NDArray[Any],  # Column coordinates (nx,).
         y: NDArray[Any],  # Row coordinates (ny,).
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:  # Predictions and variances (ny, nx).
+        # Coordinates as float.
+        xs, ys = np.asarray(x, dtype=np.float64), np.asarray(y, dtype=np.float64)
         # All grid nodes.
-        gx, gy = np.meshgrid(np.asarray(x, dtype=np.float64), np.asarray(y, dtype=np.float64))
+        gx, gy = np.meshgrid(xs, ys)
         # Predict at the nodes.
         result = self.predict(np.column_stack([gx.ravel(), gy.ravel()]))
+        # Grid shape (ny, nx).
+        shape = (ys.size, xs.size)
+        # Predictions and variances as float64.
+        pred = np.asarray(result.predictions, dtype=np.float64)
+        # Variances.
+        var = np.asarray(result.variance, dtype=np.float64)
         # Back to the grid shape.
-        return result.predictions.reshape(gx.shape), result.variance.reshape(gx.shape)
+        return pred.reshape(shape), var.reshape(shape)
 
     # Cross-validation with the fitted variogram (leave-one-out by default).
     def cross_validate(

@@ -199,9 +199,9 @@ class AHP:
             # Eigen-decomposition of the positive matrix.
             values, vectors = np.linalg.eig(a)
             # Perron root: the eigenvalue with the largest real part.
-            k = int(np.argmax(values.real))
+            k = int(np.argmax(np.real(values)))
             # Its eigenvector has entries of one sign.
-            w = np.abs(vectors[:, k].real)
+            w = np.abs(np.real(vectors[:, k]))
             # Principal eigenvalue.
             self._lambda_max = float(values[k].real)
         # Row geometric means.

@@ -66,7 +66,7 @@ from numpy.typing import NDArray
 # Pixel sizes (dx, dy) from a scalar or a pair.
 def _cellsize(cellsize: float | tuple[float, float]) -> tuple[float, float]:
     # A pair gives x and y separately.
-    dx, dy = (cellsize, cellsize) if np.isscalar(cellsize) else cellsize
+    dx, dy = (cellsize, cellsize) if isinstance(cellsize, (int, float, np.number)) else cellsize
     # Absolute values: north-up transforms have negative y sizes.
     dx, dy = abs(float(dx)), abs(float(dy))
     # Sizes must be positive.

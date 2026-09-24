@@ -454,10 +454,10 @@ def phase_unwrapping(
     psi = np.where(np.isfinite(psi), wrap_phase(psi), np.nan)
     # Pixels excluded from unwrapping.
     mask = ~np.isfinite(psi)
+    # Coherence as float64, if given.
+    coh = None if coherence is None else np.asarray(coherence, dtype=np.float64)
     # Coherence as weights and quality.
-    if coherence is not None:
-        # Coherence as float64.
-        coh = np.asarray(coherence, dtype=np.float64)
+    if coh is not None:
         # Shapes must agree.
         if coh.shape != psi.shape:
             # Report the mismatch.
@@ -475,7 +475,7 @@ def phase_unwrapping(
     # Weighted least squares.
     elif name == "least_squares":
         # Weights: coherence where given, one otherwise.
-        weights = np.clip(coh, 0.0, 1.0) if coherence is not None else np.ones_like(psi)
+        weights = np.clip(coh, 0.0, 1.0) if coh is not None else np.ones_like(psi)
         # Least-squares solution.
         result = _unwrap_least_squares(psi, np.where(mask, 0.0, weights))
         # Remove the arbitrary constant: align with the wrapped phase on average.
@@ -485,7 +485,7 @@ def phase_unwrapping(
     # Quality-guided flood fill.
     elif name == "quality_guided":
         # Coherence or phase reliability as quality.
-        quality = coh if coherence is not None else _reliability(psi)
+        quality = coh if coh is not None else _reliability(psi)
         # Flood fill.
         result = _unwrap_quality(psi, np.where(mask, np.nan, quality))
     # Unknown method.

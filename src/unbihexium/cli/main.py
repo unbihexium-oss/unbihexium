@@ -51,8 +51,8 @@ import json
 # Represent file paths.
 from pathlib import Path
 
-# Type of loosely structured values.
-from typing import Any
+# Type of loosely structured values, and the type of functions that never return.
+from typing import Any, NoReturn
 
 # Command line framework.
 import click
@@ -80,7 +80,7 @@ TORCH_HINT = "install PyTorch with pip install 'unbihexium[torch]'"
 
 
 # Print an error and exit with status 1.
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     # Error message in red; the text itself is not markup.
     console.print(f"[red]Error:[/] {escape(message)}")
     # Non-zero exit status.
@@ -118,8 +118,6 @@ def resolve_variant(model: str, variant: str | None) -> str | None:
     except ValueError as exc:
         # Report and exit.
         fail(str(exc))
-    # Not reached; fail() exits.
-    return None
 
 
 # Warn when a catalogue starter model that needs training is run.
@@ -257,8 +255,6 @@ def zoo_info(model_id: str) -> None:
     if entry is None:
         # Report and exit.
         fail(f"unknown model {model_id}; see `unbihexium zoo list`")
-    # Mypy: fail() does not return.
-    assert entry is not None
     # Entry as JSON.
     print_json(entry.to_dict())
 
@@ -701,8 +697,6 @@ def pipeline_run(
     if created is None:
         # Report and exit.
         fail(f"pipeline not found: {pipeline_id}")
-    # Mypy: fail() does not return.
-    assert created is not None
     # Input files.
     inputs = {"input": input_path, "input1": input_path}
     # Second input.
@@ -768,8 +762,6 @@ def index(index_name: str, input_path: str, output_path: str, **bands: int) -> N
     if idx is None:
         # Report the available indices and exit.
         fail(f"unknown index {index_name}; available: {', '.join(IndexRegistry.list_all())}")
-    # Mypy: fail() does not return.
-    assert idx is not None
     # Read the raster.
     raster = Raster.from_file(input_path)
     # Band data.

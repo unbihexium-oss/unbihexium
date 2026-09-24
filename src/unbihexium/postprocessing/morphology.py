@@ -297,45 +297,45 @@ def component_statistics(
     # Pixel count per label.
     counts = np.bincount(lab.ravel(), minlength=n + 1)[1:]
     # Row and column centroids.
-    centroids = ndimage.center_of_mass(np.ones(lab.shape), lab, index)
+    centroids = np.asarray(ndimage.center_of_mass(np.ones(lab.shape), lab, index)).reshape(-1, 2)
     # Bounding slices per label.
     boxes = ndimage.find_objects(lab, max_label=n)
-    # Value statistics when an image is given.
+    # Value statistics per label, when an image is given.
+    stats: dict[str, NDArray[Any]] = {}
+    # Compute them.
     if values is not None:
         # Values as float.
         v = np.asarray(values, dtype=np.float64)
-        # Means per label.
-        means = ndimage.mean(v, lab, index)
-        # Minima per label.
-        mins = ndimage.minimum(v, lab, index)
-        # Maxima per label.
-        maxs = ndimage.maximum(v, lab, index)
+        # Mean, minimum and maximum per label.
+        stats = {
+            "mean": np.asarray(ndimage.mean(v, lab, index)),  # Means.
+            "min": np.asarray(ndimage.minimum(v, lab, index)),  # Minima.
+            "max": np.asarray(ndimage.maximum(v, lab, index)),  # Maxima.
+        }  # End of the statistics.
     # Records of every region.
     records = []
     # Build the records.
     for i, label in enumerate(index):
+        # Bounding slices of the label, None when it has no pixels.
+        box = boxes[i]
         # Skip label numbers without pixels.
-        if counts[i] == 0 or boxes[i] is None:
+        if counts[i] == 0 or box is None:
             # Next label.
             continue
         # Row and column slices of the region.
-        rs, cs = boxes[i]
+        rs, cs = box
         # Record of the region.
         rec: dict[str, Any] = {
             "label": int(label),  # Region number.
             "pixels": int(counts[i]),  # Size in pixels.
             "area": float(counts[i] * pixel_area),  # Size in map units.
             "bbox": (rs.start, cs.start, rs.stop, cs.stop),  # Row/column bounds.
-            "centroid": (float(centroids[i][0]), float(centroids[i][1])),  # Row, column.
+            "centroid": (float(centroids[i, 0]), float(centroids[i, 1])),  # Row, column.
         }  # End of the record.
-        # Add value statistics.
-        if values is not None:
-            # Mean value.
-            rec["mean"] = float(means[i])
-            # Minimum value.
-            rec["min"] = float(mins[i])
-            # Maximum value.
-            rec["max"] = float(maxs[i])
+        # Add the value statistics.
+        for key, stat in stats.items():
+            # Statistic of this region.
+            rec[key] = float(stat[i])
         # Add the class of the region.
         if source is not None:
             # Any pixel of the region carries its class.

@@ -513,7 +513,6 @@ class Raster:
     ) -> Raster:  # The raster.
         # Imported lazily.
         import rasterio
-        from rasterio.windows import Window  # Pixel windows.
 
         # Open the dataset.
         with rasterio.open(path) as src:
@@ -528,7 +527,7 @@ class Raster:
                 # Explain the problem.
                 raise ValueError(f"window {window} outside the {src.height} x {src.width} raster")
             # Pixel window, or the whole raster.
-            win = None if window is None else Window(window[1], window[0], window[3], window[2])
+            win = None if window is None else _window(*window)
             # Affine coefficients of the dataset.
             a, b, c, d, e, f = tuple(src.transform)[:6]
             # Row and column of the window origin.
@@ -569,12 +568,11 @@ class Raster:
             return self
         # Imported lazily.
         import rasterio
-        from rasterio.windows import Window  # Pixel windows.
 
         # Band numbers and window stored by from_file.
         indexes, window = getattr(self, "_read_args", (None, None))
         # Pixel window.
-        win = None if window is None else Window(window[1], window[0], window[3], window[2])
+        win = None if window is None else _window(*window)
         # Open and read.
         with rasterio.open(self.source) as src:
             # All bands when none were chosen.
@@ -833,7 +831,7 @@ class Raster:
         # Pixel data.
         data = self.require_data()
         # Bands as float64 with invalid values as NaN.
-        values = self.masked().astype(np.float64).filled(np.nan)
+        values = np.ma.filled(self.masked().astype(np.float64), np.nan)
         # Band variables.
         variables = {f"b{i + 1}": values[i] for i in range(data.shape[0])}
         # Evaluate.
@@ -967,7 +965,6 @@ class Raster:
             raise ValueError("cannot read a window without data or source")
         # Imported lazily.
         import rasterio
-        from rasterio.windows import Window  # Pixel windows.
 
         # Band numbers and window of the lazy raster.
         indexes, window = getattr(self, "_read_args", (None, None))
@@ -978,7 +975,7 @@ class Raster:
             # Pixels in the dtype of the metadata.
             dtype = self.metadata.dtype.value if self.metadata else "float32"
             # Window of the file.
-            win = Window(base_col + col_off, base_row + row_off, width, height)
+            win = _window(base_row + row_off, base_col + col_off, height, width)
             # Read the bands.
             return src.read(indexes or list(range(1, src.count + 1)), window=win).astype(dtype)
 
@@ -1098,12 +1095,8 @@ class Raster:
         method: ResamplingName = "bilinear",  # Resampling method.
         resolution: float | tuple[float, float] | None = None,  # Target pixel size instead.
     ) -> Raster:  # Resampled raster.
-        # Exactly one of scale and resolution is needed.
-        if (scale is None) == (resolution is None):
-            # Explain the problem.
-            raise ValueError("give either scale or resolution")
         # Target size from the scale factor.
-        if scale is not None:
+        if scale is not None and resolution is None:
             # The factor must be positive.
             if scale <= 0:
                 # Explain the problem.
@@ -1111,15 +1104,19 @@ class Raster:
             # New size.
             new_h, new_w = max(1, round(self.height * scale)), max(1, round(self.width * scale))
         # Target size from the resolution.
-        else:
+        elif resolution is not None and scale is None:
+            # A scalar size applies to both axes.
+            size = (resolution, resolution) if isinstance(resolution, (int, float)) else resolution
             # Pixel sizes along x and y.
-            size = resolution
-            # Pixel sizes along x and y.
-            rx, ry = (size, size) if isinstance(size, (int, float)) else size
+            rx, ry = size
             # Current pixel sizes.
             px, py = self.resolution
             # New size.
             new_h, new_w = max(1, round(self.height * py / ry)), max(1, round(self.width * px / rx))
+        # Neither or both.
+        else:
+            # Exactly one of scale and resolution is needed.
+            raise ValueError("give either scale or resolution")
         # Pixel size factors along the columns and the rows.
         sx, sy = self.width / new_w, self.height / new_h
         # Affine coefficients.
@@ -1152,6 +1149,10 @@ class Raster:
             *self.bounds,  # Source bounds.
             resolution=resolution,  # Target pixel size.
         )  # End of the grid.
+        # rasterio computes the size whenever the source size is given.
+        if width is None or height is None:
+            # Explain the problem.
+            raise ValueError(f"cannot compute the output grid for {target_crs}")
         # Warp onto the grid.
         return self._warp(target_crs, dst, int(width), int(height), method)
 
@@ -1342,6 +1343,16 @@ def _window_inside(window: tuple[int, int, int, int], height: int, width: int) -
     row, col, h, w = window
     # Non-negative start, positive size and end inside the raster.
     return row >= 0 and col >= 0 and h > 0 and w > 0 and row + h <= height and col + w <= width
+
+
+# rasterio Window of a pixel window; from_slices, unlike the attrs constructor
+# of Window, is visible to type checkers.
+def _window(row_off: int, col_off: int, height: int, width: int) -> Any:
+    # Imported lazily.
+    from rasterio.windows import Window
+
+    # Rows and columns as start and stop indices.
+    return Window.from_slices((row_off, row_off + height), (col_off, col_off + width))
 
 
 # rasterio Affine object from six coefficients.

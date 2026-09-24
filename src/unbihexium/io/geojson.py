@@ -214,7 +214,7 @@ def _geometry_problems(geometry: Any, where: str, level: int = 0) -> list[str]:
         # Report it.
         return [f"{where}: unknown geometry type {kind!r}"]
     # Coordinates of the geometry.
-    coords = geometry.get("coordinates")
+    coords: Any = geometry.get("coordinates")
     # Structure of the coordinates.
     found = _coordinate_problems(coords, _DEPTH[kind], f"{where}.coordinates")
     # Stop at structural problems.

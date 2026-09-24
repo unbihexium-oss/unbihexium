@@ -349,10 +349,12 @@ class Predictor:
         acc: NDArray[np.float64] | None = None
         # Accumulated weights.
         weight: NDArray[np.float64] | None = None
+        # Blending weights of a tile.
+        wmap: NDArray[np.float32] | None = None
         # Blend the tiles.
         for (r, c), (th, tw), o in self._run_tiles(x):
             # Allocate the accumulators on the first tile.
-            if acc is None or weight is None:
+            if acc is None or weight is None or wmap is None:
                 # Windows end inside the image, or at the padded tile size.
                 ph, pw = max(h, th) * s, max(w, tw) * s
                 # Output accumulator.

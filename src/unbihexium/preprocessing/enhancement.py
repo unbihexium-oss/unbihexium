@@ -76,8 +76,8 @@ def _per_band(value: float | Sequence[float] | NDArray[Any], bands: int) -> NDAr
 # Linear stretch of [low, high] onto [0, 1], per band.
 def linear_stretch(
     image: NDArray[Any],  # (H, W) or (C, H, W) array.
-    low: float | Sequence[float],  # Value mapped to 0, scalar or per band.
-    high: float | Sequence[float],  # Value mapped to 1, scalar or per band.
+    low: float | Sequence[float] | NDArray[Any],  # Value mapped to 0, scalar or per band.
+    high: float | Sequence[float] | NDArray[Any],  # Value mapped to 1, scalar or per band.
     clip: bool = True,  # Clip the result to [0, 1].
     nodata: float | None = None,  # Value treated as missing.
 ) -> NDArray[np.float64]:  # Stretched array with NaN for missing values.

@@ -211,6 +211,9 @@ def masked_regression_loss(
 
 # Loss of a model zoo task.
 class TaskLoss(nn.Module):
+    # Type of the class weight buffer; buffers are otherwise untyped attributes.
+    class_weights: torch.Tensor | None
+
     # Create the loss for a model configuration.
     def __init__(
         self,  # The loss module.

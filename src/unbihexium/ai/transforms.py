@@ -102,7 +102,7 @@ class Normalization:
         # Means as float32 column vectors for broadcasting.
         self.mean = np.asarray(mean, dtype=np.float32).reshape(-1, 1, 1)
         # Standard deviations, bounded away from zero.
-        self.std = np.maximum(np.asarray(std, dtype=np.float32).reshape(-1, 1, 1), 1e-6)
+        self.std = np.maximum(np.asarray(std, dtype=np.float32).reshape(-1, 1, 1), np.float32(1e-6))
 
     # Number of bands.
     @property
@@ -169,7 +169,7 @@ class Normalization:
         # Standardise.
         x = (np.asarray(image, dtype=np.float32) - self.mean) / self.std
         # Replace missing values.
-        return np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+        return np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0).astype(np.float32, copy=False)
 
     # Plain dictionary for checkpoints.
     def to_dict(self) -> dict[str, list[float]]:
