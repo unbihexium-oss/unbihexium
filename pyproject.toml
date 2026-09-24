@@ -49,7 +49,7 @@
 # PEP 517 build backend and its own requirements.
 [build-system]
 # hatchling 1.27 is the first release with PEP 639 licence expression support.
-requires = ["hatchling>=1.27.0"]
+requires = ["hatchling>=1.32.4"]
 build-backend = "hatchling.build"  # Module that pip and uv call to build the package.
 
 # Core metadata of the distribution (PEP 621).
