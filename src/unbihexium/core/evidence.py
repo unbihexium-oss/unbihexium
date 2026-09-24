@@ -411,7 +411,7 @@ class ProvenanceRecord:
             # Create the parent directory.
             target.parent.mkdir(parents=True, exist_ok=True)
             # Write the text with a final newline.
-            target.write_text(text + "\n", encoding="utf-8")
+            target.write_text(text + "\n", encoding="utf-8", newline="\n")
         # Return the text.
         return text
 

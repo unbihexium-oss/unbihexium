@@ -197,7 +197,9 @@ def test_save_png_and_world_file(tmp_path) -> None:
     # Identical pixels.
     np.testing.assert_array_equal(back, image)
     # World file next to the image.
-    assert (tmp_path / "out" / "image.pgw").read_text().split() == world_file_lines(transform)
+    world = (tmp_path / "out" / "image.pgw").read_text(encoding="utf-8")
+    # Same lines as computed.
+    assert world.split() == world_file_lines(transform)
     # Float images are rejected.
     with pytest.raises(ValueError, match="uint8"):
         # Wrong type.
@@ -213,7 +215,7 @@ def test_quicklook(tmp_path) -> None:
     # Size of the quicklook.
     assert Image.open(path).size == (15, 25)
     # The world file carries the decimated pixel size.
-    assert (tmp_path / "q.pgw").read_text().split()[0] == "4.0"
+    assert (tmp_path / "q.pgw").read_text(encoding="utf-8").split()[0] == "4.0"
     # Single bands are colour-mapped.
     single = quicklook(tmp_path / "s.png", stack[0], max_size=50)
     # RGBA output of half size.

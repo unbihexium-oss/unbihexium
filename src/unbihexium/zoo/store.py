@@ -366,8 +366,10 @@ def _write_config(directory: Path, entry: ModelZooEntry) -> None:
     if _config_matches(directory, entry):
         # Nothing to write.
         return
-    # Write the file.
-    (directory / CONFIG_NAME).write_text(_config_text(directory, entry), encoding="utf-8")
+    # Configuration text.
+    text = _config_text(directory, entry)
+    # Write the file with LF line endings on every platform.
+    (directory / CONFIG_NAME).write_text(text, encoding="utf-8", newline="\n")
 
 
 # Backwards-compatible name: obtain a model and return its checkpoint path.

@@ -80,7 +80,7 @@ def write_sha256_file(
     # Write only when the contents changed, so read-only stores stay usable.
     if not target.is_file() or target.read_text(encoding="utf-8") != text:
         # Write the file.
-        target.write_text(text, encoding="utf-8")
+        target.write_text(text, encoding="utf-8", newline="\n")
     # Return the path.
     return target
 

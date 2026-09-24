@@ -118,7 +118,7 @@ def test_training_improves(tmp_path: Path, family: str, metric: str) -> None:
     # Clearly better than chance.
     assert best > 0.3
     # History of every epoch.
-    history = json.loads((tmp_path / "run" / "history.json").read_text())
+    history = json.loads((tmp_path / "run" / "history.json").read_text(encoding="utf-8"))
     # Four epochs recorded.
     assert len(history["history"]) == 4
     # The training loss decreased.

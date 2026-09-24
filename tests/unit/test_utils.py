@@ -152,8 +152,10 @@ def test_files(tmp_path: Path) -> None:
         bytes_to_human(-1)
     # Atomic write into a new directory.
     target = atomic_write_text(tmp_path / "a" / "b.txt", "hello")
-    # Content and no temporary files left.
-    assert target.read_text() == "hello" and [p.name for p in target.parent.iterdir()] == ["b.txt"]
+    # Content.
+    assert target.read_text(encoding="utf-8") == "hello"
+    # No temporary files left.
+    assert [p.name for p in target.parent.iterdir()] == ["b.txt"]
 
 
 # Seeds reproduce sequences and derived seeds are independent of order.

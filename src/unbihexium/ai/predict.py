@@ -193,13 +193,13 @@ def write_result(result: Result, path: str | Path) -> Path:
     # Detections as GeoJSON.
     if isinstance(result, DetectionResult):
         # Write the feature collection.
-        path.write_text(json.dumps(result.to_geojson(), indent=2), encoding="utf-8")
+        path.write_text(json.dumps(result.to_geojson(), indent=2), encoding="utf-8", newline="\n")
         # Return the path.
         return path
     # Scene values as JSON.
     if isinstance(result, RegressionResult) and not result.is_dense:
         # Write the values.
-        path.write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8")
+        path.write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8", newline="\n")
         # Return the path.
         return path
     # Class maps and value maps as rasters.

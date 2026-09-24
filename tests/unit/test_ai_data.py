@@ -141,7 +141,9 @@ def test_detection_geojson(tmp_path: Path) -> None:
     # Write the label file.
     (tmp_path / "train" / "labels").mkdir(parents=True)
     # JSON text.
-    (tmp_path / "train" / "labels" / "s1.geojson").write_text(json.dumps(collection))
+    text = json.dumps(collection)
+    # Write it.
+    (tmp_path / "train" / "labels" / "s1.geojson").write_text(text, encoding="utf-8")
     # Load the sample.
     sample = FolderDataset(tmp_path, "train", config)[0]
     # Box in pixel coordinates.
@@ -165,7 +167,7 @@ def test_detection_window(tmp_path: Path) -> None:
     # Two pixel boxes.
     labels = {"boxes": [[2, 2, 10, 10], [40, 40, 50, 50]], "labels": [0, "ship"]}
     # Write the label file.
-    (tmp_path / "train" / "labels" / "a.json").write_text(json.dumps(labels))
+    (tmp_path / "train" / "labels" / "a.json").write_text(json.dumps(labels), encoding="utf-8")
     # Window that contains only the second box.
     sample = FolderDataset(tmp_path, "train", config).load(0, (32, 32, 32, 32))
     # The second box in window coordinates.
@@ -187,7 +189,9 @@ def test_scene_targets(tmp_path: Path) -> None:
     # JSON file for f2.
     (tmp_path / "train" / "labels").mkdir(parents=True)
     # Values by name.
-    (tmp_path / "train" / "labels" / "f2.json").write_text(json.dumps({"values": {"yield": 7.0}}))
+    values = json.dumps({"values": {"yield": 7.0}})
+    # Write them.
+    (tmp_path / "train" / "labels" / "f2.json").write_text(values, encoding="utf-8")
     # Open the split.
     ds = FolderDataset(tmp_path, "train", config)
     # Value from the table.

@@ -102,7 +102,7 @@ def save_png(
         # Lines of the world file.
         lines = world_file_lines(transform)
         # Same name with the .pgw extension.
-        out.with_suffix(".pgw").write_text("\n".join(lines) + "\n", encoding="ascii")
+        out.with_suffix(".pgw").write_text("\n".join(lines) + "\n", encoding="ascii", newline="\n")
     # Return the path.
     return out
 
