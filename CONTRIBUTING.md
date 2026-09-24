@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-CONTRIBUTING |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -91,7 +91,6 @@ Contributions of every kind are welcome: bug fixes, new processing functions, te
 | Tool | Required for | Notes |
 | --- | --- | --- |
 | Git | All work | Fork and clone the repository |
-| Git LFS | Model weights | Needed only for work that loads the model zoo weights (`make validate`) |
 | CPython 3.10 to 3.14 | All Python work | The package declares `requires-python = ">=3.10"`; CI tests 3.10, 3.11, 3.12, 3.13 and 3.14 |
 | GNU Make | Convenience targets | Every target is a thin wrapper; the commands can be run directly |
 | uv | Regenerating lock files | Only for `make lock` and `make lock-check` (Section 7) |
@@ -112,7 +111,7 @@ make install-dev
 
 `make install-dev` runs three steps:
 
-1. `pip install -r requirements-dev.txt` installs the locked development environment: the runtime dependencies and the `all` extra (ONNX Runtime, PyTorch, serving, Dask, Ray, Zarr, NetCDF, STAC, Parquet, test and development tools) at exact versions. GPU packages are excluded; install them with `pip install ".[gpu]"` when needed.
+1. `pip install -r requirements-dev.txt` installs the locked development environment: the runtime dependencies and the `all` extra (ONNX Runtime, PyTorch, serving, Zarr, Parquet, test and development tools) at exact versions. PyTorch comes from PyPI; to use a GPU, install the CUDA build of PyTorch from the PyTorch index afterwards.
 2. `pip install --no-deps -e .` installs the package in editable mode without resolving the dependencies again.
 3. `pre-commit install` installs the Git hooks defined in `.pre-commit-config.yaml`.
 
@@ -125,7 +124,7 @@ make install-dev
 | Target | Command it runs |
 | --- | --- |
 | `make test` | `pytest tests/` |
-| `make test-fast` | `pytest tests/unit -n auto -m "not slow and not gpu"` |
+| `make test-fast` | `pytest tests/unit -n auto` |
 | `make test-cov` | `pytest tests/` with branch coverage and an XML report |
 | `make lint` | `ruff check src/ tests/` |
 | `make format` | `ruff format` and `ruff check --fix` on `src/` and `tests/` |
@@ -318,9 +317,9 @@ The CI job "Test" runs the whole suite (`pytest tests/`); the Coverage workflow 
 ### 6.2 Writing tests
 
 - Bug fixes MUST include a test that fails before the fix and passes after it. New features MUST include tests.
-- Tests MUST NOT require network access, credentials or a GPU unless they are marked accordingly. The registered markers are `slow`, `gpu` and `integration` (`pyproject.toml`); pytest runs with `--strict-markers`, so other markers are rejected.
+- Tests MUST NOT require network access, credentials or a GPU. No custom pytest markers are registered in `pyproject.toml`, and pytest runs with `--strict-markers`, so a test that uses an unregistered marker fails.
 - Tests that depend on an optional extra SHOULD skip with `pytest.mark.skipif` when the extra is not installed, as `tests/unit/test_io.py` does for rasterio, GeoPandas, pyproj and Zarr.
-- Test data MUST be synthetic or openly licensed. Small fixtures live in `tests/fixtures/` (see its README); tests SHOULD create larger inputs in temporary directories.
+- Test data MUST be synthetic or openly licensed. Tests MUST create their inputs in temporary directories (for example with the `tmp_path` fixture of pytest) instead of committing data files.
 - Tests that touch the model zoo SHOULD set the environment variable `UNBIHEXIUM_CACHE` to a temporary directory and use the `tiny` variants. The 520 models of the zoo (130 families in four variants: tiny, base, large and mega) are untrained starter models with deterministic weights, except the 28 models of the 7 spectral index families, which compute exact formulas. Tests MUST NOT assert accuracy figures for the starter models.
 
 ### 6.3 Fuzz targets
@@ -349,7 +348,7 @@ New parsers of untrusted input SHOULD come with a fuzz target, a seed corpus and
 
 ### 7.1 Declaring dependencies
 
-Dependencies are declared with version ranges in `pyproject.toml`: runtime dependencies under `[project]` and optional ones in the extras `onnx`, `torch`, `gpu`, `serving`, `dask`, `ray`, `zarr`, `netcdf`, `stac`, `parquet`, `test`, `dev` and `all`. A new dependency MUST be justified in the pull request (template questions Q25 and Q26) with its version and SPDX licence identifier. Its licence MUST be allowed by `.github/dependency-review-config.yml`, which denies GPL licences for every dependency scope; the Security and License Compliance workflows enforce this.
+Dependencies are declared with version ranges in `pyproject.toml`: runtime dependencies under `[project]` and optional ones in the extras `onnx`, `torch`, `serving`, `zarr`, `parquet`, `test`, `dev` and `all`. A new dependency MUST be justified in the pull request (template questions Q25 and Q26) with its version and SPDX licence identifier. Its licence MUST be allowed by `.github/dependency-review-config.yml`, which denies GPL licences for every dependency scope; the Security and License Compliance workflows enforce this.
 
 ### 7.2 Lock files
 
@@ -392,7 +391,7 @@ python -m unbihexium.zoo.sync --check   # report generated files that are out of
 python .github/scripts/check_model_zoo.py
 ```
 
-A change to the catalogue MUST include the regenerated files, and `make model-zoo` MUST pass. Model cards MUST describe the starter models as untrained (except the spectral index models, which compute exact formulas) and MUST NOT claim accuracy that has not been measured. Weight files are stored in Git LFS (`.gitattributes`). Contributed trained weights MUST come with a statement of the training data, its licence and the training procedure (template questions Q58 to Q63).
+A change to the catalogue MUST include the regenerated files, and `make model-zoo` MUST pass. Model cards MUST describe the starter models as untrained (except the spectral index models, which compute exact formulas) and MUST NOT claim accuracy that has not been measured. Weight files are never committed (`.gitignore` ignores them); the starter weights are rebuilt from the catalogue. Contributed trained weights MUST come with a statement of the training data, its licence and the training procedure (template questions Q58 to Q63).
 
 ## 9. Commit messages and pull request titles
 
