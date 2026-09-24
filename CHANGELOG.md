@@ -113,6 +113,7 @@ Platform, repository and continuous integration:
 
 Breaking changes:
 
+- The `processing` section of the configuration (tile size, overlap, output format, compression, nodata and seed) and `model.num_workers` were removed, because nothing read them. A configuration file, environment variable or `update()` call that still sets one of them fails with a message that names the key.
 - The runtime dependencies no longer include tqdm and scikit-learn, and the extras `gpu`, `dask`, `ray`, `netcdf` and `stac` were removed, together with torchvision, python-multipart and pytest-asyncio in the remaining extras, because no code used them. STAC search needs no extra; GPU use requires installing a CUDA build of PyTorch before the `torch` extra.
 
 - The project was relicensed from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0); source files carry the MPL-2.0 notice (#20).
@@ -124,6 +125,9 @@ Other changes:
 - The container image contains the CPU build of PyTorch next to ONNX Runtime, so its REST service builds and runs catalogue models instead of failing on every prediction; Docker Compose starts it with `unbihexium serve`.
 - The Kubernetes manifests and the Helm chart run `unbihexium serve` with a hardened security context, an emptyDir model store, probes, an autoscaler and a disruption budget; the chart gained its templates (Deployment, Service, ServiceAccount, API key Secret, autoscaler, disruption budget, optional Ingress and a `helm test` pod).
 - Model weight files are ignored by Git and marked as binary instead of being routed to Git LFS.
+- The CI type check runs pyright in standard mode with the SciPy type stubs (`scipy-stubs` in the `dev` extra for Python 3.12 and newer, and a hashed lock `.github/requirements/requirements-ci-typecheck.txt`) and fails on any error. Before, it ran `pyright src/ --level basic || true`, an invalid option whose failure was ignored; the annotations that pyright rejected were corrected.
+- Bare family names in the command line use `model.variant` of the configuration as the default variant, and `zoo verify`, `zoo where` and `zoo clear` accept `--cache-dir` like `zoo build`.
+- `scripts/unbihexium-completion.bash` uses Click's completion, which asks the installed command for its candidates, instead of a hand-written list of commands from earlier releases.
 
 - `unbihexium zoo download` and `unbihexium infer` are kept as hidden aliases of `zoo build` and `predict` (#38).
 - `unbihexium index` computes the index and writes it as GeoTIFF (#38).
@@ -168,6 +172,14 @@ Other changes:
 - The source distribution did not include `LICENSE.txt`, the notices, `REUSE.toml` or `CITATION.cff` (#33).
 - GeoJSON and STAC parsing raised `TypeError`, `OverflowError`, `IndexError` or `AttributeError` on malformed input, and rings that mixed 2-D and 3-D positions broke the area computation; malformed input now raises `ValueError` (found by fuzzing, #45).
 - `rewind` reversed rings of zero or near-zero area, including collinear holes, on every call; such rings now keep their order (found by fuzzing, #45, #46).
+- `verify_model` compared only the digest of the weights, so a modified `config.json`, `model.onnx` or `model.pt` still reported Verified and a corrupt checkpoint raised an exception. It now checks every file listed in `model.sha256` and returns False on any error. `ensure_model` reuses a cached entry only when its checksums and configuration match, uses an ONNX export only when `model.sha256` vouches for it and no longer rewrites unchanged files, so a verified store can be read-only; checkpoints registered with a URL or a path are checked against their registered digest.
+- `ModelZooEntry.version` defaults to the catalogue version, and `estimate_normalization` no longer counts the padding of border chips as zeros.
+- `--verbose` had no effect and the command line never installed its log handler; error messages lost bracketed text such as `unbihexium[torch]` to rich markup; unknown models, pipelines or parameters and a missing PyTorch ended in a traceback instead of a message with exit status 1; a checkpoint used with the ONNX backend had the variant appended to its path. `predict` and `pipeline run` now refuse output names that do not suit the result before running and warn when an untrained starter model runs.
+- The JSON routes of the REST service answered a body that was not JSON with 422 instead of the documented 415.
+- `geojson_problems` raised `RecursionError` on GeometryCollections nested about 2000 levels deep; collections nested deeper than 64 levels are reported as a problem. `geojson_problems` is exported from `unbihexium.io`.
+- The median, enhanced Lee and Gamma MAP speckle filters filled NaN pixels, and the enhanced Lee filter emitted `RuntimeWarning` at point targets; all eight filters keep invalid pixels and compute without warnings.
+- Pipeline runs hashed their input files when the run ended, so a step that changed an input produced a provenance record of a file that was never read; inputs are hashed before the first step.
+- `examples/scripts/detect_ships.py` ignored `--model-id` and wrote pixel coordinates without a CRS; the example API returned 500 with internal messages for invalid input and left temporary uploads behind.
 
 ### 2.5 Security
 
@@ -181,6 +193,14 @@ Other changes:
 - The container base image is pinned by digest and wheels are installed with verified hashes; the SPDX software bill of materials is computed from the digest of the pushed image (#45).
 - Release distributions are signed with Sigstore (`.sigstore.json` bundles), and each GitHub release carries the SLSA provenance of its GitHub artifact attestation as `unbihexium-<tag>.intoto.jsonl` (#45, #47).
 - `.github/` is kept in source archives so that OpenSSF Scorecard can analyse the workflows (#46).
+- `zoo clear` and the model store accepted model ids with path separators or parent references, which let `zoo clear` delete directories outside the store; such ids are rejected.
+- `STACClient` sent its headers, for example an `Authorization` token, to the next links of any host; they now go only to URLs of the same origin as the API.
+- The rate limiter of the REST service kept one bucket per client address for the lifetime of the process; buckets that have refilled completely are dropped once the table is large.
+- `Config.to_dict()` and `Config.to_yaml()` replace the API key with `***` unless `include_secrets=True` is passed.
+- `requirements-dev.txt` carries SHA-256 hashes and installs with `--require-hashes`, and the build backend hatchling is pinned by hash for the container image (`.github/requirements/requirements-build.txt`) and the release and package workflows, which build without isolation.
+- Bandit and pip-audit fail the Security workflow on any finding, and pip-audit also audits `requirements-dev.txt`; before, both only reported in the job log.
+- The release workflow stops before the build when the tag differs from the version recorded in `pyproject.toml`, `_version.py`, `CITATION.cff` or `codemeta.json` (`.github/scripts/check_release_version.py`).
+- `security-insights.yml` lists CodeQL and the atheris fuzzing.
 
 ### 2.6 Merged pull requests
 
