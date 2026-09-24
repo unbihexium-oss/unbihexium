@@ -1141,7 +1141,7 @@ Covers telemetry and privacy regimes outside the GDPR.
 
 _Tick every statement._
 
-- [ ] Any telemetry or storage of information on user devices complies with [ePrivacy Directive Article 5(3)](https://eur-lex.europa.eu/eli/dir/2002/58/oj/eng#art_5); Unbihexium telemetry is opt-in as described in [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md).
+- [ ] Any telemetry or storage of information on user devices complies with [ePrivacy Directive Article 5(3)](https://eur-lex.europa.eu/eli/dir/2002/58/oj/eng#art_5); Unbihexium itself sends no telemetry, as described in [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md).
 - [ ] For processing subject to UK law I comply with the [UK GDPR](https://www.legislation.gov.uk/eur/2016/679/article/5) and the [Data Protection Act 2018](https://www.legislation.gov.uk/ukpga/2018/12/contents).
 - [ ] For consumers in California I comply with the CCPA as amended by the CPRA, including [Civil Code 1798.100](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100), [1798.105](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.105) and [1798.120](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.120).
 
