@@ -111,7 +111,7 @@ The project was relicensed from Apache-2.0 to the Mozilla Public License 2.0 [3]
 | `serving` | did not exist (FastAPI was not declared) | fastapi, starlette, uvicorn |
 | `test` | did not exist | pytest and plugins, httpx |
 | `docs` | existed | removed |
-| `dev` | pytest, ruff, pyright, pre-commit, bandit, pip-audit | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox |
+| `dev` | pytest, ruff, pyright, pre-commit, bandit, pip-audit | `test` extra, ruff, pyright, scipy-stubs (Python 3.12 and newer), pre-commit, bandit, pip-audit, build, twine, tox |
 | `all` | every extra except `gpu` (including `docs` and `dev`) | every extra except `gpu` |
 
 All lower bounds of the dependencies were raised to releases that provide wheels for CPython 3.10 to 3.14 and exclude releases with known vulnerabilities (#33). Environments that pin old versions of NumPy, SciPy, rasterio, pydantic, Pillow or other dependencies MUST be updated; the exact bounds are in `pyproject.toml`. Deployments of the REST service MUST now install the `serving` extra, and deployments that run exported models without PyTorch MUST install the `onnx` extra.

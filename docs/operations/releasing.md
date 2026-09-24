@@ -106,7 +106,7 @@ The release is prepared in a pull request to `main`, from a branch such as `rele
 | [deploy/helm/unbihexium/Chart.yaml](../../deploy/helm/unbihexium/Chart.yaml) | `version` and `appVersion` |
 | [Dockerfile](../../Dockerfile) | default of the `VERSION` build argument (see [docker.md](docker.md)) |
 
-The release workflow does not compare the tag with the version in `pyproject.toml`, so a forgotten bump produces distributions with the old version number and a failed PyPI upload. The following check, run from the repository root, prints the version recorded in the four metadata files that define the package and its citation:
+The first step of the release workflow after the checkout, [.github/scripts/check_release_version.py](../../.github/scripts/check_release_version.py), compares the tag with the version in `pyproject.toml`, `_version.py`, `CITATION.cff` (version and release URL) and `codemeta.json`, and stops the release before the build when any of them differs. Run it before tagging, for example `python .github/scripts/check_release_version.py v1.0.1`. The following check, run from the repository root, prints the version recorded in the four metadata files that define the package and its citation:
 
 ```python
 import json
@@ -226,7 +226,7 @@ After the workflows have finished, the maintainer SHOULD:
 | --- | --- |
 | The workflow fails before "Create GitHub Release" | Nothing was published. Fix the cause on `main` with a pull request. Because a pushed tag must not be moved, release the fix under the next PATCH version with a new tag, and delete the unused tag only if nothing was published from it. |
 | The GitHub release exists but "Publish to PyPI" failed | Find the cause in the job log (for example an expired token). Once it is fixed, delete the assets of the existing GitHub release and re-run the job from the Actions tab. A re-run builds and signs the distributions again, so the release assets and the PyPI files then come from the same run; confirm this with item 3 of Section 8. If the cause requires a code change, release a new PATCH version instead. |
-| The version in `pyproject.toml` was not bumped | PyPI rejects the upload of an existing version. Treat as above: bump the version in a pull request and release it under a new tag. |
+| The version in `pyproject.toml` was not bumped | The step "Check the tag against the version" fails and nothing is published. Treat as above: bump the version in a pull request and release it under a new tag. |
 | A defect is found after publication | PyPI does not allow a file to be replaced. Release a fixed PATCH version; a broken release MAY be yanked on PyPI [7], which keeps it installable only for exact pins. |
 | The PyPI token leaked | Revoke it on PyPI first, then replace the repository secret, as described in [secrets_and_tokens.md](../security/secrets_and_tokens.md). |
 

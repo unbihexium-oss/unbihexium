@@ -111,7 +111,7 @@ The extras below are declared in `[project.optional-dependencies]` of [pyproject
 | `zarr` | zarr (2.18 on Python 3.10, 3.1.4 or newer otherwise), numcodecs | Zarr input and output in `unbihexium.io` |
 | `parquet` | pyarrow | GeoParquet input and output |
 | `test` | pytest, pytest-cov, pytest-xdist, httpx | Running the test suite |
-| `dev` | the `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development and release work |
+| `dev` | the `test` extra, ruff, pyright, scipy-stubs (Python 3.12 and newer), pre-commit, bandit, pip-audit, build, twine, tox | Development and release work |
 | `all` | every extra above | A complete environment |
 
 STAC search (`unbihexium.io.stac`) needs no extra; it uses requests. The functions of `unbihexium.io` import optional dependencies only when they are called, so a missing extra shows up as an `ImportError` at the first call of such a function, not at import time.

@@ -157,8 +157,8 @@ The maintainer integrates work on the `dev` branch and merges it into `main` thr
 
 - Code MUST be compatible with CPython 3.10 to 3.14. Ruff is configured with `target-version = "py310"` and a line length of 100 characters.
 - Code MUST pass `ruff check` and `ruff format --check` with the configuration in `pyproject.toml`. CI runs both on `src/`; the Make targets also cover `tests/`.
-- Public functions and classes SHOULD carry complete type annotations. Pyright is configured in strict mode in `pyproject.toml`; CI currently runs it at the basic level and reports the result without failing the job, so new code SHOULD NOT add type errors.
-- Code SHOULD NOT introduce findings of Bandit, which runs with the configuration in `pyproject.toml`.
+- Public functions and classes SHOULD carry complete type annotations. Pyright runs in standard mode with the settings in `pyproject.toml` and the SciPy type stubs of the `dev` extra; the CI job "Type Check" fails on any type error, so code MUST pass `make type-check`.
+- Code MUST NOT introduce findings of Bandit, which runs with the configuration in `pyproject.toml`; the Security workflow fails on any finding.
 - New modules MUST follow the documentation style of Section 5.2.
 
 ### 5.2 Python documentation style
@@ -357,6 +357,9 @@ Dependencies are declared with version ranges in `pyproject.toml`: runtime depen
 | `requirements.txt` | Runtime dependencies with the `onnx` and `serving` extras | Yes |
 | `requirements-dev.txt` | Runtime dependencies with the `all` extra, for development | Yes |
 | `.github/requirements/requirements-ci-test.txt` | Test environment of the CI, from `requirements-ci-test.in` | Yes |
+| `.github/requirements/requirements-ci-typecheck.txt` | Test environment plus pyright and the SciPy type stubs, from `requirements-ci-typecheck.in` | Yes |
+| `.github/requirements/requirements-docker.txt` | Dependencies of the container image | Yes |
+| `.github/requirements/requirements-build.txt` | The build backend hatchling, from `requirements-build.in` | Yes |
 | `.github/requirements/requirements-ci-tools.txt` | Linters and CI tools, from `requirements-ci-tools.in` | Yes |
 | `.github/requirements/requirements-ci-fuzz.txt` | atheris and NumPy for fuzzing, from `requirements-ci-fuzz.in` | Yes |
 | `.github/requirements/requirements-ci-torch.txt` | CPU build of PyTorch without its dependencies, from `requirements-ci-torch.in` | Yes |
@@ -459,7 +462,7 @@ The following workflows run on pull requests that target `main`. A pull request 
 
 | Workflow | What it checks |
 | --- | --- |
-| CI | Ruff lint and format check, pyright (informational) and the test suite on Python 3.10 to 3.14 |
+| CI | Ruff lint and format check, pyright and the test suite on Python 3.10 to 3.14 |
 | Integration Tests | Integration tests on Python 3.10 to 3.14, end-to-end tests and a REST API smoke test |
 | Coverage | Test suite under pytest-cov with upload to Codecov |
 | Package | Builds the sdist and wheel, validates the metadata and installs the wheel |

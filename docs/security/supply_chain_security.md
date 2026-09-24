@@ -110,14 +110,15 @@ Every workflow sets `permissions: contents: read` (the Scorecard workflow `read-
 
 | Lock file | Content | Consumers |
 | --- | --- | --- |
-| [requirements.txt](../../requirements.txt) | Runtime with the `onnx` and `serving` extras | pip-audit, licence check, type check |
-| [requirements-dev.txt](../../requirements-dev.txt) | All extras, for development | `make install-dev` |
+| [requirements.txt](../../requirements.txt) | Runtime with the `onnx` and `serving` extras | pip-audit, licence check |
+| [requirements-dev.txt](../../requirements-dev.txt) | All extras, for development | `make install-dev`, pip-audit |
 | [.github/requirements/requirements-docker.txt](../../.github/requirements/requirements-docker.txt) | Runtime with the `onnx` and `serving` extras and the dependencies of PyTorch | Container image |
 | [.github/requirements/requirements-build.txt](../../.github/requirements/requirements-build.txt) | The build backend hatchling | Container image (wheel build without isolation) |
 | [.github/requirements/requirements-ci-test.txt](../../.github/requirements/requirements-ci-test.txt) | Test environment, including the dependencies of PyTorch | CI, Coverage, Integration, Model Zoo |
+| [.github/requirements/requirements-ci-typecheck.txt](../../.github/requirements/requirements-ci-typecheck.txt) | Test environment plus pyright and the SciPy type stubs | CI type check |
 | [.github/requirements/requirements-ci-tools.txt](../../.github/requirements/requirements-ci-tools.txt) | ruff, pyright, bandit, pip-audit, build, twine, reuse, pip-licenses, check-jsonschema, yamllint, uv and their dependencies | Lint, security, release, packaging and configuration jobs |
 | [.github/requirements/requirements-ci-fuzz.txt](../../.github/requirements/requirements-ci-fuzz.txt) | atheris and NumPy | Fuzzing |
-| [.github/requirements/requirements-ci-torch.txt](../../.github/requirements/requirements-ci-torch.txt) | CPU build of PyTorch only | Container image, CI, Coverage, Integration, Model Zoo |
+| [.github/requirements/requirements-ci-torch.txt](../../.github/requirements/requirements-ci-torch.txt) | CPU build of PyTorch only | Container image, CI (tests and type check), Coverage, Integration, Model Zoo |
 
 `make lock-check` compares the committed files with a fresh compilation.
 
@@ -152,10 +153,11 @@ On every pull request, `actions/dependency-review-action` compares the dependenc
 The job `pip-audit` in [security.yml](../../.github/workflows/security.yml) runs on pushes to `main`, on pull requests and weekly (Sunday 00:00 UTC):
 
 ```bash
-pip-audit --require-hashes --disable-pip -r requirements.txt
+pip-audit --require-hashes --disable-pip --progress-spinner off -r requirements.txt
+pip-audit --require-hashes --disable-pip --progress-spinner off -r requirements-dev.txt
 ```
 
-It queries the PyPI advisory database for the exact locked versions. Its result is informational: the step ends with `|| echo "Audit completed"`, so findings appear in the job log but do not fail the build. The command was run on 2026-09-24 against the committed `requirements.txt` and reported `No known vulnerabilities found`. How findings are handled is described in [vulnerability_management.md](vulnerability_management.md).
+It queries the PyPI advisory database for the exact locked versions of the runtime lock and of the development lock, which covers every extra. Any known vulnerability fails the job; the weekly run catches advisories published after a merge. Both commands were run on 2026-09-24 against the committed lock files and reported `No known vulnerabilities found`. How findings are handled is described in [vulnerability_management.md](vulnerability_management.md).
 
 ### 4.4 Container Scan
 
@@ -169,7 +171,7 @@ Grype scans the built image; see Section 7.3.
 
 ### 5.2 Bandit
 
-The job `bandit` in [security.yml](../../.github/workflows/security.yml) runs `bandit -c pyproject.toml -r src/` with the settings in `pyproject.toml`. Like pip-audit it is informational. The same Bandit release runs as a pre-commit hook.
+The job `bandit` in [security.yml](../../.github/workflows/security.yml) runs `bandit -c pyproject.toml -r src/` with the settings in `pyproject.toml`; any finding fails the job. The run on 2026-09-24 reported no findings. The same Bandit release runs as a pre-commit hook.
 
 ### 5.3 Fuzzing
 
@@ -183,7 +185,7 @@ The job `bandit` in [security.yml](../../.github/workflows/security.yml) runs `b
 
 ### 6.1 Build
 
-Releases are built only by [.github/workflows/release.yml](../../.github/workflows/release.yml), on GitHub-hosted runners, when a tag matching `v*` is pushed. The job installs the build frontend `build` and the backend hatchling from the hashed tools lock and runs `python -m build --no-isolation`, so no unpinned package is fetched, which produces the sdist and the wheel in `dist/`. The procedure for maintainers is in [docs/operations/releasing.md](../operations/releasing.md).
+Releases are built only by [.github/workflows/release.yml](../../.github/workflows/release.yml), on GitHub-hosted runners, when a tag matching `v*` is pushed. The job first checks with [check_release_version.py](../../.github/scripts/check_release_version.py) that the tag names the version recorded in `pyproject.toml`, `_version.py`, `CITATION.cff` and `codemeta.json`, so a distribution cannot carry a version other than its tag. It then installs the build frontend `build` and the backend hatchling from the hashed tools lock and runs `python -m build --no-isolation`, so no unpinned package is fetched, which produces the sdist and the wheel in `dist/`. The procedure for maintainers is in [docs/operations/releasing.md](../operations/releasing.md).
 
 ### 6.2 Outputs
 
@@ -285,9 +287,7 @@ The following controls are not in place at the date of review. They are listed s
 
 - **Unsigned 1.0.x releases.** v1.0.0 and v1.0.1 have no signatures or provenance, and the v1.0.1 GitHub checksums do not match PyPI (Section 6.4). The first signed release is planned in [ROADMAP.md](../../ROADMAP.md).
 - **Long-lived PyPI token.** Uploads use `PYPI_API_TOKEN`; PyPI trusted publishing is under consideration.
-- **No check that the tag matches the version.** The distribution version is the static version in `pyproject.toml`; release.yml does not compare it with the tag.
 - **Some CI tools pinned by version only.** markdownlint-cli (through `npx`), the cue binary and the Security Insights schema in repo-config.yml, and the pre-commit hooks (by tag) are pinned by version, not by digest.
-- **Informational audits.** pip-audit, Bandit and pyright never fail a build; findings require a human to read the logs.
 - **Container image.** The image is not signed and has no attestation; its SBOM is only a workflow artifact.
 - **No SBOM for the Python distributions.**
 - **Package smoke test.** package.yml installs the built wheel with ordinary dependency resolution, deliberately like a user would, so that job is not hash-pinned.

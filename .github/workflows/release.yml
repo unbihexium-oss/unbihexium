@@ -24,8 +24,10 @@
 # and generated release notes (categories in .github/release.yml), and
 # finally uploads the distributions to PyPI with the PYPI_API_TOKEN
 # repository secret. The distribution version is the static version in
-# pyproject.toml, not the tag, so bump it before tagging; the workflow does
-# not compare the two.
+# pyproject.toml, not the tag, so bump it before tagging: the first step
+# after the checkout runs .github/scripts/check_release_version.py and stops
+# the release when the tag differs from the version in pyproject.toml,
+# _version.py, CITATION.cff or codemeta.json.
 #
 # Verify a downloaded distribution with
 #   python -m sigstore verify github --cert-identity \
@@ -64,6 +66,11 @@ jobs:  # Jobs of the workflow.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
           python-version: "3.14"  # Newest supported CPython.
+
+      - name: Check the tag against the version  # Stop before the build when the version was not bumped.
+        env:  # Values passed to the script.
+          TAG: ${{ github.ref_name }}  # Pushed tag, for example v1.2.3.
+        run: python .github/scripts/check_release_version.py "$TAG"  # Compare the tag with the metadata files.
 
       - name: Install build tools  # Install the PEP 517 frontend.
         run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including build.

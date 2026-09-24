@@ -193,6 +193,7 @@ dev = [
     "unbihexium[test]",  # Everything needed to run the tests.
     "ruff>=0.14.0",  # Linter and formatter.
     "pyright>=1.1.406",  # Static type checker.
+    "scipy-stubs>=1.18.1.1; python_version >= '3.12'",  # SciPy types for pyright; need Python 3.12.
     "pre-commit>=4.3.0",  # Git hook manager.
     "bandit[toml]>=1.8.6",  # Security linter that reads this file.
     "pip-audit>=2.9.0",  # Vulnerability audit of the lock files.
@@ -338,7 +339,7 @@ include = ["src"]  # Check the package sources only.
 exclude = ["**/__pycache__"]  # Skip bytecode caches.
 # Check against the oldest supported Python version.
 pythonVersion = "3.10"
-typeCheckingMode = "strict"  # Enable every strict check.
+typeCheckingMode = "standard"  # Standard checks; strict mode also rejects the untyped geospatial libraries.
 reportMissingImports = true  # Fail when an import cannot be resolved.
 reportMissingTypeStubs = false  # Allow third-party packages without type stubs.
 

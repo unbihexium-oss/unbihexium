@@ -116,7 +116,7 @@ The core installation covers input and output, preprocessing, indices, SAR, terr
 | `zarr` | zarr, numcodecs | Zarr input and output |
 | `parquet` | pyarrow | GeoParquet input and output |
 | `test` | pytest and plugins, httpx | Running the test suite |
-| `dev` | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development |
+| `dev` | `test` extra, ruff, pyright, scipy-stubs (Python 3.12 and newer), pre-commit, bandit, pip-audit, build, twine, tox | Development |
 | `all` | `onnx`, `torch`, `serving`, `zarr`, `parquet` and `dev` | A complete environment |
 
 ```bash

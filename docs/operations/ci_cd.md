@@ -124,7 +124,7 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 | Workflow and job | What it checks | Fails the check |
 | --- | --- | --- |
 | CI, `lint` | `ruff check src/ --config pyproject.toml` and `ruff format --check src/` | Yes |
-| CI, `typecheck` | `pyright src/ --level basic` against the installed runtime lock | No, errors are reported but ignored |
+| CI, `typecheck` | `pyright src/` in standard mode on CPython 3.13, against the hashed type check lock (test environment, pyright and the SciPy type stubs) and CPU PyTorch | Yes |
 | CI, `test` | `pytest tests/ --tb=short` on CPython 3.10, 3.11, 3.12, 3.13 and 3.14 with CPU PyTorch and the optional backends | Yes |
 | Integration Tests, `integration` | `pytest tests/integration/` on CPython 3.10 to 3.14; GDAL system packages are installed on a best-effort basis | Yes |
 | Integration Tests, `e2e` | `pytest tests/e2e/` on CPython 3.14, after `integration` | Yes |
@@ -158,8 +158,8 @@ Whether a failing check blocks the merge is decided by the branch protection rul
 | Workflow and job | What it checks | Blocking |
 | --- | --- | --- |
 | CodeQL, `analyze` | CodeQL `security-extended` for Python and GitHub Actions; results in code scanning | Alerts in code scanning |
-| Security, `bandit` | `bandit -c pyproject.toml -r src/` | No |
-| Security, `pip-audit` | `pip-audit --require-hashes --disable-pip -r requirements.txt` | No |
+| Security, `bandit` | `bandit -c pyproject.toml -r src/` | Yes |
+| Security, `pip-audit` | `pip-audit --require-hashes --disable-pip` on `requirements.txt` and `requirements-dev.txt` | Yes |
 | Security, `dependency-review` | New dependencies with high or critical advisories or denied licences ([.github/dependency-review-config.yml](../../.github/dependency-review-config.yml)) | Yes |
 | Secret Scan, `trufflehog` | TruffleHog 3.97.6 over the new commits, verified secrets only | Yes |
 | Container Scan, `grype` | Builds the image locally and scans it with Grype; SARIF to code scanning (category `grype-container`) | Yes, on critical findings with a fix |

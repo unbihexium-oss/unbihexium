@@ -67,8 +67,9 @@ CI_REQ := .github/requirements
 
 # Every lock file that `make lock` writes and `make lock-check` compares.
 LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-test.txt \
-	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt \
-	$(CI_REQ)/requirements-docker.txt $(CI_REQ)/requirements-build.txt
+	$(CI_REQ)/requirements-ci-typecheck.txt $(CI_REQ)/requirements-ci-tools.txt \
+	$(CI_REQ)/requirements-ci-fuzz.txt $(CI_REQ)/requirements-docker.txt \
+	$(CI_REQ)/requirements-build.txt
 
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
@@ -114,6 +115,11 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet \
 		--custom-compile-command "make lock" \
 		-o .requirements-ci-test.lock.tmp
+# Compile the hashed lock of the CI type check (the test environment plus pyright and
+# the SciPy type stubs) into a temporary file.
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(CI_REQ)/requirements-ci-typecheck.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet \
+		--custom-compile-command "make lock" \
+		-o .requirements-ci-typecheck.lock.tmp
 # Compile the hashed lock of the container image (runtime, onnx and serving extras
 # and the dependencies of PyTorch) into a temporary file.
 	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
@@ -136,6 +142,7 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 		requirements.txt .requirements.lock.tmp \
 		requirements-dev.txt .requirements-dev.lock.tmp \
 		$(CI_REQ)/requirements-ci-test.txt .requirements-ci-test.lock.tmp \
+		$(CI_REQ)/requirements-ci-typecheck.txt .requirements-ci-typecheck.lock.tmp \
 		$(CI_REQ)/requirements-ci-tools.txt .requirements-ci-tools.lock.tmp \
 		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp \
 		$(CI_REQ)/requirements-docker.txt .requirements-docker.lock.tmp \
