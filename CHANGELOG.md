@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CHANGELOG |
+| Document | UBX-DOC-101 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -142,6 +142,7 @@ Other changes:
 - GitHub Actions dependencies were updated by Dependabot: `codecov/codecov-action` 4 to 5 (#12), `ossf/scorecard-action` 2.3.1 to 2.4.3 (#11), `slsa-framework/slsa-github-generator` 1.9.0 to 2.1.0 (#10), `actions/upload-pages-artifact` 3 to 4 (#9), `docker/build-push-action` 5 to 6 (#8), `actions/setup-python` 5 to 6 (#18), `softprops/action-gh-release` 1 to 2 (#17), `github/codeql-action` 3 to 4 (#16), `actions/checkout` 4 to 6 (#15) and `actions/attest-build-provenance` 1 to 3 (#14); the container base image moved from `python:3.12-slim` to `python:3.14-slim` (#13).
 - A model path lookup that searches the parent directories for `model_zoo` (#7) and Git LFS set-up instructions (direct commits on 2025-12-22) were added for the example material and the documentation. Both referred to the model files that were removed later in this cycle and were superseded by the removals in [2.3 Removed](#23-removed).
 - The documentation under `docs/` was rewritten to match the current code, in the same document layout as the root documents, with every code example and command executed against the current code.
+- Document identifiers are numbered: `UBX-DOC-SNN`, with one series digit per area (1 project, 2 policies, 3 guides, 4 reference, 5 architecture, 6 capability domains, 7 model zoo, 8 security, 9 operations and reports), replacing the descriptive identifiers such as `UBX-DOC-SEC-SUPPLY-CHAIN`. The new [Document Register](docs/document_register.md) (UBX-DOC-302) defines the scheme, lists all 65 controlled documents and maps the previous identifiers; `.github/scripts/check_document_ids.py` enforces it in the Markdown workflow, in `make check` and as a pre-commit hook. The capability domain documents use one title form, `Capability Domain NN: Title`.
 - The package metadata, `CITATION.cff`, `codemeta.json` and `security-insights.yml` no longer name a home page address; the repository and PyPI links remain. The Helm chart and the Kubernetes manifest use the reserved placeholder host `unbihexium.example.com`.
 
 ### 2.3 Removed

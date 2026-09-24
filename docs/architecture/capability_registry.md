@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-ARCH-CAPABILITY-REGISTRY |
+| Document | UBX-DOC-502 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

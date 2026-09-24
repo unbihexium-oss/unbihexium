@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/12_radar_sar.md
-Title       : Capability 12: Radar and Synthetic Aperture Radar
+Title       : Capability Domain 12: Radar and Synthetic Aperture Radar
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability 12: Radar and Synthetic Aperture Radar
+# Capability Domain 12: Radar and Synthetic Aperture Radar
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-12-SAR |
+| Document | UBX-DOC-612 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

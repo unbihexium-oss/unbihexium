@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-TOC |
+| Document | UBX-DOC-301 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -28,7 +28,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 ## Abstract
 
-This document is the complete table of contents of the `docs/` directory of Unbihexium. It lists every document in the directory exactly once, with its document identifier, grouped in the same areas and order as the documentation hub [docs/index.md](index.md), so that readers, reviewers and maintainers can see at a glance what exists and check that nothing is missing. It does not describe the documents; their purpose and scope are summarised in the hub and stated in the abstract of each document. The list was compiled from `git ls-files docs` and contains 45 documents.
+This document is the complete table of contents of the `docs/` directory of Unbihexium. It lists every document in the directory exactly once, with its document identifier, grouped in the same areas and order as the documentation hub [docs/index.md](index.md), so that readers, reviewers and maintainers can see at a glance what exists and check that nothing is missing. The identifiers follow the numbering scheme of the [Document Register](document_register.md), which also covers the documents outside `docs/`. It does not describe the documents; their purpose and scope are summarised in the hub and stated in the abstract of each document. The list was compiled from `git ls-files docs` and contains 46 documents.
 
 ## Contents
 
@@ -56,108 +56,110 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 
 - A pull request that adds, renames or removes a document under `docs/` MUST update this list and [docs/index.md](index.md) in the same pull request.
 - The count in the abstract and in Section 12 SHOULD equal the output of `git ls-files docs | wc -l`.
-- Link text is the title (first-level heading) of the document; the identifier is the value of the `Document` row of its control table.
+- Link text is the title (first-level heading) of the document; the identifier is the value of the `Document` row of its control table, assigned under the rules of the [Document Register](document_register.md), Section 2.
+- `python .github/scripts/check_document_ids.py` (`make doc-ids`, Markdown workflow) fails when an identifier or title in this list differs from the document.
 
 ## 2. Entry points
 
 | Document | Identifier |
 | --- | --- |
-| [Unbihexium Documentation](index.md) | UBX-DOC-INDEX |
-| [Table of Contents](toc.md) | UBX-DOC-TOC |
+| [Unbihexium Documentation](index.md) | UBX-DOC-300 |
+| [Table of Contents](toc.md) | UBX-DOC-301 |
+| [Document Register](document_register.md) | UBX-DOC-302 |
 
 ## 3. Getting started and tutorials
 
 | Document | Identifier |
 | --- | --- |
-| [Installation](getting_started/installation.md) | UBX-DOC-GS-INSTALLATION |
-| [Quick Start](getting_started/quickstart.md) | UBX-DOC-GS-QUICKSTART |
-| [Configuration](getting_started/configuration.md) | UBX-DOC-GS-CONFIGURATION |
-| [Tutorials](tutorials/index.md) | UBX-DOC-TUTORIALS |
+| [Installation](getting_started/installation.md) | UBX-DOC-303 |
+| [Quick Start](getting_started/quickstart.md) | UBX-DOC-304 |
+| [Configuration](getting_started/configuration.md) | UBX-DOC-305 |
+| [Tutorials](tutorials/index.md) | UBX-DOC-306 |
 
 ## 4. Reference
 
 | Document | Identifier |
 | --- | --- |
-| [Python API Reference](reference/api.md) | UBX-DOC-REF-API |
-| [Command Line Reference](reference/cli.md) | UBX-DOC-REF-CLI |
+| [Python API Reference](reference/api.md) | UBX-DOC-401 |
+| [Command Line Reference](reference/cli.md) | UBX-DOC-402 |
 
 ## 5. Architecture
 
 | Document | Identifier |
 | --- | --- |
-| [Architecture Overview](architecture/overview.md) | UBX-DOC-ARCH-OVERVIEW |
-| [Capability Registry](architecture/capability_registry.md) | UBX-DOC-ARCH-CAPABILITY-REGISTRY |
-| [Model Zoo Architecture](architecture/model_zoo_architecture.md) | UBX-DOC-ARCH-MODEL-ZOO |
-| [Pipeline Framework](architecture/pipeline_framework.md) | UBX-DOC-ARCH-PIPELINE-FRAMEWORK |
-| [Security Model](architecture/security_model.md) | UBX-DOC-ARCH-SECURITY-MODEL |
+| [Architecture Overview](architecture/overview.md) | UBX-DOC-501 |
+| [Capability Registry](architecture/capability_registry.md) | UBX-DOC-502 |
+| [Model Zoo Architecture](architecture/model_zoo_architecture.md) | UBX-DOC-503 |
+| [Pipeline Framework](architecture/pipeline_framework.md) | UBX-DOC-504 |
+| [Security Model](architecture/security_model.md) | UBX-DOC-505 |
 
 ## 6. Capability domains
 
 | Document | Identifier |
 | --- | --- |
-| [Capability domains](capabilities/index.md) | UBX-DOC-CAP-INDEX |
-| [Capability domain 01: AI products](capabilities/01_ai_products.md) | UBX-DOC-CAP-01 |
-| [Capability domain 02: tourism and data processing](capabilities/02_tourism_data_processing.md) | UBX-DOC-CAP-02 |
-| [Capability domain 03: spectral indices, floods and water](capabilities/03_indices_flood_water.md) | UBX-DOC-CAP-03 |
-| [Capability domain 04: environment, forestry and image processing](capabilities/04_environment_forestry_image_processing.md) | UBX-DOC-CAP-04 |
-| [Capability Domain 05: Asset Management and Energy](capabilities/05_asset_management_energy.md) | UBX-DOC-CAP-05-ASSETS-ENERGY |
-| [Capability Domain 06: Urban Planning and Agriculture](capabilities/06_urban_agriculture.md) | UBX-DOC-CAP-06-URBAN-AGRICULTURE |
-| [Capability Domain 07: Risk Assessment and Neutral Monitoring](capabilities/07_risk_defense_neutral.md) | UBX-DOC-CAP-07-RISK-MONITORING |
-| [Capability Domain 08: Value-Added Imagery, Elevation and 3D Products](capabilities/08_value_added_imagery.md) | UBX-DOC-CAP-08-VALUE-ADDED-IMAGERY |
-| [Capability 09: Benefits Narrative and Reportable Outputs](capabilities/09_benefits_narrative.md) | UBX-DOC-CAP-09-BENEFITS |
-| [Capability 10: Satellite Imagery Features](capabilities/10_satellite_imagery_features.md) | UBX-DOC-CAP-10-IMAGERY |
-| [Capability 11: Resolution, Metadata and Quality Assurance](capabilities/11_resolution_metadata_qa.md) | UBX-DOC-CAP-11-RESOLUTION-QA |
-| [Capability 12: Radar and Synthetic Aperture Radar](capabilities/12_radar_sar.md) | UBX-DOC-CAP-12-SAR |
+| [Capability Domains](capabilities/index.md) | UBX-DOC-600 |
+| [Capability Domain 01: AI Products](capabilities/01_ai_products.md) | UBX-DOC-601 |
+| [Capability Domain 02: Tourism and Data Processing](capabilities/02_tourism_data_processing.md) | UBX-DOC-602 |
+| [Capability Domain 03: Spectral Indices, Floods and Water](capabilities/03_indices_flood_water.md) | UBX-DOC-603 |
+| [Capability Domain 04: Environment, Forestry and Image Processing](capabilities/04_environment_forestry_image_processing.md) | UBX-DOC-604 |
+| [Capability Domain 05: Asset Management and Energy](capabilities/05_asset_management_energy.md) | UBX-DOC-605 |
+| [Capability Domain 06: Urban Planning and Agriculture](capabilities/06_urban_agriculture.md) | UBX-DOC-606 |
+| [Capability Domain 07: Risk Assessment and Neutral Monitoring](capabilities/07_risk_defense_neutral.md) | UBX-DOC-607 |
+| [Capability Domain 08: Value-Added Imagery, Elevation and 3D Products](capabilities/08_value_added_imagery.md) | UBX-DOC-608 |
+| [Capability Domain 09: Benefits Narrative and Reportable Outputs](capabilities/09_benefits_narrative.md) | UBX-DOC-609 |
+| [Capability Domain 10: Satellite Imagery Features](capabilities/10_satellite_imagery_features.md) | UBX-DOC-610 |
+| [Capability Domain 11: Resolution, Metadata and Quality Assurance](capabilities/11_resolution_metadata_qa.md) | UBX-DOC-611 |
+| [Capability Domain 12: Radar and Synthetic Aperture Radar](capabilities/12_radar_sar.md) | UBX-DOC-612 |
 
 ## 7. Model zoo
 
 | Document | Identifier |
 | --- | --- |
-| [Model Zoo Catalogue](model_zoo/model_catalog.md) | UBX-DOC-MZ-CATALOG |
-| [Building and Verifying Models](model_zoo/download_and_verify.md) | UBX-DOC-MZ-BUILD-VERIFY |
-| [Running Models](model_zoo/inference.md) | UBX-DOC-MZ-INFERENCE |
-| [Training and Evaluating Models](model_zoo/training.md) | UBX-DOC-MZ-TRAINING |
-| [Adding Models to the Model Zoo](model_zoo/how_to_add_models.md) | UBX-DOC-MZ-ADD-MODELS |
-| [Model Distribution](model_zoo/distribution.md) | UBX-DOC-MZ-DISTRIBUTION |
-| [Model Licensing and Provenance](model_zoo/licensing_and_provenance.md) | UBX-DOC-MZ-LICENSING |
+| [Model Zoo Catalogue](model_zoo/model_catalog.md) | UBX-DOC-701 |
+| [Building and Verifying Models](model_zoo/download_and_verify.md) | UBX-DOC-702 |
+| [Running Models](model_zoo/inference.md) | UBX-DOC-703 |
+| [Training and Evaluating Models](model_zoo/training.md) | UBX-DOC-704 |
+| [Adding Models to the Model Zoo](model_zoo/how_to_add_models.md) | UBX-DOC-705 |
+| [Model Distribution](model_zoo/distribution.md) | UBX-DOC-706 |
+| [Model Licensing and Provenance](model_zoo/licensing_and_provenance.md) | UBX-DOC-707 |
 
 ## 8. Security
 
 | Document | Identifier |
 | --- | --- |
-| [Supply Chain Security](security/supply_chain_security.md) | UBX-DOC-SEC-SUPPLY-CHAIN |
-| [Model Integrity](security/model_integrity.md) | UBX-DOC-SEC-MODEL-INTEGRITY |
-| [Vulnerability Management](security/vulnerability_management.md) | UBX-DOC-SEC-VULN-MGMT |
-| [Secrets and Tokens](security/secrets_and_tokens.md) | UBX-DOC-SEC-SECRETS |
-| [Responsible Use: Technical Guidance](security/responsible_use.md) | UBX-DOC-SEC-RESPONSIBLE-USE |
+| [Supply Chain Security](security/supply_chain_security.md) | UBX-DOC-801 |
+| [Model Integrity](security/model_integrity.md) | UBX-DOC-802 |
+| [Vulnerability Management](security/vulnerability_management.md) | UBX-DOC-803 |
+| [Secrets and Tokens](security/secrets_and_tokens.md) | UBX-DOC-804 |
+| [Responsible Use: Technical Guidance](security/responsible_use.md) | UBX-DOC-805 |
 
 ## 9. Operations
 
 | Document | Identifier |
 | --- | --- |
-| [Continuous Integration and Delivery](operations/ci_cd.md) | UBX-DOC-OPS-CICD |
-| [Container Image and Deployment](operations/docker.md) | UBX-DOC-OPS-DOCKER |
-| [Release Procedure](operations/releasing.md) | UBX-DOC-OPS-RELEASING |
+| [Continuous Integration and Delivery](operations/ci_cd.md) | UBX-DOC-901 |
+| [Container Image and Deployment](operations/docker.md) | UBX-DOC-902 |
+| [Release Procedure](operations/releasing.md) | UBX-DOC-903 |
 
 ## 10. Benchmarks
 
 | Document | Identifier |
 | --- | --- |
-| [Benchmarks](benchmarks/BENCHMARKS.md) | UBX-DOC-BENCHMARKS |
+| [Benchmarks](benchmarks/BENCHMARKS.md) | UBX-DOC-904 |
 
 ## 11. General documents
 
 | Document | Identifier |
 | --- | --- |
-| [Frequently Asked Questions](faq.md) | UBX-DOC-FAQ |
-| [Glossary](glossary.md) | UBX-DOC-GLOSSARY |
-| [Migration Guide from 1.0.x to 2.0.0](MIGRATION.md) | UBX-DOC-MIGRATION |
+| [Frequently Asked Questions](faq.md) | UBX-DOC-309 |
+| [Glossary](glossary.md) | UBX-DOC-310 |
+| [Migration Guide from 1.0.x to 2.0.0](MIGRATION.md) | UBX-DOC-308 |
 
 ## 12. Summary by directory
 
 | Directory | Documents |
 | --- | --- |
-| `docs/` | 5 (`index.md`, `toc.md`, `faq.md`, `glossary.md`, `MIGRATION.md`) |
+| `docs/` | 6 (`index.md`, `toc.md`, `document_register.md`, `faq.md`, `glossary.md`, `MIGRATION.md`) |
 | `docs/getting_started/` | 3 |
 | `docs/tutorials/` | 1 |
 | `docs/reference/` | 2 |
@@ -167,9 +169,9 @@ The key words MUST and SHOULD in this section are to be interpreted as described
 | `docs/security/` | 5 |
 | `docs/operations/` | 3 |
 | `docs/benchmarks/` | 1 |
-| **Total** | **45** |
+| **Total** | **46** |
 
-Documents outside `docs/`, such as the policies in the repository root and the README files of `model_zoo/` and `examples/`, are listed in [docs/index.md, Section 12](index.md#12-project-documents-outside-docs).
+Documents outside `docs/`, such as the policies in the repository root and the README files of `model_zoo/` and `examples/`, are listed in [docs/index.md, Section 12](index.md#12-project-documents-outside-docs) and, with their identifiers, in the [Document Register](document_register.md).
 
 ## References
 

@@ -28,7 +28,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-README |
+| Document | UBX-DOC-100 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

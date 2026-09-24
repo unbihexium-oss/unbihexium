@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-MZ-ADD-MODELS |
+| Document | UBX-DOC-705 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

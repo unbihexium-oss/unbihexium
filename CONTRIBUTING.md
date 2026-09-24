@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CONTRIBUTING |
+| Document | UBX-DOC-108 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -134,8 +134,9 @@ make install-dev
 | `make licence` | REUSE lint and `.github/scripts/check_license_headers.py` |
 | `make text-policy` | `.github/scripts/check_text_policy.py` |
 | `make md-lint` | markdownlint with `.markdownlint.yaml` |
+| `make doc-ids` | `.github/scripts/check_document_ids.py` (document identifiers and register) |
 | `make model-zoo` | `.github/scripts/check_model_zoo.py` |
-| `make check` | Lint, format check, type check, tests, licence, text policy, YAML lint and model zoo |
+| `make check` | Lint, format check, type check, tests, licence, text policy, document identifiers, YAML lint and model zoo |
 | `make pre-commit` | Every pre-commit hook on all files |
 | `make check-dist` | Builds the sdist and wheel and runs `twine check --strict` |
 
@@ -284,6 +285,7 @@ YAML files are additionally linted with yamllint (`.yamllint.yml`), and workflow
 ### 5.4 Markdown
 
 - Markdown MUST pass markdownlint with `.markdownlint.yaml` (`make md-lint`; Markdown workflow). The root documents follow a common layout: an HTML comment with the licence notice and header block, one H1 heading, a document control table, an abstract, a contents list, numbered sections, references and a closing HTML comment.
+- Every controlled document carries an identifier `UBX-DOC-SNN` in the `Document` row of its control table, assigned under the rules of the [Document Register](docs/document_register.md): a new document takes the next free number of its series and is added to the register (and, under `docs/`, to `docs/toc.md` and `docs/index.md`) in the same pull request; identifiers are never changed or reused. `make doc-ids` runs `.github/scripts/check_document_ids.py`, which the Markdown workflow also runs.
 - Relative links MUST point to files that exist. The Links workflow checks links on a schedule with lychee (`.github/lychee.toml`).
 
 ### 5.5 Text policy
@@ -468,7 +470,7 @@ The following workflows run on pull requests that target `main`. A pull request 
 | Package | Builds the sdist and wheel, validates the metadata and installs the wheel |
 | Text Policy | Text policy of the files, Python and configuration file documentation style, and commit messages |
 | PR Title | Conventional Commits format of the title |
-| Markdown | markdownlint (when Markdown files change) |
+| Markdown | markdownlint and the document identifier check (when Markdown files change) |
 | Model Zoo | Consistency of the model zoo (when it changes) |
 | Fuzzing | atheris fuzz targets (when the parsers or targets change) |
 | License Compliance | MPL-2.0 notices, REUSE and the licences of the dependencies |

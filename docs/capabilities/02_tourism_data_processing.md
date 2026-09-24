@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/02_tourism_data_processing.md
-Title       : Capability domain 02: tourism and data processing
+Title       : Capability Domain 02: Tourism and Data Processing
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability domain 02: tourism and data processing
+# Capability Domain 02: Tourism and Data Processing
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-02 |
+| Document | UBX-DOC-602 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

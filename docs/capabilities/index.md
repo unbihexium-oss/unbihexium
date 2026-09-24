@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/index.md
-Title       : Capability domains
+Title       : Capability Domains
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability domains
+# Capability Domains
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-INDEX |
+| Document | UBX-DOC-600 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

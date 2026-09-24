@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/04_environment_forestry_image_processing.md
-Title       : Capability domain 04: environment, forestry and image processing
+Title       : Capability Domain 04: Environment, Forestry and Image Processing
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability domain 04: environment, forestry and image processing
+# Capability Domain 04: Environment, Forestry and Image Processing
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-04 |
+| Document | UBX-DOC-604 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/03_indices_flood_water.md
-Title       : Capability domain 03: spectral indices, floods and water
+Title       : Capability Domain 03: Spectral Indices, Floods and Water
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability domain 03: spectral indices, floods and water
+# Capability Domain 03: Spectral Indices, Floods and Water
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-03 |
+| Document | UBX-DOC-603 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

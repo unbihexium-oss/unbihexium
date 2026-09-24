@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/01_ai_products.md
-Title       : Capability domain 01: AI products
+Title       : Capability Domain 01: AI Products
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability domain 01: AI products
+# Capability Domain 01: AI Products
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-01 |
+| Document | UBX-DOC-601 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-OPS-CICD |
+| Document | UBX-DOC-901 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |
@@ -102,7 +102,7 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 | [labels.yml](../../.github/workflows/labels.yml) | Labels | PR and push touching `.github/labels.yml` or the workflow; manual | `sync` |
 | [license-compliance.yml](../../.github/workflows/license-compliance.yml) | License Compliance | PR, push, Monday 04:00, manual | `headers`, `reuse`, `dependencies` |
 | [links.yml](../../.github/workflows/links.yml) | Links | Monday 05:00, manual | `lychee` |
-| [markdown.yml](../../.github/workflows/markdown.yml) | Markdown | PR and push touching `**/*.md` or `.markdownlint.yaml`; manual | `markdownlint` |
+| [markdown.yml](../../.github/workflows/markdown.yml) | Markdown | PR and push touching `**/*.md`, `.markdownlint.yaml` or the identifier check; manual | `markdownlint`, `document-ids` |
 | [model-zoo.yml](../../.github/workflows/model-zoo.yml) | Model Zoo | PR and push touching `model_zoo/**`, `src/unbihexium/zoo/**`, `src/unbihexium/ai/models/**`, the check script or the workflow; Monday 05:00; manual (with a `rebuild` input) | `consistency`, `reproducibility` |
 | [package.yml](../../.github/workflows/package.yml) | Package | PR, push, manual | `build`, `smoke-test` (Python 3.10 and 3.14) |
 | [pr-title.yml](../../.github/workflows/pr-title.yml) | PR Title | PR target (opened, edited, reopened, synchronize) | `conventional-title` |
@@ -145,6 +145,7 @@ The Model Zoo workflow runs `.github/scripts/check_model_zoo.py` in two jobs. `c
 | Text Policy, `python-style` | `check_python_style.py` and `check_config_style.py`: headers, footers and line comments in Python and configuration files |
 | Text Policy, `commit-messages` | Every commit message of the pull request is free of emojis, em dashes, horizontal bars and the listed Turkish letters |
 | Markdown, `markdownlint` | `markdownlint-cli@0.49.1` over every Markdown file with [.markdownlint.yaml](../../.markdownlint.yaml) |
+| Markdown, `document-ids` | `.github/scripts/check_document_ids.py`: every controlled document has a numbered identifier that is unique and matches the [Document Register](../document_register.md) and [docs/toc.md](../toc.md) |
 | Repository Config, `schemas` | Issue forms, issue chooser, workflows, Dependabot, `CITATION.cff`, the Compose file and Codecov against their JSON Schemas with check-jsonschema; `codemeta.json` is valid JSON; `yamllint --strict`; the remaining `.github` YAML files parse |
 | Repository Config, `security-insights` | [security-insights.yml](../../security-insights.yml) against the OpenSSF Security Insights 2.2.0 schema with cue |
 | Workflow Lint, `actionlint` | actionlint 1.7.12 (archive pinned by SHA-256) with shellcheck over all workflows |
@@ -213,7 +214,7 @@ Scheduled runs catch problems that appear without a code change: new advisories,
 
 ## 9. Running the Checks Locally
 
-The [Makefile](../../Makefile) mirrors the CI checks; `make help` lists every target, and `make check` runs `lint`, `format-check`, `type-check`, `test`, `licence`, `text-policy`, `yaml-lint` and `model-zoo`. The pre-commit hooks in [.pre-commit-config.yaml](../../.pre-commit-config.yaml) run the same tool versions as CI (`make pre-commit`). The main commands can also be run directly in a development environment installed with `make install-dev`:
+The [Makefile](../../Makefile) mirrors the CI checks; `make help` lists every target, and `make check` runs `lint`, `format-check`, `type-check`, `test`, `licence`, `text-policy`, `doc-ids`, `yaml-lint` and `model-zoo`. The pre-commit hooks in [.pre-commit-config.yaml](../../.pre-commit-config.yaml) run the same tool versions as CI (`make pre-commit`). The main commands can also be run directly in a development environment installed with `make install-dev`:
 
 ```bash
 ruff check src/ --config pyproject.toml

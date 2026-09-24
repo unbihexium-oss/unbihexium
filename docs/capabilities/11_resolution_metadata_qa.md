@@ -6,7 +6,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 =============================================================================
 Project     : Unbihexium
 File        : docs/capabilities/11_resolution_metadata_qa.md
-Title       : Capability 11: Resolution, Metadata and Quality Assurance
+Title       : Capability Domain 11: Resolution, Metadata and Quality Assurance
 Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 Affiliation : University of Helsinki
 Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
@@ -15,11 +15,11 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 =============================================================================
 -->
 
-# Capability 11: Resolution, Metadata and Quality Assurance
+# Capability Domain 11: Resolution, Metadata and Quality Assurance
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-CAP-11-RESOLUTION-QA |
+| Document | UBX-DOC-611 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-24 |

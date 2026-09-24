@@ -19,7 +19,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 | Field | Value |
 | --- | --- |
-| Document | UBX-DOC-VERSIONING |
+| Document | UBX-DOC-102 |
 | Version | 2.0 |
 | Status | Active |
 | Last reviewed | 2026-09-23 |
