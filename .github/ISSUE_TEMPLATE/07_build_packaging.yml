@@ -63,15 +63,14 @@ body:  # Elements of the form, in display order.
         Select the kind of problem.
       options:  # Answer choices, in display order.
         - "pip installation failure"  # Choice 1.
-        - "conda installation failure"  # Choice 2.
-        - "Build from source failure"  # Choice 3.
-        - "Wheel or sdist metadata problem"  # Choice 4.
-        - "Dependency conflict"  # Choice 5.
-        - "Docker build or run failure"  # Choice 6.
-        - "CI workflow failure"  # Choice 7.
-        - "pre-commit failure"  # Choice 8.
-        - "Documentation build failure"  # Choice 9.
-        - "Other (specify in the next field)"  # Choice 10.
+        - "Build from source failure"  # Choice 2.
+        - "Wheel or sdist metadata problem"  # Choice 3.
+        - "Dependency conflict"  # Choice 4.
+        - "Docker build or run failure"  # Choice 5.
+        - "CI workflow failure"  # Choice 6.
+        - "pre-commit failure"  # Choice 7.
+        - "Documentation build failure"  # Choice 8.
+        - "Other (specify in the next field)"  # Choice 9.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -141,11 +140,10 @@ body:  # Elements of the form, in display order.
       options:  # Answer choices, in display order.
         - "pip"  # Choice 1.
         - "uv"  # Choice 2.
-        - "conda or mamba"  # Choice 3.
-        - "poetry"  # Choice 4.
-        - "pdm"  # Choice 5.
-        - "pipx"  # Choice 6.
-        - "Other (specify in the next field)"  # Choice 7.
+        - "poetry"  # Choice 3.
+        - "pdm"  # Choice 4.
+        - "pipx"  # Choice 5.
+        - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -203,18 +201,15 @@ body:  # Elements of the form, in display order.
       multiple: true  # Several choices may be selected.
       options:  # Answer choices, in display order.
         - "No extras"  # Choice 1.
-        - "torch"  # Choice 2.
-        - "gpu"  # Choice 3.
-        - "dask"  # Choice 4.
-        - "ray"  # Choice 5.
-        - "zarr"  # Choice 6.
-        - "netcdf"  # Choice 7.
-        - "stac"  # Choice 8.
-        - "parquet"  # Choice 9.
-        - "docs"  # Choice 10.
-        - "dev"  # Choice 11.
-        - "all"  # Choice 12.
-        - "Other (specify in the next field)"  # Choice 13.
+        - "onnx"  # Choice 2.
+        - "torch"  # Choice 3.
+        - "serving"  # Choice 4.
+        - "zarr"  # Choice 5.
+        - "parquet"  # Choice 6.
+        - "test"  # Choice 7.
+        - "dev"  # Choice 8.
+        - "all"  # Choice 9.
+        - "Other (specify in the next field)"  # Choice 10.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -305,29 +300,6 @@ body:  # Elements of the form, in display order.
       label: "Network setup: Other, please specify"  # Question shown to the reporter.
       description: |  # Help text shown under the question.
         Complete this field only if you selected "Other (specify in the next field)" in "Network setup". Describe your answer precisely so maintainers do not need to ask a follow-up question.
-    validations:  # Validation rules of the element.
-      required: false  # The answer is optional.
-
-  - type: dropdown  # Closed question answered from a drop-down list.
-    id: bld-lfs  # Stable key of the answer in the issue form data.
-    attributes:  # Content and presentation of the element.
-      label: "Git LFS"  # Question shown to the reporter.
-      description: |  # Help text shown under the question.
-        Declare the Git LFS status for source checkouts.
-      options:  # Answer choices, in display order.
-        - "Not a source checkout"  # Choice 1.
-        - "Git LFS installed and pulled"  # Choice 2.
-        - "Git LFS not installed"  # Choice 3.
-        - "Other (specify in the next field)"  # Choice 4.
-    validations:  # Validation rules of the element.
-      required: true  # An answer is mandatory.
-
-  - type: input  # Single-line free-text answer.
-    id: bld-lfs-other  # Stable key of the answer in the issue form data.
-    attributes:  # Content and presentation of the element.
-      label: "Git LFS: Other, please specify"  # Question shown to the reporter.
-      description: |  # Help text shown under the question.
-        Complete this field only if you selected "Other (specify in the next field)" in "Git LFS". Describe your answer precisely so maintainers do not need to ask a follow-up question.
     validations:  # Validation rules of the element.
       required: false  # The answer is optional.
 
@@ -763,9 +735,7 @@ body:  # Elements of the form, in display order.
         - "1.0.1 (latest release)"  # Choice 1.
         - "1.0.0"  # Choice 2.
         - "main branch (unreleased)"  # Choice 3.
-        - "0.9.x"  # Choice 4.
-        - "0.8.x or earlier"  # Choice 5.
-        - "Other (specify in the next field)"  # Choice 6.
+        - "Other (specify in the next field)"  # Choice 4.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -798,11 +768,10 @@ body:  # Elements of the form, in display order.
       options:  # Answer choices, in display order.
         - "PyPI with pip"  # Choice 1.
         - "PyPI with uv, pipx, poetry or pdm"  # Choice 2.
-        - "conda or mamba (conda-forge)"  # Choice 3.
-        - "Source checkout, editable install"  # Choice 4.
-        - "Official Docker image"  # Choice 5.
-        - "Custom container image"  # Choice 6.
-        - "Other (specify in the next field)"  # Choice 7.
+        - "Source checkout, editable install"  # Choice 3.
+        - "Official Docker image"  # Choice 4.
+        - "Custom container image"  # Choice 5.
+        - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -1174,12 +1143,11 @@ body:  # Elements of the form, in display order.
       multiple: true  # Several choices may be selected.
       options:  # Answer choices, in display order.
         - "No models involved"  # Choice 1.
-        - "Unbihexium model zoo models (Git LFS)"  # Choice 2.
-        - "Unbihexium models downloaded from a release asset"  # Choice 3.
-        - "Custom models trained by me or my organisation"  # Choice 4.
-        - "Unbihexium models fine-tuned by me or my organisation"  # Choice 5.
-        - "Third-party models"  # Choice 6.
-        - "Other (specify in the next field)"  # Choice 7.
+        - "Unbihexium model zoo models (built locally from the catalogue)"  # Choice 2.
+        - "Custom models trained by me or my organisation"  # Choice 3.
+        - "Unbihexium models fine-tuned by me or my organisation"  # Choice 4.
+        - "Third-party models"  # Choice 5.
+        - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 

@@ -816,9 +816,7 @@ body:  # Elements of the form, in display order.
         - "1.0.1 (latest release)"  # Choice 1.
         - "1.0.0"  # Choice 2.
         - "main branch (unreleased)"  # Choice 3.
-        - "0.9.x"  # Choice 4.
-        - "0.8.x or earlier"  # Choice 5.
-        - "Other (specify in the next field)"  # Choice 6.
+        - "Other (specify in the next field)"  # Choice 4.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -851,11 +849,10 @@ body:  # Elements of the form, in display order.
       options:  # Answer choices, in display order.
         - "PyPI with pip"  # Choice 1.
         - "PyPI with uv, pipx, poetry or pdm"  # Choice 2.
-        - "conda or mamba (conda-forge)"  # Choice 3.
-        - "Source checkout, editable install"  # Choice 4.
-        - "Official Docker image"  # Choice 5.
-        - "Custom container image"  # Choice 6.
-        - "Other (specify in the next field)"  # Choice 7.
+        - "Source checkout, editable install"  # Choice 3.
+        - "Official Docker image"  # Choice 4.
+        - "Custom container image"  # Choice 5.
+        - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 
@@ -1227,12 +1224,11 @@ body:  # Elements of the form, in display order.
       multiple: true  # Several choices may be selected.
       options:  # Answer choices, in display order.
         - "No models involved"  # Choice 1.
-        - "Unbihexium model zoo models (Git LFS)"  # Choice 2.
-        - "Unbihexium models downloaded from a release asset"  # Choice 3.
-        - "Custom models trained by me or my organisation"  # Choice 4.
-        - "Unbihexium models fine-tuned by me or my organisation"  # Choice 5.
-        - "Third-party models"  # Choice 6.
-        - "Other (specify in the next field)"  # Choice 7.
+        - "Unbihexium model zoo models (built locally from the catalogue)"  # Choice 2.
+        - "Custom models trained by me or my organisation"  # Choice 3.
+        - "Unbihexium models fine-tuned by me or my organisation"  # Choice 4.
+        - "Third-party models"  # Choice 5.
+        - "Other (specify in the next field)"  # Choice 6.
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 

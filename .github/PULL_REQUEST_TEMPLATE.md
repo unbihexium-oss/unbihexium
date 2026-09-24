@@ -469,8 +469,6 @@ _Select one._
 - [ ] 1.0.1 (latest release)
 - [ ] 1.0.0
 - [ ] main branch (unreleased)
-- [ ] 0.9.x
-- [ ] 0.8.x or earlier
 - [ ] Other:
 
 ### Q40. Exact version string or commit SHA
@@ -487,7 +485,6 @@ _Select one._
 
 - [ ] PyPI with pip
 - [ ] PyPI with uv, pipx, poetry or pdm
-- [ ] conda or mamba (conda-forge)
 - [ ] Source checkout, editable install
 - [ ] Official Docker image
 - [ ] Custom container image
@@ -682,8 +679,7 @@ Declare which models are involved. Select every option that applies.
 _Select all that apply._
 
 - [ ] No models involved
-- [ ] Unbihexium model zoo models (Git LFS)
-- [ ] Unbihexium models downloaded from a release asset
+- [ ] Unbihexium model zoo models (built locally from the catalogue)
 - [ ] Custom models trained by me or my organisation
 - [ ] Unbihexium models fine-tuned by me or my organisation
 - [ ] Third-party models
