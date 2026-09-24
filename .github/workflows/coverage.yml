@@ -64,7 +64,7 @@ jobs:  # Jobs of the workflow.
 
       - name: Upload coverage to Codecov  # Send the report to Codecov.
         if: ${{ !cancelled() }}  # Also after a coverage failure, so that Codecov shows the drop.
-        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac  # v5.5.5; Official Codecov upload action.
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v5.5.5; Official Codecov upload action.
         with:  # Inputs of the upload action.
           files: ./coverage.xml  # Report written by the previous step.
           flags: unittests  # Flag that groups these results in Codecov.
