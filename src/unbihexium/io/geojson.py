@@ -23,7 +23,10 @@
 #                                 the document, can round the coordinates
 #                                 and replaces the file atomically
 #   geojson_problems,             structural validation against RFC 7946
-#   validate_geojson              (object types, positions, rings)
+#   validate_geojson              (object types, positions, rings);
+#                                 GeometryCollections nested deeper than
+#                                 MAX_COLLECTION_DEPTH are reported as a
+#                                 problem instead of exhausting the stack
 #   geometry_to_feature,          construction of features and collections
 #   features_to_geojson
 #   geojson_crs                   CRS of a document: the legacy "crs" member
@@ -100,6 +103,11 @@ OBJECT_TYPES = (*GEOMETRY_TYPES, "Feature", "FeatureCollection")
 # Default CRS of RFC 7946: WGS 84 longitude and latitude.
 DEFAULT_CRS = "OGC:CRS84"
 
+# Deepest nesting of GeometryCollections that is validated; RFC 7946 section
+# 3.1.8 advises against nesting them at all, and deeper documents would
+# exhaust the Python stack of the recursive functions of this module.
+MAX_COLLECTION_DEPTH = 64
+
 # Nesting depth of the coordinates of each geometry type.
 _DEPTH = {
     "Point": 0,  # Position.
@@ -173,8 +181,8 @@ def _ring_problems(rings: Any, where: str) -> list[str]:
     return found
 
 
-# Problems of a geometry object.
-def _geometry_problems(geometry: Any, where: str) -> list[str]:
+# Problems of a geometry object; level counts the enclosing GeometryCollections.
+def _geometry_problems(geometry: Any, where: str, level: int = 0) -> list[str]:
     # Geometries are objects.
     if not isinstance(geometry, dict):
         # Report the type.
@@ -189,8 +197,18 @@ def _geometry_problems(geometry: Any, where: str) -> list[str]:
         if not isinstance(members, list):
             # Report it.
             return [f"{where}: GeometryCollection needs a geometries array"]
+        # Members would be nested deeper than the limit.
+        if members and level >= MAX_COLLECTION_DEPTH:
+            # Report it without descending further.
+            return [f"{where}: GeometryCollection nested deeper than {MAX_COLLECTION_DEPTH} levels"]
+        # Next nesting level.
+        down = level + 1
         # Problems of the members.
-        return [p for i, g in enumerate(members) for p in _geometry_problems(g, f"{where}[{i}]")]
+        return [
+            p  # One problem.
+            for i, g in enumerate(members)  # Every member.
+            for p in _geometry_problems(g, f"{where}[{i}]", down)  # Its problems.
+        ]  # End of the problems.
     # Unknown types.
     if kind not in _DEPTH:
         # Report it.
