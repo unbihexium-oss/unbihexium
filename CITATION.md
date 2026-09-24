@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-CITATION |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.1, development versions from the main branch, and the metadata in CITATION.cff and codemeta.json |
 
@@ -138,7 +138,7 @@ Unbihexium reads and writes rasters through GDAL (via rasterio), transforms coor
 - PROJ contributors. *PROJ coordinate transformation software library*. Open Source Geospatial Foundation. <https://doi.org/10.5281/zenodo.5884394>
 - ONNX Runtime developers. *ONNX Runtime*. <https://onnxruntime.ai>
 
-Cite also the data you processed, following the terms of their providers, and any other library your analysis relies on, such as NumPy, SciPy, scikit-learn or PyTorch. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists the dependencies of Unbihexium.
+Cite also the data you processed, following the terms of their providers, and any other library your analysis relies on, such as NumPy, SciPy, scikit-image or PyTorch. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists the dependencies of Unbihexium.
 
 ## 7. Machine-readable metadata
 

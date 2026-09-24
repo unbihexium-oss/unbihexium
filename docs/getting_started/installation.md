@@ -67,7 +67,7 @@ No compiler and no system installation of GDAL, PROJ or GEOS are needed. The bin
 
 ### 2.3 Hardware
 
-A CPU is sufficient for every part of the library. Building, training and exporting models of the model zoo requires PyTorch (extra `torch`); running exported ONNX models requires only ONNX Runtime (extra `onnx`). A CUDA GPU is optional and used only through PyTorch and CuPy (extra `gpu`). Apple silicon GPUs can be selected in training and evaluation with `--device mps` when the installed PyTorch build supports it.
+A CPU is sufficient for every part of the library. Building, training and exporting models of the model zoo requires PyTorch (extra `torch`); running exported ONNX models requires only ONNX Runtime (extra `onnx`). A CUDA GPU is optional and used only through a CUDA build of PyTorch (Section 4.3). Apple silicon GPUs can be selected in training and evaluation with `--device mps` when the installed PyTorch build supports it.
 
 ### 2.4 Disk space
 
@@ -97,7 +97,7 @@ python -m pip install --upgrade pip
 python -m pip install unbihexium
 ```
 
-The core installation depends on NumPy, SciPy, rasterio, shapely, GeoPandas, pyproj, click, rich, pydantic, PyYAML, requests, tqdm, Pillow, scikit-learn and scikit-image. It provides input and output of GeoTIFF and GeoJSON, preprocessing, spectral indices, SAR, terrain, geostatistics, spatial analysis, metrics, visualisation, the model catalogue (listing and describing models) and the `unbihexium` command.
+The core installation depends on NumPy, SciPy, rasterio, shapely, GeoPandas, pyproj, click, rich, pydantic, PyYAML, requests, Pillow and scikit-image. It provides input and output of GeoTIFF and GeoJSON, preprocessing, spectral indices, SAR, terrain, geostatistics, spatial analysis, metrics, visualisation, the model catalogue (listing and describing models) and the `unbihexium` command.
 
 ### 4.2 Optional extras
 
@@ -106,31 +106,26 @@ The extras below are declared in `[project.optional-dependencies]` of [pyproject
 | Extra | Packages added | Needed for |
 | --- | --- | --- |
 | `onnx` | onnxruntime (1.23 series on Python 3.10, 1.24.1 or newer otherwise), onnx | Inference on ONNX exports without PyTorch |
-| `torch` | torch 2.13 or newer, torchvision 0.28 or newer, onnx | Building, training, evaluating and exporting model zoo models |
-| `gpu` | the `torch` extra, cupy-cuda12x | CUDA 12 acceleration |
-| `serving` | fastapi, starlette 1.3.1 or newer, uvicorn[standard], python-multipart | The REST service `unbihexium.serving` |
-| `dask` | dask[complete] | Chunked and distributed processing |
-| `ray` | ray | Cluster computing |
+| `torch` | torch 2.13 or newer, onnx | Building, training, evaluating and exporting model zoo models |
+| `serving` | fastapi, starlette 1.3.1 or newer, uvicorn[standard] | The REST service `unbihexium.serving` |
 | `zarr` | zarr (2.18 on Python 3.10, 3.1.4 or newer otherwise), numcodecs | Zarr input and output in `unbihexium.io` |
-| `netcdf` | netCDF4, h5py | NetCDF and HDF5 files |
-| `stac` | pystac, pystac-client | STAC items, catalogues and API search |
 | `parquet` | pyarrow | GeoParquet input and output |
-| `test` | pytest, pytest-cov, pytest-xdist, pytest-asyncio, httpx | Running the test suite |
+| `test` | pytest, pytest-cov, pytest-xdist, httpx | Running the test suite |
 | `dev` | the `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development and release work |
-| `all` | every extra above except `gpu` | A complete environment |
+| `all` | every extra above | A complete environment |
 
-The functions of `unbihexium.io` import optional dependencies only when they are called, so a missing extra shows up as an `ImportError` at the first call of such a function, not at import time.
+STAC search (`unbihexium.io.stac`) needs no extra; it uses requests. The functions of `unbihexium.io` import optional dependencies only when they are called, so a missing extra shows up as an `ImportError` at the first call of such a function, not at import time.
 
 ### 4.3 PyTorch builds
 
 The `torch` extra installs whatever PyTorch wheel pip selects from PyPI; on Linux x86_64 that is a CUDA build with large NVIDIA runtime wheels. To obtain a CPU-only or a specific CUDA build, install PyTorch first from the index recommended by the PyTorch installation selector [5], then install Unbihexium with the extra; pip keeps the already installed PyTorch when it satisfies the requirement:
 
 ```bash
-python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install "unbihexium[torch]"
 ```
 
-The `gpu` extra additionally installs `cupy-cuda12x` and therefore assumes a CUDA 12 driver. Install the matching PyTorch CUDA build before the extra, as described above.
+For a GPU, install the CUDA build of PyTorch that matches the driver in the same way, then the `torch` extra; there is no separate GPU extra.
 
 ## 5. Reproducible installation from lock files
 
@@ -287,7 +282,7 @@ The model zoo contains 520 models (130 families in the variants tiny, base, larg
 In a source checkout with the `test` or `dev` extra:
 
 ```bash
-python -m pytest tests/ -m "not slow and not gpu" -n auto
+python -m pytest tests/ -n auto
 ```
 
 ## 9. Platform notes
@@ -331,7 +326,7 @@ The model store is the directory `models` below `UNBIHEXIUM_CACHE` (default `~/.
 | --- | --- | --- |
 | `Error: No module named 'torch'; install PyTorch with pip install ...` from `unbihexium zoo build` or `unbihexium train` | The `torch` extra is not installed | `python -m pip install "unbihexium[torch]"` (Section 4.3) |
 | `ModuleNotFoundError: No module named 'torch'` from `unbihexium predict <model id>` | Model ids and checkpoints need PyTorch | Install the `torch` extra, or predict with an ONNX export and `--backend onnx` |
-| `ImportError` for zarr, pyarrow, pystac or fastapi | The corresponding extra is missing | Install the extra listed in Section 4.2 |
+| `ImportError` for zarr, pyarrow or fastapi | The corresponding extra is missing | Install the extra listed in Section 4.2 |
 | `ERROR: Hashes are required in --require-hashes mode` | `--require-hashes` used with `requirements-dev.txt` | Omit the option for the development lock file (Section 5.3) |
 | `unbihexium --help` does not list `infer` or `zoo download` | Both are hidden aliases kept for compatibility; they still work | Prefer `unbihexium predict` and `unbihexium zoo build`; see [docs/reference/cli.md](../reference/cli.md) |
 | Commands or functions described in `docs/` are missing | PyPI 1.0.1 predates the main branch | Install from source (Section 7) |

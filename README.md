@@ -31,7 +31,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-README |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -98,6 +98,7 @@ Unbihexium does not ship trained weights, labelled training data or imagery, doe
 - CPython 3.10, 3.11, 3.12, 3.13 or 3.14 on Linux, macOS or Windows.
 - No compiler and no system GDAL: the binary wheels of rasterio, pyproj, shapely and onnxruntime bundle GDAL, PROJ, GEOS and their native libraries.
 - PyTorch only for building, training and exporting models (extra `torch`); inference on exported ONNX models needs only the extra `onnx`.
+- A GPU is optional. To use one, install the CUDA build of PyTorch [from pytorch.org](https://pytorch.org/get-started/locally/) before the extra `torch`; there is no separate GPU extra.
 
 ### 3.2 From PyPI
 
@@ -110,18 +111,13 @@ The core installation covers input and output, preprocessing, indices, SAR, terr
 | Extra | Adds | Needed for |
 | --- | --- | --- |
 | `onnx` | onnxruntime, onnx | Inference on ONNX exports without PyTorch |
-| `torch` | torch, torchvision, onnx | Building, training, evaluating and exporting zoo models |
-| `gpu` | `torch` extra, cupy-cuda12x | CUDA 12 acceleration (install the matching PyTorch CUDA build first) |
-| `serving` | fastapi, starlette, uvicorn, python-multipart | The REST service in `unbihexium.serving` |
-| `dask` | dask[complete] | Chunked and distributed processing |
-| `ray` | ray | Cluster computing |
+| `torch` | torch, onnx | Building, training, evaluating and exporting zoo models |
+| `serving` | fastapi, starlette, uvicorn | The REST service in `unbihexium.serving` |
 | `zarr` | zarr, numcodecs | Zarr input and output |
-| `netcdf` | netCDF4, h5py | NetCDF and HDF5 files |
-| `stac` | pystac, pystac-client | STAC search and metadata |
 | `parquet` | pyarrow | GeoParquet input and output |
 | `test` | pytest and plugins, httpx | Running the test suite |
 | `dev` | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development |
-| `all` | every extra except `gpu` | A complete environment |
+| `all` | `onnx`, `torch`, `serving`, `zarr`, `parquet` and `dev` | A complete environment |
 
 ```bash
 python -m pip install "unbihexium[torch,onnx,serving]"
@@ -516,7 +512,7 @@ Copyright 2025-2026 Unbihexium OSS Foundation and contributors. Unbihexium is li
 
 ### 16.2 Acknowledgements
 
-Unbihexium builds on the work of many open source projects, in particular NumPy, SciPy, rasterio and GDAL, pyproj and PROJ, Shapely and GEOS, GeoPandas, scikit-image, scikit-learn, PyTorch, ONNX and ONNX Runtime, FastAPI, Click and Rich. The model architectures follow the published designs cited in Section 7.1, and the spectral indices, SAR methods and geostatistical estimators follow the publications cited in the source code of each module. The author is affiliated with the University of Helsinki.
+Unbihexium builds on the work of many open source projects, in particular NumPy, SciPy, rasterio and GDAL, pyproj and PROJ, Shapely and GEOS, GeoPandas, scikit-image, PyTorch, ONNX and ONNX Runtime, FastAPI, Click and Rich. The model architectures follow the published designs cited in Section 7.1, and the spectral indices, SAR methods and geostatistical estimators follow the publications cited in the source code of each module. The author is affiliated with the University of Helsinki.
 
 ## References
 

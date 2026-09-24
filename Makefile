@@ -111,7 +111,7 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 		-o .requirements-dev.lock.tmp
 # Compile the hashed lock of the CI test environment (the dependencies of PyTorch, not
 # PyTorch itself) into a temporary file.
-	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet \
 		--custom-compile-command "make lock" \
 		-o .requirements-ci-test.lock.tmp
 # Compile the hashed lock of the container image (runtime, onnx and serving extras
@@ -157,9 +157,9 @@ test: ## Run the complete test suite
 # Run every test with the options from pyproject.toml.
 	$(PYTHON) -m pytest tests/
 
-test-fast: ## Run unit tests in parallel, skipping slow and GPU tests
+test-fast: ## Run the unit tests in parallel
 # Distribute the unit tests over all CPU cores with pytest-xdist.
-	$(PYTHON) -m pytest tests/unit -n auto -m "not slow and not gpu"
+	$(PYTHON) -m pytest tests/unit -n auto
 
 test-cov: ## Run the test suite with branch coverage (terminal and XML report)
 # Report missing lines in the terminal and write coverage.xml for Codecov.

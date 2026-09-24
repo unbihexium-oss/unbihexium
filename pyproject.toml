@@ -56,7 +56,7 @@ build-backend = "hatchling.build"  # Module that pip and uv call to build the pa
 [project]
 name = "unbihexium"  # Distribution name on PyPI.
 version = "1.0.1"  # Release version; keep in sync with CHANGELOG.md and CITATION.cff.
-description = "Production-grade Earth Observation, Geospatial, Remote Sensing, and SAR Python library"  # Summary shown on PyPI.
+description = "Earth observation, geospatial, remote sensing and SAR library for Python"  # Summary shown on PyPI.
 readme = "README.md"  # Long description shown on PyPI.
 requires-python = ">=3.10"  # Oldest supported interpreter.
 license = "MPL-2.0"  # SPDX licence expression (PEP 639).
@@ -131,12 +131,12 @@ dependencies = [
     # Configuration, validation and serialisation.
     "pydantic>=2.12.0",
     "pyyaml>=6.0.3",  # YAML configuration and the model catalogue.
-    # Model download and progress reporting.
+    # HTTP client of the STAC search (unbihexium.io.stac) and of models
+    # registered with a URL.
     "requests>=2.33.0",
-    "tqdm>=4.67.1",  # Download progress bars.
-    # Image processing and classical machine learning.
+    # Image processing: PNG quicklooks and legends (pillow) and morphology,
+    # segmentation and filters (scikit-image).
     "pillow>=12.3.0",
-    "scikit-learn>=1.7.2",  # Classical classifiers and clustering.
     "scikit-image>=0.25.2; python_version < '3.11'",  # Last scikit-image series for Python 3.10.
     "scikit-image>=0.26.0; python_version >= '3.11'",  # Morphology, segmentation and filters.
 ]
@@ -154,19 +154,12 @@ onnx = [
     # Reads the model configuration stored in exported ONNX files.
     "onnx>=1.21.0",
 ]
-# PyTorch backend for training and inference. torchvision releases are tied
-# to one torch release: torchvision 0.28 requires torch 2.13.
+# PyTorch backend for training and inference. For a GPU, install the CUDA
+# build of PyTorch from https://pytorch.org/get-started/locally/ first.
 torch = [
     "torch>=2.13.0",  # Tensors, autograd and neural network layers.
-    "torchvision>=0.28.0",  # Backbones and image transforms.
     # Writes the model configuration into exported ONNX files.
     "onnx>=1.21.0",
-]
-# GPU acceleration with CUDA 12. Install the matching PyTorch CUDA build from
-# https://pytorch.org/get-started/locally/ first.
-gpu = [
-    "unbihexium[torch]",  # GPU support builds on the PyTorch extra.
-    "cupy-cuda12x>=14.0.0",  # NumPy-compatible arrays on CUDA 12.
 ]
 # REST serving with FastAPI (unbihexium.serving). starlette is pinned
 # explicitly because releases before 1.3.1 have known vulnerabilities.
@@ -174,14 +167,6 @@ serving = [
     "fastapi>=0.133.0",  # Web framework of the REST API.
     "starlette>=1.3.1",  # ASGI toolkit under FastAPI; first release without known vulnerabilities.
     "uvicorn[standard]>=0.37.0",  # ASGI server with uvloop and httptools.
-    "python-multipart>=0.0.31",  # File uploads in form requests.
-]
-# Parallel and distributed processing.
-dask = [
-    "dask[complete]>=2025.9.1",  # Chunked arrays, data frames and the distributed scheduler.
-]
-ray = [  # Extra `unbihexium[ray]`, cluster computing.
-    "ray>=2.56.0",  # Distributed task execution.
 ]
 # Chunked array storage. zarr 3 and numcodecs 0.16 require Python 3.11.
 # zarr 3.1.4 is the first zarr 3 release that installs a working crc32c codec
@@ -192,16 +177,6 @@ zarr = [
     "numcodecs>=0.13.1; python_version < '3.11'",  # Codecs matching zarr 2.
     "numcodecs>=0.16.4; python_version >= '3.11'",  # Codecs matching zarr 3.
 ]
-# NetCDF and HDF5 input and output.
-netcdf = [
-    "netCDF4>=1.7.2",  # NetCDF files.
-    "h5py>=3.15.0",  # HDF5 files.
-]
-# SpatioTemporal Asset Catalog search and metadata.
-stac = [
-    "pystac>=1.14.1",  # STAC items and catalogues.
-    "pystac-client>=0.9.0",  # Search of STAC APIs.
-]
 # GeoParquet and Arrow input and output.
 parquet = [
     "pyarrow>=23.0.1",  # Arrow tables and Parquet files.
@@ -211,7 +186,6 @@ test = [
     "pytest>=9.0.3",  # Test runner.
     "pytest-cov>=7.0.0",  # Coverage measurement in pytest.
     "pytest-xdist>=3.8.0",  # Parallel test execution (`-n auto`).
-    "pytest-asyncio>=1.2.0",  # Tests of async code.
     "httpx>=0.28.1",  # Client of the FastAPI test client.
 ]
 # Development tools used locally and in CI.
@@ -230,9 +204,9 @@ dev = [
     # every dependency scope, so both run in isolated environments created
     # by pre-commit and tox instead of being installed here.
 ]
-# Everything except GPU packages, which depend on the local CUDA installation.
+# Every extra.
 all = [
-    "unbihexium[onnx,torch,serving,dask,ray,zarr,netcdf,stac,parquet,dev]",  # Every extra except gpu.
+    "unbihexium[onnx,torch,serving,zarr,parquet,dev]",  # Every optional feature and the tools.
 ]
 
 # Console commands installed with the package.
@@ -380,13 +354,8 @@ pythonpath = ["src"]  # Import the package from src/ without installing it.
 addopts = [  # Options added to every pytest run.
     "-ra",  # Summarise every test that did not pass.
     "-q",  # Quiet output.
-    "--strict-markers",  # Reject markers that are not registered below.
+    "--strict-markers",  # Reject markers that are not registered; none are used.
     "--strict-config",  # Reject unknown configuration keys.
-]
-markers = [  # Registered markers; --strict-markers rejects any other.
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",  # Long-running tests.
-    "gpu: marks tests that require GPU",  # Tests that need CUDA.
-    "integration: marks integration tests",  # Tests across several subsystems.
 ]
 
 # =============================================================================

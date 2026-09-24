@@ -135,7 +135,7 @@ The CPU wheels of PyTorch come from the PyTorch index (`https://download.pytorch
 
 | Ecosystem | Directory | Schedule | Notes |
 | --- | --- | --- | --- |
-| pip | `/` | weekly | Grouped into one pull request; at most 5 open; major updates of `torch` and `torchvision` are ignored |
+| pip | `/` | weekly | Grouped into one pull request; at most 5 open; major updates of `torch` are ignored |
 | github-actions | `/` | weekly | Updates the pinned SHAs and their version comments |
 | docker | `/` | monthly | Updates the tag and digest of the base image in the Dockerfile |
 

@@ -104,9 +104,7 @@ with `pip-licenses`, before you redistribute it.
   pydantic         2.12.0                 MIT
   pyyaml           6.0.3                  MIT
   requests         2.33.0                 Apache-2.0
-  tqdm             4.67.1                 MPL-2.0 AND MIT
   pillow           12.3.0                 MIT-CMU
-  scikit-learn     1.7.2                  BSD-3-Clause
   scikit-image     0.25.2 / 0.26.0 (1)    BSD-3-Clause
 
   (1) The first version applies to Python 3.10, the second to Python 3.11
@@ -117,22 +115,13 @@ with `pip-licenses`, before you redistribute it.
   Extra      Package          Minimum version   Licence
   ---------  ---------------  ----------------  -----------------------------
   onnx       onnxruntime      1.23.2 / 1.24.1   MIT
+  onnx       onnx             1.21.0            Apache-2.0 (also in torch)
   torch      torch            2.13.0            BSD-3-Clause and others (2)
-  torch      torchvision      0.28.0            BSD-3-Clause
-  gpu        cupy-cuda12x     14.0.0            MIT (requires the NVIDIA CUDA
-                                                runtime under NVIDIA's terms)
   serving    fastapi          0.133.0           MIT
   serving    starlette        1.3.1             BSD-3-Clause
   serving    uvicorn          0.37.0            BSD-3-Clause
-  serving    python-multipart 0.0.31            Apache-2.0
-  dask       dask             2025.9.1          BSD-3-Clause
-  ray        ray              2.56.0            Apache-2.0
   zarr       zarr             2.18.3 / 3.1.4    MIT
   zarr       numcodecs        0.13.1 / 0.16.4   MIT
-  netcdf     netCDF4          1.7.2             MIT
-  netcdf     h5py             3.15.0            BSD-3-Clause
-  stac       pystac           1.14.1            Apache-2.0
-  stac       pystac-client    0.9.0             Apache-2.0
   parquet    pyarrow          23.0.1            Apache-2.0
 
   (2) torch declares Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND
@@ -143,10 +132,9 @@ with `pip-licenses`, before you redistribute it.
 4.3 Development and test tools (not distributed with Unbihexium)
 
   pytest, pytest-cov, pytest-xdist, ruff, pyright, pre-commit, build, tox
-  and hatchling (build backend) are MIT licensed; pytest-asyncio, bandit,
-  pip-audit and twine are Apache-2.0; httpx is BSD-3-Clause; reuse is
-  Apache-2.0 with parts under GPL-3.0-or-later; yamllint is
-  GPL-3.0-or-later. These tools are used to build and check Unbihexium.
+  and hatchling (build backend) are MIT licensed; bandit, pip-audit and
+  twine are Apache-2.0; httpx is BSD-3-Clause; reuse is Apache-2.0 with
+  parts under GPL-3.0-or-later; yamllint is GPL-3.0-or-later. These tools are used to build and check Unbihexium.
   They are not imported by the library and not included in any
   distribution, so their licences place no obligations on users of
   Unbihexium.
@@ -189,9 +177,8 @@ code at https://sources.debian.org/.
 Unbihexium does not ship Earth observation imagery or other third-party
 data. Users are responsible for complying with the licences and terms of
 use of the data they process, for example the Copernicus Sentinel data
-licence or the USGS Landsat terms. The test fixtures in tests/fixtures/
-are small simulated arrays, not real imagery, and are licensed under the
-MPL-2.0.
+licence or the USGS Landsat terms. The tests generate synthetic arrays at
+run time; the repository contains no imagery.
 
 
 ===============================================================================

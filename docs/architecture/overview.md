@@ -176,17 +176,15 @@ The following cross-package imports happen only when a function is called:
 
 ### 4.1 Core and optional dependencies
 
-The core installation (the `dependencies` of [pyproject.toml](../../pyproject.toml)) contains NumPy, SciPy, rasterio, Shapely, GeoPandas, pyproj, Click, Rich, pydantic, PyYAML, requests, tqdm, Pillow, scikit-learn and scikit-image. Heavier or specialised components are optional extras [2]. The table maps each extra to the code that needs it.
+The core installation (the `dependencies` of [pyproject.toml](../../pyproject.toml)) contains NumPy, SciPy, rasterio, Shapely, GeoPandas, pyproj, Click, Rich, pydantic, PyYAML, requests, Pillow and scikit-image. Heavier or specialised components are optional extras [2]. The table maps each extra to the code that needs it.
 
 | Extra | Packages | Needed by |
 | --- | --- | --- |
-| `torch` | torch, torchvision, onnx | `unbihexium.ai.models`, `ai.training`, `ai.losses`, `zoo.checkpoint`, `zoo.export`, `zoo.load_model`, `zoo.ensure_model`, the `TorchBackend` of the `Predictor`, `unbihexium train`, `evaluate`, `zoo build`, `zoo export` |
+| `torch` | torch, onnx | `unbihexium.ai.models`, `ai.training`, `ai.losses`, `zoo.checkpoint`, `zoo.export`, `zoo.load_model`, `zoo.ensure_model`, the `TorchBackend` of the `Predictor`, `unbihexium train`, `evaluate`, `zoo build`, `zoo export` |
 | `onnx` | onnxruntime, onnx | The `OnnxBackend` of the `Predictor`, `ModelWrapper` with ONNX files, `unbihexium predict --backend onnx` |
-| `serving` | fastapi, starlette, uvicorn, python-multipart | `unbihexium.serving` |
+| `serving` | fastapi, starlette, uvicorn | `unbihexium.serving` |
 | `zarr` | zarr, numcodecs | `unbihexium.io.zarr_io` |
 | `parquet` | pyarrow | `unbihexium.io.parquet` |
-| `stac` | pystac, pystac-client | Not imported by the package; `unbihexium.io.stac` is implemented with the standard library and requests |
-| `netcdf`, `dask`, `ray`, `gpu` | see [pyproject.toml](../../pyproject.toml) | Not imported by `src/unbihexium`; provided for user workflows |
 
 ### 4.2 Lazy import pattern
 

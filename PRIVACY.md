@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-PRIVACY |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -73,7 +73,7 @@ Unbihexium is software, not a service. When you run it, you (or your organisatio
 
 ### 3.1 Input Data
 
-The library and the CLI read the files, arrays and documents that the calling program or the user passes to them: raster images (for example GeoTIFF, Zarr, NetCDF), vector data (GeoJSON, GeoParquet), STAC items and catalogues, configuration files and model checkpoints. Processing happens in the memory of the local process. Unbihexium does not copy these inputs elsewhere and does not keep them after the call returns, except where the user explicitly writes an output.
+The library and the CLI read the files, arrays and documents that the calling program or the user passes to them: raster images (GeoTIFF, Cloud Optimized GeoTIFF, Zarr), vector data (GeoJSON, GeoParquet), STAC items and catalogues, configuration files and model checkpoints. Processing happens in the memory of the local process. Unbihexium does not copy these inputs elsewhere and does not keep them after the call returns, except where the user explicitly writes an output.
 
 Earth observation data can be personal data. Very high resolution imagery can show individuals, vehicles, number plates or private property, and location data linked to an identifiable person is personal data under the GDPR. The software does not detect or classify personal data; this assessment belongs to the user (Section 8).
 

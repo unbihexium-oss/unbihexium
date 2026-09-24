@@ -107,8 +107,8 @@ The project was relicensed from Apache-2.0 to the Mozilla Public License 2.0 [3]
 | Extra | 1.0.x | main branch |
 | --- | --- | --- |
 | `onnx` | did not exist | onnxruntime, onnx |
-| `torch` | torch, torchvision | torch, torchvision, onnx |
-| `serving` | did not exist (FastAPI was not declared) | fastapi, starlette, uvicorn, python-multipart |
+| `torch` | torch, torchvision | torch, onnx (torchvision removed, because no code used it) |
+| `serving` | did not exist (FastAPI was not declared) | fastapi, starlette, uvicorn |
 | `test` | did not exist | pytest and plugins, httpx |
 | `docs` | existed | removed |
 | `dev` | pytest, ruff, pyright, pre-commit, bandit, pip-audit | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox |

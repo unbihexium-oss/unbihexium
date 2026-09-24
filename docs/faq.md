@@ -81,14 +81,14 @@ No. The binary wheels of rasterio, pyproj, Shapely and ONNX Runtime bundle GDAL,
 | Build, train, evaluate or export models | `unbihexium[torch]` |
 | Run exported ONNX models without PyTorch | `unbihexium[onnx]` |
 | REST service | `unbihexium[serving]` |
-| Zarr, GeoParquet, STAC search | `unbihexium[zarr]`, `[parquet]`, `[stac]` |
-| Everything except CUDA | `unbihexium[all]` |
+| Zarr, GeoParquet | `unbihexium[zarr]`, `[parquet]` (STAC search needs no extra) |
+| Everything | `unbihexium[all]` |
 
 The full table of extras is in [README.md, Section 3.2](../README.md#32-from-pypi).
 
 ### 2.4 How do I use a GPU?
 
-Install the CUDA build of PyTorch that matches your driver first, following the PyTorch installation instructions [2], then install `unbihexium[gpu]` (the `torch` extra plus `cupy-cuda12x`). Training uses the GPU with `--device auto` (the default of `unbihexium train`) or `--device cuda`; `--amp` enables mixed precision on CUDA. Prediction defaults to `--device cpu`; pass `--device cuda` to `unbihexium predict`. Apple silicon is addressed with `--device mps`.
+Install the CUDA build of PyTorch that matches your driver first, following the PyTorch installation instructions [2], then install `unbihexium[torch]`; pip keeps the CUDA build that is already installed. Training uses the GPU with `--device auto` (the default of `unbihexium train`) or `--device cuda`; `--amp` enables mixed precision on CUDA. Prediction defaults to `--device cpu`; pass `--device cuda` to `unbihexium predict`. Apple silicon is addressed with `--device mps`.
 
 ### 2.5 Is there a conda package?
 

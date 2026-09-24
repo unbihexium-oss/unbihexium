@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-SUPPORT |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -127,7 +127,7 @@ The Stale workflow ([.github/workflows/stale.yml](.github/workflows/stale.yml)) 
 | Unbihexium release | The latest 1.0.x release (1.0.1) and the main branch. Fixes are released in new patch versions; older patch versions are not updated. |
 | Python | CPython 3.10 to 3.14, each tested in CI on every pull request. A Python version is dropped after its upstream end of life, as described in [VERSIONING.md](VERSIONING.md). |
 | Operating systems | CI runs on Linux (Ubuntu, GitHub-hosted runners). macOS and Windows are expected to work where the dependencies provide wheels; problems specific to them are handled on a best-effort basis. |
-| Optional extras | `onnx`, `torch`, `serving`, `stac`, `zarr`, `netcdf`, `parquet`, `dask`, `ray` and `gpu`. GPU problems are handled on a best-effort basis, because CI has no GPU. |
+| Optional extras | `onnx`, `torch`, `serving`, `zarr` and `parquet`. STAC search needs no extra. GPU use through the CUDA build of PyTorch is handled on a best-effort basis, because CI has no GPU. |
 | Container image | Images published to `ghcr.io/unbihexium-oss/unbihexium` from the main branch and from version tags. |
 
 ## 7. Scope of Support

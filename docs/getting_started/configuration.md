@@ -421,8 +421,8 @@ The following variables are read by dependencies, not by Unbihexium; they are li
 | `GDAL_CACHEMAX`, `GDAL_NUM_THREADS` | GDAL through rasterio [8] | Block cache size and threads for compression and warping |
 | `GDAL_DISABLE_READDIR_ON_OPEN`, `CPL_VSIL_CURL_ALLOWED_EXTENSIONS` | GDAL | Faster opening of remote Cloud Optimized GeoTIFFs |
 | `AWS_NO_SIGN_REQUEST`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` | GDAL | Access to public or private S3 buckets |
-| `OMP_NUM_THREADS` | NumPy, scikit-learn, ONNX Runtime, PyTorch | Number of CPU threads |
-| `CUDA_VISIBLE_DEVICES` | PyTorch, CuPy | GPUs visible to the process |
+| `OMP_NUM_THREADS` | NumPy, ONNX Runtime, PyTorch | Number of CPU threads |
+| `CUDA_VISIBLE_DEVICES` | CUDA builds of PyTorch | GPUs visible to the process |
 | `HTTPS_PROXY`, `NO_PROXY` | requests (STAC client, model downloads) and pip | Proxies in corporate networks |
 | `PYTHONUNBUFFERED`, `PYTHONDONTWRITEBYTECODE` | CPython | Set in the container image |
 
