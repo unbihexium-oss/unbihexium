@@ -27,8 +27,8 @@
 # .github/release.yml), and finally uploads the distributions to PyPI with
 # trusted publishing: PyPI accepts the OIDC token of this job in the
 # environment "pypi", so no upload token is stored in the repository, and
-# the publish action adds PEP 740 attestations. The trusted publisher must
-# be registered on PyPI for this repository, release.yml and the environment
+# the publish action adds PEP 740 attestations. The trusted publisher is
+# registered on PyPI for this repository, release.yml and the environment
 # "pypi" (docs/operations/releasing.md).
 #
 # The distribution version is the static version in pyproject.toml, not the

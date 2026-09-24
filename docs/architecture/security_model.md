@@ -251,6 +251,7 @@ Two properties remain by design and are described in Section 6.2: the OpenAPI do
 - [SECURITY.md](../../SECURITY.md): reporting, supported versions, supply-chain controls, secure operation.
 - [PRIVACY.md](../../PRIVACY.md): data processed, network access and storage.
 - [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md): intended and prohibited uses.
+- [docs/security/self_assessment.md](../security/self_assessment.md): security self-assessment of the project, which summarises this document.
 - [docs/security/model_integrity.md](../security/model_integrity.md), [docs/security/secrets_and_tokens.md](../security/secrets_and_tokens.md), [docs/security/supply_chain_security.md](../security/supply_chain_security.md), [docs/security/vulnerability_management.md](../security/vulnerability_management.md).
 - [model_zoo_architecture.md](model_zoo_architecture.md): starter weights, digests and checkpoints.
 

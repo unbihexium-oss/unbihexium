@@ -92,6 +92,8 @@ The release workflow uploads to PyPI with trusted publishing [8] and holds no Py
 1. open <https://pypi.org/manage/project/unbihexium/settings/publishing/> and add a GitHub publisher with the owner `unbihexium-oss`, the repository `unbihexium`, the workflow name `release.yml` and the environment name `pypi`;
 2. delete the repository secret `PYPI_API_TOKEN` (Settings, Secrets and variables, Actions) and revoke that token on PyPI, since no workflow uses it any more.
 
+Both steps were completed on 2026-09-24. They are kept here for the case that the repository, the workflow file or the environment is renamed, since the trusted publisher then has to be registered again with the new names.
+
 The GitHub environment `pypi` is created by the first run of the release job. Required reviewers and a deployment rule that allows only tags matching `v*` MAY be added to it (Settings, Environments), so that every upload waits for an approval and cannot start from a branch.
 
 ## 3. Choosing the Version Number

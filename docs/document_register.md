@@ -28,7 +28,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 
 ## Abstract
 
-This register defines how Unbihexium identifies its documents and lists every controlled document with its identifier. An identifier has the form `UBX-DOC-SNN`: a fixed prefix, one series digit for the area of the document and a two-digit sequence number within the series, for example `UBX-DOC-801` for the first security document. Identifiers are permanent: they do not change when a document is edited, retitled, renamed or moved, and the number of a withdrawn document is never assigned again. The register contains 65 documents in nine series. `.github/scripts/check_document_ids.py` compares it with the documents on every change to a Markdown file.
+This register defines how Unbihexium identifies its documents and lists every controlled document with its identifier. An identifier has the form `UBX-DOC-SNN`: a fixed prefix, one series digit for the area of the document and a two-digit sequence number within the series, for example `UBX-DOC-801` for the first security document. Identifiers are permanent: they do not change when a document is edited, retitled, renamed or moved, and the number of a withdrawn document is never assigned again. The register contains 66 documents in nine series. `.github/scripts/check_document_ids.py` compares it with the documents on every change to a Markdown file.
 
 ## Contents
 
@@ -201,6 +201,7 @@ Each entry gives the identifier, the title (first-level heading) with a link to 
 | UBX-DOC-803 | [Vulnerability Management](security/vulnerability_management.md) | `docs/security/vulnerability_management.md` |
 | UBX-DOC-804 | [Secrets and Tokens](security/secrets_and_tokens.md) | `docs/security/secrets_and_tokens.md` |
 | UBX-DOC-805 | [Responsible Use: Technical Guidance](security/responsible_use.md) | `docs/security/responsible_use.md` |
+| UBX-DOC-806 | [Security Self-Assessment](security/self_assessment.md) | `docs/security/self_assessment.md` |
 
 ### 3.9 Series 9: Operations and reports
 

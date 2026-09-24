@@ -146,10 +146,11 @@ Cite also the data you processed, following the terms of their providers, and an
 
 - [CITATION.cff](CITATION.cff): Citation File Format 1.2.0 [1]. It is read by GitHub, Zenodo and reference managers, and is the authoritative source for the citation.
 - [codemeta.json](codemeta.json): CodeMeta 3.0 [2] software metadata in JSON-LD, including requirements, platforms and keywords.
+- [.zenodo.json](.zenodo.json): metadata of the Zenodo deposit that the GitHub integration of Zenodo creates for each GitHub release: title, description, creators, licence, keywords and related identifiers. When this file is present, Zenodo reads it instead of `CITATION.cff`; the version and publication date of a deposit are taken from the release. The integration is not yet enabled, so no release has a DOI yet ([ROADMAP.md](ROADMAP.md), Section 5.2).
 
 ### 7.2 Maintenance
 
-The maintainer MUST update `version`, `date-released` and the version-specific `identifiers` in `CITATION.cff`, and `version`, `softwareVersion` and `dateModified` in `codemeta.json`, in every release, as listed in [VERSIONING.md](VERSIONING.md). This document MUST be updated in the same change. `CITATION.cff` is validated against the Citation File Format schema by the Repository Config workflow (`.github/workflows/repo-config.yml`); it can be checked locally with `cffconvert --validate`.
+The maintainer MUST update `version`, `date-released` and the version-specific `identifiers` in `CITATION.cff`, and `version`, `softwareVersion` and `dateModified` in `codemeta.json`, in every release, as listed in [VERSIONING.md](VERSIONING.md). `.zenodo.json` carries no version and changes only when the title, the description, the creators or the keywords change; it MUST then agree with `CITATION.cff`. This document MUST be updated in the same change. `CITATION.cff` is validated against the Citation File Format schema by the Repository Config workflow (`.github/workflows/repo-config.yml`); it can be checked locally with `cffconvert --validate`.
 
 ## 8. Corrections
 

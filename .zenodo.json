@@ -1,0 +1,52 @@
+{
+  "title": "Unbihexium: Earth Observation, Geospatial, Remote Sensing and SAR Library for Python",
+  "upload_type": "software",
+  "description": "<p>Unbihexium is a Python library for Earth observation, geospatial analysis, remote sensing and synthetic aperture radar (SAR). It provides raster and vector input and output (GeoTIFF, Cloud Optimized GeoTIFF, Zarr, GeoParquet, GeoJSON and STAC catalogues), spectral indices, SAR processing (calibration, speckle filtering, polarimetric decomposition and interferometry), terrain analysis, geostatistics (variograms and kriging), tiled inference pipelines, a command line interface, a FastAPI based REST service, and a model zoo of 130 capabilities in four size variants (tiny, base, large and mega) for object detection, semantic segmentation, change detection, classification and regression. Models run with ONNX Runtime or PyTorch on CPU or GPU. The library supports CPython 3.10 to 3.14 on Linux, macOS and Windows.</p>",
+  "creators": [
+    {
+      "name": "Unbihexium OSS Foundation"
+    },
+    {
+      "name": "Laitinen Imanov, Olaf Yunus",
+      "affiliation": "University of Helsinki"
+    }
+  ],
+  "access_right": "open",
+  "license": "mpl-2.0",
+  "keywords": [
+    "earth observation",
+    "geospatial",
+    "remote sensing",
+    "synthetic aperture radar",
+    "SAR",
+    "satellite imagery",
+    "GIS",
+    "machine learning",
+    "deep learning",
+    "object detection",
+    "semantic segmentation",
+    "change detection",
+    "flood mapping",
+    "agriculture",
+    "urban planning",
+    "environmental monitoring",
+    "spectral indices",
+    "geostatistics",
+    "ONNX",
+    "Python"
+  ],
+  "language": "eng",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/unbihexium-oss/unbihexium",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/unbihexium-oss/unbihexium/tree/main/docs",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Cite the exact version you used. How to cite Unbihexium and the libraries it builds on is described in CITATION.md in the repository."
+}

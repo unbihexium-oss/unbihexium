@@ -75,18 +75,6 @@ As of 2026-09-24:
 - Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
 - Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
 
-### 3.3 Trusted publisher registration on PyPI (planned)
-
-- Gap: the release workflow uploads with PyPI trusted publishing [3] from the GitHub environment `pypi`, but the trusted publisher still has to be registered on PyPI, and the former `PYPI_API_TOKEN` repository secret still has to be deleted and its token revoked.
-- Evidence: the "Publish to PyPI" step and the `environment` of `.github/workflows/release.yml`; the publishing settings of the project on PyPI.
-- Outcome: the publisher is registered for `release.yml` and the environment `pypi` as described in [docs/operations/releasing.md](docs/operations/releasing.md), Section 2.1, before the next release, so that no upload credential is stored anywhere.
-
-### 3.4 Security self-assessment (planned)
-
-- Gap: no security self-assessment has been published.
-- Evidence: the `security.assessments.self` entry of [security-insights.yml](security-insights.yml).
-- Outcome: a self-assessment based on the threat model in `docs/architecture/security_model.md`, referenced from `security-insights.yml`.
-
 ## 4. Model zoo
 
 ### 4.1 Trained weights (planned)
@@ -109,23 +97,23 @@ As of 2026-09-24:
 - Evidence: [MAINTAINERS.md](MAINTAINERS.md); `core-team` in [security-insights.yml](security-insights.yml).
 - Outcome: at least one further maintainer with write access and a share of the security response, appointed under the rules in [GOVERNANCE.md](GOVERNANCE.md). Contributors interested in the role are invited to start with reviewed pull requests.
 
-### 5.2 Persistent identifiers for citation (under consideration)
+### 5.2 Persistent identifiers for citation (planned)
 
-- Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author.
-- Evidence: [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json).
-- Outcome: archive each release in a repository that assigns DOIs, for example through the GitHub integration of Zenodo, and add the DOI and ORCID to the citation metadata and [CITATION.md](CITATION.md).
+- Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author. `.zenodo.json` describes the deposit that Zenodo creates for each release, but the GitHub integration of Zenodo is not yet enabled for the repository.
+- Evidence: [CITATION.cff](CITATION.cff), [codemeta.json](codemeta.json) and `.zenodo.json`.
+- Outcome: the Zenodo integration is enabled, so that every GitHub release is archived with a version DOI under one concept DOI; the DOIs and the ORCID identifier are then added to the citation metadata and [CITATION.md](CITATION.md).
 
 ## 6. Platform support
 
 ### 6.1 Python 3.10 end of life (planned)
 
-- Gap: Python 3.10 reaches its upstream end of life in October 2026 [4].
+- Gap: Python 3.10 reaches its upstream end of life in October 2026 [3].
 - Evidence: the Python version support policy in [VERSIONING.md](VERSIONING.md).
 - Outcome: under that policy, support for Python 3.10 is removed in the first minor release after its end of life, together with the Python 3.10 specific dependency bounds and lock entries.
 
 ### 6.2 Python 3.15 (planned)
 
-- Gap: Python 3.15 is scheduled for release in October 2026 [4] and is not yet tested.
+- Gap: Python 3.15 is scheduled for release in October 2026 [3] and is not yet tested.
 - Evidence: the CI test matrix and the classifiers in `pyproject.toml`.
 - Outcome: support for Python 3.15 once the runtime dependencies publish wheels for it, following the dependency policy in `pyproject.toml`.
 
@@ -147,9 +135,7 @@ Proposals are made in an issue opened with the feature request form at <https://
 
 [2] B. Leiba. RFC 8174: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words. IETF, 2017. <https://www.rfc-editor.org/rfc/rfc8174>
 
-[3] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
-
-[4] Python Software Foundation. Status of Python versions, Python Developer's Guide. 2026. <https://devguide.python.org/versions/>
+[3] Python Software Foundation. Status of Python versions, Python Developer's Guide. 2026. <https://devguide.python.org/versions/>
 
 <!--
 =============================================================================

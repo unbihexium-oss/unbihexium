@@ -159,7 +159,7 @@ Whether a failing check blocks the merge is decided by the branch protection rul
 
 ### 4.4 Required Status Checks
 
-The branch protection rule (or ruleset) of `main` SHOULD require the checks below. They run on every pull request, so requiring them never leaves a pull request waiting for a check that does not start:
+The branch protection rule (or ruleset) of `main` requires the checks below. They run on every pull request, so requiring them never leaves a pull request waiting for a check that does not start:
 
 | Workflow | Checks |
 | --- | --- |

@@ -280,6 +280,7 @@ These recommendations address operators of Unbihexium. They are not vulnerabilit
 - [COMPLIANCE.md](COMPLIANCE.md): licence compliance and regulatory information.
 - [RESPONSIBLE_USE.md](RESPONSIBLE_USE.md): intended and prohibited uses.
 - [SUPPORT.md](SUPPORT.md): support channels for questions that are not security issues.
+- [docs/security/self_assessment.md](docs/security/self_assessment.md): security self-assessment of the project.
 - [docs/security/](docs/security/): further notes on model integrity, secrets and supply chain security.
 
 ## References
