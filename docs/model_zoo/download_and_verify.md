@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | The main branch of Unbihexium, model zoo catalogue version 2.0.0 (not part of release 1.0.1) |
+| Applies to | Unbihexium 2.0.0 and the main branch, model zoo catalogue version 2.0.0 |
 
 ## Abstract
 

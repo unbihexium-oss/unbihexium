@@ -209,7 +209,7 @@ curl -s -F "file=@input.tif" "http://127.0.0.1:8000/detect/buildings"
 ```
 
 ```text
-{"status":"healthy","version":"1.0.1"}
+{"status":"healthy","version":"2.0.0"}
 {"index_name":"NDVI","min_value":-0.9200797496617876,"max_value":0.9190091032253411,"mean_value":0.00028512461033844655,"shape":[64,64]}
 {"count":0,"model_id":"ship_detector_base","detections":[]}
 {"detail":"building_detector_base expects 3 bands (red, green, blue), got shape (4, 64, 64)"}

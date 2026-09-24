@@ -834,8 +834,8 @@ body:  # Elements of the form, in display order.
       description: |  # Help text shown under the question.
         Select the Unbihexium version you are using. Run `python -c "import unbihexium; print(unbihexium.__version__)"` if you are unsure.
       options:  # Answer choices, in display order.
-        - "1.0.1 (latest release)"  # Choice 1.
-        - "1.0.0"  # Choice 2.
+        - "2.0.0 (latest release)"  # Choice 1.
+        - "1.0.x (1.0.0 or 1.0.1)"  # Choice 2.
         - "main branch (unreleased)"  # Choice 3.
         - "Other (specify in the next field)"  # Choice 4.
     validations:  # Validation rules of the element.
@@ -857,7 +857,7 @@ body:  # Elements of the form, in display order.
       description: |  # Help text shown under the question.
         Paste the exact version string, and for source installations also the output of `git rev-parse HEAD`.
       placeholder: |  # Example answer shown in the empty field.
-        1.0.1 / 3430ec9
+        2.0.0 / 0123abc
     validations:  # Validation rules of the element.
       required: true  # An answer is mandatory.
 

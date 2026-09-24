@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch |
+| Applies to | Unbihexium 2.0.0 and the main branch |
 
 ## Abstract
 
@@ -103,8 +103,8 @@ Importing `unbihexium` loads only the version. Each subpackage is imported on fi
 
 | Name | Kind | Signature or value | Description |
 | --- | --- | --- | --- |
-| `__version__` | constant | `'1.0.1'` | Version string. |
-| `__version_tuple__` | constant | `(1, 0, 1)` | Version as a tuple of integers. |
+| `__version__` | constant | `'2.0.0'` | Version string. |
+| `__version_tuple__` | constant | `(2, 0, 0)` | Version as a tuple of integers. |
 
 ```python
 import unbihexium
@@ -113,7 +113,7 @@ print(unbihexium.__version__, unbihexium.__version_tuple__)
 ```
 
 ```text
-1.0.1 (1, 0, 1)
+2.0.0 (2, 0, 0)
 ```
 
 ## 4. unbihexium.core

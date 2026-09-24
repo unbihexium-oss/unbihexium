@@ -55,7 +55,7 @@ build-backend = "hatchling.build"  # Module that pip and uv call to build the pa
 # Core metadata of the distribution (PEP 621).
 [project]
 name = "unbihexium"  # Distribution name on PyPI.
-version = "1.0.1"  # Release version; keep in sync with CHANGELOG.md and CITATION.cff.
+version = "2.0.0"  # Release version; keep in sync with CHANGELOG.md and CITATION.cff.
 description = "Earth observation, geospatial, remote sensing and SAR library for Python"  # Summary shown on PyPI.
 readme = "README.md"  # Long description shown on PyPI.
 requires-python = ">=3.10"  # Oldest supported interpreter.

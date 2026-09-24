@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch |
+| Applies to | Unbihexium 2.0.0 and the main branch |
 
 ## Abstract
 
@@ -213,7 +213,7 @@ A vulnerability in a dependency is handled as described in [Vulnerability Manage
 
 ### 8.1 Known issues over time
 
-No security advisory has been published for Unbihexium. The review for the [Security Model](../architecture/security_model.md) found five weaknesses on the main branch before any of them was released: path traversal in `zoo clear`, unbounded recursion in the GeoJSON validator, STAC credentials sent to other hosts, an unbounded rate limiter table and an incomplete `zoo verify`. All five are fixed, covered by unit tests and listed in [CHANGELOG.md](../../CHANGELOG.md), Section 2.5. The releases 1.0.0 and 1.0.1 predate the current release pipeline and carry no signatures or provenance ([Supply Chain Security](supply_chain_security.md), Section 10).
+No security advisory has been published for Unbihexium. The review for the [Security Model](../architecture/security_model.md) found five weaknesses on the main branch before any of them was released: path traversal in `zoo clear`, unbounded recursion in the GeoJSON validator, STAC credentials sent to other hosts, an unbounded rate limiter table and an incomplete `zoo verify`. All five are fixed, covered by unit tests and listed in [CHANGELOG.md](../../CHANGELOG.md), Section 3.5. The releases 1.0.0 and 1.0.1 predate the current release pipeline and carry no signatures or provenance ([Supply Chain Security](supply_chain_security.md), Section 10).
 
 ### 8.2 OpenSSF Best Practices
 

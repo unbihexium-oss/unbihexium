@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch, including the model zoo |
+| Applies to | Unbihexium 2.0.0 and the main branch, including the model zoo |
 
 ## Abstract
 
@@ -92,7 +92,7 @@ Output:
 ```text
 ship_detector_tiny has untrained starter weights; its output is not meaningful
 {
-  "library_version": "1.0.1",
+  "library_version": "2.0.0",
   "catalog_version": "2.0.0",
   "model_id": "ship_detector_tiny",
   "weights_digest": "e278457bcbb75b891f2b0730889fab1a33a7f346fa695e33cc5545b5952e2899",

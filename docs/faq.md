@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch (model catalogue 2.0.0) |
+| Applies to | Unbihexium 2.0.0 and the main branch (model catalogue 2.0.0) |
 
 ## Abstract
 
@@ -53,7 +53,7 @@ The classical processing functions are deterministic implementations of publishe
 
 ### 1.3 Which version should I use?
 
-The latest release on PyPI is 1.0.1 (tag `v1.0.1`, 21 December 2025). The main branch has changed substantially since then and has not yet been released; the next release will be 2.0.0 because the changes include breaking ones. The documentation under `docs/` describes the main branch. To use it, install from source ([installation guide](getting_started/installation.md)); to move existing 1.0.x code, read [MIGRATION.md](MIGRATION.md). An installation from the main branch still reports version 1.0.1 ([VERSIONING.md](../VERSIONING.md), Section 2.4), so record the commit hash with your results.
+Use the latest release, 2.0.0 (tag `v2.0.0`, 24 September 2026), from PyPI ([installation guide](getting_started/installation.md)). It is a major release with breaking changes; to move existing 1.0.x code, read [MIGRATION.md](MIGRATION.md). The documentation under `docs/` describes the main branch, which matches 2.0.0 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). An installation from the main branch reports the version of the last release ([VERSIONING.md](../VERSIONING.md), Section 2.4), so record the commit hash with results obtained from it.
 
 ### 1.4 Can I use it in proprietary software?
 

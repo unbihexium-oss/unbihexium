@@ -24,7 +24,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Status | Active |
 | Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
-| Applies to | Unbihexium 1.0.1 and the main branch |
+| Applies to | Unbihexium 2.0.0 and the main branch |
 
 ## Abstract
 
@@ -82,7 +82,7 @@ The size of an environment depends mostly on the extras. As a reference, a virtu
 | Container image | [6](#6-container-image) | Running the CLI or the REST service without a local Python | Yes, CPU build |
 | Git clone, editable install | [7](#7-installing-from-source) | The newest code, development and contributions | As selected |
 
-**Release status.** The distribution on PyPI with version 1.0.1 was built from the tag `v1.0.1` (21 December 2025). The main branch has changed substantially since then (among other things model training and evaluation, the `predict` and `zoo build` commands, and the REST prediction route) and has not yet been released under a new version number, although `pyproject.toml` still declares 1.0.1. The documentation in `docs/` describes the main branch. Users who want the commands and functions described there SHOULD install from source (Section 7) until the next release; see [CHANGELOG.md](../../CHANGELOG.md).
+**Release status.** The latest distribution on PyPI is 2.0.0, built from the tag `v2.0.0` (24 September 2026). The documentation in `docs/` describes the main branch, which matches 2.0.0 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../../CHANGELOG.md); install from source (Section 7) to use such changes before the next release. Users of 1.0.x should read [MIGRATION.md](../MIGRATION.md) before upgrading.
 
 ## 4. Installing from PyPI
 
@@ -243,8 +243,8 @@ unbihexium info
 Output on the main branch:
 
 ```text
-unbihexium, version 1.0.1
-Unbihexium v1.0.1
+unbihexium, version 2.0.0
+Unbihexium v2.0.0
 Registered capabilities: 147
 Model zoo models: 520 (catalogue 2.0.0)
 Registered pipelines: 5
@@ -329,7 +329,7 @@ The model store is the directory `models` below `UNBIHEXIUM_CACHE` (default `~/.
 | `ImportError` for zarr, pyarrow or fastapi | The corresponding extra is missing | Install the extra listed in Section 4.2 |
 | `ERROR: Hashes are required in --require-hashes mode` | A requirements file without hashes, or an additional requirement given on the command line, in hash-checking mode | Install such packages in a separate command without `--require-hashes` |
 | `unbihexium --help` does not list `infer` or `zoo download` | Both are hidden aliases kept for compatibility; they still work | Prefer `unbihexium predict` and `unbihexium zoo build`; see [docs/reference/cli.md](../reference/cli.md) |
-| Commands or functions described in `docs/` are missing | PyPI 1.0.1 predates the main branch | Install from source (Section 7) |
+| Commands or functions described in `docs/` are missing | An older release is installed, or the feature is newer than the latest release | Upgrade with `python -m pip install -U unbihexium`, or install from source (Section 7) |
 | `pip` tries to compile rasterio, pyproj or onnxruntime | No wheel for the interpreter or platform, for example an unsupported Python version | Use CPython 3.10 to 3.14 on a platform with wheels |
 
 ## References
