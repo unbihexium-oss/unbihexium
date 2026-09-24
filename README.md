@@ -31,7 +31,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-README |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -98,6 +98,7 @@ Unbihexium does not ship trained weights, labelled training data or imagery, doe
 - CPython 3.10, 3.11, 3.12, 3.13 or 3.14 on Linux, macOS or Windows.
 - No compiler and no system GDAL: the binary wheels of rasterio, pyproj, shapely and onnxruntime bundle GDAL, PROJ, GEOS and their native libraries.
 - PyTorch only for building, training and exporting models (extra `torch`); inference on exported ONNX models needs only the extra `onnx`.
+- A GPU is optional. To use one, install the CUDA build of PyTorch [from pytorch.org](https://pytorch.org/get-started/locally/) before the extra `torch`; there is no separate GPU extra.
 
 ### 3.2 From PyPI
 
@@ -110,18 +111,13 @@ The core installation covers input and output, preprocessing, indices, SAR, terr
 | Extra | Adds | Needed for |
 | --- | --- | --- |
 | `onnx` | onnxruntime, onnx | Inference on ONNX exports without PyTorch |
-| `torch` | torch, torchvision, onnx | Building, training, evaluating and exporting zoo models |
-| `gpu` | `torch` extra, cupy-cuda12x | CUDA 12 acceleration (install the matching PyTorch CUDA build first) |
-| `serving` | fastapi, starlette, uvicorn, python-multipart | The REST service in `unbihexium.serving` |
-| `dask` | dask[complete] | Chunked and distributed processing |
-| `ray` | ray | Cluster computing |
+| `torch` | torch, onnx | Building, training, evaluating and exporting zoo models |
+| `serving` | fastapi, starlette, uvicorn | The REST service in `unbihexium.serving` |
 | `zarr` | zarr, numcodecs | Zarr input and output |
-| `netcdf` | netCDF4, h5py | NetCDF and HDF5 files |
-| `stac` | pystac, pystac-client | STAC search and metadata |
 | `parquet` | pyarrow | GeoParquet input and output |
 | `test` | pytest and plugins, httpx | Running the test suite |
-| `dev` | `test` extra, ruff, pyright, pre-commit, bandit, pip-audit, build, twine, tox | Development |
-| `all` | every extra except `gpu` | A complete environment |
+| `dev` | `test` extra, ruff, pyright, scipy-stubs (Python 3.12 and newer), pre-commit, bandit, pip-audit, build, twine, tox | Development |
+| `all` | `onnx`, `torch`, `serving`, `zarr`, `parquet` and `dev` | A complete environment |
 
 ```bash
 python -m pip install "unbihexium[torch,onnx,serving]"
@@ -129,13 +125,13 @@ python -m pip install "unbihexium[torch,onnx,serving]"
 
 ### 3.3 Container image
 
-The workflow `.github/workflows/docker.yml` builds the image from the [Dockerfile](https://github.com/unbihexium-oss/unbihexium/blob/main/Dockerfile) and pushes it to the GitHub Container Registry as `ghcr.io/unbihexium-oss/unbihexium`. Pushes to `main` are tagged `main`, version tags are tagged `<major>.<minor>.<patch>` and `<major>.<minor>`, and every image is also tagged with its commit (`sha-<short sha>`); there is no `latest` tag. The image contains the ONNX Runtime backend and the REST service, installed from the hashed lock file `requirements.txt`, runs as the unprivileged user `unbihexium` and does not contain model weights or PyTorch.
+The workflow `.github/workflows/docker.yml` builds the image from the [Dockerfile](https://github.com/unbihexium-oss/unbihexium/blob/main/Dockerfile) and pushes it to the GitHub Container Registry as `ghcr.io/unbihexium-oss/unbihexium`. Pushes to `main` are tagged `main`, version tags are tagged `<major>.<minor>.<patch>` and `<major>.<minor>`, and every image is also tagged with its commit (`sha-<short sha>`); there is no `latest` tag. The image contains the command line interface, the REST service and the CPU builds of PyTorch and ONNX Runtime, installed from the hashed lock files `.github/requirements/requirements-docker.txt` and `.github/requirements/requirements-ci-torch.txt`. It runs as the unprivileged user `unbihexium` and contains no model weights: the service builds each model on first use and checks it against its published digest.
 
 ```bash
 docker pull ghcr.io/unbihexium-oss/unbihexium:main
 docker run --rm ghcr.io/unbihexium-oss/unbihexium:main unbihexium info
 docker run --rm -p 8000:8000 ghcr.io/unbihexium-oss/unbihexium:main \
-    uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+    unbihexium serve --host 0.0.0.0 --port 8000
 ```
 
 To build the image locally, run `docker build -t unbihexium:local .` in the repository root. [docker-compose.yml](https://github.com/unbihexium-oss/unbihexium/blob/main/docker-compose.yml) and the manifests under [deploy/](https://github.com/unbihexium-oss/unbihexium/tree/main/deploy) (a Helm chart and a Kubernetes deployment) start the REST service; see [docs/operations/docker.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/operations/docker.md).
@@ -304,6 +300,7 @@ The complete command set is:
 | `unbihexium evaluate` | Evaluate a model on a dataset split |
 | `unbihexium predict` | Run a model on a raster and write the result |
 | `unbihexium pipeline list`, `run` | List and run registered processing pipelines |
+| `unbihexium serve` | Start the REST service (extra `serving`; see Section 8) |
 
 Every command documents its options with `--help`; the full reference is [docs/reference/cli.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/reference/cli.md). Bash completion is provided in [scripts/unbihexium-completion.bash](https://github.com/unbihexium-oss/unbihexium/blob/main/scripts/unbihexium-completion.bash).
 
@@ -364,14 +361,14 @@ The 520 models have 10,655,126,116 parameters in total.
 
 No weights are downloaded. The starter weights of each model are generated locally and deterministically from its model id, and their digest (SHA-256 over the sorted state dictionary) is compared with the published value in [src/unbihexium/zoo/digests.json](https://github.com/unbihexium-oss/unbihexium/blob/main/src/unbihexium/zoo/digests.json). The workflow `.github/workflows/model-zoo.yml` rebuilds the tiny variants on pull requests and all 520 models weekly to detect platform drift. Checkpoints contain plain data only and are loaded with `torch.load(weights_only=True)`, so loading a checkpoint cannot execute code.
 
-As stated in Section 2.2, only the 28 spectral index models produce meaningful output without training. The per-family model cards are indexed in [model_zoo/MODEL_CARDS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md), and one example notebook per family is in [examples/notebooks/](https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks).
+As stated in Section 2.2, only the 28 spectral index models produce meaningful output without training. The per-family model cards are indexed in [model_zoo/MODEL_CARDS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md).
 
 ## 8. REST service
 
-`unbihexium.serving` provides a FastAPI application (extra `serving`). Start it with uvicorn; interactive OpenAPI documentation is then available at `/docs`.
+`unbihexium.serving` provides a FastAPI application (extra `serving`). Start it with `unbihexium serve`, which runs uvicorn with the host, port and log level of the configuration (`--host` and `--port` override them); interactive OpenAPI documentation is then available at `/docs`. The application object `unbihexium.serving.app:app` can also be passed to any ASGI server.
 
 ```bash
-uvicorn unbihexium.serving.app:app --host 127.0.0.1 --port 8000
+unbihexium serve --host 127.0.0.1 --port 8000
 ```
 
 | Method and path | Purpose |
@@ -405,7 +402,7 @@ Settings are layered, later layers winning: the built-in defaults, a YAML file (
 
 - **Locked dependencies.** `requirements.txt` (runtime with `onnx` and `serving`), `requirements-dev.txt` (all extras) and the CI lock files in `.github/requirements/` pin every package with SHA-256 hashes; CI installs with `--require-hashes`. The container image installs binary wheels only from `requirements.txt`, and its base image is pinned by digest.
 - **Deterministic models.** Starter weights are derived from the model id and verified by digest (Section 7.3). Training takes a `seed`, and the normalisation statistics estimated from the training data are stored with the checkpoint, so inference and ONNX exports apply exactly the same scaling.
-- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, notebook checks, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
+- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
 
 ### 10.2 Release integrity
 
@@ -444,7 +441,7 @@ unbihexium/
   tests/                 unit, integration, end-to-end and benchmark tests
   model_zoo/             model cards, manifests, inventory and checksums
   docs/                  user, architecture, model zoo, security and operations documentation
-  examples/              notebooks (one per model family), scripts and a serving example
+  examples/              example scripts and a serving example
   fuzz/                  atheris fuzz targets and seed corpora
   deploy/                Helm chart and Kubernetes manifests
   scripts/               lock merging, model validation and shell completion
@@ -467,7 +464,7 @@ unbihexium/
 | Model zoo: catalogue, training, inference, distribution | [docs/model_zoo/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/model_zoo) |
 | Security | [docs/security/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/security) |
 | Operations: CI/CD, Docker, releasing | [docs/operations/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/operations) |
-| Tutorials and notebooks | [docs/tutorials/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/tutorials) |
+| Tutorials | [docs/tutorials/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/tutorials) |
 | Frequently asked questions, glossary | [docs/faq.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/faq.md), [docs/glossary.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/glossary.md) |
 | Migration between versions | [docs/MIGRATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/MIGRATION.md) |
 
@@ -478,7 +475,7 @@ Project policies are kept in the repository root: [GOVERNANCE.md](https://github
 Contributions are welcome. [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md) describes the development setup, the coding and documentation standards, the tests and checks expected before review, and the pull request process; participants follow the [CODE_OF_CONDUCT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md). Pull request titles follow Conventional Commits, and the local checks mirror CI:
 
 ```bash
-make check        # lint, format, types, tests, licences, text policy, YAML, notebooks, model zoo
+make check        # lint, format, types, tests, licences, text policy, YAML, model zoo
 pre-commit run --all-files
 ```
 
@@ -515,7 +512,7 @@ Copyright 2025-2026 Unbihexium OSS Foundation and contributors. Unbihexium is li
 
 ### 16.2 Acknowledgements
 
-Unbihexium builds on the work of many open source projects, in particular NumPy, SciPy, rasterio and GDAL, pyproj and PROJ, Shapely and GEOS, GeoPandas, scikit-image, scikit-learn, PyTorch, ONNX and ONNX Runtime, FastAPI, Click and Rich. The model architectures follow the published designs cited in Section 7.1, and the spectral indices, SAR methods and geostatistical estimators follow the publications cited in the source code of each module. The author is affiliated with the University of Helsinki.
+Unbihexium builds on the work of many open source projects, in particular NumPy, SciPy, rasterio and GDAL, pyproj and PROJ, Shapely and GEOS, GeoPandas, scikit-image, PyTorch, ONNX and ONNX Runtime, FastAPI, Click and Rich. The model architectures follow the published designs cited in Section 7.1, and the spectral indices, SAR methods and geostatistical estimators follow the publications cited in the source code of each module. The author is affiliated with the University of Helsinki.
 
 ## References
 

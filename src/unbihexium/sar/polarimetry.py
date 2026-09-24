@@ -89,7 +89,7 @@ class PolarimetricResult:
     # Name of the decomposition.
     decomposition_type: str
     # Output images by name (powers, angles, eigenvalues).
-    components: dict[str, NDArray[np.floating[Any]]] = field(default_factory=dict)
+    components: dict[str, NDArray[Any]] = field(default_factory=dict)
     # Entropy H in [0, 1] (H / A / alpha only).
     entropy: NDArray[np.floating[Any]] | None = None
     # Anisotropy A in [0, 1] (H / A / alpha only).

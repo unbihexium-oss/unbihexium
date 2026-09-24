@@ -1,0 +1,43 @@
+{{- /*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+=============================================================================
+Project     : Unbihexium
+File        : deploy/helm/unbihexium/templates/service.yaml
+Title       : Service of the REST API
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Kubernetes manifest template (Go text/template), rendered by Helm 3
+=============================================================================
+
+Abstract
+--------
+ClusterIP Service on service.port in front of the pods of the release.
+=============================================================================
+*/ -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "unbihexium.fullname" . }}
+  labels:
+    {{- include "unbihexium.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "unbihexium.selectorLabels" . | nindent 4 }}
+{{- /*
+=============================================================================
+End of file deploy/helm/unbihexium/templates/service.yaml
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+*/ -}}

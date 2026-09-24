@@ -58,7 +58,7 @@ The following people have contributed to Unbihexium, in alphabetical order:
 
 | Name | GitHub | Contributions |
 | --- | --- | --- |
-| Exstaa | [@Exstaa](https://github.com/Exstaa) | Portable detection of the `model_zoo` path; Git LFS set-up instructions in the prerequisites of the example notebooks (December 2025) |
+| Exstaa | [@Exstaa](https://github.com/Exstaa) | Portable detection of the `model_zoo` path; Git LFS set-up instructions (December 2025) |
 | Olaf Yunus Laitinen Imanov | [@olaflaitinen](https://github.com/olaflaitinen) | Lead author (Section 2) |
 
 ## 4. Automated contributions

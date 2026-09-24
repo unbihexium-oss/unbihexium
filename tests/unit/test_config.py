@@ -45,7 +45,7 @@ def test_defaults() -> None:
     # Valid.
     assert config.problems() == []
     # Section values.
-    assert config.model.variant == "base" and config.processing.tile_size == 512
+    assert config.model.variant == "base" and config.model.device == "cpu"
     # 10 MiB body limit of the service.
     assert config.serving.max_request_bytes == 10 * 1024 * 1024
     # Dictionary round trip.
@@ -57,28 +57,27 @@ def test_layers(tmp_path: Path) -> None:
     # YAML file with two sections.
     path = tmp_path / "config.yaml"
     # File content.
-    path.write_text("model:\n  batch_size: 2\nprocessing:\n  overlap: 32\n", encoding="utf-8")
+    path.write_text("model:\n  batch_size: 2\n  backend: onnx\n", encoding="utf-8")
     # Environment overriding the batch size and setting a list and None.
     env = {
         "UNBIHEXIUM_MODEL__BATCH_SIZE": "16",  # Integer from text.
         "UNBIHEXIUM_SERVING__CORS_ORIGINS": "https://a.org, https://b.org",  # List.
-        "UNBIHEXIUM_PROCESSING__NODATA": "-9999",  # Float from text.
-        "UNBIHEXIUM_PROCESSING__SEED": "none",  # Optional value.
+        "UNBIHEXIUM_SERVING__API_KEY": "none",  # Optional value.
         "UNBIHEXIUM_LOG_LEVEL": "debug",  # Top-level value.
         "UNBIHEXIUM_CACHE": "/tmp/cache",  # Unrelated variable, ignored.
     }  # End of the environment.
     # Layers: file, environment, overrides.
-    config = load_config(path, environ=env, overrides={"processing": {"tile_size": 256}})
+    config = load_config(path, environ=env, overrides={"model": {"variant": "tiny"}})
     # Environment wins over the file.
     assert config.model.batch_size == 16
     # File value without an environment variable.
-    assert config.processing.overlap == 32
+    assert config.model.backend == "onnx"
     # Override applied last.
-    assert config.processing.tile_size == 256
+    assert config.model.variant == "tiny"
     # Converted values.
     assert config.serving.cors_origins == ["https://a.org", "https://b.org"]
-    # Float and None.
-    assert config.processing.nodata == -9999.0 and config.processing.seed is None
+    # None from text.
+    assert config.serving.api_key is None
     # Level in upper case.
     assert config.log_level == "DEBUG"
     # The file path can come from UNBIHEXIUM_CONFIG.
@@ -97,10 +96,10 @@ def test_validation(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match=r"model\.variant.*model\.batch_size"):
         # Validate.
         bad.validate()
-    # Overlap must be below the tile size.
-    same = Config.from_dict({"processing": {"tile_size": 64, "overlap": 64}})
+    # Port range.
+    closed = Config.from_dict({"serving": {"port": 0}})
     # Reported.
-    assert any("processing.overlap" in p for p in same.problems())
+    assert any("serving.port" in p for p in closed.problems())
     # Misspelt keys.
     with pytest.raises(ValueError, match=r"unknown setting model\.batchsize"):
         # Unknown key.
@@ -129,10 +128,10 @@ def test_validation(tmp_path: Path) -> None:
 def test_update() -> None:
     # Defaults.
     config = Config()
-    # Plain key of the processing section and a qualified serving key.
-    config.update(tile_size=256, **{"serving.port": 9000, "serving__rate_limit_per_minute": 30})
+    # Plain key of the model section and a qualified serving key.
+    config.update(batch_size=4, **{"serving.port": 9000, "serving__rate_limit_per_minute": 30})
     # Values applied in place.
-    assert config.processing.tile_size == 256 and config.serving.port == 9000
+    assert config.model.batch_size == 4 and config.serving.port == 9000
     # Double underscore form.
     assert config.serving.rate_limit_per_minute == 30
     # Invalid values are rejected.
@@ -141,6 +140,46 @@ def test_update() -> None:
         config.update(port=70000)
     # The failed update left the object unchanged.
     assert config.serving.port == 9000
+
+
+# Settings that nothing read were removed; setting them fails with their name.
+def test_removed_settings(tmp_path: Path) -> None:
+    # Removed section in a file.
+    path = tmp_path / "old.yaml"
+    # Section of earlier releases.
+    path.write_text("processing:\n  tile_size: 256\n", encoding="utf-8")
+    # The message names the key.
+    with pytest.raises(ValueError, match=r"processing\.tile_size was removed"):
+        # Load the file.
+        load_config(path, env=False)
+    # Removed key in the environment.
+    with pytest.raises(ValueError, match=r"model\.num_workers was removed"):
+        # Load with the variable.
+        load_config(environ={"UNBIHEXIUM_MODEL__NUM_WORKERS": "2"})
+    # Removed key given to update().
+    with pytest.raises(ValueError, match=r"model\.num_workers was removed"):
+        # Plain key.
+        Config().update(num_workers=2)
+
+
+# The API key is redacted in dictionaries and files unless requested.
+def test_secret_redaction(tmp_path: Path) -> None:
+    # Configuration with a key.
+    config = Config.from_dict({"serving": {"api_key": "s3cret"}})
+    # The object keeps the key.
+    assert config.serving.api_key == "s3cret"
+    # Dictionaries hide it by default.
+    assert config.to_dict()["serving"]["api_key"] == "***"
+    # Explicit opt-in.
+    assert config.to_dict(include_secrets=True)["serving"]["api_key"] == "s3cret"
+    # Written files hide it by default.
+    text = config.to_yaml(tmp_path / "c.yaml").read_text(encoding="utf-8")
+    # Not in the file.
+    assert "s3cret" not in text
+    # A file written with the key reads back equal.
+    config.to_yaml(tmp_path / "full.yaml", include_secrets=True)
+    # Round trip.
+    assert Config.from_yaml(tmp_path / "full.yaml") == config
 
 
 # =============================================================================

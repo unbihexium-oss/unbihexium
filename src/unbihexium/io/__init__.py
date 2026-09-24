@@ -38,6 +38,7 @@ from unbihexium.io.geojson import (
     features_to_geojson,  # FeatureCollection from features.
     geojson_bounds,  # Bounding box.
     geojson_crs,  # CRS of a document.
+    geojson_problems,  # Structural problems of a document.
     geometry_to_feature,  # Feature from a geometry.
     read_geojson,  # Read a file.
     reproject_geojson,  # Change the CRS.
@@ -98,6 +99,7 @@ __all__ = [
     "filter_items",  # Offline STAC search.
     "geojson_bounds",  # Bounding box of a document.
     "geojson_crs",  # CRS of a document.
+    "geojson_problems",  # Structural problems of a document.
     "geometry_to_feature",  # Feature from a geometry.
     "geoparquet_bounds",  # Bounding box of a file.
     "geoparquet_metadata",  # The geo metadata.

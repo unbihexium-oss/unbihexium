@@ -1,617 +1,361 @@
-# Capability 01: AI Products
+<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-## Executive Summary
+=============================================================================
+Project     : Unbihexium
+File        : docs/capabilities/01_ai_products.md
+Title       : Capability domain 01: AI products
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
+=============================================================================
+-->
 
-This document provides comprehensive documentation for the AI Products capability domain within the Unbihexium framework. The AI Products domain represents the foundational artificial intelligence capabilities for remote sensing and Earth observation applications, encompassing core models for image enhancement, object detection, and semantic segmentation across satellite and aerial imagery.
+# Capability domain 01: AI products
 
-The domain comprises 13 base model architectures with 52 total variants (tiny, base, large, mega), serving as building blocks for more specialized applications across the 12 capability domains. These models have been optimized for production deployment with verified performance metrics and extensive documentation.
+| Field | Value |
+| --- | --- |
+| Document | UBX-DOC-CAP-01 |
+| Version | 2.0 |
+| Status | Active |
+| Last reviewed | 2026-09-24 |
+| Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
+| Applies to | The main branch of Unbihexium (declared version 1.0.1, model catalogue 2.0.0) |
 
----
+## Abstract
 
-## Domain Overview
+This document describes capability domain 01, "AI products": the general-purpose learned models of the Unbihexium model zoo (object detection, semantic segmentation, change detection and SAR-to-optical translation) and the library capabilities that build, run, train, evaluate and serve every model of the zoo. It is written for users who want to know which model families exist in this domain and how to run them, for contributors who extend the task interfaces, and for reviewers who need to check what the code actually provides. It maps the domain to the registry (`unbihexium.registry`, domain value `ai`) and to the `domain` field of `src/unbihexium/zoo/catalog.yaml`, lists the seven model families in a table generated from the catalogue, explains the network output layouts and the decoding formulas that the code implements, and gives executed examples. All seven families are untrained starter models; the domain describes intended applications, not validated products.
 
-### Scope and Objectives
+## Contents
 
-The AI Products capability domain addresses the following primary objectives:
+1. [Scope and status](#1-scope-and-status)
+2. [Place in the registry and the catalogue](#2-place-in-the-registry-and-the-catalogue)
+3. [Model families](#3-model-families)
+4. [Library functions](#4-library-functions)
+5. [Examples](#5-examples)
+6. [Limitations and responsible use](#6-limitations-and-responsible-use)
+7. [Related documents](#7-related-documents)
+8. [References](#references)
 
-1. **Image Enhancement**: Improve spatial resolution, radiometric quality, and visual clarity of satellite and aerial imagery through super-resolution and enhancement techniques.
+## 1. Scope and status
 
-2. **Object Detection**: Identify and localize discrete objects of interest within imagery, including ships, buildings, vehicles, and other anthropogenic features.
+### 1.1 What the domain covers
 
-3. **Semantic Segmentation**: Classify every pixel in an image according to predefined land cover or land use categories, enabling area-based analysis and change detection.
+Domain 01 groups two kinds of capabilities:
 
-4. **Image Processing**: Provide foundational preprocessing and postprocessing capabilities including pansharpening, orthorectification, and mosaicking.
+- the model families whose catalogue entry has `domain: ai`: generic detectors of aircraft, ships, vehicles and common objects in overhead RGB imagery, a six-class semantic segmentation model, a two-date change detector and a network that synthesises an RGB image from Sentinel-1 backscatter;
+- the library capabilities that the registry files under the same domain: the model zoo itself (`model_zoo`), training and evaluation (`model_training`) and the REST service (`model_serving`). These serve all 130 families of the zoo, not only the seven of this domain.
 
-### Domain Statistics
+Thematic models that also detect or segment objects (buildings, water, crops, oil spills and so on) belong to the domains of their application and are described in the other capability documents; see the [capability index](index.md).
 
-| Metric | Value |
-| -------- | ------- |
-| Base Model Architectures | 13 |
-| Total Model Variants | 52 |
-| Minimum Parameters (tiny) | 49,667 |
-| Maximum Parameters (mega) | 4,107,010 |
-| Primary Tasks | Enhancement, Detection, Segmentation |
-| Production Status | Fully Production Ready |
+### 1.2 Status of the models
 
----
+Every model of this domain is an **untrained starter model**: a complete, trainable network with the input and output layout of its task and deterministic initial weights whose SHA-256 digest is published in `model_zoo/manifests/`. The weights have not been fitted to Earth observation data, so predictions are not meaningful until the model has been trained or fine-tuned on labelled data for the sensor and area of interest (see [docs/model_zoo/training.md](../model_zoo/training.md)). The only exception in the whole zoo are the seven spectral index families (28 models) of [domain 03](03_indices_flood_water.md), which compute exact formulas; none of them belongs to this domain. No accuracy figures are published for any model, because there are no trained weights to measure. Section 5.2 shows what the output of an untrained model looks like.
 
-## Model Inventory
+### 1.3 Changes from the previous version
 
-### Complete Model Listing
+Version 1 of this document listed thirteen "production" models, accuracy and throughput tables, an SRCNN super-resolution network, a Siamese change detection network and commands such as `unbihexium infer`. None of these exists in the current code: the models are untrained, no benchmarks were measured, super-resolution and pansharpening families belong to the imaging domain ([domain 04](04_environment_forestry_image_processing.md)), change detection uses an early-fusion U-Net (Section 3.3), and models are run with `unbihexium predict`. The content was replaced by a description of the code.
 
-| Model ID | Task | Architecture | Classes | Variants | Parameter Range |
-| ---------- | ------ | -------------- | --------- | ---------- | ----------------- |
-| super_resolution | Enhancement | SRCNN | - | 4 | 49,667 - 751,619 |
-| ship_detector | Detection | UNet | 1 | 4 | 143,201 - 2,268,545 |
-| building_detector | Detection | UNet | 1 | 4 | 143,201 - 2,268,545 |
-| cloud_mask | Segmentation | UNet | 3 | 4 | 143,587 - 2,269,059 |
-| lulc_classifier | Segmentation | UNet | 5 | 4 | 143,973 - 2,269,573 |
-| change_detector | Segmentation | Siamese | 2 | 4 | 258,754 - 4,107,010 |
-| pansharpening | Enhancement | CNN | - | 4 | 186,243 - 2,956,803 |
-| orthorectification | Enhancement | CNN | - | 4 | 186,243 - 2,956,803 |
-| coregistration | Enhancement | CNN | - | 4 | 186,243 - 2,956,803 |
-| mosaicking | Enhancement | CNN | - | 4 | 186,243 - 2,956,803 |
-| ndvi_calculator | Index | CNN | - | 4 | 186,243 - 2,956,803 |
-| dem_generator | Terrain | CNN | - | 4 | 186,177 - 2,956,545 |
-| dsm_generator | Terrain | CNN | - | 4 | 186,177 - 2,956,545 |
+## 2. Place in the registry and the catalogue
 
-### Variant Specifications
+The registry enumeration `unbihexium.registry.CapabilityDomain` has the member `AI = "ai"`. The capability registry loads one model capability per catalogue family and a fixed list of library capabilities (`src/unbihexium/registry/capabilities.py`). For the value `ai` it holds ten capabilities:
 
-| Variant | Resolution | Base Channels | Use Case | Latency Target |
-| --------- | ------------ | --------------- | ---------- | ---------------- |
-| tiny | 64 x 64 px | 32 | Edge devices, embedded systems, real-time processing | < 10 ms |
-| base | 128 x 128 px | 64 | Standard production workloads, balanced performance | < 50 ms |
-| large | 256 x 256 px | 96 | High-accuracy requirements, detailed analysis | < 200 ms |
-| mega | 512 x 512 px | 128 | Maximum quality, research applications | < 500 ms |
+| Capability id | Kind | Maturity | Entry points |
+| --- | --- | --- | --- |
+| `aircraft_detector`, `object_detector`, `ship_detector`, `vehicle_detector`, `multi_solution_segmentation`, `change_detector`, `synthetic_imagery` | model family | beta (starter model, `requires_training` tag `true`) | `unbihexium.ai.predict.predict` |
+| `model_zoo` | library | stable | `unbihexium.zoo` |
+| `model_training` | library | stable | `unbihexium.ai.training`, `unbihexium.ai.evaluation` |
+| `model_serving` | library | stable | `unbihexium.serving` |
 
----
+The maturity follows a fixed rule in `catalogue_capabilities()`: spectral index families are `stable`, every other family is `beta` until it is trained. Two of the seven families have a registered pipeline (`PIPELINES_BY_FAMILY`): `ship_detector` runs in the pipeline `ship_detection` and `change_detector` in `change_detection`. The pipelines `building_detection`, `water_detection` and `super_resolution` also list `ai` among their domains, but their model families belong to the urban, water and imaging domains.
 
-## Performance Metrics and Benchmarks
+Every capability of a model family carries the command line `unbihexium predict <family>_base INPUT OUTPUT`, the family's task, its input bands and the four model ids of its size variants (`tiny`, `base`, `large`, `mega`).
 
-### Detection Performance
+## 3. Model families
 
-Detection models are evaluated using mean Average Precision at IoU threshold 0.5 (mAP@0.5):
+### 3.1 Inventory
+
+The two tables below were generated from the catalogue and the model registry of the installed package with the script of [index.md, Section 4](index.md#4-regenerating-the-family-tables), run with the argument `ai`. The parameter counts are those of the deterministic starter networks (`unbihexium.zoo.get_model(model_id).num_parameters`).
+
+| Family | Domain | Task | Input bands | Outputs | Parameters (tiny / base / large / mega) |
+| --- | --- | --- | --- | --- | --- |
+| `aircraft_detector` | ai | detection | red, green, blue | aircraft | 730,581 / 7,049,125 / 22,038,197 / 60,413,509 |
+| `object_detector` | ai | detection | red, green, blue | building, vehicle, ship, aircraft, storage_tank, bridge | 730,746 / 7,049,450 / 22,038,682 / 60,414,154 |
+| `ship_detector` | ai | detection | red, green, blue | ship | 730,581 / 7,049,125 / 22,038,197 / 60,413,509 |
+| `vehicle_detector` | ai | detection | red, green, blue | car, truck, bus | 730,647 / 7,049,255 / 22,038,391 / 60,413,767 |
+| `multi_solution_segmentation` | ai | segmentation | red, green, blue | background, building, road, water, vegetation, bare_ground | 733,014 / 7,058,598 / 22,059,318 / 60,450,886 |
+| `change_detector` | ai | change_detection | red, green, blue (x 2 dates) | no_change, change | 733,378 / 7,059,330 / 22,060,418 / 60,452,354 |
+| `synthetic_imagery` | ai | enhancement | VV, VH | red, green, blue | 732,819 / 7,058,211 / 22,058,739 / 60,450,115 |
+
+| Family | Name | Intended application | Reference data needed for training |
+| --- | --- | --- | --- |
+| `aircraft_detector` | Aircraft Detector | Detects aircraft on aprons, runways and in flight in very high resolution optical imagery. | Bounding boxes of aircraft. |
+| `object_detector` | Generic Object Detector | Multi-class detector for common objects in overhead imagery. | Bounding boxes of the six object classes. |
+| `ship_detector` | Ship Detector | Detects ships in optical imagery. | Bounding boxes of ships. |
+| `vehicle_detector` | Vehicle Detector | Detects cars, trucks and buses. | Bounding boxes of vehicles by type. |
+| `multi_solution_segmentation` | General Semantic Segmentation | General-purpose semantic segmentation with six common classes. | Masks of the six classes. |
+| `change_detector` | Change Detector | Binary change detection between two dates. | Binary change masks. |
+| `synthetic_imagery` | SAR to Optical Translator | Synthesises an optical RGB image from SAR backscatter, for example to fill cloud gaps. | Co-located cloud-free optical images. |
+
+The column "Intended application" is the catalogue description of what the model does **once it has been trained**. The catalogue also records suitable input data for each family (field `sources`), which `unbihexium zoo info <model id>` prints.
+
+### 3.2 Size variants
+
+Each family exists in four variants that differ in width, depth and tile size (`unbihexium.zoo.get_variant`): `tiny` (16 base channels, depth 3, tile 256 pixels), `base` (32, 4, 256), `large` (48, 4, 512) and `mega` (64, 5, 512). The `base` variant is the default wherever a family name is given without a variant.
+
+### 3.3 Architectures and output layouts
+
+The networks are defined in `src/unbihexium/ai/models/`. All take a float32 tensor $(N, C, H, W)$ with the input bands on the channel axis; the encoder is a residual convolutional network [1] with group normalisation [2] and the decoder a U-Net decoder with skip connections [3].
+
+| Task (families) | Architecture id | Output tensor |
+| --- | --- | --- |
+| detection (`aircraft_detector`, `object_detector`, `ship_detector`, `vehicle_detector`) | `centernet` | $(N, K + 4, H/4, W/4)$: $K$ class heat map logits, box width and height in output-stride pixels, and the $x$ and $y$ centre offsets [4] |
+| segmentation (`multi_solution_segmentation`) | `unet` | $(N, K, H, W)$ class logits; softmax over $K$ |
+| change detection (`change_detector`) | `unet_early_fusion` | $(N, K, H, W)$ change class logits; the two dates are stacked on the channel axis (6 input channels: `red_t1`, `green_t1`, `blue_t1`, `red_t2`, `green_t2`, `blue_t2`) |
+| enhancement (`synthetic_imagery`) | `unet_image_to_image` | $(N, K, H, W)$ output bands (here red, green and blue) |
+
+The initial weights are drawn from a NumPy `RandomState` stream seeded with the first four bytes of SHA-256 of `"unbihexium:" + model id`, with He normal initialisation [5] of convolution and linear layers (`src/unbihexium/ai/models/init.py`), so the same model id yields bit-identical weights on every platform.
+
+## 4. Library functions
+
+### 4.1 Task interfaces
+
+`unbihexium.ai` exposes one class per task. Each accepts a family name, a model id, a checkpoint, an ONNX file or a loaded model, plus the options `variant`, `weights`, `device`, `backend` (`auto`, `torch` or `onnx`), `tile_size`, `overlap` (default 0.25) and `batch_size`. Inputs are a `Raster`, a file path or a NumPy array of shape $(C, H, W)$; arrays without georeferencing are given the identity transform and `EPSG:4326`.
+
+| Class | Default family | Method | Result |
+| --- | --- | --- | --- |
+| `ObjectDetector` | `object_detector` | `predict(image)` | `DetectionResult`: list of `Detection` (pixel box, map box, confidence, class id and name); options `threshold` (0.5), `iou_threshold` (0.5), `max_detections` (1000) |
+| `ShipDetector`, `AircraftDetector`, `VehicleDetector` | `ship_detector`, `aircraft_detector`, `vehicle_detector` | `predict(image)` | `DetectionResult` |
+| `SemanticSegmenter` | `lulc_classifier` (pass `multi_solution_segmentation` explicitly) | `predict(image)` | `SegmentationResult`: `mask` (uint8 class map, 255 for rejected pixels), `classes`, `class_fractions()`, `class_areas()`, optional `probabilities` |
+| `ChangeDetector` | `change_detector` | `predict_pair(before, after)` | `SegmentationResult` of the classes `no_change` and `change` |
+| `Enhancer` | `pansharpening` (pass `synthetic_imagery` explicitly) | `predict(image)` | `EnhancementResult` with an output raster |
+
+The generic functions `unbihexium.ai.predict(model, image, **options)` and `unbihexium.ai.write_result(result, path)` pick the class that matches the task of any model and write detections as a GeoJSON FeatureCollection, class maps as single-band GeoTIFF and image outputs as multi-band float32 GeoTIFF. The command `unbihexium predict` is a thin wrapper around these two functions.
+
+For two-class models, `SemanticSegmenter` labels a pixel as class 1 when $p_1 \ge t$ (threshold $t$, default 0.5); for more classes it takes the arg max and rejects pixels whose largest probability is below $t$ (label 255).
+
+### 4.2 Decoding of detector outputs
+
+`unbihexium.ai.decode` turns the raw detector tensor into boxes (CenterNet decoding [4]). With $K$ classes, stride $s = 4$ and output $O$ of shape $(K + 4, h, w)$:
+
+1. heat map scores $\hat{Y}_{k,i,j} = \sigma(O_{k,i,j})$ with the logistic function $\sigma$;
+2. peaks are cells equal to the maximum of their $3 \times 3$ neighbourhood with $\hat{Y} \ge$ `threshold` (default 0.3 in `decode_centernet`);
+3. a peak at row $i$, column $j$ becomes the box with centre and size
 
 $$
-\text{mAP@0.5} = \frac{1}{| C |} \sum_{c \in C} \int_0^1 P(R) \, dR
+c_x = (j + O_{K+2,i,j})\,s, \quad c_y = (i + O_{K+3,i,j})\,s, \quad w = \max(O_{K,i,j}, 0)\,s, \quad h = \max(O_{K+1,i,j}, 0)\,s .
 $$
 
-Where $P(R)$ is the precision at recall level $R$ for class $c$.
-
-| Model | Metric | Tiny | Base | Large | Mega | Test Dataset |
-| ------- | -------- | ------ | ------ | ------- | ------ | -------------- |
-| ship_detector | mAP@0.5 | 0.72 | 0.81 | 0.88 | 0.92 | xView-Ships |
-| building_detector | mAP@0.5 | 0.70 | 0.79 | 0.86 | 0.91 | SpaceNet-Buildings |
-| aircraft_detector | mAP@0.5 | 0.75 | 0.83 | 0.89 | 0.93 | DOTA-Aircraft |
-
-### Segmentation Performance
-
-Segmentation models are evaluated using mean Intersection over Union (mIoU):
+Overlapping boxes are then removed per class by greedy non-maximum suppression (`nms`) with the intersection over union
 
 $$
-\text{mIoU} = \frac{1}{| C | } \sum_{c=1}^{ | C |} \frac{\text{TP}_c}{\text{TP}_c + \text{FP}_c + \text{FN}_c}
+\mathrm{IoU}(A, B) = \frac{|A \cap B|}{|A \cup B|} ,
 $$
 
-| Model | Metric | Tiny | Base | Large | Mega | Test Dataset |
-| ------- | -------- | ------ | ------ | ------- | ------ | -------------- |
-| lulc_classifier | mIoU | 0.65 | 0.74 | 0.82 | 0.88 | LandCover.ai |
-| cloud_mask | mIoU | 0.78 | 0.85 | 0.91 | 0.94 | 95-Cloud |
-| change_detector | F1 | 0.68 | 0.77 | 0.84 | 0.90 | OSCD |
+keeping the box with the higher score when the IoU exceeds `iou_threshold`.
 
-### Enhancement Performance
+### 4.3 Training and evaluation (`model_training`)
 
-Enhancement and super-resolution models are evaluated using Peak Signal-to-Noise Ratio (PSNR) and Structural Similarity Index (SSIM):
+`unbihexium.ai.training` trains any family of the zoo on a dataset folder or on synthetic samples: AdamW with linear warm-up and cosine decay, gradient clipping, optional mixed precision, validation after every epoch, best and last checkpoints and early stopping. The per-band normalisation statistics of the training data are stored with the checkpoint so that inference and ONNX exports apply the same scaling. The command line equivalents are `unbihexium train` and `unbihexium evaluate`.
 
-$$
-\text{PSNR} = 10 \cdot \log_{10}\left(\frac{\text{MAX}_I^2}{\text{MSE}}\right) \quad \text{[dB]}
-$$
+`unbihexium.ai.evaluation` computes the measures reported by training and evaluation: average precision per class and its mean at IoU 0.5 and averaged over IoU 0.5 to 0.95 [6], [7] for detectors; overall accuracy, per-class and mean IoU, F1, precision, recall and Cohen's kappa [8] for segmentation and change detection; MAE, RMSE, bias and $R^2$ for regression; PSNR and SSIM [9] for image outputs. The training procedure and the dataset layout are described in [docs/model_zoo/training.md](../model_zoo/training.md).
 
-$$
-\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + c_1)(2\sigma_{xy} + c_2)}{(\mu_x^2 + \mu_y^2 + c_1)(\sigma_x^2 + \sigma_y^2 + c_2)}
-$$
+### 4.4 Model zoo and serving (`model_zoo`, `model_serving`)
 
-| Model | Metric | Tiny | Base | Large | Mega | Test Dataset |
-| ------- | -------- | ------ | ------ | ------- | ------ | -------------- |
-| super_resolution | PSNR | 28.5 dB | 30.2 dB | 32.1 dB | 34.5 dB | DIV2K |
-| super_resolution | SSIM | 0.82 | 0.87 | 0.91 | 0.94 | DIV2K |
-| pansharpening | PSNR | 32.0 dB | 35.5 dB | 38.2 dB | 40.8 dB | GaoFen-2 |
+`unbihexium.zoo` holds the catalogue, builds the deterministic starter weights into the local store (`UNBIHEXIUM_CACHE`), verifies them against the published digests and exports models to ONNX (`unbihexium zoo build|verify|export|info|list|where|clear`). `unbihexium.serving` is a FastAPI application with the routes `/health`, `/capabilities`, `/capabilities/{capability_id}`, `/models`, `/models/{model_id}`, `/pipelines`, `/predict/{model_id}`, `/infer/{model_id}`, `/detect/{model_id}` and `/segment/{model_id}`. See [docs/model_zoo/inference.md](../model_zoo/inference.md), [docs/model_zoo/download_and_verify.md](../model_zoo/download_and_verify.md) and [docs/operations/docker.md](../operations/docker.md).
 
----
+## 5. Examples
 
-## Architecture Specifications
+The examples were executed on 24 September 2026 against the main branch with CPython 3.13, PyTorch (CPU) and `UNBIHEXIUM_CACHE` set to a temporary directory. They use the `tiny` variants and small synthetic arrays, so they run in a few seconds on a CPU.
 
-### Super Resolution Network (SRCNN)
+### 5.1 Querying the registry
 
-The super-resolution model employs a Sub-pixel Convolution Network architecture optimized for 2x spatial upscaling of satellite imagery.
+```python
+from unbihexium.registry import CapabilityRegistry
 
-```mermaid
-graph LR
-    A[Input LR 64x64] --> B[Feature Extraction]
-    B --> C[Feature Mapping]
-    C --> D[Sub-pixel Conv]
-    D --> E[PixelShuffle 2x]
-    E --> F[Reconstruction]
-    F --> G[Output HR 128x128]
+for cap in CapabilityRegistry.by_domain("ai"):
+    print(f"{cap.capability_id:28} {cap.maturity.value:7} {cap.task or '-'}")
 ```
 
-#### Layer Configuration
-
-| Layer | Operation | Input Shape | Output Shape | Parameters | Activation |
-| ------- | ----------- | ------------- | -------------- | ------------ | ------------ |
-| Feat1 | Conv2d 5x5 | B x 3 x H x W | B x base x H x W | 75*base + base | ReLU |
-| BN1 | BatchNorm2d | B x base x H x W | B x base x H x W | 2*base | - |
-| Feat2 | Conv2d 3x3 | B x base x H x W | B x base x H x W | 9*base^2 + base | ReLU |
-| BN2 | BatchNorm2d | B x base x H x W | B x base x H x W | 2*base | - |
-| Up | Conv2d 3x3 | B x base x H x W | B x 4*base x H x W | 36*base^2 | - |
-| Shuffle | PixelShuffle(2) | B x 4*base x H x W | B x base x 2H x 2W | 0 | - |
-| Recon | Conv2d 3x3 | B x base x 2H x 2W | B x 3 x 2H x 2W | 27*base + 3 | - |
-
-#### Mathematical Formulation
-
-The sub-pixel convolution operation is defined as:
-
-$$
-\text{PS}(T)_{x,y,c} = T_{\lfloor x/r \rfloor, \lfloor y/r \rfloor, c \cdot r^2 + (x \mod r) \cdot r + (y \mod r)}
-$$
-
-Where $r$ is the upscaling factor (2 in our implementation) and $T$ is the input tensor.
-
-#### Parameter Count by Variant
-
-| Variant | Base Channels | Total Parameters | Model Size (MB) |
-| --------- | --------------- | ------------------ | ----------------- |
-| tiny | 32 | 49,667 | 0.19 |
-| base | 64 | 191,491 | 0.73 |
-| large | 96 | 425,475 | 1.62 |
-| mega | 128 | 751,619 | 2.87 |
-
-### UNet Architecture (Detection/Segmentation)
-
-The UNet architecture provides pixel-level predictions through an encoder-decoder structure with skip connections.
-
-```mermaid
-graph TB
-    subgraph "Encoder Path"
-        E1[Input 3ch] --> E2[Conv Block 1: base ch]
-        E2 --> E3[MaxPool + Conv Block 2: 2*base ch]
-        E3 --> E4[MaxPool + Conv Block 3: 4*base ch]
-    end
-
-    subgraph "Decoder Path"
-        E4 --> D1[UpConv Block 1: 2*base ch]
-        D1 --> D2[UpConv Block 2: base ch]
-        D2 --> D3[Output Conv: C_out ch]
-    end
-
-    E2 -.->| Skip Connection | D2
-    E3 -.->| Skip Connection | D1
+```text
+aircraft_detector            beta    detection
+change_detector              beta    change_detection
+model_serving                stable  -
+model_training               stable  -
+model_zoo                    stable  -
+multi_solution_segmentation  beta    segmentation
+object_detector              beta    detection
+ship_detector                beta    detection
+synthetic_imagery            beta    enhancement
+vehicle_detector             beta    detection
 ```
 
-#### Encoder Block Structure
+### 5.2 Running a tiny starter model
 
-Each encoder block consists of:
+The change detector compares two acquisitions on the same grid. Here only a 20 by 20 pixel square (about 9.8 % of the image) differs between the dates, yet the untrained model flags most of the image as change. This is the expected behaviour of a starter model and the reason why every model outside the spectral index families must be trained before use.
 
-$$
-\text{EncoderBlock}(x) = \text{ReLU}(\text{BN}(\text{Conv}_{3\times3}(x)))
-$$
+```python
+import numpy as np
+from unbihexium.ai import ChangeDetector
 
-With stride-2 convolutions for downsampling.
+rng = np.random.default_rng(0)
+before = rng.random((3, 64, 64), dtype=np.float32)
+after = before.copy()
+after[:, 20:40, 20:40] = 1.0
 
-#### Decoder Block Structure
-
-Each decoder block consists of:
-
-$$
-\text{DecoderBlock}(x, skip) = \text{ReLU}(\text{BN}(\text{ConvT}_{2\times2}(x) \oplus skip))
-$$
-
-Where $\oplus$ denotes concatenation along the channel dimension.
-
-#### Parameter Count Formula
-
-$$
-P_{UNet} = 27C + 2C + 18C^2 + 4C + 72C^2 + 8C + 32C^2 + 4C + 16C^2 + 2C + 2C \cdot C_{out} + C_{out}
-$$
-
-Simplified:
-
-$$
-P_{UNet} \approx 138C^2 + 47C + 2C \cdot C_{out} + C_{out}
-$$
-
-Where $C$ is the base channel count and $C_{out}$ is the number of output classes.
-
-### Siamese Network (Change Detection)
-
-The Siamese architecture processes bi-temporal image pairs to detect changes over time.
-
-```mermaid
-graph TB
-    subgraph "Input Processing"
-        I1[Image T1: 3ch] --> C1[Concatenate]
-        I2[Image T2: 3ch] --> C1
-        C1 --> I3[Combined: 6ch]
-    end
-
-    subgraph "Shared Encoder"
-        I3 --> SE1[Conv Block 1: base ch]
-        SE1 --> SE2[Conv Block 2: 2*base ch]
-        SE2 --> SE3[Conv Block 3: 4*base ch]
-    end
-
-    subgraph "Decoder"
-        SE3 --> D1[UpConv Block 1: 2*base ch]
-        D1 --> D2[UpConv Block 2: base ch]
-        D2 --> D3[Output: C_out ch]
-    end
+result = ChangeDetector("change_detector_tiny").predict_pair(before, after)
+print(result.mask.shape, result.mask.dtype, result.classes)
+print({k: round(v, 3) for k, v in result.class_fractions().items()})
 ```
 
-#### Change Detection Formulation
+```text
+(64, 64) uint8 ['no_change', 'change']
+{'no_change': 0.271, 'change': 0.729}
+```
 
-The change detection output is computed as:
+The model registry validates inputs before a model is run, and names the expected bands:
 
-$$
-\Delta = \sigma(f_{decoder}([f_{encoder}(I_{t1}), f_{encoder}(I_{t2})]))
-$$
+```python
+from unbihexium.registry import ModelRegistry
 
-Where $\sigma$ is the sigmoid function and $[\cdot, \cdot]$ denotes channel-wise concatenation.
+try:
+    ModelRegistry.check_input("change_detector_tiny", (3, 64, 64))
+except ValueError as error:
+    print(error)
+```
 
----
+```text
+change_detector_tiny expects 6 bands (red_t1, green_t1, blue_t1, red_t2, green_t2, blue_t2), got 3
+```
 
-## Usage Examples
+### 5.3 Decoding a detector output and suppressing duplicates
 
-### CLI Usage
+A synthetic CenterNet output with one class and a single peak at row 8, column 8 decodes to one box of 16 by 8 pixels centred at (34, 34); non-maximum suppression then removes the second of two boxes whose IoU is 0.681.
+
+```python
+import numpy as np
+from unbihexium.ai.decode import box_iou, decode_centernet, nms
+
+out = np.zeros((5, 16, 16), dtype=np.float32)
+out[0] = -10.0                         # heat map logits of the only class
+out[0, 8, 8] = 5.0                     # one peak at row 8, column 8
+out[1, 8, 8], out[2, 8, 8] = 4.0, 2.0  # width and height in stride units
+out[3, 8, 8], out[4, 8, 8] = 0.5, 0.5  # sub-pixel centre offset
+boxes, scores, classes = decode_centernet(out, threshold=0.3)
+print(boxes, scores.round(4), classes)
+
+b = np.array([[0, 0, 10, 10], [1, 1, 11, 11], [20, 20, 30, 30]], dtype=float)
+print(box_iou(b[:1], b).round(3))
+print(nms(b, np.array([0.9, 0.8, 0.7]), iou_threshold=0.5))
+```
+
+```text
+[[26. 30. 42. 38.]] [0.9933] [0]
+[[1.    0.681 0.   ]]
+[0 2]
+```
+
+### 5.4 Command line
+
+The following commands write a small georeferenced test image, list the tiny models of the domain and run the ship detector. The untrained detector finds no ship, so the FeatureCollection is empty.
+
+```python
+import numpy as np
+from unbihexium.core.raster import Raster
+
+rng = np.random.default_rng(0)
+Raster.from_array(
+    rng.random((3, 64, 64)).astype("float32"),
+    crs="EPSG:32633",
+    transform=(10.0, 0.0, 500000.0, 0.0, -10.0, 6700000.0),
+).to_file("rgb.tif")
+```
 
 ```bash
-# List all AI Products models
-unbihexium zoo list --domain ai_products
-
-# Download super-resolution model
-unbihexium zoo download super_resolution_mega --verify
-
-# Run super-resolution on a single image
-unbihexium infer super_resolution_mega \
-    --input low_resolution_image.tif \
-    --output enhanced_image.tif \
-    --device cuda:0
-
-# Run batch super-resolution
-unbihexium infer super_resolution_large \
-    --input data/low_res/ \
-    --output data/high_res/ \
-    --batch-size 8 \
-    --workers 4
-
-# Run ship detection with confidence threshold
-unbihexium infer ship_detector_mega \
-    --input satellite_image.tif \
-    --output ship_detections.geojson \
-    --confidence 0.5 \
-    --nms-threshold 0.4
-
-# Run LULC classification
-unbihexium infer lulc_classifier_large \
-    --input multispectral_image.tif \
-    --output land_cover_map.tif \
-    --class-names water,forest,urban,agriculture,barren
-
-# Run change detection on bi-temporal imagery
-unbihexium infer change_detector_mega \
-    --input-t1 image_2020.tif \
-    --input-t2 image_2024.tif \
-    --output change_map.tif \
-    --threshold 0.5
+unbihexium zoo list --domain ai --variant tiny
+unbihexium predict ship_detector_tiny rgb.tif ships.geojson
+cat ships.geojson
 ```
 
-### Python API Usage
-
-```python
-from unbihexium import Pipeline, Config
-from unbihexium.zoo import get_model, list_models
-from unbihexium.transforms import Normalize, ToTensor
-import numpy as np
-
-# Discover AI Products models
-ai_models = list_models(domain="ai_products")
-print(f"Found {len(ai_models)} AI Products models")
-
-for model in ai_models:
-    print(f"  - {model.id}: {model.task}, {model.params:,} params")
-
-# Super-resolution example
-sr_model = get_model("super_resolution_mega")
-print(f"Super-resolution model loaded: {sr_model.num_parameters:,} parameters")
-
-# Configure pipeline
-config = Config(
-    tile_size=64,
-    overlap=8,
-    batch_size=16,
-    device="cuda:0",
-    precision="fp16"
-)
-
-# Create and run pipeline
-sr_pipeline = Pipeline.from_config(
-    capability="super_resolution",
-    variant="mega",
-    config=config
-)
-
-enhanced_image = sr_pipeline.run("low_res_image.tif")
-enhanced_image.save("high_res_image.tif")
-
-# Ship detection example
-ship_model = get_model("ship_detector_large")
-detection_config = Config(
-    tile_size=512,
-    overlap=64,
-    batch_size=4,
-    device="cuda:0",
-    confidence_threshold=0.5,
-    nms_threshold=0.4
-)
-
-detection_pipeline = Pipeline.from_config(
-    capability="ship_detection",
-    variant="large",
-    config=detection_config
-)
-
-results = detection_pipeline.run("coastal_image.tif")
-
-# Access detections
-print(f"Found {len(results.detections)} ships")
-for i, det in enumerate(results.detections):
-    print(f"  Ship {i+1}:")
-    print(f"    Confidence: {det.score:.4f}")
-    print(f"    Bounding Box: {det.bbox}")
-    print(f"    Centroid (lat, lon): {det.centroid}")
-    print(f"    Area (m^2): {det.area:.2f}")
-
-# Export results
-results.to_geojson("ships.geojson")
-results.to_shapefile("ships.shp")
-results.to_csv("ships.csv")
-
-# Change detection example
-change_config = Config(
-    tile_size=256,
-    overlap=32,
-    batch_size=8,
-    device="cuda:0",
-    change_threshold=0.5
-)
-
-change_pipeline = Pipeline.from_config(
-    capability="change_detection",
-    variant="mega",
-    config=change_config
-)
-
-# Process bi-temporal pair
-change_map = change_pipeline.run(
-    t1="image_2020.tif",
-    t2="image_2024.tif"
-)
-
-change_map.save("changes.tif")
-print(f"Change area: {change_map.change_area_km2:.2f} km^2")
-print(f"Change percentage: {change_map.change_percentage:.2f}%")
+```text
+                             Model zoo (7 models)
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Model ID                         ┃ Task             ┃ Domain ┃ Parameters ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━┩
+│ aircraft_detector_tiny           │ detection        │ ai     │    730,581 │
+│ object_detector_tiny             │ detection        │ ai     │    730,746 │
+│ ship_detector_tiny               │ detection        │ ai     │    730,581 │
+│ vehicle_detector_tiny            │ detection        │ ai     │    730,647 │
+│ multi_solution_segmentation_tiny │ segmentation     │ ai     │    733,014 │
+│ change_detector_tiny             │ change_detection │ ai     │    733,378 │
+│ synthetic_imagery_tiny           │ enhancement      │ ai     │    732,819 │
+└──────────────────────────────────┴──────────────────┴────────┴────────────┘
+Wrote: ships.geojson (ship_detector_tiny)
+{
+  "type": "FeatureCollection",
+  "model_id": "ship_detector_tiny",
+  "crs": "EPSG:32633",
+  "features": []
+}
 ```
 
----
+The same model runs through the registered pipeline with `unbihexium pipeline run ship_detection -i rgb.tif -o ships.geojson -p variant=tiny`.
 
-## Technical Requirements
+## 6. Limitations and responsible use
 
-### Hardware Requirements
+### 6.1 Conventions
 
-| Component | Minimum | Recommended | Optimal |
-| ----------- | --------- | ------------- | --------- |
-| CPU | 4 cores | 8 cores | 16+ cores |
-| RAM | 8 GB | 16 GB | 32 GB |
-| GPU | None | RTX 3060 (12 GB) | A100 (40 GB) |
-| Storage | 10 GB | 50 GB | 200 GB |
+The key words MUST, SHOULD and MAY in this section are to be interpreted as described in RFC 2119 and RFC 8174 [11], [12] when, and only when, they appear in capitals.
 
-### Memory Consumption
+### 6.2 Limitations
 
-Memory usage scales with variant size and batch size:
+- The models of this domain are untrained. Their outputs MUST NOT be used for decisions before the model has been trained and validated on independent reference data for the intended sensor, resolution and area. The measures of Section 4.3 and of `unbihexium.metrics` SHOULD be used for that validation.
+- The family descriptions state intended applications. They are not claims that a trained model reaches any particular accuracy.
+- Detections of aircraft, ships and vehicles can concern people and property. Users MUST read [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md) before deploying a trained model, in particular for monitoring or security uses.
+- Detection results keep the coordinate reference system of the input raster, which is recorded in the `crs` member of the GeoJSON output. Users who need a strictly RFC 7946 conformant file [10] SHOULD reproject the boxes to WGS 84.
 
-$$
-M_{total} = M_{base} + M_{model} + N_{batch} \times M_{tile}
-$$
+## 7. Related documents
 
-| Variant | Model Memory | Per-Tile Memory | Batch 1 | Batch 8 | Batch 16 |
-| --------- | -------------- | ----------------- | --------- | --------- | ---------- |
-| tiny | 2 MB | 0.5 MB | 50 MB | 100 MB | 150 MB |
-| base | 8 MB | 2 MB | 100 MB | 300 MB | 500 MB |
-| large | 20 MB | 8 MB | 200 MB | 800 MB | 1.5 GB |
-| mega | 60 MB | 32 MB | 500 MB | 2.5 GB | 5 GB |
-
-### Throughput Benchmarks
-
-Inference throughput in tiles per second:
-
-| Variant | CPU (8 cores) | RTX 3060 | RTX 3080 | A100 |
-| --------- | --------------- | ---------- | ---------- | ------ |
-| tiny | 100 | 500 | 600 | 1000 |
-| base | 25 | 150 | 200 | 400 |
-| large | 6 | 40 | 60 | 120 |
-| mega | 2 | 12 | 18 | 40 |
-
----
-
-## Input/Output Specifications
-
-### Input Requirements
-
-| Parameter | Specification |
-| ----------- | --------------- |
-| File Format | GeoTIFF, JPEG, PNG, JPEG2000 |
-| Bit Depth | 8-bit, 16-bit, 32-bit float |
-| Color Space | RGB, RGBN, Multispectral |
-| Coordinate System | Any projected CRS |
-| Resolution | 0.3m - 30m GSD |
-
-### Output Specifications
-
-| Product | Format | Georeferencing | Metadata |
-| --------- | -------- | ---------------- | ---------- |
-| Enhanced Images | GeoTIFF | Preserved | EXIF, XMP |
-| Detections | GeoJSON, Shapefile | WGS84 | Confidence, Class |
-| Segmentation | GeoTIFF, COG | Preserved | Class Legend |
-| Change Maps | GeoTIFF | Preserved | Temporal Info |
-
-### Data Quality Requirements
-
-| Metric | Threshold | Notes |
-| -------- | ----------- | ------- |
-| Cloud Cover | < 10% | For optical imagery |
-| Radiometric Quality | DN > 100 | Avoid saturated pixels |
-| Geometric Accuracy | RMSE < 2 pixels | For change detection |
-| Temporal Gap | < 5 years | For meaningful change analysis |
-
----
-
-## Integration Guidelines
-
-### Pipeline Integration
-
-```python
-from unbihexium import Pipeline, Stage, Config
-
-# Define multi-stage pipeline
-pipeline = Pipeline([
-    Stage(
-        name="preprocessing",
-        model="cloud_mask_base",
-        output="cloud_mask"
-    ),
-    Stage(
-        name="enhancement",
-        model="super_resolution_large",
-        depends_on="preprocessing",
-        condition="cloud_cover < 0.1"
-    ),
-    Stage(
-        name="detection",
-        model="ship_detector_mega",
-        depends_on="enhancement"
-    )
-])
-
-# Execute pipeline
-results = pipeline.run(
-    input="satellite_image.tif",
-    output_dir="results/"
-)
-```
-
-### API Integration
-
-```python
-from unbihexium.api import UnbihexiumClient
-
-# Initialize client
-client = UnbihexiumClient(
-    endpoint="http://localhost:8000",
-    api_key="your-api-key"
-)
-
-# Submit job
-job_id = client.submit_job(
-    model="ship_detector_mega",
-    input_url="s3://bucket/image.tif",
-    output_url="s3://bucket/results/",
-    config={"confidence": 0.5}
-)
-
-# Check status
-status = client.get_job_status(job_id)
-print(f"Job status: {status.state}")
-
-# Get results
-if status.state == "completed":
-    results = client.get_job_results(job_id)
-    print(f"Detections: {len(results.detections)}")
-```
-
----
-
-## Quality Assurance
-
-### Validation Methodology
-
-All models undergo rigorous validation including:
-
-1. **Holdout Validation**: 20% of training data reserved for validation
-2. **Cross-Validation**: 5-fold cross-validation for hyperparameter tuning
-3. **Independent Test Set**: Performance evaluated on completely unseen data
-4. **Geographic Diversity**: Test sets span multiple continents and climate zones
-
-### Quality Metrics Thresholds
-
-| Task | Metric | Minimum | Target | Actual |
-| ------ | -------- | --------- | -------- | -------- |
-| Detection | mAP@0.5 | 0.65 | 0.85 | 0.92 |
-| Segmentation | mIoU | 0.60 | 0.80 | 0.88 |
-| Super Resolution | PSNR | 28 dB | 32 dB | 34.5 dB |
-| Change Detection | F1 | 0.65 | 0.80 | 0.90 |
-
-### Continuous Monitoring
-
-Production deployments should implement:
-
-| Monitor | Threshold | Action |
-| --------- | ----------- | -------- |
-| Inference Latency | > 2x baseline | Alert |
-| Memory Usage | > 80% capacity | Scale |
-| Error Rate | > 1% | Investigate |
-| Drift Detection | KL divergence > 0.1 | Retrain |
-
----
-
-## Responsible Use Guidelines
-
-### Intended Use Cases
-
-1. Environmental monitoring and conservation
-2. Agricultural yield estimation and crop health
-3. Urban planning and development tracking
-4. Disaster response and damage assessment
-5. Maritime domain awareness for safety
-
-### Prohibited Use Cases
-
-1. Surveillance of individuals without consent
-2. Military targeting or offensive operations
-3. Activities violating human rights
-4. Circumventing legal restrictions
-
-### Bias and Fairness Considerations
-
-| Consideration | Mitigation |
-| --------------- | ------------ |
-| Geographic Bias | Training data from 6 continents |
-| Temporal Bias | Data spans 2015-2024 |
-| Sensor Bias | Multi-sensor training (optical, SAR) |
-| Resolution Bias | Multi-resolution training |
-
----
-
-## Version History
-
-| Version | Date | Changes |
-| --------- | ------ | --------- |
-| 1.0.0 | 2025-01-01 | Initial release with 13 models |
-| 1.1.0 | 2025-03-01 | Added mega variants |
-| 1.2.0 | 2025-06-01 | Performance improvements |
-
----
+- [Capability index](index.md) and the other capability domain documents.
+- [Model catalogue](../model_zoo/model_catalog.md), [training](../model_zoo/training.md), [inference](../model_zoo/inference.md).
+- [Command line reference](../reference/cli.md) and [API reference](../reference/api.md).
+- [Capability registry architecture](../architecture/capability_registry.md).
+- [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md) and [README.md](../../README.md).
 
 ## References
 
-1. Ronneberger, O., Fischer, P., & Brox, T. (2015). U-Net: Convolutional Networks for Biomedical Image Segmentation. MICCAI.
-2. Shi, W., et al. (2016). Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network. CVPR.
-3. Chen, L. C., et al. (2018). Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation. ECCV.
-4. Bromley, J., et al. (1993). Signature Verification using a Siamese Time Delay Neural Network. NeurIPS.
+[1] He, K., Zhang, X., Ren, S., Sun, J. Deep residual learning for image recognition. CVPR 2016. 2016. <https://doi.org/10.1109/CVPR.2016.90>
+
+[2] Wu, Y., He, K. Group normalization. ECCV 2018. 2018. <https://doi.org/10.1007/978-3-030-01261-8_1>
+
+[3] Ronneberger, O., Fischer, P., Brox, T. U-Net: convolutional networks for biomedical image segmentation. MICCAI 2015. 2015. <https://doi.org/10.1007/978-3-319-24574-4_28>
+
+[4] Zhou, X., Wang, D., Kraehenbuehl, P. Objects as points. arXiv:1904.07850. 2019. <https://arxiv.org/abs/1904.07850>
+
+[5] He, K., Zhang, X., Ren, S., Sun, J. Delving deep into rectifiers: surpassing human-level performance on ImageNet classification. ICCV 2015. 2015. <https://doi.org/10.1109/ICCV.2015.123>
+
+[6] Everingham, M., Van Gool, L., Williams, C. K. I., Winn, J., Zisserman, A. The PASCAL visual object classes (VOC) challenge. International Journal of Computer Vision 88, 303-338. 2010. <https://doi.org/10.1007/s11263-009-0275-4>
+
+[7] Lin, T.-Y., et al. Microsoft COCO: common objects in context. ECCV 2014. 2014. <https://doi.org/10.1007/978-3-319-10602-1_48>
+
+[8] Cohen, J. A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20(1), 37-46. 1960. <https://doi.org/10.1177/001316446002000104>
+
+[9] Wang, Z., Bovik, A. C., Sheikh, H. R., Simoncelli, E. P. Image quality assessment: from error visibility to structural similarity. IEEE Transactions on Image Processing 13(4), 600-612. 2004. <https://doi.org/10.1109/TIP.2003.819861>
+
+[10] Butler, H., et al. The GeoJSON format. RFC 7946. 2016. <https://www.rfc-editor.org/rfc/rfc7946>
+
+[11] Bradner, S. Key words for use in RFCs to indicate requirement levels. RFC 2119. 1997. <https://www.rfc-editor.org/rfc/rfc2119>
+
+[12] Leiba, B. Ambiguity of uppercase vs lowercase in RFC 2119 key words. RFC 8174. 2017. <https://www.rfc-editor.org/rfc/rfc8174>
+
+<!--
+=============================================================================
+End of file docs/capabilities/01_ai_products.md
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+-->

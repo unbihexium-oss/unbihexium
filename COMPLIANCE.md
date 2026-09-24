@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-COMPLIANCE |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch |
 
@@ -131,7 +131,7 @@ The Dependency Review job of [.github/workflows/security.yml](.github/workflows/
 
 ### 4.4 Optional Dependencies
 
-Optional extras (for example `gpu`, `ray`, `dask`, `netcdf`) are not all installed by the Dependency licences job, which audits the locked runtime set in [requirements.txt](requirements.txt), including the `onnx` and `serving` extras. Users who install other extras, or the GPU builds of PyTorch and CuPy with their vendor libraries, SHOULD review the licences of what they install. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists the main third-party components.
+Optional extras (`torch`, `zarr` and `parquet`) are not installed by the Dependency licences job, which audits the locked runtime set in [requirements.txt](requirements.txt), including the `onnx` and `serving` extras. Users who install other extras, or the CUDA builds of PyTorch with their vendor libraries, SHOULD review the licences of what they install. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists the main third-party components.
 
 ## 5. Model Zoo and Data Licences
 

@@ -1,598 +1,431 @@
-# Model Catalog
+<!--
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-## Overview
-
-This document provides a comprehensive catalog of all 520 production-ready models in the Unbihexium Model Zoo. The catalog is organized as 130 base architectures across 4 variant tiers, with complete specifications, parameter counts, and usage guidelines derived from verified model files.
-
----
-
-## Model Statistics Summary
-
-### Aggregate Statistics
-
-| Metric | Value |
-| -------- | ------- |
-| Total Models | 520 |
-| Base Architectures | 130 |
-| Variant Tiers | 4 (tiny, base, large, mega) |
-| Total Parameters | 515,466,484 |
-| Task Categories | 7 |
-| Capability Domains | 12 |
-
-### Total Parameter Calculation
-
-$$
-P_{total} = \sum_{v \in \{tiny, base, large, mega\}} \sum_{m=1}^{130} P_{v,m} = 515,466,484
-$$
-
-### Variant Specifications
-
-| Variant | Count | Resolution | Base Channels | Min Params | Max Params | Avg Params | Total Params |
-| --------- | ------- | ------------ | --------------- | ------------ | ------------ | ------------ | -------------- |
-| tiny | 130 | 64 x 64 | 32 | 49,667 | 258,754 | 133,755 | 17,388,189 |
-| base | 130 | 128 x 128 | 64 | 191,491 | 1,029,506 | 530,267 | 68,934,749 |
-| large | 130 | 256 x 256 | 96 | 425,475 | 2,312,258 | 1,189,538 | 154,639,901 |
-| mega | 130 | 512 x 512 | 128 | 751,619 | 4,107,010 | 2,111,567 | 274,503,645 |
-
-### Parameter Scaling Analysis
-
-The relationship between variant parameters follows consistent scaling patterns:
-
-$$
-\frac{P_{base}}{P_{tiny}} \approx 3.96, \quad \frac{P_{large}}{P_{base}} \approx 2.24, \quad \frac{P_{mega}}{P_{large}} \approx 1.78
-$$
-
-For convolutional layers, parameter count scales quadratically with channel count:
-
-$$
-P_{conv} = K^2 \times C_{in} \times C_{out} + C_{out}
-$$
-
-Where $K$ is kernel size, $C_{in}$ is input channels, and $C_{out}$ is output channels.
-
----
-
-## Task Distribution
-
-```mermaid
-pie title Model Distribution by Task (520 Total)
-    "Regression" : 188
-    "Segmentation" : 128
-    "Detection" : 76
-    "Terrain" : 52
-    "Enhancement" : 44
-    "Index" : 28
-    "Super Resolution" : 4
-```
-
-### Detailed Task Statistics
-
-| Task | Models/Variant | Total | Min Params | Max Params | Avg Params | Primary Architecture |
-| ------ | --------------- | ------- | ------------ | ------------ | ------------ | --------------------- |
-| Regression | 47 | 188 | 67,329 | 1,065,473 | 498,942 | MLP |
-| Segmentation | 32 | 128 | 143,266 | 4,107,010 | 1,307,290 | UNet, Siamese |
-| Detection | 19 | 76 | 143,201 | 2,269,059 | 1,064,595 | UNet |
-| Terrain | 13 | 52 | 186,177 | 2,956,545 | 1,387,041 | CNN |
-| Enhancement | 11 | 44 | 186,243 | 2,956,803 | 1,387,203 | CNN |
-| Index | 7 | 28 | 186,243 | 2,956,803 | 1,387,203 | CNN |
-| Super Resolution | 1 | 4 | 49,667 | 751,619 | 354,563 | SRCNN |
-
----
-
-## Model Architectures
-
-### Architecture Overview
-
-```mermaid
-graph TB
-    subgraph "UNet Architecture"
-        U1[Input 3ch] --> U2[Encoder Block 1]
-        U2 --> U3[Encoder Block 2]
-        U3 --> U4[Encoder Block 3]
-        U4 --> U5[Decoder Block 1]
-        U5 --> U6[Decoder Block 2]
-        U6 --> U7[Output Conv]
-        U2 -.->| Skip | U6
-        U3 -.->| Skip | U5
-    end
-
-    subgraph "Siamese Architecture"
-        S1[Image T1] --> S2[Shared Encoder]
-        S3[Image T2] --> S2
-        S2 --> S4[Feature Concat]
-        S4 --> S5[Decoder]
-        S5 --> S6[Change Mask]
-    end
-
-    subgraph "MLP Architecture"
-        M1[Features] --> M2[Linear + BN + ReLU]
-        M2 --> M3[Linear + BN + ReLU]
-        M3 --> M4[Linear + BN + ReLU]
-        M4 --> M5[Output]
-    end
-```
-
-### UNet Architecture (Detection and Segmentation)
-
-The UNet architecture is used for spatial prediction tasks requiring pixel-level output.
-
-#### Layer Configuration
-
-| Layer | Operation | Input Channels | Output Channels | Kernel | Stride | Parameters |
-| ------- | ----------- | ---------------- | ----------------- | -------- | -------- | ------------ |
-| E1 | Conv2d + BN + ReLU | 3 | base | 3x3 | 1 | 27*base + 2*base |
-| E2 | Conv2d + BN + ReLU | base | 2*base | 3x3 | 2 | 18*base^2 + 4*base |
-| E3 | Conv2d + BN + ReLU | 2*base | 4*base | 3x3 | 2 | 72*base^2 + 8*base |
-| D2 | ConvTranspose2d + BN + ReLU | 4*base | 2*base | 2x2 | 2 | 32*base^2 + 4*base |
-| D1 | ConvTranspose2d + BN + ReLU | 4*base | base | 2x2 | 2 | 16*base^2 + 2*base |
-| Out | Conv2d | 2*base | C_out | 1x1 | 1 | 2*base*C_out + C_out |
-
-#### Parameter Count Formula
-
-$$
-P_{UNet} = 27C + 2C + 18C^2 + 4C + 72C^2 + 8C + 32C^2 + 4C + 16C^2 + 2C + 2C \cdot C_{out} + C_{out}
-$$
-
-Simplified:
-
-$$
-P_{UNet} \approx 138C^2 + 47C + 2C \cdot C_{out} + C_{out}
-$$
-
-Where $C$ is the base channel count.
-
-#### Variant-Specific Parameters
-
-| Variant | Base Channels | Output Classes | Total Parameters |
-| --------- | --------------- | ---------------- | ------------------ |
-| tiny | 32 | 1 | ~143,201 |
-| base | 64 | 1 | ~568,961 |
-| large | 96 | 1 | ~1,277,281 |
-| mega | 128 | 1 | ~2,268,161 |
-
-### Siamese Network (Change Detection)
-
-Bi-temporal input processing for change detection tasks using weight-shared encoders.
-
-#### Architecture Design
-
-```mermaid
-graph LR
-    subgraph "Input Processing"
-        A1[Image T1] --> B1[Concat]
-        A2[Image T2] --> B1
-        B1 --> C1["Combined 6ch"]
-    end
-
-    subgraph "Encoder (Shared Weights)"
-        C1 --> D1[Conv 6->base]
-        D1 --> D2[Conv base->2*base]
-        D2 --> D3[Conv 2*base->4*base]
-    end
-
-    subgraph "Decoder"
-        D3 --> E1[ConvT 4*base->2*base]
-        E1 --> E2[ConvT 2*base->base]
-        E2 --> E3[Conv base->C_out]
-    end
-```
-
-#### Layer Configuration
-
-| Layer | Operation | Input | Output | Stride | Parameters |
-| ------- | ----------- | ------- | -------- | -------- | ------------ |
-| Enc1 | Conv2d + BN + ReLU | 6 | base | 1 | 54*base + 2*base |
-| Enc2 | Conv2d + BN + ReLU | base | 2*base | 2 | 18*base^2 + 4*base |
-| Enc3 | Conv2d + BN + ReLU | 2*base | 4*base | 2 | 72*base^2 + 8*base |
-| Dec1 | ConvT2d + BN + ReLU | 4*base | 2*base | 2 | 128*base^2 + 4*base |
-| Dec2 | ConvT2d + BN + ReLU | 2*base | base | 2 | 32*base^2 + 2*base |
-| Out | Conv2d | base | C_out | 1 | base*C_out + C_out |
-
-#### Parameter Count
-
-$$
-P_{Siamese} = 56C + 18C^2 + 4C + 72C^2 + 8C + 128C^2 + 4C + 32C^2 + 2C + C \cdot C_{out} + C_{out}
-$$
-
-Simplified:
-
-$$
-P_{Siamese} \approx 250C^2 + 74C + C \cdot C_{out} + C_{out}
-$$
-
-### MLP Architecture (Regression)
-
-Fully-connected network for tabular data and risk assessment tasks.
-
-#### Layer Configuration
-
-| Layer | Input | Output | Activation | Dropout | Parameters |
-| ------- | ------- | -------- | ------------ | --------- | ------------ |
-| FC1 | N_features | hidden | ReLU | 0.2 | N_features * hidden + hidden |
-| BN1 | hidden | hidden | - | - | 2 * hidden |
-| FC2 | hidden | 2*hidden | ReLU | 0.2 | hidden * 2*hidden + 2*hidden |
-| BN2 | 2*hidden | 2*hidden | - | - | 4 * hidden |
-| FC3 | 2*hidden | hidden | ReLU | - | 2*hidden * hidden + hidden |
-| BN3 | hidden | hidden | - | - | 2 * hidden |
-| FC4 | hidden | 1 | Linear | - | hidden + 1 |
-
-#### Parameter Count Formula
-
-$$
-P_{MLP} = N_f \cdot H + H + 2H + 2H^2 + 2H + 4H + 2H^2 + H + 2H + H + 1
-$$
-
-Simplified:
-
-$$
-P_{MLP} = N_f \cdot H + 4H^2 + 12H + 1
-$$
-
-Where $N_f$ is input features and $H$ is hidden dimension.
-
-### CNN Architecture (Enhancement, Index, Terrain)
-
-Convolutional network for image-to-image transformation tasks.
-
-#### Layer Configuration
-
-| Layer | Input | Output | Kernel | Activation | Parameters |
-| ------- | ------- | -------- | -------- | ------------ | ------------ |
-| Conv1 | 3 | base | 3x3 | ReLU | 27*base + 2*base |
-| Conv2 | base | 2*base | 3x3 | ReLU | 18*base^2 + 4*base |
-| Conv3 | 2*base | 4*base | 3x3 | ReLU | 72*base^2 + 8*base |
-| Conv4 | 4*base | 2*base | 3x3 | ReLU | 72*base^2 + 4*base |
-| Conv5 | 2*base | base | 3x3 | ReLU | 18*base^2 + 2*base |
-| Conv6 | base | C_out | 1x1 | Linear | base*C_out + C_out |
-
-#### Parameter Count
-
-$$
-P_{CNN} = 29C + 180C^2 + 20C + C \cdot C_{out} + C_{out}
-$$
-
-### SRCNN Architecture (Super Resolution)
-
-Sub-pixel convolution network for upscaling imagery.
-
-#### Architecture Design
-
-```mermaid
-graph LR
-    A[Input LR] --> B[Feature Extraction]
-    B --> C[Feature Conv]
-    C --> D[Sub-pixel Conv]
-    D --> E[PixelShuffle]
-    E --> F[Reconstruction]
-    F --> G[Output HR]
-```
-
-#### Layer Configuration
-
-| Layer | Input | Output | Kernel | Activation | Parameters |
-| ------- | ------- | -------- | -------- | ------------ | ------------ |
-| Feat1 | 3 | base | 5x5 | ReLU | 75*base + 2*base |
-| Feat2 | base | base | 3x3 | ReLU | 9*base^2 + 2*base |
-| Up | base | base*scale^2 | 3x3 | - | 9*base^2*scale^2 |
-| Shuffle | base*scale^2 | base | - | - | 0 |
-| Recon | base | 3 | 3x3 | - | 27*base + 3 |
-
----
-
-## Detection Models (19 base, 76 total)
-
-### Model Registry
-
-| Model ID | Description | Classes | Architecture | Tiny Params | Mega Params |
-| ---------- | ------------- | --------- | -------------- | ------------- | ------------- |
-| aircraft_detector | Aircraft detection in satellite imagery | 1 | UNet | 143,201 | 2,268,545 |
-| building_detector | Building footprint extraction | 1 | UNet | 143,201 | 2,268,545 |
-| builtup_detector | Built-up area classification | 1 | UNet | 143,201 | 2,268,545 |
-| crop_detector | Agricultural crop detection | 1 | UNet | 143,201 | 2,268,545 |
-| greenhouse_detector | Greenhouse structure detection | 1 | UNet | 143,201 | 2,268,545 |
-| object_detector | Generic object detection | 1 | UNet | 143,201 | 2,268,545 |
-| ship_detector | Maritime vessel detection | 1 | UNet | 143,201 | 2,268,545 |
-| target_detector | Target object detection | 1 | UNet | 143,201 | 2,268,545 |
-| vehicle_detector | Ground vehicle detection | 1 | UNet | 143,201 | 2,268,545 |
-| damage_assessor | Damage extent assessment | 1 | UNet | 143,201 | 2,268,545 |
-| encroachment_detector | Land encroachment detection | 1 | UNet | 143,201 | 2,268,545 |
-| fire_monitor | Active fire detection | 1 | UNet | 143,201 | 2,268,545 |
-| border_monitor | Border activity monitoring | 1 | UNet | 143,201 | 2,268,545 |
-| military_objects_detector | Military asset detection (neutral) | 3 | UNet | 143,587 | 2,269,059 |
-| sar_ship_detector | SAR-based ship detection | 1 | UNet | 143,201 | 2,268,545 |
-| pivot_inventory | Pivot irrigation inventory | 1 | UNet | 143,201 | 2,268,545 |
-| leakage_detector | Infrastructure leakage detection | 1 | UNet | 143,201 | 2,268,545 |
-| maritime_awareness | Maritime domain awareness | 2 | UNet | 143,394 | 2,268,802 |
-| security_monitor | Security perimeter monitoring | 2 | UNet | 143,394 | 2,268,802 |
-
-### Performance Benchmarks
-
-| Model | Metric | Tiny | Base | Large | Mega |
-| ------- | -------- | ------ | ------ | ------- | ------ |
-| ship_detector | mAP@0.5 | 0.72 | 0.81 | 0.88 | 0.92 |
-| building_detector | mAP@0.5 | 0.70 | 0.79 | 0.86 | 0.91 |
-| vehicle_detector | mAP@0.5 | 0.68 | 0.77 | 0.84 | 0.89 |
-| aircraft_detector | mAP@0.5 | 0.75 | 0.83 | 0.89 | 0.93 |
-
----
-
-## Segmentation Models (32 base, 128 total)
-
-### Model Registry
-
-| Model ID | Architecture | Classes | Description | Tiny Params | Mega Params |
-| ---------- | -------------- | --------- | ------------- | ------------- | ------------- |
-| change_detector | Siamese | 2 | Bi-temporal change detection | 258,754 | 4,107,010 |
-| cloud_mask | UNet | 3 | Cloud and shadow masking | 143,587 | 2,269,059 |
-| crop_classifier | UNet | 5 | Multi-class crop classification | 143,973 | 2,269,573 |
-| lulc_classifier | UNet | 5 | Land use/land cover | 143,973 | 2,269,573 |
-| multi_solution_segmentation | UNet | 4 | Generic multi-class segmentation | 143,780 | 2,269,316 |
-| protected_area_change_detector | Siamese | 2 | Protected area monitoring | 258,754 | 4,107,010 |
-| water_surface_detector | UNet | 2 | Water body segmentation | 143,394 | 2,268,802 |
-| thematic_mapper | UNet | 3 | Thematic mapping | 143,587 | 2,269,059 |
-| transportation_mapper | UNet | 3 | Transportation network | 143,587 | 2,269,059 |
-| urban_planner | UNet | 4 | Urban zone classification | 143,780 | 2,269,316 |
-| utility_mapper | UNet | 4 | Utility infrastructure | 143,780 | 2,269,316 |
-| topography_mapper | UNet | 4 | Topographic features | 143,780 | 2,269,316 |
-| crop_boundary_delineation | UNet | 2 | Field boundary extraction | 143,394 | 2,268,802 |
-| plowed_land_detector | UNet | 2 | Tillage detection | 143,394 | 2,268,802 |
-| salinity_detector | UNet | 2 | Soil salinity assessment | 143,394 | 2,268,802 |
-| deforestation_detector | Siamese | 2 | Deforestation monitoring | 258,754 | 4,107,010 |
-| desertification_monitor | UNet | 2 | Desertification tracking | 143,394 | 2,268,802 |
-| erosion_detector | UNet | 2 | Soil erosion mapping | 143,394 | 2,268,802 |
-| forest_monitor | UNet | 2 | Forest cover monitoring | 143,394 | 2,268,802 |
-| land_degradation_detector | UNet | 2 | Land degradation assessment | 143,394 | 2,268,802 |
-| construction_monitor | Siamese | 2 | Construction activity | 258,754 | 4,107,010 |
-| corridor_monitor | Siamese | 2 | Linear corridor monitoring | 258,754 | 4,107,010 |
-| infrastructure_monitor | Siamese | 2 | Infrastructure change | 258,754 | 4,107,010 |
-| urban_growth_assessor | Siamese | 2 | Urban expansion tracking | 258,754 | 4,107,010 |
-| road_network_analyzer | UNet | 2 | Road network extraction | 143,394 | 2,268,802 |
-| digitization_2d | UNet | 2 | Feature digitization | 143,394 | 2,268,802 |
-| reservoir_monitor | UNet | 2 | Water reservoir tracking | 143,394 | 2,268,802 |
-| marine_pollution_detector | UNet | 2 | Marine pollution mapping | 143,394 | 2,268,802 |
-| sar_flood_detector | UNet | 2 | SAR flood mapping | 143,394 | 2,268,802 |
-| sar_oil_spill_detector | UNet | 2 | SAR oil spill detection | 143,394 | 2,268,802 |
-| tourist_destination_monitor | Siamese | 2 | Tourism impact monitoring | 258,754 | 4,107,010 |
-| asset_condition_change | Siamese | 2 | Asset condition tracking | 258,754 | 4,107,010 |
-
-### Performance Benchmarks
-
-| Model | Metric | Tiny | Base | Large | Mega |
-| ------- | -------- | ------ | ------ | ------- | ------ |
-| lulc_classifier | mIoU | 0.65 | 0.74 | 0.82 | 0.88 |
-| change_detector | F1 | 0.68 | 0.77 | 0.84 | 0.90 |
-| water_surface_detector | IoU | 0.78 | 0.85 | 0.91 | 0.94 |
-| deforestation_detector | F1 | 0.72 | 0.81 | 0.88 | 0.93 |
-
----
-
-## Regression Models (47 base, 188 total)
-
-### Model Registry
-
-| Model ID | Input Features | Domain | Tiny Params | Mega Params |
-| ---------- | ---------------- | -------- | ------------- | ------------- |
-| flood_risk | 10 | Risk | 68,481 | 1,060,353 |
-| flood_risk_assessor | 15 | Risk | 69,121 | 1,062,913 |
-| hazard_vulnerability | 12 | Risk | 68,737 | 1,061,377 |
-| landslide_risk | 10 | Risk | 68,481 | 1,060,353 |
-| seismic_risk | 8 | Risk | 68,225 | 1,059,329 |
-| wildfire_risk | 12 | Risk | 68,737 | 1,061,377 |
-| environmental_risk | 10 | Environment | 68,481 | 1,060,353 |
-| disaster_management | 15 | Risk | 69,121 | 1,062,913 |
-| emergency_disaster_manager | 20 | Risk | 69,761 | 1,065,473 |
-| preparedness_manager | 12 | Risk | 68,737 | 1,061,377 |
-| crop_growth_monitor | 8 | Agriculture | 68,225 | 1,059,329 |
-| crop_health_assessor | 10 | Agriculture | 68,481 | 1,060,353 |
-| livestock_estimator | 6 | Agriculture | 67,969 | 1,058,305 |
-| yield_predictor | 12 | Agriculture | 68,737 | 1,061,377 |
-| beekeeping_suitability | 8 | Agriculture | 68,225 | 1,059,329 |
-| grazing_potential | 6 | Agriculture | 67,969 | 1,058,305 |
-| perennial_garden_suitability | 10 | Agriculture | 68,481 | 1,060,353 |
-| drought_monitor | 8 | Environment | 68,225 | 1,059,329 |
-| natural_resources_monitor | 10 | Environment | 68,481 | 1,060,353 |
-| wildlife_habitat_analyzer | 12 | Environment | 68,737 | 1,061,377 |
-| watershed_manager | 8 | Environment | 68,225 | 1,059,329 |
-| environmental_monitor | 15 | Environment | 69,121 | 1,062,913 |
-| pipeline_route_planner | 10 | Infrastructure | 68,481 | 1,060,353 |
-| route_planner | 8 | Transportation | 68,225 | 1,059,329 |
-| accessibility_analyzer | 10 | Transportation | 68,481 | 1,060,353 |
-| network_analyzer | 12 | Transportation | 68,737 | 1,061,377 |
-| viewshed_analyzer | 6 | Terrain | 67,969 | 1,058,305 |
-| energy_potential | 10 | Energy | 68,481 | 1,060,353 |
-| hydroelectric_monitor | 8 | Energy | 68,225 | 1,059,329 |
-| solar_site_selector | 12 | Energy | 68,737 | 1,061,377 |
-| wind_site_selector | 10 | Energy | 68,481 | 1,060,353 |
-| offshore_survey | 8 | Energy | 68,225 | 1,059,329 |
-| onshore_monitor | 10 | Energy | 68,481 | 1,060,353 |
-| business_valuation | 15 | Finance | 69,121 | 1,062,913 |
-| economic_spatial_assessor | 12 | Finance | 68,737 | 1,061,377 |
-| insurance_underwriting | 20 | Finance | 69,761 | 1,065,473 |
-| site_suitability | 10 | Planning | 68,481 | 1,060,353 |
-| resource_allocation | 8 | Planning | 68,225 | 1,059,329 |
-| water_quality_assessor | 10 | Environment | 68,481 | 1,060,353 |
-| geostatistical_analyzer | 10 | Analysis | 68,481 | 1,060,353 |
-| mobility_analyzer | 8 | Transportation | 68,225 | 1,059,329 |
-| spatial_analyzer | 10 | Analysis | 68,481 | 1,060,353 |
-| spatial_relationship | 8 | Analysis | 68,225 | 1,059,329 |
-| timeseries_analyzer | 12 | Analysis | 68,737 | 1,061,377 |
-| zonal_statistics | 6 | Analysis | 67,969 | 1,058,305 |
-| field_surveyor | 8 | Surveying | 68,225 | 1,059,329 |
-| forest_density_estimator | 1 | Forestry | 67,329 | 1,055,745 |
-
-### Performance Benchmarks
-
-| Model | Metric | Tiny | Base | Large | Mega |
-| ------- | -------- | ------ | ------ | ------- | ------ |
-| flood_risk | R-squared | 0.72 | 0.79 | 0.85 | 0.90 |
-| yield_predictor | R-squared | 0.75 | 0.82 | 0.88 | 0.93 |
-| solar_site_selector | R-squared | 0.78 | 0.85 | 0.90 | 0.94 |
-
----
-
-## Index and Enhancement Models
-
-### Index Calculators (7 base, 28 total)
-
-| Model ID | Formula | Bands Required | Tiny Params | Mega Params |
-| ---------- | --------- | ---------------- | ------------- | ------------- |
-| ndvi_calculator | (NIR-Red)/(NIR+Red) | NIR, Red | 186,243 | 2,956,803 |
-| ndwi_calculator | (Green-NIR)/(Green+NIR) | Green, NIR | 186,243 | 2,956,803 |
-| evi_calculator | 2.5*(NIR-Red)/(NIR+6*Red-7.5*Blue+1) | NIR, Red, Blue | 186,243 | 2,956,803 |
-| nbr_calculator | (NIR-SWIR)/(NIR+SWIR) | NIR, SWIR | 186,243 | 2,956,803 |
-| savi_calculator | 1.5*(NIR-Red)/(NIR+Red+0.5) | NIR, Red | 186,243 | 2,956,803 |
-| msi_calculator | SWIR/NIR | SWIR, NIR | 186,243 | 2,956,803 |
-| vegetation_condition | f(NDVI, historical) | NIR, Red | 186,243 | 2,956,803 |
-
-### Enhancement Models (11 base, 44 total)
-
-| Model ID | Description | Input | Output | Tiny Params | Mega Params |
-| ---------- | ------------- | ------- | -------- | ------------- | ------------- |
-| super_resolution | 2x spatial upscaling | LR image | HR image | 49,667 | 751,619 |
-| pansharpening | Pan + MS fusion | Pan, MS | Sharpened | 186,243 | 2,956,803 |
-| orthorectification | Geometric correction | Raw | Ortho | 186,243 | 2,956,803 |
-| coregistration | Multi-image alignment | Images | Aligned | 186,243 | 2,956,803 |
-| mosaicking | Image stitching | Tiles | Mosaic | 186,243 | 2,956,803 |
-| mosaic_processor | Advanced mosaicking | Tiles | Mosaic | 186,243 | 2,956,803 |
-| ortho_processor | Ortho processing | Raw | Ortho | 186,243 | 2,956,803 |
-| raster_tiler | Tile generation | Raster | Tiles | 186,243 | 2,956,803 |
-| multispectral_processor | MS processing | MS | Processed | 186,243 | 2,956,803 |
-| panchromatic_processor | Pan processing | Pan | Processed | 186,243 | 2,956,803 |
-| synthetic_imagery | Synthetic image generation | Features | Image | 186,243 | 2,956,803 |
-
----
-
-## Terrain Models (13 base, 52 total)
-
-| Model ID | Output Product | Accuracy (mega) | Tiny Params | Mega Params |
-| ---------- | --------------- | ----------------- | ------------- | ------------- |
-| dem_generator | Digital Elevation Model | RMSE 0.8m | 186,177 | 2,956,545 |
-| dsm_generator | Digital Surface Model | RMSE 0.6m | 186,177 | 2,956,545 |
-| dtm_generator | Digital Terrain Model | RMSE 1.0m | 186,177 | 2,956,545 |
-| digitization_3d | 3D Feature Extraction | - | 186,177 | 2,956,545 |
-| model_3d | 3D Model Generation | - | 186,177 | 2,956,545 |
-| stereo_processor | Stereo Processing | - | 186,177 | 2,956,545 |
-| tri_stereo_processor | Tri-stereo Processing | - | 186,177 | 2,956,545 |
-| tree_height_estimator | Canopy Height Model | RMSE 1.5m | 186,177 | 2,956,545 |
-| sar_amplitude | SAR Amplitude | - | 186,177 | 2,956,545 |
-| sar_phase_displacement | Phase Displacement | RMSE 1mm | 186,177 | 2,956,545 |
-| sar_subsidence_monitor | Subsidence Monitoring | RMSE 2mm | 186,177 | 2,956,545 |
-| ground_displacement | Ground Displacement | RMSE 2mm | 186,177 | 2,956,545 |
-| land_surface_temperature | LST Estimation | RMSE 1.5K | 186,177 | 2,956,545 |
-
----
-
-## Quality Metrics and Evaluation
-
-### Detection Metrics
-
-Mean Average Precision at IoU threshold 0.5:
-
-$$
-\text{mAP@0.5} = \frac{1}{| C |} \sum_{c \in C} \text{AP}_{0.5}(c)
-$$
-
-Where Average Precision for class $c$ is:
-
-$$
-\text{AP}(c) = \int_0^1 P(R) \, dR \approx \sum_{n} (R_n - R_{n-1}) P_n
-$$
-
-### Segmentation Metrics
-
-Intersection over Union:
-
-$$
-\text{IoU} = \frac{| A \cap B | }{ | A \cup B |} = \frac{\text{TP}}{\text{TP} + \text{FP} + \text{FN}}
-$$
-
-Mean IoU across classes:
-
-$$
-\text{mIoU} = \frac{1}{| C | } \sum_{c=1}^{ | C |} \text{IoU}_c
-$$
-
-F1 Score:
-
-$$
-F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2\text{TP}}{2\text{TP} + \text{FP} + \text{FN}}
-$$
-
-### Enhancement Metrics
-
-Peak Signal-to-Noise Ratio:
-
-$$
-\text{PSNR} = 10 \cdot \log_{10}\left(\frac{\text{MAX}_I^2}{\text{MSE}}\right) = 20 \cdot \log_{10}\left(\frac{\text{MAX}_I}{\sqrt{\text{MSE}}}\right)
-$$
-
-Structural Similarity:
-
-$$
-\text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + c_1)(2\sigma_{xy} + c_2)}{(\mu_x^2 + \mu_y^2 + c_1)(\sigma_x^2 + \sigma_y^2 + c_2)}
-$$
-
-### Regression Metrics
-
-Coefficient of Determination:
-
-$$
-R^2 = 1 - \frac{\sum_{i}(y_i - \hat{y}_i)^2}{\sum_{i}(y_i - \bar{y})^2}
-$$
-
-Root Mean Square Error:
-
-$$
-\text{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(y_i - \hat{y}_i)^2}
-$$
-
----
-
-## File Structure
-
-Each model directory contains:
-
-```text
-model_zoo/assets/{variant}/{model_id}_{variant}/
-├── model.onnx       # ONNX format for inference
-├── model.pt         # PyTorch format for fine-tuning
-├── config.json      # Model configuration and metadata
-└── model.sha256     # SHA256 checksums for verification
-```
-
-### Configuration Schema
-
-```json
-{
-  "model_id": "ship_detector_mega",
-  "task": "detection",
-  "variant": "mega",
-  "params": 2268545,
-  "resolution": 512,
-  "base_channels": 128
-}
-```
-
----
-
-## CLI Access
+=============================================================================
+Project     : Unbihexium
+File        : docs/model_zoo/model_catalog.md
+Title       : Model Zoo Catalogue
+Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+Affiliation : University of Helsinki
+Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+Licence     : Mozilla Public License 2.0, see LICENSE.txt
+Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
+=============================================================================
+-->
+
+# Model Zoo Catalogue
+
+| Field | Value |
+| --- | --- |
+| Document | UBX-DOC-MZ-CATALOG |
+| Version | 2.0 |
+| Status | Active |
+| Last reviewed | 2026-09-24 |
+| Owner | Unbihexium maintainers (see [MAINTAINERS.md](../../MAINTAINERS.md)) |
+| Applies to | The main branch of Unbihexium, model zoo catalogue version 2.0.0 (not part of release 1.0.1) |
+
+## Abstract
+
+This document lists every model family of the Unbihexium model zoo with its task, capability domain, input bands and outputs, and links each family to its generated model card. It is written for users who need to choose a model and prepare matching input data, for contributors who extend the catalogue, and for reviewers who need an overview of what the zoo contains. It explains how model identifiers, size variants, input band sets and output layouts are defined, and then lists all 130 families grouped by task and indexed by domain. The tables were produced by a script from `src/unbihexium/zoo/catalog.yaml` (catalogue version 2.0.0) and from the published digests in `src/unbihexium/zoo/digests.json`, so that they match the catalogue exactly. Apart from the 7 spectral index families, every model is an untrained starter model: the catalogue describes what a model does once it has been trained, not what its starter weights can do.
+
+## Contents
+
+1. [Status of the models](#1-status-of-the-models)
+2. [Structure of the catalogue](#2-structure-of-the-catalogue)
+3. [Families by task](#3-families-by-task)
+4. [Families by domain](#4-families-by-domain)
+5. [Related documents](#5-related-documents)
+6. [References](#references)
+
+## 1. Status of the models
+
+### 1.1 Starter models
+
+The model zoo contains 520 models: 130 families, each in the four size variants `tiny`, `base`, `large` and `mega`. Every model of the 123 learned families (492 models) is a starter model, a complete and trainable network for its task whose weights are initialised deterministically from the model identifier. The starter models have **not** been trained on Earth observation data. Their predictions are meaningless until the model is trained or fine-tuned on labelled data for the area, sensor and season of interest (see [training.md](training.md)). No accuracy figures are published for any model of the zoo, because there are no trained weights to measure.
+
+The 7 spectral index families (28 models) are the exception. They have no trainable weights and compute published formulas exactly; their status in the manifests is `reference` instead of `starter`.
+
+### 1.2 Where the information comes from
+
+| Source | Content |
+| --- | --- |
+| [src/unbihexium/zoo/catalog.yaml](../../src/unbihexium/zoo/catalog.yaml) | Single source of truth: family identifier, name, task, domain, description, bands, dates, outputs, units, range, scale, formula, training labels and data sources |
+| [src/unbihexium/zoo/digests.json](../../src/unbihexium/zoo/digests.json) | Weights digest and parameter count of each of the 520 models |
+| [model_zoo/cards/](../../model_zoo/cards/) | Generated model card per family, with the input channel order, the output table, the variants with their digests, the training command and the limitations |
+| [model_zoo/manifests/](../../model_zoo/manifests/) | Generated machine-readable manifest per family, validated against [model_zoo/manifest.schema.json](../../model_zoo/manifest.schema.json) |
+| [model_zoo/MODEL_CARDS.md](../../model_zoo/MODEL_CARDS.md) | Generated index of the model cards |
+
+The model cards and manifests are generated by `python -m unbihexium.zoo.sync` (see [how_to_add_models.md](how_to_add_models.md)). Where this document and a model card differ, the model card and the catalogue prevail.
+
+## 2. Structure of the catalogue
+
+### 2.1 Model identifiers and variants
+
+A model identifier is the family identifier followed by the variant, for example `ship_detector_tiny` or `lulc_classifier_mega`. A family identifier without a suffix, such as `ship_detector`, denotes the `base` variant wherever the library accepts a model name (`unbihexium.zoo.parse_model_id`). The variants differ only in capacity and in the recommended tile size; the inputs and outputs of a family are the same in every variant.
+
+| Variant | Base channels | Encoder depth | Blocks per stage | Head channels | Tile size | Parameters of the smallest learned model | Parameters of the largest model | Parameters of all 130 models |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `tiny` | 16 | 3 | 1 | 32 | 256 | 134,992 | 735,428 | 86,951,209 |
+| `base` | 32 | 4 | 1 | 64 | 256 | 657,264 | 7,063,428 | 825,294,793 |
+| `large` | 48 | 4 | 2 | 96 | 512 | 2,784,528 | 22,066,564 | 2,611,810,665 |
+| `mega` | 64 | 5 | 2 | 128 | 512 | 6,109,872 | 60,460,548 | 7,131,069,449 |
+
+The parameter counts are those recorded in `src/unbihexium/zoo/digests.json`. The smallest and largest columns cover the learned families; the spectral index models have no parameters. The 520 models have 10,655,126,116 parameters in total. The depth of the encoder determines the size multiple of the network input (2 to the power of the depth: 8 for `tiny`, 16 for `base` and `large`, 32 for `mega`); training chips and inference tiles are rounded up to that multiple automatically.
+
+### 2.2 Tasks and architectures
+
+The task of a family fixes its architecture, its input and output layout, its loss and its evaluation metric.
+
+| Task | Families | Models | Architecture | Status |
+| --- | --- | --- | --- | --- |
+| [Object detection](#31-object-detection) | 19 | 76 | CenterNet (anchor-free, output stride 4) | untrained starter |
+| [Semantic segmentation](#32-semantic-segmentation) | 26 | 104 | U-Net | untrained starter |
+| [Change detection](#33-change-detection) | 6 | 24 | U-Net on the stacked dates (early fusion) | untrained starter |
+| [Dense regression](#34-dense-regression) | 49 | 196 | U-Net with a regression output | untrained starter |
+| [Scene regression](#35-scene-regression) | 11 | 44 | Residual encoder with pooled regression head | untrained starter |
+| [Image enhancement](#36-image-enhancement) | 11 | 44 | U-Net, image to image | untrained starter |
+| [Super-resolution](#37-super-resolution) | 1 | 4 | EDSR-style residual network, sub-pixel upsampling | untrained starter |
+| [Spectral indices](#38-spectral-indices) | 7 | 28 | Exact formula, no trainable weights | reference formula |
+| **Total** | **130** | **520** | | |
+
+The detector follows the CenterNet design of Zhou et al. [1], the segmentation, change detection, dense regression and enhancement networks the U-Net of Ronneberger et al. [2], and the super-resolution network the EDSR design of Lim et al. [3]. The spectral index formulas and their primary sources are listed in [Section 3.8](#38-spectral-indices).
+
+### 2.3 Input band sets
+
+Most families name a band set of the catalogue instead of listing their bands. Band names follow the naming of the data provider (for example `B02` to `B12` for Sentinel-2 and `VV`, `VH` for Sentinel-1). The input channels of a model are the bands of its band set in the order shown; a change detection model stacks the bands of the first date followed by the bands of the second date, with the suffixes `_t1` and `_t2` (for example `red_t1, green_t1, blue_t1, red_t2, green_t2, blue_t2`). Input rasters MUST provide the channels in exactly this order; the model card of each family lists them one by one.
+
+| Band set | Bands | Families |
+| --- | --- | --- |
+| `rgb` | `red`, `green`, `blue` | 32 |
+| `rgbn` | `blue`, `green`, `red`, `nir` | 13 |
+| `pan` | `pan` | 1 |
+| `pan_pair` | `pan_t1`, `pan_t2` | 3 |
+| `pan_triplet` | `pan_forward`, `pan_nadir`, `pan_backward` | 1 |
+| `s2_10` | `B02`, `B03`, `B04`, `B05`, `B06`, `B07`, `B08`, `B8A`, `B11`, `B12` | 24 |
+| `s2_13` | `B01`, `B02`, `B03`, `B04`, `B05`, `B06`, `B07`, `B08`, `B8A`, `B09`, `B10`, `B11`, `B12` | 1 |
+| `s2_swir` | `B12`, `B8A`, `B04` | 1 |
+| `s1` | `VV`, `VH` | 4 |
+| `s1_vv` | `VV` | 1 |
+| `s2_s1` | `B02`, `B03`, `B04`, `B05`, `B06`, `B07`, `B08`, `B8A`, `B11`, `B12`, `VV`, `VH` | 2 |
+| `landsat_st` | `SR_B2`, `SR_B3`, `SR_B4`, `SR_B5`, `SR_B6`, `SR_B7`, `ST_B10` | 2 |
+| `dem` | `elevation` | 2 |
+| `dsm` | `surface_height` | 1 |
+| `rgb_dsm` | `red`, `green`, `blue`, `surface_height` | 2 |
+| `rgbn_dem` | `blue`, `green`, `red`, `nir`, `elevation` | 2 |
+| `s2_dem` | `B02`, `B03`, `B04`, `B05`, `B06`, `B07`, `B08`, `B8A`, `B11`, `B12`, `elevation`, `slope` | 12 |
+| `insar` | `cos_phase`, `sin_phase`, `coherence` | 2 |
+| `insar_stack` | `los_t1`, `los_t2`, `los_t3`, `los_t4`, `los_t5`, `los_t6` | 1 |
+| `ms_pan` | `ms_blue`, `ms_green`, `ms_red`, `ms_nir`, `pan` | 1 |
+| `image_dem` | `red`, `green`, `blue`, `elevation` | 2 |
+| `ndvi_stats` | `ndvi`, `ndvi_min`, `ndvi_max` | 1 |
+| `context` | `B02`, `B03`, `B04`, `B08`, `B11`, `B12`, `elevation`, `slope`, `population`, `road_distance` | 10 |
+
+The families `leakage_detector`, `timeseries_analyzer`, `sar_amplitude` and the spectral index families other than `vegetation_condition` list their bands explicitly; the tables in Section 3 show those lists.
+
+### 2.4 Output layout
+
+| Task | Output tensor | Written by `unbihexium predict` as |
+| --- | --- | --- |
+| Detection | (N, K + 4, H/4, W/4): K class heatmap logits, box width and height in output-stride pixels, and the x and y centre offsets | GeoJSON FeatureCollection of boxes |
+| Segmentation | (N, K, H, W) class logits; softmax over K | Single-band class raster, 255 for no data |
+| Change detection | (N, K, H, W) change class logits; softmax over K | Single-band class raster, 255 for no data |
+| Dense regression | (N, K, H, W) target values in the listed units | Float32 raster with one band per output, NaN for no data |
+| Scene regression | (N, K), one value per target and chip | JSON document with one value per output |
+| Enhancement | (N, K, H, W) output bands or displacement components | Raster of the output bands on the input grid |
+| Super-resolution | (N, K, sH, sW) at s times the input resolution | Raster on a grid s times finer |
+| Spectral index | (N, 1, H, W) index value; NaN where undefined | Float32 raster, NaN for no data |
+
+In the tables below, a unit of `1` denotes a dimensionless quantity. A range such as `[0, 1]` means that the network bounds its output to that interval; regression families whose range is exactly `[0, 1]` use a sigmoid output. The output layout of each task is recorded verbatim in the `outputs.layout` field of every manifest. [inference.md](inference.md) describes how the outputs are post-processed.
+
+### 2.5 Querying the catalogue
+
+The catalogue ships with the package, so it can be queried without PyTorch:
 
 ```bash
-# List all models
-unbihexium zoo list
-
-# Filter by task
-unbihexium zoo list --task detection
-
-# Filter by variant
-unbihexium zoo list --variant mega
-
-# Get detailed model info
-unbihexium zoo info ship_detector_base
-
-# Download with verification
-unbihexium zoo download building_detector_large --verify
-
-# Export model statistics
-unbihexium zoo stats --output stats.json
+unbihexium zoo list --task spectral_index --variant tiny
+unbihexium zoo list --domain forestry --json
+unbihexium zoo info tree_height_estimator_base
 ```
+
+```python
+from unbihexium.zoo import get_spec, list_specs
+
+print(len(list_specs()), len(list_specs(task="detection")))
+spec = get_spec("tree_height_estimator")
+print(spec.task.value, spec.in_channels, spec.channel_names[:3], spec.outputs, spec.units)
+```
+
+Output of the Python example:
+
+```text
+130 19
+dense_regression 12 ('B02', 'B03', 'B04') ('canopy_height',) ('m',)
+```
+
+## 3. Families by task
+
+Each family identifier links to its model card. Inputs name the band set (Section 2.3) or the explicit band list and the number of bands; outputs list the classes, targets or bands in channel order, with units for regression targets.
+
+### 3.1 Object detection
+
+19 families, 76 models. Architecture: CenterNet (anchor-free, output stride 4).
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`aircraft_detector`](../../model_zoo/cards/aircraft_detector.md) | Aircraft Detector | ai | `rgb` (3 bands) | `aircraft` |
+| [`border_monitor`](../../model_zoo/cards/border_monitor.md) | Border Area Monitor | defense | `rgb` (3 bands) | `vehicle`, `vessel`, `structure` |
+| [`building_detector`](../../model_zoo/cards/building_detector.md) | Building Detector | urban | `rgb` (3 bands) | `building` |
+| [`builtup_detector`](../../model_zoo/cards/builtup_detector.md) | Built-up Area Detector | urban | `rgbn` (4 bands) | `built_up_area` |
+| [`crop_detector`](../../model_zoo/cards/crop_detector.md) | Crop Parcel Detector | agriculture | `rgbn` (4 bands) | `crop_parcel`, `orchard` |
+| [`damage_assessor`](../../model_zoo/cards/damage_assessor.md) | Building Damage Assessor | risk | `rgb` (3 bands) | `damaged_building`, `destroyed_building` |
+| [`encroachment_detector`](../../model_zoo/cards/encroachment_detector.md) | Encroachment Detector | assets | `rgb` (3 bands) | `structure`, `vehicle`, `excavation` |
+| [`fire_monitor`](../../model_zoo/cards/fire_monitor.md) | Active Fire Detector | environment | `s2_swir` (3 bands) | `active_fire` |
+| [`greenhouse_detector`](../../model_zoo/cards/greenhouse_detector.md) | Greenhouse Detector | agriculture | `rgb` (3 bands) | `greenhouse` |
+| [`leakage_detector`](../../model_zoo/cards/leakage_detector.md) | Leakage Detector | assets | `blue`, `green`, `red`, `nir`, `swir1` (5 bands) | `leak_signature` |
+| [`maritime_awareness`](../../model_zoo/cards/maritime_awareness.md) | Maritime Awareness Detector | defense | `rgb` (3 bands) | `vessel`, `offshore_platform` |
+| [`military_objects_detector`](../../model_zoo/cards/military_objects_detector.md) | Military Objects Detector | defense | `rgb` (3 bands) | `vehicle`, `aircraft`, `vessel`, `fortified_structure` |
+| [`object_detector`](../../model_zoo/cards/object_detector.md) | Generic Object Detector | ai | `rgb` (3 bands) | `building`, `vehicle`, `ship`, `aircraft`, `storage_tank`, `bridge` |
+| [`pivot_inventory`](../../model_zoo/cards/pivot_inventory.md) | Centre Pivot Inventory | agriculture | `rgbn` (4 bands) | `centre_pivot` |
+| [`sar_ship_detector`](../../model_zoo/cards/sar_ship_detector.md) | SAR Ship Detector | sar | `s1` (2 bands) | `ship` |
+| [`security_monitor`](../../model_zoo/cards/security_monitor.md) | Security Monitor | defense | `rgb` (3 bands) | `vehicle`, `vessel`, `temporary_structure` |
+| [`ship_detector`](../../model_zoo/cards/ship_detector.md) | Ship Detector | ai | `rgb` (3 bands) | `ship` |
+| [`target_detector`](../../model_zoo/cards/target_detector.md) | Target Detector | defense | `rgb` (3 bands) | `object_of_interest` |
+| [`vehicle_detector`](../../model_zoo/cards/vehicle_detector.md) | Vehicle Detector | ai | `rgb` (3 bands) | `car`, `truck`, `bus` |
+
+### 3.2 Semantic segmentation
+
+26 families, 104 models. Architecture: U-Net.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`cloud_mask`](../../model_zoo/cards/cloud_mask.md) | Cloud and Shadow Mask | imaging | `s2_13` (13 bands) | `clear`, `thick_cloud`, `thin_cloud`, `cloud_shadow` |
+| [`corridor_monitor`](../../model_zoo/cards/corridor_monitor.md) | Corridor Monitor | assets | `rgb` (3 bands) | `background`, `vegetation_encroachment`, `structure` |
+| [`crop_boundary_delineation`](../../model_zoo/cards/crop_boundary_delineation.md) | Crop Boundary Delineation | agriculture | `rgbn` (4 bands) | `background`, `field_interior`, `field_boundary` |
+| [`crop_classifier`](../../model_zoo/cards/crop_classifier.md) | Crop Type Classifier | agriculture | `s2_10` (10 bands) | `background`, `wheat`, `maize`, `rice`, `soybean`, `sunflower`, `other_crop` |
+| [`desertification_monitor`](../../model_zoo/cards/desertification_monitor.md) | Desertification Monitor | environment | `s2_10` (10 bands) | `not_degraded`, `low`, `moderate`, `severe` |
+| [`digitization_2d`](../../model_zoo/cards/digitization_2d.md) | 2D Digitisation | imaging | `rgb` (3 bands) | `background`, `building`, `road`, `water`, `vegetation` |
+| [`erosion_detector`](../../model_zoo/cards/erosion_detector.md) | Erosion Detector | environment | `rgbn_dem` (5 bands) | `stable`, `sheet_erosion`, `gully` |
+| [`forest_monitor`](../../model_zoo/cards/forest_monitor.md) | Forest Monitor | forestry | `s2_10` (10 bands) | `non_forest`, `broadleaf`, `coniferous`, `mixed` |
+| [`infrastructure_monitor`](../../model_zoo/cards/infrastructure_monitor.md) | Infrastructure Monitor | assets | `rgb` (3 bands) | `background`, `road`, `railway`, `building`, `bridge` |
+| [`land_degradation_detector`](../../model_zoo/cards/land_degradation_detector.md) | Land Degradation Detector | environment | `s2_10` (10 bands) | `not_degraded`, `degraded` |
+| [`lulc_classifier`](../../model_zoo/cards/lulc_classifier.md) | Land Use and Land Cover Classifier | environment | `s2_10` (10 bands) | `tree_cover`, `shrubland`, `grassland`, `cropland`, `built_up`, `bare_sparse`, `snow_ice`, `water`, `herbaceous_wetland`, `mangroves`, `moss_lichen` |
+| [`marine_pollution_detector`](../../model_zoo/cards/marine_pollution_detector.md) | Marine Pollution Detector | water | `s2_10` (10 bands) | `water`, `floating_debris`, `oil_sheen` |
+| [`multi_solution_segmentation`](../../model_zoo/cards/multi_solution_segmentation.md) | General Semantic Segmentation | ai | `rgb` (3 bands) | `background`, `building`, `road`, `water`, `vegetation`, `bare_ground` |
+| [`plowed_land_detector`](../../model_zoo/cards/plowed_land_detector.md) | Ploughed Land Detector | agriculture | `rgbn` (4 bands) | `background`, `ploughed` |
+| [`reservoir_monitor`](../../model_zoo/cards/reservoir_monitor.md) | Reservoir Monitor | water | `rgbn` (4 bands) | `background`, `water` |
+| [`road_network_analyzer`](../../model_zoo/cards/road_network_analyzer.md) | Road Network Extractor | urban | `rgb` (3 bands) | `background`, `road` |
+| [`salinity_detector`](../../model_zoo/cards/salinity_detector.md) | Soil Salinity Detector | agriculture | `s2_10` (10 bands) | `non_saline`, `slight`, `moderate`, `strong` |
+| [`sar_flood_detector`](../../model_zoo/cards/sar_flood_detector.md) | SAR Flood Detector | sar | `s1` (2 bands) | `non_flooded`, `flooded` |
+| [`sar_oil_spill_detector`](../../model_zoo/cards/sar_oil_spill_detector.md) | SAR Oil Spill Detector | sar | `s1_vv` (1 band) | `sea`, `oil_spill`, `look_alike` |
+| [`thematic_mapper`](../../model_zoo/cards/thematic_mapper.md) | Thematic Mapper | imaging | `s2_10` (10 bands) | `artificial`, `agricultural`, `forest`, `grassland`, `wetland`, `water`, `bare`, `snow_ice` |
+| [`topography_mapper`](../../model_zoo/cards/topography_mapper.md) | Landform Mapper | imaging | `dem` (1 band) | `flat`, `slope`, `ridge`, `valley`, `peak`, `pit` |
+| [`tourist_destination_monitor`](../../model_zoo/cards/tourist_destination_monitor.md) | Tourist Destination Monitor | tourism | `rgb` (3 bands) | `background`, `beach`, `built_up`, `vegetation`, `water` |
+| [`transportation_mapper`](../../model_zoo/cards/transportation_mapper.md) | Transportation Mapper | urban | `rgb` (3 bands) | `background`, `road`, `railway`, `airport`, `port` |
+| [`urban_planner`](../../model_zoo/cards/urban_planner.md) | Urban Land Use Mapper | urban | `rgb` (3 bands) | `background`, `residential`, `commercial`, `industrial`, `green_space` |
+| [`utility_mapper`](../../model_zoo/cards/utility_mapper.md) | Utility Mapper | assets | `rgb` (3 bands) | `background`, `power_line`, `pipeline_corridor`, `substation` |
+| [`water_surface_detector`](../../model_zoo/cards/water_surface_detector.md) | Water Surface Detector | water | `rgbn` (4 bands) | `background`, `water` |
+
+### 3.3 Change detection
+
+6 families, 24 models. Architecture: U-Net on the stacked dates (early fusion).
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`asset_condition_change`](../../model_zoo/cards/asset_condition_change.md) | Asset Condition Change | assets | `rgb` (3 bands) x 2 dates = 6 channels | `no_change`, `deterioration`, `repair` |
+| [`change_detector`](../../model_zoo/cards/change_detector.md) | Change Detector | ai | `rgb` (3 bands) x 2 dates = 6 channels | `no_change`, `change` |
+| [`construction_monitor`](../../model_zoo/cards/construction_monitor.md) | Construction Monitor | urban | `rgb` (3 bands) x 2 dates = 6 channels | `no_change`, `new_construction`, `demolition` |
+| [`deforestation_detector`](../../model_zoo/cards/deforestation_detector.md) | Deforestation Detector | forestry | `s2_10` (10 bands) x 2 dates = 20 channels | `no_change`, `forest_loss` |
+| [`protected_area_change_detector`](../../model_zoo/cards/protected_area_change_detector.md) | Protected Area Change Detector | environment | `s2_10` (10 bands) x 2 dates = 20 channels | `no_change`, `vegetation_loss`, `new_structure`, `other_change` |
+| [`urban_growth_assessor`](../../model_zoo/cards/urban_growth_assessor.md) | Urban Growth Assessor | urban | `s2_10` (10 bands) x 2 dates = 20 channels | `no_change`, `urban_expansion` |
+
+### 3.4 Dense regression
+
+49 families, 196 models. Architecture: U-Net with a regression output.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`accessibility_analyzer`](../../model_zoo/cards/accessibility_analyzer.md) | Accessibility Analyser | tourism | `context` (10 bands) | `travel_time` (min) |
+| [`beekeeping_suitability`](../../model_zoo/cards/beekeeping_suitability.md) | Beekeeping Suitability | agriculture | `s2_dem` (12 bands) | `suitability` (1); range [0, 1] |
+| [`crop_growth_monitor`](../../model_zoo/cards/crop_growth_monitor.md) | Crop Growth Monitor | agriculture | `s2_10` (10 bands) | `leaf_area_index` (m2 m-2); range [0, 8] |
+| [`crop_health_assessor`](../../model_zoo/cards/crop_health_assessor.md) | Crop Health Assessor | agriculture | `s2_10` (10 bands) | `health_score` (1); range [0, 1] |
+| [`drought_monitor`](../../model_zoo/cards/drought_monitor.md) | Drought Monitor | environment | `s2_10` (10 bands) | `drought_severity` (1); range [0, 1] |
+| [`energy_potential`](../../model_zoo/cards/energy_potential.md) | Energy Potential | energy | `s2_dem` (12 bands) | `solar_potential` (kWh m-2 a-1) |
+| [`environmental_risk`](../../model_zoo/cards/environmental_risk.md) | Environmental Risk | risk | `context` (10 bands) | `risk_score` (1); range [0, 1] |
+| [`flood_risk`](../../model_zoo/cards/flood_risk.md) | Flood Risk | water | `s2_dem` (12 bands) | `flood_susceptibility` (1); range [0, 1] |
+| [`forest_density_estimator`](../../model_zoo/cards/forest_density_estimator.md) | Forest Density Estimator | forestry | `s2_10` (10 bands) | `canopy_cover` (1); range [0, 1] |
+| [`grazing_potential`](../../model_zoo/cards/grazing_potential.md) | Grazing Potential | agriculture | `s2_10` (10 bands) | `forage_biomass` (kg ha-1) |
+| [`hazard_vulnerability`](../../model_zoo/cards/hazard_vulnerability.md) | Hazard Vulnerability | risk | `context` (10 bands) | `vulnerability` (1); range [0, 1] |
+| [`landslide_risk`](../../model_zoo/cards/landslide_risk.md) | Landslide Susceptibility | risk | `s2_dem` (12 bands) | `susceptibility` (1); range [0, 1] |
+| [`mobility_analyzer`](../../model_zoo/cards/mobility_analyzer.md) | Mobility Analyser | urban | `context` (10 bands) | `traffic_intensity` (vehicles h-1) |
+| [`perennial_garden_suitability`](../../model_zoo/cards/perennial_garden_suitability.md) | Perennial Garden Suitability | agriculture | `s2_dem` (12 bands) | `suitability` (1); range [0, 1] |
+| [`pipeline_route_planner`](../../model_zoo/cards/pipeline_route_planner.md) | Pipeline Route Cost Surface | assets | `context` (10 bands) | `cost` (cost units per metre) |
+| [`route_planner`](../../model_zoo/cards/route_planner.md) | Route Cost Surface | tourism | `context` (10 bands) | `travel_cost` (s m-1) |
+| [`seismic_risk`](../../model_zoo/cards/seismic_risk.md) | Seismic Risk | risk | `context` (10 bands) | `risk_score` (1); range [0, 1] |
+| [`site_suitability`](../../model_zoo/cards/site_suitability.md) | Site Suitability | analysis | `context` (10 bands) | `suitability` (1); range [0, 1] |
+| [`solar_site_selector`](../../model_zoo/cards/solar_site_selector.md) | Solar Site Selector | energy | `s2_dem` (12 bands) | `suitability` (1); range [0, 1] |
+| [`spatial_analyzer`](../../model_zoo/cards/spatial_analyzer.md) | Spatial Density Estimator | analysis | `rgbn` (4 bands) | `density` (ha-1) |
+| [`viewshed_analyzer`](../../model_zoo/cards/viewshed_analyzer.md) | Visibility Estimator | tourism | `dem` (1 band) | `visible_fraction` (1); range [0, 1] |
+| [`water_quality_assessor`](../../model_zoo/cards/water_quality_assessor.md) | Water Quality Assessor | water | `s2_10` (10 bands) | `chlorophyll_a` (mg m-3), `turbidity` (FNU) |
+| [`wildfire_risk`](../../model_zoo/cards/wildfire_risk.md) | Wildfire Risk | risk | `s2_dem` (12 bands) | `susceptibility` (1); range [0, 1] |
+| [`wildlife_habitat_analyzer`](../../model_zoo/cards/wildlife_habitat_analyzer.md) | Wildlife Habitat Suitability | environment | `s2_dem` (12 bands) | `habitat_suitability` (1); range [0, 1] |
+| [`wind_site_selector`](../../model_zoo/cards/wind_site_selector.md) | Wind Site Selector | energy | `s2_dem` (12 bands) | `suitability` (1); range [0, 1] |
+| [`flood_risk_assessor`](../../model_zoo/cards/flood_risk_assessor.md) | Flood Depth Estimator | water | `s2_dem` (12 bands) | `water_depth` (m) |
+| [`geostatistical_analyzer`](../../model_zoo/cards/geostatistical_analyzer.md) | Geostatistical Surface Estimator | analysis | `s2_dem` (12 bands) | `value` (user defined) |
+| [`spatial_relationship`](../../model_zoo/cards/spatial_relationship.md) | Proximity Estimator | analysis | `rgbn` (4 bands) | `distance` (m) |
+| [`natural_resources_monitor`](../../model_zoo/cards/natural_resources_monitor.md) | Natural Resources Monitor | environment | `s2_s1` (12 bands) | `above_ground_biomass` (Mg ha-1) |
+| [`environmental_monitor`](../../model_zoo/cards/environmental_monitor.md) | Environmental Condition Monitor | environment | `s2_10` (10 bands) | `condition` (1); range [0, 1] |
+| [`network_analyzer`](../../model_zoo/cards/network_analyzer.md) | Road Network Density Estimator | urban | `rgbn` (4 bands) | `road_density` (km km-2) |
+| [`watershed_manager`](../../model_zoo/cards/watershed_manager.md) | Runoff Estimator | water | `s2_dem` (12 bands) | `runoff_coefficient` (1); range [0, 1] |
+| [`hydroelectric_monitor`](../../model_zoo/cards/hydroelectric_monitor.md) | Hydroelectric Reservoir Level Estimator | energy | `rgbn_dem` (5 bands) | `water_surface_elevation` (m) |
+| [`offshore_survey`](../../model_zoo/cards/offshore_survey.md) | Bathymetry Estimator | water | `s2_10` (10 bands) | `depth` (m); range [0, 30] |
+| [`onshore_monitor`](../../model_zoo/cards/onshore_monitor.md) | Surface Temperature Anomaly | energy | `landsat_st` (7 bands) | `temperature_anomaly` (K) |
+| [`field_surveyor`](../../model_zoo/cards/field_surveyor.md) | Field Productivity Estimator | agriculture | `s2_10` (10 bands) | `relative_yield` (1); range [0, 2] |
+| [`dem_generator`](../../model_zoo/cards/dem_generator.md) | DEM from Stereo | imaging | `pan_pair` (2 bands) | `elevation` (m) |
+| [`digitization_3d`](../../model_zoo/cards/digitization_3d.md) | Building Height Estimator | urban | `rgb_dsm` (4 bands) | `building_height` (m) |
+| [`dsm_generator`](../../model_zoo/cards/dsm_generator.md) | DSM from Stereo | imaging | `pan_pair` (2 bands) | `surface_elevation` (m) |
+| [`dtm_generator`](../../model_zoo/cards/dtm_generator.md) | DTM from DSM | imaging | `dsm` (1 band) | `ground_elevation` (m) |
+| [`ground_displacement`](../../model_zoo/cards/ground_displacement.md) | Ground Displacement Estimator | sar | `insar` (3 bands) | `los_displacement` (mm) |
+| [`land_surface_temperature`](../../model_zoo/cards/land_surface_temperature.md) | Land Surface Temperature | environment | `landsat_st` (7 bands) | `surface_temperature` (K) |
+| [`model_3d`](../../model_zoo/cards/model_3d.md) | Normalised Surface Model | imaging | `rgb_dsm` (4 bands) | `object_height` (m) |
+| [`sar_amplitude`](../../model_zoo/cards/sar_amplitude.md) | SAR Backscatter Normaliser | sar | `VV`, `VH`, `elevation` (3 bands) | `gamma0_vv` (dB), `gamma0_vh` (dB) |
+| [`sar_phase_displacement`](../../model_zoo/cards/sar_phase_displacement.md) | InSAR Phase Unwrapper | sar | `insar` (3 bands) | `unwrapped_phase` (rad) |
+| [`sar_subsidence_monitor`](../../model_zoo/cards/sar_subsidence_monitor.md) | Subsidence Velocity Estimator | sar | `insar_stack` (6 bands) | `velocity` (mm a-1) |
+| [`stereo_processor`](../../model_zoo/cards/stereo_processor.md) | Stereo Disparity Estimator | imaging | `pan_pair` (2 bands) | `disparity` (px) |
+| [`tree_height_estimator`](../../model_zoo/cards/tree_height_estimator.md) | Canopy Height Estimator | forestry | `s2_s1` (12 bands) | `canopy_height` (m); range [0, 60] |
+| [`tri_stereo_processor`](../../model_zoo/cards/tri_stereo_processor.md) | DSM from Tri-Stereo | imaging | `pan_triplet` (3 bands) | `surface_elevation` (m) |
+
+### 3.5 Scene regression
+
+11 families, 44 models. Architecture: Residual encoder with pooled regression head.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`yield_predictor`](../../model_zoo/cards/yield_predictor.md) | Yield Predictor | agriculture | `s2_10` (10 bands) | `yield` (t ha-1) |
+| [`business_valuation`](../../model_zoo/cards/business_valuation.md) | Economic Activity Estimator | analysis | `rgbn` (4 bands) | `activity_index` (1) |
+| [`economic_spatial_assessor`](../../model_zoo/cards/economic_spatial_assessor.md) | Property Value Estimator | analysis | `rgb` (3 bands) | `median_value` (currency m-2) |
+| [`insurance_underwriting`](../../model_zoo/cards/insurance_underwriting.md) | Insurance Risk Scorer | risk | `context` (10 bands) | `hazard_score` (1), `exposure_score` (1); range [0, 1] |
+| [`livestock_estimator`](../../model_zoo/cards/livestock_estimator.md) | Livestock Estimator | agriculture | `rgb` (3 bands) | `head_count` (animals) |
+| [`resource_allocation`](../../model_zoo/cards/resource_allocation.md) | Service Demand Estimator | analysis | `rgbn` (4 bands) | `population` (persons), `service_demand` (1) |
+| [`disaster_management`](../../model_zoo/cards/disaster_management.md) | Disaster Impact Estimator | risk | `s2_10` (10 bands) | `affected_fraction` (1); range [0, 1] |
+| [`emergency_disaster_manager`](../../model_zoo/cards/emergency_disaster_manager.md) | Emergency Needs Estimator | risk | `rgbn` (4 bands) | `affected_population` (persons), `shelter_need` (persons) |
+| [`preparedness_manager`](../../model_zoo/cards/preparedness_manager.md) | Preparedness Scorer | risk | `context` (10 bands) | `preparedness` (1); range [0, 1] |
+| [`timeseries_analyzer`](../../model_zoo/cards/timeseries_analyzer.md) | Phenology Estimator | agriculture | `ndvi_t1`, `ndvi_t2`, `ndvi_t3`, `ndvi_t4`, `ndvi_t5`, `ndvi_t6` (6 bands) | `start_of_season` (day of year), `peak_of_season` (day of year), `end_of_season` (day of year) |
+| [`zonal_statistics`](../../model_zoo/cards/zonal_statistics.md) | Zonal Cover Estimator | analysis | `s2_10` (10 bands) | `vegetation_fraction` (1), `water_fraction` (1), `built_up_fraction` (1); range [0, 1] |
+
+### 3.6 Image enhancement
+
+11 families, 44 models. Architecture: U-Net, image to image.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`coregistration`](../../model_zoo/cards/coregistration.md) | Co-registration Flow Estimator | imaging | `rgb` (3 bands) x 2 dates = 6 channels | `dx` (px), `dy` (px) |
+| [`mosaic_processor`](../../model_zoo/cards/mosaic_processor.md) | Mosaic Colour Harmoniser | imaging | `rgb` (3 bands) | `red`, `green`, `blue` |
+| [`mosaicking`](../../model_zoo/cards/mosaicking.md) | Seamline Blender | imaging | `rgb` (3 bands) x 2 dates = 6 channels | `red`, `green`, `blue` |
+| [`multispectral_processor`](../../model_zoo/cards/multispectral_processor.md) | Multispectral Denoiser | imaging | `s2_10` (10 bands) | `B02`, `B03`, `B04`, `B05`, `B06`, `B07`, `B08`, `B8A`, `B11`, `B12` |
+| [`ortho_processor`](../../model_zoo/cards/ortho_processor.md) | Orthorectification Flow Estimator | imaging | `image_dem` (4 bands) | `dx` (px), `dy` (px) |
+| [`orthorectification`](../../model_zoo/cards/orthorectification.md) | Learned Orthorectification | imaging | `image_dem` (4 bands) | `red`, `green`, `blue` |
+| [`panchromatic_processor`](../../model_zoo/cards/panchromatic_processor.md) | Panchromatic Denoiser | imaging | `pan` (1 band) | `pan` |
+| [`pansharpening`](../../model_zoo/cards/pansharpening.md) | Pansharpening | imaging | `ms_pan` (5 bands) | `blue`, `green`, `red`, `nir` |
+| [`raster_tiler`](../../model_zoo/cards/raster_tiler.md) | Tile Radiometric Normaliser | imaging | `rgb` (3 bands) | `red`, `green`, `blue` |
+| [`sar_mapping_workflow`](../../model_zoo/cards/sar_mapping_workflow.md) | SAR Despeckler | sar | `s1` (2 bands) | `VV`, `VH` |
+| [`synthetic_imagery`](../../model_zoo/cards/synthetic_imagery.md) | SAR to Optical Translator | ai | `s1` (2 bands) | `red`, `green`, `blue` |
+
+### 3.7 Super-resolution
+
+1 families, 4 models. Architecture: EDSR-style residual network, sub-pixel upsampling.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`super_resolution`](../../model_zoo/cards/super_resolution.md) | Super-Resolution | imaging | `rgb` (3 bands) | `red`, `green`, `blue`; scale x4 |
+
+### 3.8 Spectral indices
+
+7 families, 28 models. Architecture: Exact formula, no trainable weights.
+
+| Family | Name | Domain | Inputs | Outputs |
+| --- | --- | --- | --- | --- |
+| [`evi_calculator`](../../model_zoo/cards/evi_calculator.md) | EVI Calculator | indices | `blue`, `red`, `nir` (3 bands) | `evi`; formula `evi` |
+| [`msi_calculator`](../../model_zoo/cards/msi_calculator.md) | MSI Calculator | indices | `nir`, `swir1` (2 bands) | `msi`; formula `msi` |
+| [`nbr_calculator`](../../model_zoo/cards/nbr_calculator.md) | NBR Calculator | indices | `nir`, `swir2` (2 bands) | `nbr`; formula `nbr` |
+| [`ndvi_calculator`](../../model_zoo/cards/ndvi_calculator.md) | NDVI Calculator | indices | `red`, `nir` (2 bands) | `ndvi`; formula `ndvi` |
+| [`ndwi_calculator`](../../model_zoo/cards/ndwi_calculator.md) | NDWI Calculator | indices | `green`, `nir` (2 bands) | `ndwi`; formula `ndwi` |
+| [`savi_calculator`](../../model_zoo/cards/savi_calculator.md) | SAVI Calculator | indices | `red`, `nir` (2 bands) | `savi`; formula `savi` |
+| [`vegetation_condition`](../../model_zoo/cards/vegetation_condition.md) | Vegetation Condition Index | indices | `ndvi_stats` (3 bands) | `vci`; formula `vci` |
+
+The index modules (`unbihexium.ai.models.spectral`) evaluate the following formulas on surface reflectance, with the input channels in the order listed above. Pixels where the denominator is zero are NaN.
+
+| Formula id | Family | Formula | Source |
+| --- | --- | --- | --- |
+| `evi` | `evi_calculator` | $2.5\,(\mathrm{NIR} - \mathrm{RED}) / (\mathrm{NIR} + 6\,\mathrm{RED} - 7.5\,\mathrm{BLUE} + 1)$ | Huete et al. [6] |
+| `msi` | `msi_calculator` | $\mathrm{SWIR1} / \mathrm{NIR}$ | Rock et al. [8] |
+| `nbr` | `nbr_calculator` | $(\mathrm{NIR} - \mathrm{SWIR2}) / (\mathrm{NIR} + \mathrm{SWIR2})$ | Key and Benson [9] |
+| `ndvi` | `ndvi_calculator` | $(\mathrm{NIR} - \mathrm{RED}) / (\mathrm{NIR} + \mathrm{RED})$ | Rouse et al. [4] |
+| `ndwi` | `ndwi_calculator` | $(\mathrm{GREEN} - \mathrm{NIR}) / (\mathrm{GREEN} + \mathrm{NIR})$ | McFeeters [5] |
+| `savi` | `savi_calculator` | $1.5\,(\mathrm{NIR} - \mathrm{RED}) / (\mathrm{NIR} + \mathrm{RED} + 0.5)$ | Huete [7] |
+| `vci` | `vegetation_condition` | $(\mathrm{NDVI} - \mathrm{NDVI_{min}}) / (\mathrm{NDVI_{max}} - \mathrm{NDVI_{min}})$ | Kogan [10] |
+
+## 4. Families by domain
+
+The capability domain of a family is the domain under which the capability registry (`unbihexium.registry`) lists it and the value accepted by `unbihexium zoo list --domain`. Domains describe the field of application and are independent of the task.
+
+| Domain | Families | Members |
+| --- | --- | --- |
+| `agriculture` | 16 | `beekeeping_suitability`, `crop_boundary_delineation`, `crop_classifier`, `crop_detector`, `crop_growth_monitor`, `crop_health_assessor`, `field_surveyor`, `grazing_potential`, `greenhouse_detector`, `livestock_estimator`, `perennial_garden_suitability`, `pivot_inventory`, `plowed_land_detector`, `salinity_detector`, `timeseries_analyzer`, `yield_predictor` |
+| `ai` | 7 | `aircraft_detector`, `change_detector`, `multi_solution_segmentation`, `object_detector`, `ship_detector`, `synthetic_imagery`, `vehicle_detector` |
+| `analysis` | 8 | `business_valuation`, `economic_spatial_assessor`, `geostatistical_analyzer`, `resource_allocation`, `site_suitability`, `spatial_analyzer`, `spatial_relationship`, `zonal_statistics` |
+| `assets` | 7 | `asset_condition_change`, `corridor_monitor`, `encroachment_detector`, `infrastructure_monitor`, `leakage_detector`, `pipeline_route_planner`, `utility_mapper` |
+| `defense` | 5 | `border_monitor`, `maritime_awareness`, `military_objects_detector`, `security_monitor`, `target_detector` |
+| `energy` | 5 | `energy_potential`, `hydroelectric_monitor`, `onshore_monitor`, `solar_site_selector`, `wind_site_selector` |
+| `environment` | 11 | `desertification_monitor`, `drought_monitor`, `environmental_monitor`, `erosion_detector`, `fire_monitor`, `land_degradation_detector`, `land_surface_temperature`, `lulc_classifier`, `natural_resources_monitor`, `protected_area_change_detector`, `wildlife_habitat_analyzer` |
+| `forestry` | 4 | `deforestation_detector`, `forest_density_estimator`, `forest_monitor`, `tree_height_estimator` |
+| `imaging` | 20 | `cloud_mask`, `coregistration`, `dem_generator`, `digitization_2d`, `dsm_generator`, `dtm_generator`, `model_3d`, `mosaic_processor`, `mosaicking`, `multispectral_processor`, `ortho_processor`, `orthorectification`, `panchromatic_processor`, `pansharpening`, `raster_tiler`, `stereo_processor`, `super_resolution`, `thematic_mapper`, `topography_mapper`, `tri_stereo_processor` |
+| `indices` | 7 | `evi_calculator`, `msi_calculator`, `nbr_calculator`, `ndvi_calculator`, `ndwi_calculator`, `savi_calculator`, `vegetation_condition` |
+| `risk` | 10 | `damage_assessor`, `disaster_management`, `emergency_disaster_manager`, `environmental_risk`, `hazard_vulnerability`, `insurance_underwriting`, `landslide_risk`, `preparedness_manager`, `seismic_risk`, `wildfire_risk` |
+| `sar` | 8 | `ground_displacement`, `sar_amplitude`, `sar_flood_detector`, `sar_mapping_workflow`, `sar_oil_spill_detector`, `sar_phase_displacement`, `sar_ship_detector`, `sar_subsidence_monitor` |
+| `tourism` | 4 | `accessibility_analyzer`, `route_planner`, `tourist_destination_monitor`, `viewshed_analyzer` |
+| `urban` | 10 | `building_detector`, `builtup_detector`, `construction_monitor`, `digitization_3d`, `mobility_analyzer`, `network_analyzer`, `road_network_analyzer`, `transportation_mapper`, `urban_growth_assessor`, `urban_planner` |
+| `water` | 8 | `flood_risk`, `flood_risk_assessor`, `marine_pollution_detector`, `offshore_survey`, `reservoir_monitor`, `water_quality_assessor`, `water_surface_detector`, `watershed_manager` |
+
+Some families, for example `border_monitor`, `military_objects_detector`, `maritime_awareness`, `security_monitor` and `target_detector` in the `defense` domain, have dual-use character. They are shipped as untrained starter architectures; [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md) describes the expectations for their use and the uses the project does not support.
+
+## 5. Related documents
+
+- [distribution.md](distribution.md): how the models are distributed.
+- [download_and_verify.md](download_and_verify.md): building, verifying and exporting models.
+- [training.md](training.md): dataset layout, training and evaluation.
+- [inference.md](inference.md): running models on imagery.
+- [how_to_add_models.md](how_to_add_models.md): extending the catalogue.
+- [licensing_and_provenance.md](licensing_and_provenance.md): licence and provenance of the models.
+- [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md): limits of the starter models and responsible use.
+
+## References
+
+[1] Zhou, X., Wang, D. and Kraehenbuehl, P. Objects as points. arXiv:1904.07850. 2019. <https://arxiv.org/abs/1904.07850>
+
+[2] Ronneberger, O., Fischer, P. and Brox, T. U-Net: Convolutional networks for biomedical image segmentation. MICCAI 2015, LNCS 9351, 234-241. 2015. <https://arxiv.org/abs/1505.04597>
+
+[3] Lim, B., Son, S., Kim, H., Nah, S. and Lee, K. M. Enhanced deep residual networks for single image super-resolution. CVPR Workshops. 2017. <https://arxiv.org/abs/1707.02921>
+
+[4] Rouse, J. W., Haas, R. H., Schell, J. A. and Deering, D. W. Monitoring vegetation systems in the Great Plains with ERTS. Third Earth Resources Technology Satellite-1 Symposium, NASA SP-351, 309-317. 1974. <https://ntrs.nasa.gov/citations/19740022614>
+
+[5] McFeeters, S. K. The use of the Normalized Difference Water Index (NDWI) in the delineation of open water features. International Journal of Remote Sensing 17(7), 1425-1432. 1996. <https://doi.org/10.1080/01431169608948714>
+
+[6] Huete, A., Didan, K., Miura, T., Rodriguez, E. P., Gao, X. and Ferreira, L. G. Overview of the radiometric and biophysical performance of the MODIS vegetation indices. Remote Sensing of Environment 83(1-2), 195-213. 2002. <https://doi.org/10.1016/S0034-4257(02)00096-2>
+
+[7] Huete, A. R. A soil-adjusted vegetation index (SAVI). Remote Sensing of Environment 25(3), 295-309. 1988. <https://doi.org/10.1016/0034-4257(88)90106-X>
+
+[8] Rock, B. N., Vogelmann, J. E., Williams, D. L., Vogelmann, A. F. and Hoshizaki, T. Remote detection of forest damage. BioScience 36(7), 439-445. 1986. <https://doi.org/10.2307/1310339>
+
+[9] Key, C. H. and Benson, N. C. Landscape assessment: ground measure of severity, the Composite Burn Index; and remote sensing of severity, the Normalized Burn Ratio. In: FIREMON: Fire Effects Monitoring and Inventory System, USDA Forest Service, RMRS-GTR-164-CD, LA 1-51. 2006. <https://www.fs.usda.gov/research/treesearch/24066>
+
+[10] Kogan, F. N. Application of vegetation index and brightness temperature for drought detection. Advances in Space Research 15(11), 91-100. 1995. <https://doi.org/10.1016/0273-1177(95)00079-T>
+
+<!--
+=============================================================================
+End of file docs/model_zoo/model_catalog.md
+Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+Cite the project as described in CITATION.cff.
+=============================================================================
+-->

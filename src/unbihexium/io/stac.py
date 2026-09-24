@@ -33,7 +33,10 @@
 #                              and item links recursively
 #   STACClient, search_stac    STAC API item search with pagination through
 #                              "next" links; the HTTP transport can be
-#                              replaced, for example in tests
+#                              replaced, for example in tests; the client
+#                              headers (for example an Authorization
+#                              token) are only sent to URLs of the same
+#                              origin (scheme, host, port) as the API
 #   load_from_stac             read an asset with the GeoTIFF reader
 #
 # Method
@@ -640,6 +643,28 @@ def walk_catalog(path: str | Path, max_depth: int = 16) -> Iterator[STACItem]:
                 stack.append((Path(resolve_href(link["href"], str(current))), depth + 1))
 
 
+# Default ports of the URL schemes of the API.
+_DEFAULT_PORTS = {"http": 80, "https": 443}
+
+
+# Origin (scheme, host, port) of a URL, as defined by RFC 6454.
+def _origin(url: str) -> tuple[str, str, int | None]:
+    # Parsed URL.
+    parts = urlparse(url)
+    # Scheme in lower case.
+    scheme = parts.scheme.lower()
+    # Explicit ports; malformed ports make the origin unknown.
+    try:
+        # Port number or None.
+        port = parts.port
+    # Ports outside 0 to 65535 or not numeric.
+    except ValueError:
+        # An origin that matches nothing.
+        return ("", "", -1)
+    # Host in lower case with the default port of the scheme.
+    return (scheme, (parts.hostname or "").lower(), port or _DEFAULT_PORTS.get(scheme))
+
+
 # Default HTTP transport with requests.
 def _requests_transport(headers: dict[str, str], timeout: float) -> Transport:
     # Send one request and decode the JSON response.
@@ -674,8 +699,11 @@ class STACClient:
 
     # Send a request with the configured transport.
     def _send(self, method: str, url: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        # The client headers may hold credentials: send them only to the origin of
+        # the API, never to "next" links that point to another host.
+        headers = self.headers if _origin(url) == _origin(self.url) else {}
         # Transport of the client.
-        send = self.transport or _requests_transport(self.headers, self.timeout)
+        send = self.transport or _requests_transport(headers, self.timeout)
         # Response document.
         return send(method, url, body)
 
@@ -741,8 +769,8 @@ class STACClient:
                 return
             # Next request as described by the link.
             method = str(nxt.get("method", "GET")).upper()
-            # URL of the next page.
-            url = nxt["href"]
+            # URL of the next page; relative links are resolved against the current page.
+            url = urljoin(url, nxt["href"])
             # Body of POST links; merge requests extend the previous body.
             payload = {**payload, **nxt.get("body", {})} if nxt.get("merge") else nxt.get("body")
 

@@ -162,7 +162,7 @@ def verify_onnx(model: ZooModel, path: str | Path, tolerance: float = 1e-3) -> f
     # ONNX Runtime session on the CPU.
     session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
     # ONNX Runtime output.
-    actual = session.run(None, {"input": example.numpy()})[0]
+    actual = np.asarray(session.run(None, {"input": example.numpy()})[0])
     # Shapes must agree exactly.
     if actual.shape != expected.shape:
         # Report the shape mismatch.

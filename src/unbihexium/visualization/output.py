@@ -232,11 +232,12 @@ def legend_figure(
 ) -> Any:  # matplotlib.figure.Figure.
     # Matplotlib is optional.
     try:
-        # Patches for the legend.
-        from matplotlib.figure import Figure
+        # Figure without the global pyplot state; matplotlib is optional and
+        # is not part of the type check environment.
+        from matplotlib.figure import Figure  # pyright: ignore[reportMissingImports]
 
-        # Colour patches.
-        from matplotlib.patches import Patch
+        # Colour patches for the legend.
+        from matplotlib.patches import Patch  # pyright: ignore[reportMissingImports]
     # Explain how to install it.
     except ImportError as exc:
         # Re-raise with a hint.

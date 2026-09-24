@@ -53,7 +53,6 @@ header:  # Metadata about this file.
 # -----------------------------------------------------------------------------
 project:  # The project as a whole.
   name: Unbihexium  # Project name.
-  homepage: https://github.com/unbihexium-oss/unbihexium  # Main web page of the project.
   funding: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/FUNDING.yml  # How the project is funded.
   roadmap: https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md  # Planned work.
   administrators:  # People with administrative rights on the project.
@@ -211,8 +210,9 @@ repository:  # This repository.
       - name: pip-audit  # Tool name.
         type: SCA  # Tool category in the specification.
         comment: |  # What the tool checks and where it runs.
-          Checks the installed dependencies against the PyPI advisory
-          database (Security workflow, `make security`).
+          Checks the exact versions of requirements.txt and
+          requirements-dev.txt against the PyPI advisory database; any known
+          vulnerability fails the Security workflow (also `make security`).
         rulesets:  # Rule sets or configuration files used.
           - default  # Default rules of the tool.
         integration:  # When the tool runs.
@@ -223,10 +223,42 @@ repository:  # This repository.
       - name: Bandit  # Tool name.
         type: SAST  # Tool category in the specification.
         comment: |  # What the tool checks and where it runs.
-          Static analysis of src/ for common Python security issues
-          (Security workflow, pre-commit, `make security`).
+          Static analysis of src/ for common Python security issues; any
+          finding fails the Security workflow (also pre-commit and
+          `make security`).
         rulesets:  # Rule sets or configuration files used.
           - pyproject.toml  # Configuration file of the tool.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results: {}  # No results published.
+      - name: CodeQL  # Tool name.
+        type: SAST  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
+          security-extended queries for Python and GitHub Actions on pull
+          requests, pushes to main and weekly (CodeQL workflow); alerts
+          appear in GitHub code scanning.
+        rulesets:  # Rule sets or configuration files used.
+          - security-extended  # CodeQL query suite.
+        integration:  # When the tool runs.
+          adhoc: true  # Also started by hand or on a schedule.
+          ci: true  # Runs on pushes or pull requests.
+          release: false  # Does not gate the release pipeline.
+        results:  # Published results.
+          ci:  # Results of the CI runs.
+            name: CodeQL SARIF report  # Name of the result set.
+            predicate-uri: https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html  # Format of the results, SARIF 2.1.0.
+            location: https://github.com/unbihexium-oss/unbihexium/security/code-scanning  # Where the results can be seen.
+            comment: Visible to repository maintainers in GitHub code scanning.  # Who can see the results.
+      - name: atheris  # Tool name.
+        type: fuzzing  # Tool category in the specification.
+        comment: |  # What the tool checks and where it runs.
+          Coverage-guided fuzzing of the GeoJSON and STAC parsers from the
+          seed corpora in fuzz/corpus/ (Fuzz workflow); a crash fails the job
+          and its input is kept as a regression test.
+        rulesets:  # Rule sets or configuration files used.
+          - fuzz/  # Fuzz targets and seed corpora.
         integration:  # When the tool runs.
           adhoc: true  # Also started by hand or on a schedule.
           ci: true  # Runs on pushes or pull requests.

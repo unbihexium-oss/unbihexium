@@ -390,6 +390,46 @@ def test_api_key() -> None:
     assert APIKeyAuth(None)(None) is None  # type: ignore[arg-type]
 
 
+# JSON routes reject other media types with 415, as README.md states.
+def test_json_media_type(client: TestClient) -> None:
+    # A JSON body sent as plain text.
+    body = '{"image": [[[0.1, 0.2]], [[0.5, 0.6]]]}'
+    # Route of the prediction.
+    url = "/predict/ndvi_calculator_tiny"
+    # Plain text is refused before the body is parsed.
+    response = client.post(url, content=body, headers={"Content-Type": "text/plain"})
+    # Unsupported media type.
+    assert response.status_code == 415
+    # The same body as JSON is accepted.
+    response = client.post(url, content=body, headers={"Content-Type": "application/json"})
+    # Success.
+    assert response.status_code == 200
+    # Structured syntax suffixes such as application/geo+json count as JSON.
+    response = client.post(url, content=body, headers={"Content-Type": "application/geo+json"})
+    # Success.
+    assert response.status_code == 200
+
+
+# The rate limiter forgets clients whose bucket has refilled completely.
+def test_rate_limiter_memory_is_bounded() -> None:
+    # Fake clock.
+    now = [0.0]
+    # One request per second, bursts of one.
+    limiter = RateLimiter(60, burst=1, clock=lambda: now[0])
+    # Many clients within one second stay in memory.
+    for i in range(3000):
+        # Each client takes its token.
+        assert limiter.acquire(f"10.0.{i // 256}.{i % 256}") == 0.0
+    # All are recent.
+    assert len(limiter._buckets) == 3000
+    # Ten seconds later every bucket has refilled.
+    now[0] = 10.0
+    # The next request drops the idle buckets.
+    assert limiter.acquire("192.0.2.1") == 0.0
+    # Only the new client remains.
+    assert len(limiter._buckets) == 1
+
+
 # Token bucket: 60 requests per minute with bursts of 2.
 def test_rate_limiter() -> None:
     # Fake clock.

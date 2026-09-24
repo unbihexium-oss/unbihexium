@@ -54,7 +54,7 @@ changelog:  # Settings for the generated changelog.
         - compliance  # Licence, privacy and policy documents.
     - title: Documentation  # Documentation changes.
       labels:  # Labels that select this section.
-        - documentation  # Guides, docstrings, notebooks and model cards.
+        - documentation  # Guides, docstrings, examples and model cards.
     - title: Build, CI and containers  # Tooling changes.
       labels:  # Labels that select this section.
         - build  # Packaging and build.

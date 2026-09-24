@@ -10,7 +10,6 @@
   "softwareVersion": "1.0.1",
   "license": "https://spdx.org/licenses/MPL-2.0",
   "isAccessibleForFree": true,
-  "url": "https://unbihexium.org",
   "codeRepository": "https://github.com/unbihexium-oss/unbihexium",
   "issueTracker": "https://github.com/unbihexium-oss/unbihexium/issues",
   "continuousIntegration": "https://github.com/unbihexium-oss/unbihexium/actions",
@@ -19,19 +18,14 @@
   "buildInstructions": "https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md",
   "softwareHelp": [
     {
-      "@type": "WebSite",
+      "@type": "CreativeWork",
       "name": "Documentation",
       "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/docs"
     },
     {
-      "@type": "WebSite",
+      "@type": "CreativeWork",
       "name": "Support policy",
       "url": "https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md"
-    },
-    {
-      "@type": "WebSite",
-      "name": "Example notebooks",
-      "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks"
     }
   ],
   "downloadUrl": "https://pypi.org/project/unbihexium/#files",
@@ -107,33 +101,23 @@
     "pydantic>=2.12.0",
     "pyyaml>=6.0.3",
     "requests>=2.33.0",
-    "tqdm>=4.67.1",
     "pillow>=12.3.0",
-    "scikit-learn>=1.7.2",
     "scikit-image>=0.25.2; python_version < '3.11'",
     "scikit-image>=0.26.0; python_version >= '3.11'"
   ],
   "softwareSuggestions": [
     "onnxruntime>=1.23.2,<1.24; python_version < '3.11'",
     "onnxruntime>=1.24.1; python_version >= '3.11'",
+    "onnx>=1.21.0",
     "torch>=2.13.0",
-    "torchvision>=0.28.0",
     "fastapi>=0.133.0",
     "starlette>=1.3.1",
     "uvicorn[standard]>=0.37.0",
-    "python-multipart>=0.0.31",
-    "dask[complete]>=2025.9.1",
-    "ray>=2.56.0",
     "zarr>=2.18.3; python_version < '3.11'",
     "zarr>=3.1.4; python_version >= '3.11'",
     "numcodecs>=0.13.1; python_version < '3.11'",
     "numcodecs>=0.16.4; python_version >= '3.11'",
-    "netCDF4>=1.7.2",
-    "h5py>=3.15.0",
-    "pystac>=1.14.1",
-    "pystac-client>=0.9.0",
-    "pyarrow>=23.0.1",
-    "cupy-cuda12x>=14.0.0"
+    "pyarrow>=23.0.1"
   ],
   "author": [
     {

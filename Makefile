@@ -67,12 +67,14 @@ CI_REQ := .github/requirements
 
 # Every lock file that `make lock` writes and `make lock-check` compares.
 LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-test.txt \
-	$(CI_REQ)/requirements-ci-tools.txt $(CI_REQ)/requirements-ci-fuzz.txt
+	$(CI_REQ)/requirements-ci-typecheck.txt $(CI_REQ)/requirements-ci-tools.txt \
+	$(CI_REQ)/requirements-ci-fuzz.txt $(CI_REQ)/requirements-docker.txt \
+	$(CI_REQ)/requirements-build.txt
 
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
         lint format format-check type-check security licence text-policy \
-        yaml-lint md-lint notebooks model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
+        yaml-lint md-lint model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
         validate verify clean distclean
 
 ##@ Help
@@ -87,13 +89,13 @@ help: ## Show this help
 
 install: ## Install the package with the locked runtime dependencies
 # Install the exact runtime versions from the lock file.
-	$(PIP) install -r requirements.txt
+	$(PIP) install --require-hashes -r requirements.txt
 # Install the package itself without resolving dependencies again.
 	$(PIP) install --no-deps .
 
 install-dev: ## Install the locked development environment and pre-commit hooks
 # Install the exact development versions from the lock file.
-	$(PIP) install -r requirements-dev.txt
+	$(PIP) install --require-hashes -r requirements-dev.txt
 # Install the package in editable mode without resolving dependencies again.
 	$(PIP) install --no-deps -e .
 # Register the Git hooks of .pre-commit-config.yaml.
@@ -104,15 +106,29 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
 		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving -o requirements.txt" \
 		-o .requirements.lock.tmp
-# Compile the development lock with every extra into a temporary file.
-	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --extra all \
-		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --extra all -o requirements-dev.txt" \
+# Compile the development lock with every extra and hashes into a temporary file.
+	$(UV) pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra all \
+		--custom-compile-command "uv pip compile pyproject.toml $(LOCK_FLAGS) --generate-hashes --extra all -o requirements-dev.txt" \
 		-o .requirements-dev.lock.tmp
 # Compile the hashed lock of the CI test environment (the dependencies of PyTorch, not
 # PyTorch itself) into a temporary file.
-	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet --extra stac \
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet \
 		--custom-compile-command "make lock" \
 		-o .requirements-ci-test.lock.tmp
+# Compile the hashed lock of the CI type check (the test environment plus pyright and
+# the SciPy type stubs) into a temporary file.
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(CI_REQ)/requirements-ci-typecheck.in $(LOCK_FLAGS) --generate-hashes --extra test --extra onnx --extra serving --extra zarr --extra parquet \
+		--custom-compile-command "make lock" \
+		-o .requirements-ci-typecheck.lock.tmp
+# Compile the hashed lock of the container image (runtime, onnx and serving extras
+# and the dependencies of PyTorch) into a temporary file.
+	$(UV) pip compile pyproject.toml $(CI_REQ)/requirements-ci-test.in $(LOCK_FLAGS) --generate-hashes --extra onnx --extra serving \
+		--custom-compile-command "make lock" \
+		-o .requirements-docker.lock.tmp
+# Compile the hashed lock of the build backend into a temporary file.
+	$(UV) pip compile $(CI_REQ)/requirements-build.in $(LOCK_FLAGS) --generate-hashes \
+		--custom-compile-command "make lock" \
+		-o .requirements-build.lock.tmp
 # Compile the hashed lock of the CI tools into a temporary file.
 	$(UV) pip compile $(CI_REQ)/requirements-ci-tools.in $(LOCK_FLAGS) --generate-hashes \
 		--custom-compile-command "make lock" \
@@ -126,10 +142,13 @@ lock: ## Regenerate requirements.txt, requirements-dev.txt and the hashed CI loc
 		requirements.txt .requirements.lock.tmp \
 		requirements-dev.txt .requirements-dev.lock.tmp \
 		$(CI_REQ)/requirements-ci-test.txt .requirements-ci-test.lock.tmp \
+		$(CI_REQ)/requirements-ci-typecheck.txt .requirements-ci-typecheck.lock.tmp \
 		$(CI_REQ)/requirements-ci-tools.txt .requirements-ci-tools.lock.tmp \
-		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp
+		$(CI_REQ)/requirements-ci-fuzz.txt .requirements-ci-fuzz.lock.tmp \
+		$(CI_REQ)/requirements-docker.txt .requirements-docker.lock.tmp \
+		$(CI_REQ)/requirements-build.txt .requirements-build.lock.tmp
 # Remove the temporary files.
-	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp
+	@rm -f .requirements.lock.tmp .requirements-dev.lock.tmp .requirements-ci-*.lock.tmp .requirements-docker.lock.tmp .requirements-build.lock.tmp
 # Remind the maintainer to review the new pins.
 	@echo "Lock files regenerated. Review the diff before committing."
 
@@ -150,9 +169,9 @@ test: ## Run the complete test suite
 # Run every test with the options from pyproject.toml.
 	$(PYTHON) -m pytest tests/
 
-test-fast: ## Run unit tests in parallel, skipping slow and GPU tests
+test-fast: ## Run the unit tests in parallel
 # Distribute the unit tests over all CPU cores with pytest-xdist.
-	$(PYTHON) -m pytest tests/unit -n auto -m "not slow and not gpu"
+	$(PYTHON) -m pytest tests/unit -n auto
 
 test-cov: ## Run the test suite with branch coverage (terminal and XML report)
 # Report missing lines in the terminal and write coverage.xml for Codecov.
@@ -205,15 +224,11 @@ md-lint: ## Lint all Markdown files with markdownlint
 # Run a pinned markdownlint-cli with the rules of .markdownlint.yaml.
 	npx --yes markdownlint-cli@0.49.1 --config .markdownlint.yaml "**/*.md" --ignore node_modules
 
-notebooks: ## Validate the example notebooks (format, no outputs)
-# Check the notebook format and that no outputs are committed.
-	$(PYTHON) .github/scripts/check_notebooks.py examples/notebooks
-
 model-zoo: ## Check model zoo structure, checksums, cards and manifests
 # Check the model zoo against its catalogue and checksums.
 	$(PYTHON) .github/scripts/check_model_zoo.py
 
-check: lint format-check type-check test licence text-policy yaml-lint notebooks model-zoo ## Run all local checks that CI runs
+check: lint format-check type-check test licence text-policy yaml-lint model-zoo ## Run all local checks that CI runs
 
 pre-commit: ## Run every pre-commit hook on all files
 # Run all hooks, not only those for changed files.
@@ -245,11 +260,11 @@ docker-run: ## Run the command line interface in the container
 docker-api: ## Run the REST API in the container on http://localhost:$(PORT)
 # Serve the API on port 8000 in the container, published on PORT of the host.
 	docker run --rm -p $(PORT):8000 $(IMAGE) \
-		uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
+		unbihexium serve --host 0.0.0.0 --port 8000
 
 ##@ Model zoo and verification
 
-validate: ## Load and run every model (requires Git LFS weights)
+validate: ## Build, verify and run every model of the zoo (requires PyTorch)
 # Build, run and compare every model of the zoo.
 	$(PYTHON) scripts/validate_models.py
 

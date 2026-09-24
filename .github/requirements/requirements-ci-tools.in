@@ -37,8 +37,8 @@ check-jsonschema==0.38.1  # JSON Schema validation; same release as the pre-comm
 yamllint==1.38.0  # YAML lint; same release as the pre-commit hook.
 pyyaml  # YAML parser for the repository scripts.
 jsonschema  # JSON Schema validation of the model manifests.
-nbformat  # Notebook format validation.
 uv  # Lock file compiler used by the torch lock workflow.
+hatchling>=1.27.0  # Build backend for `python -m build --no-isolation`; keep in step with pyproject.toml.
 
 # =============================================================================
 # End of file .github/requirements/requirements-ci-tools.in

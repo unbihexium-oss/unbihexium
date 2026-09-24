@@ -5,19 +5,19 @@
 # =============================================================================
 # Project     : Unbihexium
 # File        : .gitattributes
-# Title       : Line endings, binary files, Git LFS and GitHub linguist
+# Title       : Line endings, binary files and GitHub linguist
 # Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
 # Affiliation : University of Helsinki
 # Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
 # Licence     : Mozilla Public License 2.0, see LICENSE.txt
-# Format      : Git attributes, read by Git, Git LFS and GitHub linguist
+# Format      : Git attributes, read by Git and GitHub linguist
 # =============================================================================
 #
 # Abstract
 # --------
 # Assigns Git attributes to paths (https://git-scm.com/docs/gitattributes):
-# the line ending normalisation, the diff drivers, the files stored in Git
-# LFS, the files treated as binary, the linguist classification used for the
+# the line ending normalisation, the diff drivers, the files treated as
+# binary, the linguist classification used for the
 # GitHub language statistics and the paths left out of `git archive`.
 #
 # When several patterns match a path, the later line wins for each attribute.
@@ -48,21 +48,20 @@
 *.sh diff=bash
 
 # -----------------------------------------------------------------------------
-# Git LFS: model weights
-# The starter weights of the model zoo are generated locally from the model
-# id and are not committed (see src/unbihexium/zoo/catalog.yaml). Weight files
-# that are committed anyway, for example fine-tuned checkpoints, are stored
-# in Git LFS instead of the Git history.
+# Model weights
+# The starter weights of the model zoo are built locally from the catalogue
+# and never committed; .gitignore ignores weight files. Should one be added
+# with `git add --force`, it is at least treated as binary.
 # -----------------------------------------------------------------------------
 
-# Store ONNX models in Git LFS and never merge or diff them as text.
-*.onnx filter=lfs diff=lfs merge=lfs -text
-# Store PyTorch checkpoints in Git LFS.
-*.pt filter=lfs diff=lfs merge=lfs -text
-# Store PyTorch state dictionaries in Git LFS.
-*.pth filter=lfs diff=lfs merge=lfs -text
-# Store safetensors weight files in Git LFS.
-*.safetensors filter=lfs diff=lfs merge=lfs -text
+# ONNX models.
+*.onnx binary
+# PyTorch checkpoints.
+*.pt binary
+# PyTorch state dictionaries.
+*.pth binary
+# safetensors weight files.
+*.safetensors binary
 
 # -----------------------------------------------------------------------------
 # Binary files tracked directly in Git
@@ -93,12 +92,10 @@
 
 # -----------------------------------------------------------------------------
 # GitHub linguist
-# Keep documentation, notebooks, model cards and licence texts out of the
+# Keep documentation, model cards and licence texts out of the
 # language statistics so that the repository is classified as Python.
 # -----------------------------------------------------------------------------
 
-# Example notebooks count as documentation, not as Jupyter code.
-examples/notebooks/*.ipynb linguist-documentation
 # Model cards describe the model zoo and count as documentation.
 model_zoo/cards/** linguist-documentation
 # The documentation sources.

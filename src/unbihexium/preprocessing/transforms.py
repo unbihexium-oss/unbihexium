@@ -35,13 +35,28 @@
 from __future__ import annotations
 
 # Type of loosely structured values and callables.
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Literal, Sequence
 
 # Arrays.
 import numpy as np
 
 # Array type annotations.
 from numpy.typing import NDArray
+
+# Padding modes of numpy.pad.
+PadMode = Literal[
+    "constant",  # A constant value, zero by default.
+    "edge",  # The edge values.
+    "linear_ramp",  # A ramp from the edge values to zero.
+    "maximum",  # The maximum of each axis.
+    "mean",  # The mean of each axis.
+    "median",  # The median of each axis.
+    "minimum",  # The minimum of each axis.
+    "reflect",  # Reflection without repeating the edge.
+    "symmetric",  # Reflection including the edge.
+    "wrap",  # Periodic continuation.
+    "empty",  # Undefined values.
+]
 
 
 # Float copy of an array with nodata values replaced by NaN.
@@ -154,11 +169,11 @@ class Resize:
 # Pad an (H, W) or (C, H, W) array at the bottom and right to a target size.
 class Pad:
     # Store the target size.
-    def __init__(self, target_size: tuple[int, int], mode: str = "constant") -> None:
+    def __init__(self, target_size: tuple[int, int], mode: PadMode = "constant") -> None:
         # Target height and width.
         self.target_size = target_size
         # NumPy padding mode.
-        self.mode = mode
+        self.mode: PadMode = mode
 
     # Pad the array.
     def __call__(self, image: NDArray[Any]) -> NDArray[Any]:

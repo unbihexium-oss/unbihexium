@@ -28,7 +28,7 @@ documentation:
   - changed-files:  # Match against the files changed by the pull request.
       - any-glob-to-any-file:  # Label when any changed file matches any glob.
           - "docs/**"  # Documentation tree.
-          - "examples/**"  # Example scripts and notebooks.
+          - "examples/**"  # Example scripts and the example REST service.
           - "**/*.md"  # Markdown anywhere in the repository.
 
 # Model zoo files and the code that loads and registers models.

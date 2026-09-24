@@ -203,8 +203,10 @@ def annotate_yaml(text: str) -> str:
     out = []
     # Walk over the lines.
     for line in text.splitlines():
-        # Parse the line; the pattern matches every line.
+        # Parse the line.
         match = YAML_LINE.match(line)
+        # The pattern matches every line, since all of its groups are optional.
+        assert match is not None
         # Column of the key or item.
         column = len(match.group("indent")) + (2 if match.group("dash") else 0)
         # Close the mappings that this line leaves.

@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-NOTICE |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch: source tree, wheel, source distribution and container image |
 
@@ -62,7 +62,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ```
 
-Files that cannot carry a comment, such as JSON files, notebooks and NumPy arrays, are covered by the annotation in `REUSE.toml`, which applies the same copyright and licence to every file in the repository in the manner defined by the REUSE specification [3].
+Files that cannot carry a comment, such as JSON files and NumPy arrays, are covered by the annotation in `REUSE.toml`, which applies the same copyright and licence to every file in the repository in the manner defined by the REUSE specification [3].
 
 ### 1.3 What the licence means in practice
 
@@ -95,11 +95,11 @@ Unbihexium is distributed as a pure Python package. The wheel and the source dis
 
 ### 4.2 Runtime dependencies
 
-The runtime dependencies are numpy, scipy, rasterio, shapely, geopandas, pyproj, click, rich, pydantic, pyyaml, requests, tqdm, pillow, scikit-learn and scikit-image. All are under permissive licences (BSD-3-Clause, MIT, MIT-CMU and Apache-2.0), except tqdm, which is under MPL-2.0 AND MIT. Binary wheels of some of them bundle native libraries such as GDAL, PROJ, GEOS (LGPL-2.1-or-later) and the GCC runtime libraries (GPL-3.0-or-later with the GCC Runtime Library Exception).
+The runtime dependencies are numpy, scipy, rasterio, shapely, geopandas, pyproj, click, rich, pydantic, pyyaml, requests, pillow and scikit-image. All are under permissive licences (BSD-3-Clause, MIT, MIT-CMU and Apache-2.0). Binary wheels of some of them bundle native libraries such as GDAL, PROJ, GEOS (LGPL-2.1-or-later) and the GCC runtime libraries (GPL-3.0-or-later with the GCC Runtime Library Exception).
 
 ### 4.3 Optional dependencies
 
-The extras `onnx`, `torch`, `gpu`, `serving`, `dask`, `ray`, `zarr`, `netcdf`, `stac` and `parquet` install further packages, including onnxruntime and onnx, torch and torchvision, cupy-cuda12x, fastapi, starlette, uvicorn and python-multipart, dask, ray, zarr and numcodecs, netCDF4 and h5py, pystac and pystac-client, and pyarrow. CUDA builds of PyTorch and the `gpu` extra require NVIDIA libraries under NVIDIA's own licence terms.
+The extras `onnx`, `torch`, `serving`, `zarr` and `parquet` install further packages, including onnxruntime and onnx, torch, fastapi, starlette and uvicorn, zarr and numcodecs, and pyarrow. CUDA builds of PyTorch, which users install themselves to use a GPU, require NVIDIA libraries under NVIDIA's own licence terms.
 
 ### 4.4 Development and test tools
 
@@ -120,7 +120,7 @@ Redistributors of the image must comply with the licences of all of these compon
 
 ## 6. Data
 
-Unbihexium does not ship Earth observation imagery or other third-party data. Users are responsible for complying with the licences and terms of use of the data they process, for example the Copernicus Sentinel data licence or the USGS Landsat terms. The test fixtures in `tests/fixtures/` are small simulated arrays, not real imagery, and are licensed under the MPL-2.0.
+Unbihexium does not ship Earth observation imagery or other third-party data. Users are responsible for complying with the licences and terms of use of the data they process, for example the Copernicus Sentinel data licence or the USGS Landsat terms. The tests generate synthetic arrays at run time; the repository contains no imagery.
 
 ## 7. Trademarks
 

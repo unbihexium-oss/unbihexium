@@ -72,7 +72,7 @@ _Select all that apply._
 - [ ] unbihexium.visualization
 - [ ] unbihexium.zoo (model download, verification and loading)
 - [ ] Model zoo assets (model_zoo/)
-- [ ] Documentation or example notebooks
+- [ ] Documentation or examples
 - [ ] Packaging, Docker image or CI configuration
 - [ ] Not sure
 - [ ] Other:
@@ -267,7 +267,7 @@ _Select all that apply._
 - [ ] README
 - [ ] Documentation in docs/
 - [ ] Docstrings
-- [ ] Example notebooks
+- [ ] Example scripts
 - [ ] Model cards
 - [ ] Not needed
 - [ ] Other:
@@ -469,8 +469,6 @@ _Select one._
 - [ ] 1.0.1 (latest release)
 - [ ] 1.0.0
 - [ ] main branch (unreleased)
-- [ ] 0.9.x
-- [ ] 0.8.x or earlier
 - [ ] Other:
 
 ### Q40. Exact version string or commit SHA
@@ -487,7 +485,6 @@ _Select one._
 
 - [ ] PyPI with pip
 - [ ] PyPI with uv, pipx, poetry or pdm
-- [ ] conda or mamba (conda-forge)
 - [ ] Source checkout, editable install
 - [ ] Official Docker image
 - [ ] Custom container image
@@ -682,8 +679,7 @@ Declare which models are involved. Select every option that applies.
 _Select all that apply._
 
 - [ ] No models involved
-- [ ] Unbihexium model zoo models (Git LFS)
-- [ ] Unbihexium models downloaded from a release asset
+- [ ] Unbihexium model zoo models (built locally from the catalogue)
 - [ ] Custom models trained by me or my organisation
 - [ ] Unbihexium models fine-tuned by me or my organisation
 - [ ] Third-party models
@@ -1145,7 +1141,7 @@ Covers telemetry and privacy regimes outside the GDPR.
 
 _Tick every statement._
 
-- [ ] Any telemetry or storage of information on user devices complies with [ePrivacy Directive Article 5(3)](https://eur-lex.europa.eu/eli/dir/2002/58/oj/eng#art_5); Unbihexium telemetry is opt-in as described in [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md).
+- [ ] Any telemetry or storage of information on user devices complies with [ePrivacy Directive Article 5(3)](https://eur-lex.europa.eu/eli/dir/2002/58/oj/eng#art_5); Unbihexium itself sends no telemetry, as described in [PRIVACY.md](https://github.com/unbihexium-oss/unbihexium/blob/main/PRIVACY.md).
 - [ ] For processing subject to UK law I comply with the [UK GDPR](https://www.legislation.gov.uk/eur/2016/679/article/5) and the [Data Protection Act 2018](https://www.legislation.gov.uk/ukpga/2018/12/contents).
 - [ ] For consumers in California I comply with the CCPA as amended by the CPRA, including [Civil Code 1798.100](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.100), [1798.105](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.105) and [1798.120](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1798.120).
 

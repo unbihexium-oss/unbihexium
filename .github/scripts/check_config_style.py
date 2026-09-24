@@ -39,9 +39,12 @@
 # the comment of the line that opens them.
 #
 # Files that cannot hold comments are not checked: JSON, NumPy arrays, the
-# empty py.typed marker, the Markdown and notebook documentation (own rules),
+# empty py.typed marker, the Markdown documentation (own rules),
 # the fuzzer inputs in fuzz/corpus/ and the licence and notice texts, which
-# are reproduced verbatim.
+# are reproduced verbatim. Helm templates under deploy/helm/*/templates/ are
+# Go templates, not YAML: a `#` comment would be copied into every rendered
+# manifest, so they carry the header in a template comment ({{- /* ... */ -}})
+# and are checked by `helm lint` instead.
 #
 # Usage
 # -----
@@ -85,7 +88,7 @@ NOTICE_LINE = "# This Source Code Form is subject to the terms of the Mozilla Pu
 
 # Files and patterns that are not checked, with the reason in the comment.
 SKIPPED = (
-    re.compile(r"\.(md|ipynb)$"),  # Documentation, own rules.
+    re.compile(r"\.md$"),  # Documentation, own rules.
     re.compile(r"\.py$"),  # Python, checked by check_python_style.py.
     re.compile(r"\.json$"),  # JSON has no comment syntax.
     re.compile(r"\.npy$"),  # Binary NumPy arrays.
@@ -94,6 +97,7 @@ SKIPPED = (
     re.compile(r"^NOTICE$"),  # Legal notice text, reproduced verbatim.
     re.compile(r"(^|/)py\.typed$"),  # Empty PEP 561 marker.
     re.compile(r"^fuzz/corpus/"),  # Fuzzer inputs, reproduced byte for byte.
+    re.compile(r"^deploy/helm/[^/]+/templates/"),  # Go templates; header in a template comment.
 )  # End of the skipped patterns.
 
 

@@ -236,6 +236,165 @@ def test_pipeline_list(runner: CliRunner) -> None:
     assert result.exit_code == 0 and "ship_detection" in result.output
 
 
+# `serve` starts uvicorn with the configured and the given address.
+def test_serve(runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    # The serving extra is optional.
+    uvicorn = pytest.importorskip("uvicorn")
+    # Settings cache of the library.
+    from unbihexium.config import reset_settings
+
+    # Arguments of the uvicorn.run calls.
+    calls: list[dict[str, object]] = []
+    # Record the call instead of starting a server.
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kwargs: calls.append(kwargs))
+    # Configuration file with a port and a log level.
+    config = tmp_path / "serve.yaml"
+    # Serving section and top-level level.
+    config.write_text("log_level: INFO\nserving:\n  port: 9100\n", encoding="utf-8")
+    # `serve --config` sets UNBIHEXIUM_CONFIG; register it so that it is restored.
+    monkeypatch.setenv("UNBIHEXIUM_CONFIG", str(config))
+    # Forget cached settings.
+    reset_settings()
+    # Values from the file.
+    result = runner.invoke(cli, ["serve", "--config", str(config)])
+    # One call on the configured port and the default host.
+    assert result.exit_code == 0, result.output
+    # Port and host of the configuration.
+    assert calls[-1]["port"] == 9100 and calls[-1]["host"] == "127.0.0.1"
+    # Log level of the configuration.
+    assert calls[-1]["log_level"] == "info"
+    # Command line options win.
+    result = runner.invoke(cli, ["serve", "--host", "0.0.0.0", "--port", "8001", "--proxy-headers"])
+    # Second call with the given address.
+    assert calls[-1]["host"] == "0.0.0.0" and calls[-1]["port"] == 8001
+    # Forwarded headers are trusted on request.
+    assert calls[-1]["proxy_headers"] is True
+    # Leave no settings behind for other tests.
+    reset_settings()
+
+
+# Command errors are messages with exit status 1, not tracebacks.
+def test_clean_errors(runner: CliRunner, tmp_path: Path) -> None:
+    # Three-band image.
+    image = geotiff(tmp_path / "rgb.tif", 3)
+    # Unknown model of zoo export.
+    result = runner.invoke(cli, ["zoo", "export", "nosuch", str(tmp_path / "x.onnx")])
+    # Message without a traceback.
+    assert result.exit_code == 1 and "unknown model 'nosuch'" in result.output
+    # Unknown pipeline parameter.
+    args = ["pipeline", "run", "ship_detection", "-i", str(image), "-o", "o.geojson"]
+    # Run with a parameter that the task API does not accept.
+    result = runner.invoke(cli, [*args, "-p", "bogus=1"])
+    # Message naming the problem.
+    assert result.exit_code == 1 and "invalid parameters for ship_detection" in result.output
+    # Unknown pipeline.
+    result = runner.invoke(cli, ["pipeline", "run", "nosuch", "-i", str(image), "-o", "o.tif"])
+    # Message without a traceback.
+    assert result.exit_code == 1 and "pipeline not found: nosuch" in result.output
+    # Ids that would leave the model store.
+    result = runner.invoke(cli, ["zoo", "clear", "../outside"])
+    # Refused.
+    assert result.exit_code == 1 and "invalid model id" in result.output
+
+
+# Hints keep their square brackets, which rich would read as markup.
+def test_hints_keep_brackets(runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Model store functions.
+    import unbihexium.zoo
+
+    # Simulate a missing PyTorch.
+    def missing(*args: object, **kwargs: object) -> None:
+        # Same error as a failed import.
+        raise ImportError("No module named 'torch'")
+
+    # Replace the store function used by zoo build.
+    monkeypatch.setattr(unbihexium.zoo, "ensure_model", missing)
+    # Run the command.
+    result = runner.invoke(cli, ["zoo", "build", "ship_detector_tiny"])
+    # The extra is printed with its brackets.
+    assert result.exit_code == 1 and "unbihexium[torch]" in result.output
+
+
+# --verbose sets the library logger to DEBUG.
+def test_verbose_configures_logging(runner: CliRunner) -> None:
+    # Standard logging.
+    import logging
+
+    # Run a command with the flag.
+    assert runner.invoke(cli, ["--verbose", "info"]).exit_code == 0
+    # Level of the library logger.
+    assert logging.getLogger("unbihexium").level == logging.DEBUG
+    # Without the flag the default level applies again.
+    assert runner.invoke(cli, ["info"]).exit_code == 0
+    # WARNING unless UNBIHEXIUM_LOG_LEVEL says otherwise.
+    assert logging.getLogger("unbihexium").level == logging.WARNING
+
+
+# predict refuses mismatched output names, warns about starter models and
+# takes the configured default variant for family names.
+def test_predict_output_warning_and_variant(
+    runner: CliRunner,  # Command runner.
+    tmp_path: Path,  # Temporary directory.
+    monkeypatch: pytest.MonkeyPatch,  # Environment patching.
+) -> None:  # The test returns nothing.
+    # PyTorch runs the models.
+    pytest.importorskip("torch")
+    # Settings cache of the library.
+    from unbihexium.config import reset_settings
+
+    # Three-band image.
+    image = geotiff(tmp_path / "rgb.tif", 3)
+    # Detections cannot be written to a GeoTIFF name.
+    args = ["predict", "ship_detector_tiny", str(image), str(tmp_path / "ships.tif")]
+    # Run the command.
+    result = runner.invoke(cli, args)
+    # Refused before any file is written.
+    assert result.exit_code == 1 and "written as .geojson" in result.output
+    # Nothing was written.
+    assert not (tmp_path / "ships.tif").exists()
+    # Default variant from the configuration for a bare family name.
+    monkeypatch.setenv("UNBIHEXIUM_MODEL__VARIANT", "tiny")
+    # Forget cached settings.
+    reset_settings()
+    # Run the family name.
+    args = ["predict", "ship_detector", str(image), str(tmp_path / "ships.geojson")]
+    # Run the command.
+    result = runner.invoke(cli, args)
+    # The tiny variant ran, with the starter model warning.
+    assert result.exit_code == 0 and "ship_detector_tiny" in result.output
+    # Starter models are flagged.
+    assert "untrained starter model" in result.output
+    # Leave no settings behind for other tests.
+    reset_settings()
+
+
+# A checkpoint file runs with the ONNX backend, with or without a variant.
+def test_predict_checkpoint_with_onnx_backend(runner: CliRunner, tmp_path: Path) -> None:
+    # Building the checkpoint needs PyTorch, the export onnx and ONNX Runtime.
+    pytest.importorskip("torch")
+    # ONNX file writer.
+    pytest.importorskip("onnx")
+    # ONNX file runner.
+    pytest.importorskip("onnxruntime")
+    # Store function that builds the checkpoint.
+    from unbihexium.zoo import ensure_model
+
+    # Checkpoint file of a starter model.
+    checkpoint = ensure_model("ship_detector_tiny") / "model.pt"
+    # Three-band image.
+    image = geotiff(tmp_path / "rgb.tif", 3)
+    # Output file.
+    out = tmp_path / "ships.geojson"
+    # The variant must not be appended to the file name.
+    args = ["predict", str(checkpoint), str(image), str(out), "--variant", "tiny"]
+    # Run with ONNX Runtime.
+    result = runner.invoke(cli, [*args, "--backend", "onnx"])
+    # Success and a feature collection.
+    assert result.exit_code == 0, result.output
+    # GeoJSON output.
+    assert json.loads(out.read_text())["type"] == "FeatureCollection"
+
+
 # =============================================================================
 # End of module tests/unit/test_cli.py
 # Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).

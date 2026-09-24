@@ -19,16 +19,17 @@
 # Sunday at 00:00 UTC:
 #
 #   bandit             static analysis of src/ with the Bandit settings in
-#                      pyproject.toml; informational, never fails
-#   pip-audit          audits the runtime lock file requirements.txt against
-#                      the PyPI advisory database; informational, never fails
+#                      pyproject.toml; any finding fails the job
+#   pip-audit          audits the lock files requirements.txt and
+#                      requirements-dev.txt against the PyPI advisory
+#                      database; any known vulnerability fails the job
 #   dependency-review  pull requests only: blocks new dependencies with
 #                      high or critical vulnerabilities or denied licences,
 #                      as configured in .github/dependency-review-config.yml
 #
-# Bandit and pip-audit report in the job log only; review their output when
-# the weekly run completes. The tools come from the hashed lock file
-# .github/requirements/requirements-ci-tools.txt.
+# The weekly run catches advisories published after a merge: a red weekly
+# run means that a locked version needs an update. The tools come from the
+# hashed lock file .github/requirements/requirements-ci-tools.txt.
 # =============================================================================
 
 name: Security  # Name shown in the Actions tab and in the status checks.
@@ -60,7 +61,7 @@ jobs:  # Jobs of the workflow.
         run: python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt  # Locked, hashed CI tools, including bandit[toml].
 
       - name: Run bandit  # Scan the package recursively.
-        run: bandit -c pyproject.toml -r src/ || echo "Bandit scan completed"  # Informational: findings do not fail the job.
+        run: bandit -c pyproject.toml -r src/  # Any finding fails the job.
 
   pip-audit:  # Known vulnerabilities in dependencies.
     name: Dependency Audit  # Name of the status check.
@@ -78,8 +79,12 @@ jobs:  # Jobs of the workflow.
           # Install the locked, hashed CI tools, including the dependency auditor.
           python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
 
-      - name: Run pip-audit  # Audit the installed environment.
-        run: pip-audit --require-hashes --disable-pip -r requirements.txt || echo "Audit completed"  # Audit the runtime lock file; informational, findings do not fail the job.
+      - name: Run pip-audit  # Audit the lock files; any known vulnerability fails the job.
+        run: |  # Shell script run by bash.
+          # Audit the exact versions of the runtime lock file.
+          pip-audit --require-hashes --disable-pip --progress-spinner off -r requirements.txt
+          # Audit the development lock file, which also covers every extra.
+          pip-audit --require-hashes --disable-pip --progress-spinner off -r requirements-dev.txt
 
   dependency-review:  # Review dependency changes of a pull request.
     name: Dependency Review  # Name of the status check.

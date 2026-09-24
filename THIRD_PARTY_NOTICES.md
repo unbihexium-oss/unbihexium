@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-THIRD-PARTY |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | Unbihexium 1.0.x and the main branch: source tree, wheel, source distribution and container image |
 
@@ -113,9 +113,7 @@ These packages are always installed with Unbihexium. "Minimum" is the lower boun
 | pydantic | 2.12.0 | 2.13.5 | MIT |
 | pyyaml | 6.0.3 | 6.0.3 | MIT |
 | requests | 2.33.0 | 2.34.2 | Apache-2.0 |
-| tqdm | 4.67.1 | 4.70.1 | MPL-2.0 AND MIT |
 | pillow | 12.3.0 | 12.3.0 | MIT-CMU |
-| scikit-learn | 1.7.2 | 1.7.2 / 1.9.1 | BSD-3-Clause |
 | scikit-image | 0.25.2 / 0.26.0 | 0.25.2 / 0.26.0 | BSD licence (classifier; BSD-3-Clause text) |
 
 ## 5. Optional dependencies
@@ -127,27 +125,18 @@ These packages are installed only when the corresponding extra is requested, for
 | onnx | onnxruntime | 1.23.2 / 1.24.1 | 1.23.2 / 1.30.0 | MIT |
 | onnx, torch | onnx | 1.21.0 | 1.23.0 | Apache-2.0 |
 | torch | torch | 2.13.0 | 2.14.0 | Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT |
-| torch | torchvision | 0.28.0 | 0.29.0 | BSD (free text) |
-| gpu | cupy-cuda12x | 14.0.0 | not locked | MIT |
 | serving | fastapi | 0.133.0 | 0.141.1 | MIT |
 | serving | starlette | 1.3.1 | 1.7.0 | BSD-3-Clause |
 | serving | uvicorn | 0.37.0 | 0.53.0 | BSD-3-Clause |
-| serving | python-multipart | 0.0.31 | 0.0.32 | Apache-2.0 |
-| dask | dask | 2025.9.1 | 2026.8.0 | BSD-3-Clause |
-| ray | ray | 2.56.0 | 2.58.0 | Apache-2.0 (free text) |
 | zarr | zarr | 2.18.3 / 3.1.4 | 2.18.3 / 3.1.6 / 3.4.0 | MIT |
 | zarr | numcodecs | 0.13.1 / 0.16.4 | 0.13.1 / 0.16.5 / 0.17.0 | MIT |
-| netcdf | netCDF4 | 1.7.2 | 1.7.3 / 1.7.4 (by platform) | MIT |
-| netcdf | h5py | 3.15.0 | 3.16.0 | BSD-3-Clause |
-| stac | pystac | 1.14.1 | 1.15.2 | Apache-2.0 |
-| stac | pystac-client | 0.9.0 | 0.9.0 | Apache-2.0 |
 | parquet | pyarrow | 23.0.1 | 25.0.1 | Apache-2.0 |
 
-CUDA builds of PyTorch and the `gpu` extra also install or require NVIDIA libraries and the NVIDIA CUDA runtime, which are distributed under NVIDIA's own licence terms, not under an open source licence. Users of those builds MUST accept and follow NVIDIA's terms.
+CUDA builds of PyTorch, which users install themselves to use a GPU, also install or require NVIDIA libraries and the NVIDIA CUDA runtime, which are distributed under NVIDIA's own licence terms, not under an open source licence. Users of those builds MUST accept and follow NVIDIA's terms.
 
 ## 6. Indirect runtime dependencies
 
-The following packages are installed as dependencies of the packages in Sections 4 and 5 (`onnx` and `serving` extras). Together with those sections they form the complete environment of `requirements.txt`. Some entries apply only to certain Python versions or platforms (for example `colorama` and `pyreadline3` on Windows, `exceptiongroup` on Python 3.10).
+The following packages are installed as dependencies of the packages in Sections 4 and 5 (`onnx` and `serving` extras). Together with those sections they form the complete environment of `requirements.txt`. Some entries apply only to certain Python versions or platforms (for example `pyreadline3` on Windows, `exceptiongroup` on Python 3.10).
 
 | Package | Declared licence |
 | --- | --- |
@@ -156,19 +145,17 @@ The following packages are installed as dependencies of the packages in Sections
 | certifi | MPL-2.0 |
 | charset-normalizer | MIT |
 | click-plugins, cligj | BSD (free text) |
-| cloudpickle | BSD licence (classifier) |
-| colorama, pyreadline3 | BSD licence (classifier) |
+| pyreadline3 | BSD licence (classifier) |
 | coloredlogs, humanfriendly | MIT |
 | exceptiongroup | MIT |
 | flatbuffers | Apache-2.0 |
 | h11, httptools | MIT |
 | idna | BSD-3-Clause |
 | imageio | BSD-2-Clause |
-| joblib, lazy-loader, networkx, threadpoolctl, tifffile | BSD-3-Clause |
+| lazy-loader, networkx, tifffile | BSD-3-Clause |
 | markdown-it-py, mdurl | MIT |
 | ml-dtypes | Apache-2.0 |
 | mpmath, sympy | BSD (free text) |
-| narwhals | MIT |
 | packaging | Apache-2.0 OR BSD-2-Clause |
 | pandas | BSD licence (classifier; BSD-3-Clause text) |
 | protobuf | BSD-3-Clause |
@@ -189,7 +176,7 @@ The following packages are installed as dependencies of the packages in Sections
 
 ## 7. Native libraries in binary wheels
 
-Several dependencies are distributed as binary wheels that contain compiled third-party libraries. The list below was taken from the Linux x86_64 wheels of the locked versions for CPython 3.12; wheels for other platforms contain equivalent libraries. The numpy, scipy, scikit-learn, shapely, pyproj and pillow wheels ship the licence texts of their bundled libraries in their `.dist-info` directories; the rasterio wheel ships only the rasterio licence, so the licences given for its libraries are those published by the upstream projects.
+Several dependencies are distributed as binary wheels that contain compiled third-party libraries. The list below was taken from the Linux x86_64 wheels of the locked versions for CPython 3.12; wheels for other platforms contain equivalent libraries. The numpy, scipy, shapely, pyproj and pillow wheels ship the licence texts of their bundled libraries in their `.dist-info` directories; the rasterio wheel ships only the rasterio licence, so the licences given for its libraries are those published by the upstream projects.
 
 | Wheel | Bundled libraries | Licences |
 | --- | --- | --- |
@@ -198,7 +185,6 @@ Several dependencies are distributed as binary wheels that contain compiled thir
 | shapely | GEOS | LGPL-2.1-or-later |
 | pyproj | PROJ, libcurl, libtiff, SQLite, nghttp2 | PROJ: MIT; the others under permissive licences |
 | numpy, scipy | OpenBLAS, LAPACK, libgfortran, libquadmath | OpenBLAS: BSD-3-Clause; LAPACK: BSD-3-Clause-Open-MPI; libgfortran: GPL-3.0-or-later WITH GCC-exception-3.1; libquadmath: LGPL-2.1-or-later |
-| scikit-learn | libgomp | GPL-3.0-or-later WITH GCC-exception-3.1 |
 | pillow | libjpeg, libpng, libtiff, libwebp, FreeType, HarfBuzz, Little CMS, OpenJPEG, libavif, Brotli, zstd and others | Permissive licences listed in the pillow wheel |
 
 The GCC Runtime Library Exception permits the distribution of programs linked with these runtime libraries under terms of the distributor's choice. LGPL-2.1-or-later libraries such as GEOS and libquadmath are shipped as separate shared libraries; a redistributor of the wheels MUST keep their licence texts and make the corresponding source available as the LGPL requires [10].

@@ -15,8 +15,7 @@
 #
 # Abstract
 # --------
-# Checks every link in the Markdown files and the example notebooks with
-# lychee, configured by .github/lychee.toml. It runs weekly on Monday at
+# Checks every link in the Markdown files with lychee, configured by .github/lychee.toml. It runs weekly on Monday at
 # 05:00 UTC and on demand, not on pull requests, because external sites fail
 # intermittently and must not block merges. Broken links never fail the run;
 # instead the report is posted to an open issue titled "Broken links report",
@@ -52,14 +51,13 @@ jobs:  # Jobs of the workflow.
         with:  # Inputs of the checkout action.
           persist-credentials: false  # Do not leave the token in .git/config.
 
-      - name: Check links in Markdown and notebooks  # Run lychee over the documentation.
+      - name: Check links in Markdown  # Run lychee over the documentation.
         id: lychee  # Identifier for reading the exit code later.
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8  # v2.9.0
         with:  # Inputs of the lychee action.
           args: >-  # lychee options followed by the files to check.
             --config .github/lychee.toml
             './**/*.md'
-            './examples/**/*.ipynb'
           output: lychee/report.md  # Markdown report used as the issue body.
           fail: false  # Broken links do not fail the job; the issue reports them.
 

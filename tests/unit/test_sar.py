@@ -223,16 +223,39 @@ def test_speckle_filters(name: str) -> None:
         assert out.mean() == pytest.approx(noisy.mean(), rel=0.1)
 
 
+# The enhanced Lee filter warns about nothing, also at point targets.
+def test_enhanced_lee_without_warnings() -> None:
+    # Warning control.
+    import warnings
+
+    # One-look speckle with a strong point target and a NaN pixel.
+    image = 5.0 * np.random.default_rng(3).exponential(1.0, size=(32, 32))
+    # Point target, where the local variation exceeds Cmax.
+    image[16, 16] = 1e4
+    # Missing pixel.
+    image[2, 2] = np.nan
+    # Every warning becomes an error.
+    with warnings.catch_warnings():
+        # Turn warnings into errors.
+        warnings.simplefilter("error")
+        # Filter the image.
+        out = speckle_filter(image, "enhanced_lee", 5)
+    # The point target is kept and the missing pixel stays missing.
+    assert out[16, 16] == image[16, 16] and np.isnan(out[2, 2])
+
+
 # Filters keep NaN pixels and validate their parameters.
 def test_speckle_filter_nodata_and_errors() -> None:
     # Constant image with one invalid pixel.
     image = np.full((8, 8), 2.0)
     # Nodata pixel.
     image[3, 3] = np.nan
-    # Lee filter output.
-    out = lee_filter(image, 3)
-    # The invalid pixel stays NaN and the rest is finite.
-    assert np.isnan(out[3, 3]) and np.isfinite(out[~np.isnan(image)]).all()
+    # Every filter keeps the invalid pixel and fills nothing else with NaN.
+    for name in SPECKLE_FILTERS:
+        # Filter output.
+        out = speckle_filter(image, name, 3)
+        # The invalid pixel stays NaN and the rest is finite.
+        assert np.isnan(out[3, 3]) and np.isfinite(out[~np.isnan(image)]).all(), name
     # Even windows are rejected.
     with pytest.raises(ValueError):
         # Window of 4 pixels.

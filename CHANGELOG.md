@@ -22,7 +22,7 @@ Format      : Markdown (CommonMark with GitHub Flavored Markdown extensions)
 | Document | UBX-DOC-CHANGELOG |
 | Version | 2.0 |
 | Status | Active |
-| Last reviewed | 2026-09-23 |
+| Last reviewed | 2026-09-24 |
 | Owner | Unbihexium maintainers (see [MAINTAINERS.md](MAINTAINERS.md)) |
 | Applies to | All tagged releases of Unbihexium (v1.0.0 and v1.0.1) and the unreleased changes on the main branch |
 
@@ -98,7 +98,7 @@ Platform, repository and continuous integration:
 
 - Official support for CPython 3.13 and 3.14; CPython 3.10 to 3.14 are tested in CI, and a Python version support policy was added to [VERSIONING.md](VERSIONING.md) (#21).
 - Issue forms for bug reports, feature requests, documentation, the model zoo, performance, compliance, build and packaging, and questions; a rewritten pull request template; CODEOWNERS; label definitions synchronised from `.github/labels.yml`; and release note categories in `.github/release.yml` (#23).
-- Workflows for package builds, licence compliance, the text policy, Markdown, model zoo integrity, notebooks, repository configuration schemas, workflow linting (actionlint and shellcheck), secret scanning (TruffleHog), container scanning (Grype), conventional pull request titles, path labels, link checking, stale items and first-time contributors, and a dependency review policy (#30).
+- Workflows for package builds, licence compliance, the text policy, Markdown, model zoo integrity, repository configuration schemas, workflow linting (actionlint and shellcheck), secret scanning (TruffleHog), container scanning (Grype), conventional pull request titles, path labels, link checking, stale items and first-time contributors, and a dependency review policy (#30).
 - Root project files: AUTHORS.md, MAINTAINERS.md, ROADMAP.md, RESPONSIBLE_USE.md, `security-insights.yml` (OpenSSF Security Insights), `codemeta.json`, `codecov.yml`, `REUSE.toml`, `.mailmap`, `.env.example` and `.yamllint.yml`, with REUSE, Security Insights, Codecov, CodeMeta and yamllint checks in CI (#31).
 - Locked dependency sets `requirements.txt` (runtime with the `onnx` and `serving` extras) and `requirements-dev.txt` (all extras), compiled with `uv pip compile --universal` for Python 3.10 to 3.14, with `make lock` and `make lock-check`; tox environments for the lowest supported dependency versions, formatting, security, the text policy and package builds (#33).
 - Codecov components per subpackage (#33).
@@ -106,16 +106,28 @@ Platform, repository and continuous integration:
 - A Model Zoo workflow that checks the generated files and rebuilds the starter weights to prove that their digests are reproducible (#37).
 - Integration and end-to-end tests that run registered pipelines on GeoTIFFs, round-trip a model through the store, compare ONNX with PyTorch after training on a dataset folder, and run ship detection, burn severity, change detection and REST workflows, replacing empty placeholder tests (#41).
 - Throughput and memory measurements in the benchmark tests, replacing empty benchmarks (#39).
+- `unbihexium serve`, which starts the REST service with the host, port and log level of the configuration; `--host`, `--port`, `--config` and `--proxy-headers` override them.
+- A Deploy Files workflow that lints the Helm chart and validates the Kubernetes manifests, two renderings of the chart and the Compose file, and a hashed lock file of the container image, `.github/requirements/requirements-docker.txt`, maintained by `make lock`.
 
 ### 2.2 Changed
 
 Breaking changes:
+
+- The `processing` section of the configuration (tile size, overlap, output format, compression, nodata and seed) and `model.num_workers` were removed, because nothing read them. A configuration file, environment variable or `update()` call that still sets one of them fails with a message that names the key.
+- The runtime dependencies no longer include tqdm and scikit-learn, and the extras `gpu`, `dask`, `ray`, `netcdf` and `stac` were removed, together with torchvision, python-multipart and pytest-asyncio in the remaining extras, because no code used them. STAC search needs no extra; GPU use requires installing a CUDA build of PyTorch before the `torch` extra.
 
 - The project was relicensed from Apache-2.0 to the Mozilla Public License 2.0 (MPL-2.0); source files carry the MPL-2.0 notice (#20).
 - Rewritten modules changed their interfaces (#39): writers take the data before the path (the previous order is still accepted); `read_geotiff` returns the transform as six coefficients and the CRS as a string; SAR angles are in degrees by default; a zero denominator of a spectral index gives NaN instead of using a small epsilon; `aspect` returns compass degrees and `hillshade` returns floating point values; `Evidence` and `ProvenanceRecord` have new fields; pipeline steps must return a mapping; `ssim` uses a Gaussian window; model configuration defaults to the base variant on the CPU.
 - Task APIs take a catalogue model, a trained checkpoint or an ONNX file (`weights=`) and default to the base variant; `SuperResolution` uses the catalogue factor 4 unless `scale_factor` is given; `CropDetector` and `GreenhouseDetector` are detectors, as in the catalogue, and remain importable from `unbihexium.ai.segmentation` (#38).
 
 Other changes:
+
+- The container image contains the CPU build of PyTorch next to ONNX Runtime, so its REST service builds and runs catalogue models instead of failing on every prediction; Docker Compose starts it with `unbihexium serve`.
+- The Kubernetes manifests and the Helm chart run `unbihexium serve` with a hardened security context, an emptyDir model store, probes, an autoscaler and a disruption budget; the chart gained its templates (Deployment, Service, ServiceAccount, API key Secret, autoscaler, disruption budget, optional Ingress and a `helm test` pod).
+- Model weight files are ignored by Git and marked as binary instead of being routed to Git LFS.
+- The CI type check runs pyright in standard mode with the SciPy type stubs (`scipy-stubs` in the `dev` extra for Python 3.12 and newer, and a hashed lock `.github/requirements/requirements-ci-typecheck.txt`) and fails on any error. Before, it ran `pyright src/ --level basic || true`, an invalid option whose failure was ignored; the annotations that pyright rejected were corrected.
+- Bare family names in the command line use `model.variant` of the configuration as the default variant, and `zoo verify`, `zoo where` and `zoo clear` accept `--cache-dir` like `zoo build`.
+- `scripts/unbihexium-completion.bash` uses Click's completion, which asks the installed command for its candidates, instead of a hand-written list of commands from earlier releases.
 
 - `unbihexium zoo download` and `unbihexium infer` are kept as hidden aliases of `zoo build` and `predict` (#38).
 - `unbihexium index` computes the index and writes it as GeoTIFF (#38).
@@ -128,10 +140,14 @@ Other changes:
 - The contact address in the package metadata, the citation files, the container image, the Helm chart and the security, privacy, conduct and support policies is `yunus.z.imanov@helsinki.fi` (#35).
 - Python files in the package, the tests, `.github/scripts/`, `scripts/` and `examples/` use `#` comments with a standard header and footer; configuration and data files carry the same header (#36, #37, #39, #42).
 - GitHub Actions dependencies were updated by Dependabot: `codecov/codecov-action` 4 to 5 (#12), `ossf/scorecard-action` 2.3.1 to 2.4.3 (#11), `slsa-framework/slsa-github-generator` 1.9.0 to 2.1.0 (#10), `actions/upload-pages-artifact` 3 to 4 (#9), `docker/build-push-action` 5 to 6 (#8), `actions/setup-python` 5 to 6 (#18), `softprops/action-gh-release` 1 to 2 (#17), `github/codeql-action` 3 to 4 (#16), `actions/checkout` 4 to 6 (#15) and `actions/attest-build-provenance` 1 to 3 (#14); the container base image moved from `python:3.12-slim` to `python:3.14-slim` (#13).
-- The notebook model path lookup searches the parent directories for `model_zoo` (#7), and the notebooks and documentation gained Git LFS instructions (direct commits on 2025-12-22). Both refer to the model files that were removed later in this cycle (see [2.3 Removed](#23-removed)).
+- A model path lookup that searches the parent directories for `model_zoo` (#7) and Git LFS set-up instructions (direct commits on 2025-12-22) were added for the example material and the documentation. Both referred to the model files that were removed later in this cycle and were superseded by the removals in [2.3 Removed](#23-removed).
+- The documentation under `docs/` was rewritten to match the current code, in the same document layout as the root documents, with every code example and command executed against the current code.
+- The package metadata, `CITATION.cff`, `codemeta.json` and `security-insights.yml` no longer name a home page address; the repository and PyPI links remain. The Helm chart and the Kubernetes manifest use the reserved placeholder host `unbihexium.example.com`.
 
 ### 2.3 Removed
 
+- The GPU profile of the Compose file, which reserved a GPU for an image without CUDA support, the `UNBIHEXIUM_HOME` variable, which nothing read, and the random arrays in `tests/fixtures/`, which no test used.
+- The 130 example notebooks under `examples/notebooks/`, which loaded the removed model files and could not run as written, together with their format check, `make notebooks` and the nbformat CI dependency.
 - The model files stored with Git LFS under `model_zoo/assets/`, the 520 per-variant model cards and their metrics, which were not the result of training or evaluation on real data (#37).
 - Placeholder model classes in `unbihexium.ai.models`, `unbihexium.ai.change_detection`, `unbihexium.ai.super_resolution` and `unbihexium.ai.synthesis`, and the model zoo `cache` and `downloader` modules (#37).
 - The MkDocs configuration, the Read the Docs configuration, the documentation deployment workflow and the `docs` extra (#33).
@@ -156,6 +172,14 @@ Other changes:
 - The source distribution did not include `LICENSE.txt`, the notices, `REUSE.toml` or `CITATION.cff` (#33).
 - GeoJSON and STAC parsing raised `TypeError`, `OverflowError`, `IndexError` or `AttributeError` on malformed input, and rings that mixed 2-D and 3-D positions broke the area computation; malformed input now raises `ValueError` (found by fuzzing, #45).
 - `rewind` reversed rings of zero or near-zero area, including collinear holes, on every call; such rings now keep their order (found by fuzzing, #45, #46).
+- `verify_model` compared only the digest of the weights, so a modified `config.json`, `model.onnx` or `model.pt` still reported Verified and a corrupt checkpoint raised an exception. It now checks every file listed in `model.sha256` and returns False on any error. `ensure_model` reuses a cached entry only when its checksums and configuration match, uses an ONNX export only when `model.sha256` vouches for it and no longer rewrites unchanged files, so a verified store can be read-only; checkpoints registered with a URL or a path are checked against their registered digest.
+- `ModelZooEntry.version` defaults to the catalogue version, and `estimate_normalization` no longer counts the padding of border chips as zeros.
+- `--verbose` had no effect and the command line never installed its log handler; error messages lost bracketed text such as `unbihexium[torch]` to rich markup; unknown models, pipelines or parameters and a missing PyTorch ended in a traceback instead of a message with exit status 1; a checkpoint used with the ONNX backend had the variant appended to its path. `predict` and `pipeline run` now refuse output names that do not suit the result before running and warn when an untrained starter model runs.
+- The JSON routes of the REST service answered a body that was not JSON with 422 instead of the documented 415.
+- `geojson_problems` raised `RecursionError` on GeometryCollections nested about 2000 levels deep; collections nested deeper than 64 levels are reported as a problem. `geojson_problems` is exported from `unbihexium.io`.
+- The median, enhanced Lee and Gamma MAP speckle filters filled NaN pixels, and the enhanced Lee filter emitted `RuntimeWarning` at point targets; all eight filters keep invalid pixels and compute without warnings.
+- Pipeline runs hashed their input files when the run ended, so a step that changed an input produced a provenance record of a file that was never read; inputs are hashed before the first step.
+- `examples/scripts/detect_ships.py` ignored `--model-id` and wrote pixel coordinates without a CRS; the example API returned 500 with internal messages for invalid input and left temporary uploads behind.
 
 ### 2.5 Security
 
@@ -169,6 +193,14 @@ Other changes:
 - The container base image is pinned by digest and wheels are installed with verified hashes; the SPDX software bill of materials is computed from the digest of the pushed image (#45).
 - Release distributions are signed with Sigstore (`.sigstore.json` bundles), and each GitHub release carries the SLSA provenance of its GitHub artifact attestation as `unbihexium-<tag>.intoto.jsonl` (#45, #47).
 - `.github/` is kept in source archives so that OpenSSF Scorecard can analyse the workflows (#46).
+- `zoo clear` and the model store accepted model ids with path separators or parent references, which let `zoo clear` delete directories outside the store; such ids are rejected.
+- `STACClient` sent its headers, for example an `Authorization` token, to the next links of any host; they now go only to URLs of the same origin as the API.
+- The rate limiter of the REST service kept one bucket per client address for the lifetime of the process; buckets that have refilled completely are dropped once the table is large.
+- `Config.to_dict()` and `Config.to_yaml()` replace the API key with `***` unless `include_secrets=True` is passed.
+- `requirements-dev.txt` carries SHA-256 hashes and installs with `--require-hashes`, and the build backend hatchling is pinned by hash for the container image (`.github/requirements/requirements-build.txt`) and the release and package workflows, which build without isolation.
+- Bandit and pip-audit fail the Security workflow on any finding, and pip-audit also audits `requirements-dev.txt`; before, both only reported in the job log.
+- The release workflow stops before the build when the tag differs from the version recorded in `pyproject.toml`, `_version.py`, `CITATION.cff` or `codemeta.json` (`.github/scripts/check_release_version.py`).
+- `security-insights.yml` lists CodeQL and the atheris fuzzing.
 
 ### 2.6 Merged pull requests
 
@@ -196,6 +228,7 @@ Other changes:
 | #45 | 2026-09-23 | ci: raise the OpenSSF Scorecard checks and fix the bugs found by fuzzing |
 | #46 | 2026-09-23 | fix: keep collinear rings stable in rewind and let Scorecard read the workflows |
 | #47 | 2026-09-23 | ci: pin PyTorch by hash and attach SLSA provenance to releases |
+| #48 | 2026-09-23 | docs: rewrite the root documents in a standardised academic layout |
 
 ## 3. [1.0.1] - 2025-12-21
 

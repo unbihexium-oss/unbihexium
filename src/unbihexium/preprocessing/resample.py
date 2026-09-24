@@ -51,7 +51,7 @@ from __future__ import annotations
 import warnings
 
 # Type of loosely structured values.
-from typing import Any
+from typing import Any, Literal
 
 # Arrays.
 import numpy as np
@@ -65,8 +65,11 @@ from scipy.ndimage import zoom
 # Float conversion and band layout helpers.
 from unbihexium.preprocessing.transforms import as_float, band_first
 
+# Spline orders that scipy.ndimage supports.
+SplineOrder = Literal[0, 1, 2, 3, 4, 5]
+
 # Spline order of each interpolation method.
-RESAMPLING_ORDERS = {"nearest": 0, "bilinear": 1, "cubic": 3}
+RESAMPLING_ORDERS: dict[str, SplineOrder] = {"nearest": 0, "bilinear": 1, "cubic": 3}
 
 # Reductions of the aggregate function.
 AGGREGATIONS = ("mean", "sum", "min", "max", "median", "mode")

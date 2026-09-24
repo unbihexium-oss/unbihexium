@@ -26,7 +26,9 @@
 #   results         the output values themselves (not serialised)
 #   seed            the seed of the random number generators
 #   provenance      a ProvenanceRecord with SHA-256 evidence of every input
-#                   and output that is a file
+#                   and output that is a file; input files are hashed when
+#                   the run starts, before any step can change them, and
+#                   output files when it ends
 #
 # Reproducibility: when the configuration has a seed (the `seed` field or a
 # `seed` parameter), the Python, NumPy and, when loaded, PyTorch generators
@@ -262,7 +264,7 @@ class PipelineRun:
     seed: int | None = None
     # Records of the executed steps.
     steps: list[StepRecord] = field(default_factory=list)
-    # Provenance of the run, built when the run ends.
+    # Provenance of the run: inputs hashed at the start, the record built at the end.
     provenance: ProvenanceRecord | None = field(default=None, repr=False)
     # Output values themselves; not serialised.
     results: dict[str, Any] = field(default_factory=dict, repr=False, compare=False)
@@ -479,6 +481,9 @@ class Pipeline:
         if run.seed is not None:
             # Python, NumPy and PyTorch.
             seed_everything(run.seed)
+        # Hash the input files before any step runs, so the record describes
+        # the files that were read even when a step modifies them.
+        input_evidence = _artefacts(values, EvidenceType.INPUT) if record_provenance else []
         # Running state.
         run.start()
         # Log the start.
@@ -542,13 +547,13 @@ class Pipeline:
             # Provenance of the partial run.
             if record_provenance:
                 # Inputs only; there are no outputs.
-                run.provenance = self._provenance(run, dict(inputs or {}), {})
+                run.provenance = self._provenance(run, {}, {}, input_evidence)
             # Re-raise for the caller.
             raise
         # Provenance of the completed run.
         if record_provenance:
             # Inputs and outputs with evidence.
-            run.provenance = self._provenance(run, dict(inputs or {}), values)
+            run.provenance = self._provenance(run, {}, values, input_evidence)
         # Total duration metric.
         run.metrics["run.seconds"] = run.duration_seconds or 0.0
         # Return the run.
@@ -560,6 +565,7 @@ class Pipeline:
         run: PipelineRun,  # The run.
         inputs: Mapping[str, Any],  # Input values.
         outputs: Mapping[str, Any],  # Output values.
+        input_evidence: list[Evidence | str] | None = None,  # Inputs hashed at the start.
     ) -> ProvenanceRecord:  # The record.
         # Model identifiers named in the parameters.
         model = self.config.parameters.get("model_id") or self.config.parameters.get("model")
@@ -567,7 +573,7 @@ class Pipeline:
         return ProvenanceRecord(
             run_id=run.run_id,  # Run.
             pipeline_id=run.pipeline_id,  # Pipeline.
-            inputs=_artefacts(inputs, EvidenceType.INPUT),  # Input evidence.
+            inputs=[*(input_evidence or []), *_artefacts(inputs, EvidenceType.INPUT)],  # Inputs.
             outputs=_artefacts(outputs, EvidenceType.OUTPUT),  # Output evidence.
             model_ids=[str(model)] if isinstance(model, str) else [],  # Models.
             config=run.config_snapshot,  # Configuration.

@@ -128,10 +128,66 @@ def predict(model: Any, image: Any, **options: Any) -> Result:
     return api.predict(image)  # type: ignore[attr-defined]
 
 
+# File extensions accepted for each kind of result.
+VECTOR_SUFFIXES = (".geojson", ".json")
+# Scene values are written as JSON.
+JSON_SUFFIXES = (".json",)
+# Rasters are written as GeoTIFF.
+RASTER_SUFFIXES = (".tif", ".tiff")
+
+
+# Extensions that suit the results of a task.
+def suffixes_for(task: Task) -> tuple[str, ...]:
+    # Detections are vector features.
+    if task is Task.DETECTION:
+        # GeoJSON.
+        return VECTOR_SUFFIXES
+    # Scene-level values.
+    if task is Task.SCENE_REGRESSION:
+        # JSON.
+        return JSON_SUFFIXES
+    # Every other result is a raster.
+    return RASTER_SUFFIXES
+
+
+# Refuse an output file name whose extension does not suit the task.
+def check_output_path(task: Task, path: str | Path) -> None:
+    # Extensions of the task.
+    allowed = suffixes_for(task)
+    # Extension in lower case.
+    suffix = Path(path).suffix.lower()
+    # Reject other extensions instead of writing, for example, GeoJSON to .tif.
+    if suffix not in allowed:
+        # Explain the accepted names.
+        raise ValueError(
+            f"{Path(path).name}: a {task.value} result is written as "
+            f"{' or '.join(allowed)}, not {suffix or 'a file without extension'}"
+        )  # End of the error.
+
+
 # Write a result to a file in the natural format of its task.
 def write_result(result: Result, path: str | Path) -> Path:
     # Destination file.
     path = Path(path)
+    # Kind of result: vector, scene values or raster.
+    if isinstance(result, DetectionResult):
+        # GeoJSON.
+        allowed = VECTOR_SUFFIXES
+    # Scene values.
+    elif isinstance(result, RegressionResult) and not result.is_dense:
+        # JSON.
+        allowed = JSON_SUFFIXES
+    # Rasters.
+    else:
+        # GeoTIFF.
+        allowed = RASTER_SUFFIXES
+    # The extension must suit the result.
+    if path.suffix.lower() not in allowed:
+        # Explain the accepted names.
+        raise ValueError(
+            f"{path.name}: this result is written as {' or '.join(allowed)}, "
+            f"not {path.suffix or 'a file without extension'}"
+        )  # End of the error.
     # Create the parent directory.
     path.parent.mkdir(parents=True, exist_ok=True)
     # Detections as GeoJSON.

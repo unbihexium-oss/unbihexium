@@ -76,6 +76,9 @@ from numpy.typing import NDArray
 # Spline interpolation for upsampling.
 from scipy.ndimage import zoom
 
+# Spline orders of scipy.ndimage.
+from unbihexium.preprocessing.resample import SplineOrder
+
 
 # Validate the inputs and return them as float arrays.
 def _prepare(
@@ -138,7 +141,7 @@ def _match_moments(pan: NDArray[Any], intensity: NDArray[Any]) -> NDArray[np.flo
 def upsample_to_pan(
     ms: NDArray[Any],  # (C, h, w) multispectral bands.
     shape: tuple[int, int],  # (H, W) of the pan grid.
-    order: int = 3,  # Spline order: 0 nearest, 1 bilinear, 3 cubic.
+    order: SplineOrder = 3,  # Spline order: 0 nearest, 1 bilinear, 3 cubic.
 ) -> NDArray[np.float64]:  # (C, H, W) bands on the pan grid.
     # Bands as float.
     m = np.asarray(ms, dtype=np.float64)

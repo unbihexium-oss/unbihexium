@@ -126,6 +126,17 @@ class DatasetError(ValueError):
     pass
 
 
+# Rasterio window of a (top, left, height, width) tuple.
+def _window(window: tuple[int, int, int, int]) -> Any:
+    # Imported here so that NumPy-only datasets work without GDAL setup.
+    from rasterio.windows import Window
+
+    # Top, left, height and width.
+    top, left, height, width = window
+    # Rows and columns as start and stop indices.
+    return Window.from_slices((top, top + height), (left, left + width))
+
+
 # Read an array file as (bands, rows, cols), optionally only a window.
 def read_raster(
     path: Path,  # File to read.
@@ -150,14 +161,13 @@ def read_raster(
     else:
         # Imported here so that NumPy-only datasets work without GDAL setup.
         import rasterio
-        from rasterio.windows import Window  # Pixel windows of rasterio.
 
         # Open the file.
         with rasterio.open(path) as src:
             # Rasterio band indices are one-based.
             indexes = [b + 1 for b in bands] if bands is not None else None
             # Window in rasterio form.
-            win = Window(window[1], window[0], window[3], window[2]) if window else None
+            win = _window(window) if window else None
             # Read the requested bands and window.
             data = src.read(indexes=indexes, window=win)
         # Bands were already selected.

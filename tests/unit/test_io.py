@@ -649,6 +649,74 @@ def test_stac_client_pagination() -> None:
     assert len(list(client.search(limit=1))) == 1 and len(calls) == 1
 
 
+# Client headers, which may hold credentials, only go to the API origin.
+def test_stac_client_headers_stay_on_origin(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Module of the client.
+    import unbihexium.io.stac as stac
+
+    # Headers given to the transport of each request.
+    seen: list[tuple[str, dict[str, str]]] = []
+
+    # Replacement of the requests transport, which records the headers.
+    def fake_transport(headers: dict[str, str], timeout: float) -> Any:
+        # Transport function of one request.
+        def send(method: str, url: str, body: dict[str, Any] | None) -> dict[str, Any]:
+            # Record the URL and the headers.
+            seen.append((url, dict(headers)))
+            # First page links to another host, the second to a relative page.
+            if len(seen) == 1:
+                # Next page on a foreign host.
+                return {"features": [], "links": [{"rel": "next", "href": "https://evil.test/p2"}]}
+            # Second page links back to the API origin.
+            if len(seen) == 2:
+                # Next page on the API origin.
+                return {"features": [], "links": [{"rel": "next", "href": "https://api.test/p3"}]}
+            # Last page.
+            return {"features": [], "links": []}
+
+        # Return the function.
+        return send
+
+    # Use the recording transport.
+    monkeypatch.setattr(stac, "_requests_transport", fake_transport)
+    # Client with a token.
+    client = STACClient("https://api.test/stac/", headers={"Authorization": "Bearer t"})
+    # Run the search to the end.
+    list(client.search())
+    # The search endpoint gets the token.
+    assert seen[0][1] == {"Authorization": "Bearer t"}
+    # The foreign next link does not.
+    assert seen[1] == ("https://evil.test/p2", {})
+    # The API origin (default port 443) gets it again.
+    assert seen[2][1] == {"Authorization": "Bearer t"}
+
+
+# Deeply nested GeometryCollections are reported, not a RecursionError.
+def test_geojson_deep_collection() -> None:
+    # Innermost geometry.
+    geometry: dict[str, Any] = {"type": "Point", "coordinates": [0.0, 0.0]}
+    # Nest it 3000 levels deep.
+    for _ in range(3000):
+        # One more collection level.
+        geometry = {"type": "GeometryCollection", "geometries": [geometry]}
+    # Validation returns a problem instead of exhausting the stack.
+    problems = geojson_problems(geometry)
+    # The depth is named.
+    assert any("nested deeper than" in p for p in problems)
+    # Shallow collections are valid.
+    shallow = {
+        "type": "GeometryCollection",  # Collection type.
+        "geometries": [{"type": "Point", "coordinates": [0, 0]}],  # One point.
+    }  # End of the collection.
+    # No problems.
+    assert geojson_problems(shallow) == []
+    # The function is part of the package interface.
+    from unbihexium.io import geojson_problems as exported
+
+    # Same object.
+    assert exported is geojson_problems
+
+
 # ---------------------------------------------------------------------------
 # Zarr
 # ---------------------------------------------------------------------------

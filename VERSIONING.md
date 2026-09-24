@@ -164,7 +164,7 @@ A release is prepared in a pull request to `main` that MUST:
 
 After the pull request is merged, the maintainer creates and pushes the annotated tag, for example `git tag -a v2.0.0 -m "Release v2.0.0"` followed by `git push origin v2.0.0`. The tag starts `.github/workflows/release.yml`, which:
 
-1. builds the source distribution and the wheel with `python -m build` from hashed, locked build tools;
+1. builds the source distribution and the wheel with `python -m build --no-isolation`, with the build frontend and the backend hatchling from the hashed tools lock;
 2. writes `SHA256SUMS.txt` for the distributions;
 3. creates GitHub artifact attestations of build provenance for every distribution;
 4. signs every distribution with Sigstore and attaches the `.sigstore.json` bundles;

@@ -20,7 +20,8 @@
 #
 #   lint       ruff check and ruff format --check over src/, with the rules
 #              from pyproject.toml (the pre-commit hooks run the same checks)
-#   typecheck  pyright in basic mode; it only reports and never fails the run
+#   typecheck  pyright in standard mode (pyproject.toml) on Python 3.13, with
+#              the SciPy type stubs; any type error fails the run
 #   test       pytest over tests/ on every supported CPython from 3.10 to
 #              3.14, with CPU-only PyTorch and the optional backends
 #
@@ -69,19 +70,20 @@ jobs:  # Jobs of the workflow; they run in parallel.
       - name: Set up Python  # Install the interpreter that pyright resolves imports against.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
         with:  # Inputs of the setup action.
-          python-version: "3.14"  # Newest supported CPython.
+          python-version: "3.13"  # scipy-stubs requires Python 3.12 or newer.
 
-      - name: Install dependencies  # Install pyright and the package so imports resolve.
+      - name: Install dependencies  # Install pyright, the type stubs and the package so imports resolve.
         run: |  # Shell script run by bash.
-          # Install the locked, hashed CI tools, including the pyright wrapper.
-          python -m pip install --require-hashes -r .github/requirements/requirements-ci-tools.txt
-          # Install the locked, hashed runtime dependencies so that imports resolve.
-          python -m pip install --require-hashes -r requirements.txt
+          # Install the locked, hashed CPU-only PyTorch build from the PyTorch index.
+          python -m pip install --require-hashes --no-deps -r .github/requirements/requirements-ci-torch.txt
+          # Install the locked, hashed type check environment: the test environment,
+          # pyright and the SciPy type stubs.
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-typecheck.txt
           # Install the package itself in editable mode without resolving dependencies again.
           python -m pip install --no-deps -e .
 
-      - name: Run pyright  # Report type errors in src/.
-        run: pyright src/ --level basic || true  # Informational only: type errors do not fail the job.
+      - name: Run pyright  # Type check src/.
+        run: pyright src/  # Settings from pyproject.toml; any type error fails the job.
 
   test:  # Unit tests on every supported Python version.
     name: Test  # Name of the status check (the matrix adds the version).

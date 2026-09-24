@@ -321,6 +321,30 @@ def test_run_provenance(tmp_path: Path) -> None:
     assert record.verify_outputs() == []
 
 
+# Input files are hashed when the run starts, before a step can change them.
+def test_run_provenance_hashes_inputs_first(tmp_path: Path) -> None:
+    # Input file with the content "abc".
+    source = tmp_path / "input.txt"
+    # Write it.
+    source.write_bytes(b"abc")
+
+    # Step that overwrites its input.
+    def overwrite(values: dict[str, Any]) -> dict[str, Any]:
+        # Replace the content.
+        Path(values["input"]).write_bytes(b"changed")
+        # No outputs.
+        return {}
+
+    # Pipeline with the step.
+    pipeline = Pipeline(PipelineConfig("overwrite", "Overwrite"))
+    # Run it.
+    record = pipeline.add_step(overwrite).run({"input": source}).provenance
+    # The record describes the file that was read, not the changed file.
+    assert record is not None and record.inputs[0].checksum == SHA256_ABC  # type: ignore[union-attr]
+    # Each input appears once.
+    assert len(record.inputs) == 1
+
+
 # Evidence records identify artefacts by digest.
 def test_evidence_fields() -> None:
     # Record without a digest.

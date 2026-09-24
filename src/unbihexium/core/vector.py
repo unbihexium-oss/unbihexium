@@ -657,12 +657,12 @@ class Vector:
         values = gdf[attribute] if attribute else np.ones(len(gdf))
         # Pairs of geometry and value, skipping missing geometries.
         pairs = [(g, v) for g, v in zip(gdf.geometry, values) if g is not None and not g.is_empty]
-        # Burned array.
+        # Burned array; rasterio is untyped, so pyright takes int for fill from its default.
         burned = rasterize(
             pairs,  # Shapes and values.
             out_shape=(like.height, like.width),  # Grid size.
             transform=_affine(like),  # Grid transform.
-            fill=fill,  # Background.
+            fill=fill,  # Background.  # pyright: ignore[reportArgumentType]
             all_touched=all_touched,  # Rasterisation rule.
             dtype=dtype,  # Output dtype.
         )  # End of the rasterisation.

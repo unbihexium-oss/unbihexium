@@ -464,14 +464,22 @@ def enhanced_lee_filter(
     cmax = float(np.sqrt(1.0 + 2.0 / looks))
     # Local variation.
     ci = np.sqrt(_ci2(mean, var))
-    # Exponential weight in the intermediate class.
-    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
-        # exp(-damping (Ci - Cu) / (Cmax - Ci)).
-        w = np.exp(-damping * (ci - cu) / (cmax - ci))
+    # Intermediate class Cu < Ci < Cmax, the only one that uses the weight.
+    middle = (ci > cu) & (ci < cmax)
+    # Distance to Cmax, replaced by 1 outside the class so that no division by
+    # zero or overflow occurs there (those pixels are overwritten below).
+    gap = np.where(middle, cmax - ci, 1.0)
+    # Weight outside the class: 0, or NaN where the variation is undefined.
+    rest = np.where(np.isnan(ci), np.nan, 0.0)
+    # exp(-damping (Ci - Cu) / (Cmax - Ci)) in the class; the exponent is not
+    # positive there, so the weight lies in [0, 1].
+    w = np.where(middle, np.exp(-damping * np.where(middle, ci - cu, 0.0) / gap), rest)
     # Homogeneous windows take the mean.
     out = np.where(ci <= cu, mean, mean * w + image * (1.0 - w))
     # Point targets and strong edges keep the observation.
-    return np.where(ci >= cmax, image, out)
+    out = np.where(ci >= cmax, image, out)
+    # Keep NaN at invalid pixels.
+    return np.where(np.isfinite(image), out, np.nan)
 
 
 # Frost et al. (1982) exponentially weighted filter.
@@ -547,7 +555,9 @@ def gamma_map_filter(
     # Homogeneous windows take the mean.
     out = np.where(ci2 <= cu2, mean, estimate)
     # Point targets and strong edges keep the observation.
-    return np.where(ci2 >= cmax2, image, out)
+    out = np.where(ci2 >= cmax2, image, out)
+    # Keep NaN at invalid pixels.
+    return np.where(np.isfinite(image), out, np.nan)
 
 
 # Eight edge-aligned 7 x 7 windows of the refined Lee filter.
@@ -648,6 +658,14 @@ def refined_lee_filter(
     return np.where(np.isfinite(image), out, np.nan)
 
 
+# Median of the finite values of a window, NaN when there are none.
+def _valid_median(values: NDArray[np.float64]) -> float:
+    # Finite values of the window.
+    valid = values[np.isfinite(values)]
+    # Median, or NaN without a warning for empty windows.
+    return float(np.median(valid)) if valid.size else float("nan")
+
+
 # Moving-window speckle filter selected by name.
 def speckle_filter(
     data: NDArray[Any],  # Intensity (or amplitude) image.
@@ -667,8 +685,12 @@ def speckle_filter(
     if name == "median":
         # Median of the valid pixels in the window.
         size = _check_window(window_size)
-        # NaN-aware median filter.
-        return ndimage.generic_filter(_as_image(data), np.nanmedian, size=size, mode="reflect")
+        # Input image.
+        image = _as_image(data)
+        # NaN-aware median filter; windows without valid pixels give NaN.
+        out = ndimage.generic_filter(image, _valid_median, size=size, mode="reflect")
+        # Keep NaN at invalid pixels.
+        return np.where(np.isfinite(image), out, np.nan)
     # Lee filter.
     if name == "lee":
         # Lee (1980).

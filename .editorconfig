@@ -63,11 +63,6 @@ indent_size = 2
 # Override the two-space TOML default above for these two files.
 indent_size = 4
 
-# Jupyter notebooks, written by nbformat.
-[*.ipynb]
-# nbformat indents by one space; keeping it makes notebook diffs minimal.
-indent_size = 1
-
 # Markdown documentation.
 [*.md]
 # Two trailing spaces can be a meaningful hard line break in Markdown.

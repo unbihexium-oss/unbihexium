@@ -72,7 +72,6 @@ date-released: "2025-12-21"  # Release date of that version, quoted so it stays 
 # -----------------------------------------------------------------------------
 # Locations
 # -----------------------------------------------------------------------------
-url: "https://unbihexium.org"  # Project web site.
 repository-code: "https://github.com/unbihexium-oss/unbihexium"  # Source code repository.
 repository-artifact: "https://pypi.org/project/unbihexium/"  # Built packages on PyPI.
 identifiers:  # Further identifiers of this version.

@@ -29,6 +29,8 @@
 #                                GeoTIFF or JSON depending on the task
 #   pipeline list|run            registered processing pipelines
 #   index NAME -i IN -o OUT      spectral index of a raster
+#   serve [--host H] [--port P]  REST service (unbihexium.serving) with
+#                                uvicorn; needs the serving extra
 #
 # Model arguments accept a catalogue family or model id (starter weights), a
 # checkpoint written by `train` (.pt) or an ONNX export (.onnx).
@@ -49,14 +51,17 @@ import json
 # Represent file paths.
 from pathlib import Path
 
-# Type of loosely structured values.
-from typing import Any
+# Type of loosely structured values, and the type of functions that never return.
+from typing import Any, NoReturn
 
 # Command line framework.
 import click
 
 # Rich terminal output.
 from rich.console import Console
+
+# Escape text that must not be read as rich markup, such as "[torch]".
+from rich.markup import escape
 
 # Tables in the terminal.
 from rich.table import Table
@@ -67,13 +72,72 @@ from unbihexium._version import __version__
 # Console used by every command.
 console = Console()
 
+# Console for warnings, which go to standard error.
+err_console = Console(stderr=True)
+
+# Install hint for commands that need PyTorch.
+TORCH_HINT = "install PyTorch with pip install 'unbihexium[torch]'"
+
 
 # Print an error and exit with status 1.
-def fail(message: str) -> None:
-    # Error message in red.
-    console.print(f"[red]Error:[/] {message}")
+def fail(message: str) -> NoReturn:
+    # Error message in red; the text itself is not markup.
+    console.print(f"[red]Error:[/] {escape(message)}")
     # Non-zero exit status.
     raise SystemExit(1)
+
+
+# Print a warning to standard error.
+def warn(message: str) -> None:
+    # Warning in yellow; the text itself is not markup.
+    err_console.print(f"[yellow]Warning:[/] {escape(message)}")
+
+
+# Variant for a model argument: the option, else the configured default for
+# bare catalogue family names, else None (ids, files and checkpoints).
+def resolve_variant(model: str, variant: str | None) -> str | None:
+    # An explicit option wins.
+    if variant is not None:
+        # Use it.
+        return variant
+    # Catalogue families, imported lazily.
+    from unbihexium.zoo import list_specs
+
+    # Only bare family names take the configured default.
+    if model not in {spec.family for spec in list_specs()}:
+        # Ids with a variant suffix, files and checkpoints.
+        return None
+    # Settings, imported lazily.
+    from unbihexium.config import get_settings
+
+    # Configured default variant; invalid configurations are reported.
+    try:
+        # Layered settings.
+        return get_settings().model.variant
+    # Invalid files or environment variables.
+    except ValueError as exc:
+        # Report and exit.
+        fail(str(exc))
+
+
+# Warn when a catalogue starter model that needs training is run.
+def warn_if_untrained(model: Any, variant: str | None = None) -> None:
+    # Files and model objects are the user's own trained models.
+    if not isinstance(model, str) or Path(model).suffix:
+        # Nothing to say.
+        return
+    # Catalogue lookup, imported lazily.
+    from unbihexium.zoo import get_model
+
+    # Entry of the id, or of the family with the variant.
+    entry = get_model(f"{model}_{variant}" if variant else model) or get_model(model)
+    # Starter models of trainable tasks produce meaningless output.
+    if entry is not None and entry.requires_training:
+        # One-line notice.
+        warn(
+            f"{entry.model_id} is an untrained starter model; its output has no meaning "
+            "until the model is trained (see unbihexium train)"
+        )  # End of the warning.
 
 
 # Print a dictionary as JSON; NaN becomes null.
@@ -96,6 +160,18 @@ def main(ctx: click.Context, verbose: bool) -> None:
     ctx.ensure_object(dict)
     # Verbose flag.
     ctx.obj["verbose"] = verbose
+    # Library log handler; the level comes from UNBIHEXIUM_LOG_LEVEL unless
+    # --verbose asks for debug messages.
+    from unbihexium.utils.log import configure_logging
+
+    # Messages go to standard error.
+    try:
+        # DEBUG with --verbose, otherwise the environment or WARNING.
+        configure_logging("DEBUG" if verbose else None)
+    # Unknown level names in the environment.
+    except ValueError as exc:
+        # Report and exit.
+        fail(f"invalid UNBIHEXIUM_LOG_LEVEL: {exc}")
 
 
 # Library information.
@@ -179,8 +255,6 @@ def zoo_info(model_id: str) -> None:
     if entry is None:
         # Report and exit.
         fail(f"unknown model {model_id}; see `unbihexium zoo list`")
-    # Mypy: fail() does not return.
-    assert entry is not None
     # Entry as JSON.
     print_json(entry.to_dict())
 
@@ -202,7 +276,7 @@ def zoo_build(model_id: str, onnx: bool, force: bool, cache_dir: str | None) -> 
     # Import errors mean PyTorch is missing.
     except ImportError as exc:
         # Explain the extra to install.
-        fail(f"{exc}; install PyTorch with pip install 'unbihexium[torch]'")
+        fail(f"{exc}; {TORCH_HINT}")
     # Unknown models and verification errors.
     except (KeyError, ValueError) as exc:
         # Report and exit.
@@ -229,13 +303,28 @@ def zoo_download(ctx: click.Context, model_id: str, force: bool, cache_dir: str 
 @click.option("--no-verify", is_flag=True, help="Skip the ONNX Runtime comparison.")
 def zoo_export(model: str, output: str, no_verify: bool) -> None:
     # Imported lazily; export needs PyTorch and onnx.
-    from unbihexium.zoo import load_model  # Model loading.
-    from unbihexium.zoo.export import export_onnx  # ONNX export.
-
-    # Load the model or checkpoint.
-    net = load_model(model)
-    # Export and verify.
-    path = export_onnx(net, output, verify=not no_verify)
+    try:
+        # Model loading.
+        from unbihexium.zoo import load_model
+        from unbihexium.zoo.export import ExportError, export_onnx  # ONNX export.
+    # PyTorch or onnx is missing.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; {TORCH_HINT}")
+    # Load and export.
+    try:
+        # Load the model or checkpoint.
+        net = load_model(model)
+        # Export and verify.
+        path = export_onnx(net, output, verify=not no_verify)
+    # PyTorch or onnx is missing.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; {TORCH_HINT}")
+    # Unknown models, invalid checkpoints and failed comparisons.
+    except (KeyError, ValueError, OSError, ExportError) as exc:
+        # KeyError messages are quoted by Python; show the plain text.
+        fail(str(exc.args[0]) if isinstance(exc, KeyError) and exc.args else str(exc))
     # Report the file.
     console.print(f"[green]Exported:[/] {path}")
 
@@ -243,12 +332,13 @@ def zoo_export(model: str, output: str, no_verify: bool) -> None:
 # Verify a cached model.
 @zoo.command("verify", help="Verify the files and weights digest of a cached model.")
 @click.argument("model_id")
-def zoo_verify(model_id: str) -> None:
+@click.option("--cache-dir", type=click.Path(), help="Cache root directory.")
+def zoo_verify(model_id: str, cache_dir: str | None) -> None:
     # Imported lazily.
     from unbihexium.zoo import verify_model
 
-    # Check the checksums and the digest.
-    if verify_model(model_id):
+    # Check the checksums of every file and the digest.
+    if verify_model(model_id, cache_dir=cache_dir):
         # Success.
         console.print(f"[green]Verified:[/] {model_id}")
     # Missing or modified files.
@@ -260,12 +350,19 @@ def zoo_verify(model_id: str) -> None:
 # Location of a cached model.
 @zoo.command("where", help="Print the checkpoint path of a cached model.")
 @click.argument("model_id")
-def zoo_where(model_id: str) -> None:
+@click.option("--cache-dir", type=click.Path(), help="Cache root directory.")
+def zoo_where(model_id: str, cache_dir: str | None) -> None:
     # Imported lazily.
     from unbihexium.zoo import get_cached_model_path
 
-    # Checkpoint path, or None.
-    path = get_cached_model_path(model_id)
+    # Checkpoint path, or None; invalid ids are errors.
+    try:
+        # Look up the store.
+        path = get_cached_model_path(model_id, cache_dir)
+    # Ids with path separators.
+    except ValueError as exc:
+        # Report and exit.
+        fail(str(exc))
     # Models that are not cached.
     if path is None:
         # Report and exit.
@@ -278,7 +375,8 @@ def zoo_where(model_id: str) -> None:
 @zoo.command("clear", help="Remove one or all models from the local store.")
 @click.argument("model_id", required=False)
 @click.option("--yes", is_flag=True, help="Do not ask for confirmation.")
-def zoo_clear(model_id: str | None, yes: bool) -> None:
+@click.option("--cache-dir", type=click.Path(), help="Cache root directory.")
+def zoo_clear(model_id: str | None, yes: bool, cache_dir: str | None) -> None:
     # Imported lazily.
     from unbihexium.zoo import clear_cache
 
@@ -286,8 +384,14 @@ def zoo_clear(model_id: str | None, yes: bool) -> None:
     if model_id is None and not yes:
         # Confirmation prompt; aborts on no.
         click.confirm("Remove every cached model?", abort=True)
-    # Remove the files.
-    removed = clear_cache(model_id)
+    # Remove the files; ids outside the store are refused.
+    try:
+        # Delete the model directories.
+        removed = clear_cache(model_id, cache_dir=cache_dir)
+    # Invalid or unknown ids.
+    except ValueError as exc:
+        # Report and exit.
+        fail(str(exc))
     # Report the number of removed models.
     console.print(f"Removed {removed} model(s)")
 
@@ -327,7 +431,7 @@ def train(**options: Any) -> None:
     # PyTorch is missing.
     except ImportError as exc:
         # Explain the extra to install.
-        fail(f"{exc}; install PyTorch with pip install 'unbihexium[torch]'")
+        fail(f"{exc}; {TORCH_HINT}")
     # Hyperparameters from the options.
     config = TrainConfig(
         epochs=options["epochs"],  # Epochs.
@@ -356,7 +460,7 @@ def train(**options: Any) -> None:
             options["model"],  # Model.
             options["data"],  # Dataset.
             config,  # Hyperparameters.
-            variant=options["variant"],  # Variant.
+            variant=resolve_variant(options["model"], options["variant"]),  # Variant.
             synthetic=options["synthetic"],  # Synthetic samples.
         )  # End of the training.
     # Dataset and configuration problems.
@@ -392,7 +496,13 @@ def evaluate(
     threshold: float,  # Detection threshold.
 ) -> None:  # The command returns nothing.
     # Imported lazily; evaluation needs PyTorch.
-    from unbihexium.ai.training import evaluate as run_evaluation
+    try:
+        # Evaluation entry point.
+        from unbihexium.ai.training import evaluate as run_evaluation
+    # PyTorch is missing.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; {TORCH_HINT}")
 
     # Metrics of the model.
     try:
@@ -441,8 +551,10 @@ def predict(
     device: str,  # Device.
 ) -> None:  # The command returns nothing.
     # Imported lazily.
-    from unbihexium.ai.predict import task_api, write_result
+    from unbihexium.ai.predict import check_output_path, task_api, write_result
 
+    # Configured default variant for bare family names.
+    variant = resolve_variant(model, variant)
     # Inference options.
     options: dict[str, Any] = {
         "variant": variant,  # Variant.
@@ -459,6 +571,10 @@ def predict(
     try:
         # Task API of the model.
         api = task_api(model, **options)
+        # The output name must suit the result, before any work is done.
+        check_output_path(api.predictor.config.task, output_path)
+        # Starter models are flagged.
+        warn_if_untrained(model, variant)
         # Change detection with two files.
         if second is not None:
             # Pairwise prediction.
@@ -467,10 +583,14 @@ def predict(
         else:
             # Prediction.
             result = api.predict(input_path)  # type: ignore[attr-defined]
+    # PyTorch is missing for a catalogue model or checkpoint.
+    except ImportError as exc:
+        # Explain the extra to install.
+        fail(f"{exc}; {TORCH_HINT}, or pass an ONNX export with the onnx extra")
     # Invalid inputs and models.
     except (ValueError, KeyError, AttributeError) as exc:
-        # Report and exit.
-        fail(str(exc))
+        # KeyError messages are quoted by Python; show the plain text.
+        fail(str(exc.args[0]) if isinstance(exc, KeyError) and exc.args else str(exc))
     # Write the result.
     path = write_result(result, output_path)
     # Report the output.
@@ -561,20 +681,34 @@ def pipeline_run(
         except json.JSONDecodeError:
             # Keep the text.
             params[key] = value
-    # Create the pipeline.
-    created = PipelineRegistry.create(pipeline_id, **params)
+    # Unknown pipelines.
+    if PipelineRegistry.get(pipeline_id) is None:
+        # Report and exit.
+        fail(f"pipeline not found: {pipeline_id}; see unbihexium pipeline list")
+    # Create the pipeline; unknown or invalid parameters are errors.
+    try:
+        # Pipeline with its task API.
+        created = PipelineRegistry.create(pipeline_id, **params)
+    # Unexpected keyword arguments and invalid values.
+    except (TypeError, ValueError, KeyError) as exc:
+        # Report and exit.
+        fail(f"invalid parameters for {pipeline_id}: {exc}")
     # Unknown pipelines.
     if created is None:
         # Report and exit.
         fail(f"pipeline not found: {pipeline_id}")
-    # Mypy: fail() does not return.
-    assert created is not None
     # Input files.
     inputs = {"input": input_path, "input1": input_path}
     # Second input.
     if input2_path:
         # Add it.
         inputs["input2"] = input2_path
+    # Task API of the pipeline, when it runs a model.
+    task = getattr(created, "task", None)
+    # Starter models are flagged; checkpoints given as weights are the user's.
+    if task is not None:
+        # Model and variant of the task API.
+        warn_if_untrained(task.source, task.variant)
     # Run the pipeline.
     try:
         # Execute the steps.
@@ -587,8 +721,14 @@ def pipeline_run(
     result = getattr(created, "last_result", None)
     # Write the result when the pipeline produced one.
     if result is not None:
-        # Write the file.
-        write_result(result, output_path)
+        # Wrong output names are reported without a traceback.
+        try:
+            # Write the file.
+            write_result(result, output_path)
+        # Extension that does not suit the result.
+        except ValueError as exc:
+            # Report and exit.
+            fail(str(exc))
     # Report the run.
     console.print(f"[green]Completed:[/] {run.run_id} -> {output_path}")
 
@@ -622,8 +762,6 @@ def index(index_name: str, input_path: str, output_path: str, **bands: int) -> N
     if idx is None:
         # Report the available indices and exit.
         fail(f"unknown index {index_name}; available: {', '.join(IndexRegistry.list_all())}")
-    # Mypy: fail() does not return.
-    assert idx is not None
     # Read the raster.
     raster = Raster.from_file(input_path)
     # Band data.
@@ -660,6 +798,57 @@ def index(index_name: str, input_path: str, output_path: str, **bands: int) -> N
     out.to_file(output_path)
     # Report the output.
     console.print(f"[green]Wrote:[/] {output_path} ({idx.name})")
+
+
+# Start the REST service.
+@main.command(help="Start the REST service with uvicorn (needs the serving extra).")
+@click.option("--host", help="Listen address; default from the serving configuration.")
+@click.option("--port", type=int, help="Port; default from the serving configuration.")
+@click.option(
+    "--config",  # Option name.
+    "config_path",  # Parameter name.
+    type=click.Path(exists=True, dir_okay=False),  # An existing YAML file.
+    help="YAML configuration file; default UNBIHEXIUM_CONFIG.",  # Help text.
+)
+@click.option("--proxy-headers", is_flag=True, help="Trust X-Forwarded-* headers from a proxy.")
+def serve(host: str | None, port: int | None, config_path: str | None, proxy_headers: bool) -> None:
+    # The server and the application need the serving extra.
+    try:
+        # ASGI server.
+        import uvicorn
+
+        # Application factory.
+        from unbihexium.serving import create_app
+    # Missing optional dependencies.
+    except ImportError:
+        # Explain how to install them.
+        fail("the REST service needs the serving extra: pip install 'unbihexium[serving]'")
+    # Environment access.
+    import os
+
+    # Layered configuration.
+    from unbihexium.config import get_settings, reset_settings
+
+    # A file given on the command line replaces UNBIHEXIUM_CONFIG.
+    if config_path is not None:
+        # Make every part of the service read the same file.
+        os.environ["UNBIHEXIUM_CONFIG"] = str(Path(config_path).resolve())
+        # Drop settings cached before.
+        reset_settings()
+    # Layered settings: defaults, file, environment.
+    settings = get_settings()
+    # Command line values win over the configuration.
+    bind_host = host if host is not None else settings.serving.host
+    # Port from the command line or the configuration.
+    bind_port = port if port is not None else settings.serving.port
+    # Serve until interrupted.
+    uvicorn.run(
+        create_app(config=settings.serving),  # Application with these settings.
+        host=bind_host,  # Listen address.
+        port=bind_port,  # Port.
+        proxy_headers=proxy_headers,  # Trust forwarded headers.
+        log_level=settings.log_level.lower(),  # Same level as the library.
+    )
 
 
 # Name used by earlier releases and the tests.

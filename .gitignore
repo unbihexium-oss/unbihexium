@@ -23,11 +23,10 @@
 #
 # Notes for maintainers:
 #
-#   - Model weights (*.onnx, *.pt) under model_zoo/ are committed through Git
-#     LFS and are therefore NOT ignored (see .gitattributes).
+#   - Model weights are never committed: the model zoo builds its starter
+#     weights locally from the catalogue, and trained checkpoints and ONNX
+#     exports are user data (see the model weights section below).
 #   - .env.example is committed on purpose; real .env files are ignored.
-#   - Test fixtures under tests/fixtures/ are committed even when their file
-#     type is ignored elsewhere.
 #
 # Git reads a `#` only at the start of a line as a comment, so every comment
 # stands on its own line above the pattern it explains. Check a path with
@@ -196,15 +195,6 @@ cython_debug/
 /LICENSES/
 
 # -----------------------------------------------------------------------------
-# Documentation build output
-# -----------------------------------------------------------------------------
-
-# Site built by MkDocs.
-/site/
-# Output of a Sphinx build.
-docs/_build/
-
-# -----------------------------------------------------------------------------
 # Jupyter and IPython
 # -----------------------------------------------------------------------------
 
@@ -243,8 +233,8 @@ Thumbs.db
 desktop.ini
 
 # -----------------------------------------------------------------------------
-# Geospatial and scientific data. Large inputs and outputs are kept out of
-# Git; small test fixtures are allowed explicitly.
+# Geospatial and scientific data. Inputs and outputs are kept out of Git; the
+# tests create their data in temporary directories.
 # -----------------------------------------------------------------------------
 
 # GeoTIFF rasters with the .tif extension.
@@ -259,11 +249,20 @@ desktop.ini
 *.h5
 # Zarr stores, which are directories.
 *.zarr/
-# Small GeoTIFF test fixtures are committed despite the rule above.
-!tests/fixtures/**/*.tif
 
-# Model zoo download cache used by unbihexium.zoo during development.
-.unbihexium_cache/
+
+# -----------------------------------------------------------------------------
+# Model weights: checkpoints written by `unbihexium train` and ONNX exports
+# -----------------------------------------------------------------------------
+
+# ONNX models.
+*.onnx
+# PyTorch checkpoints.
+*.pt
+# PyTorch state dictionaries.
+*.pth
+# safetensors weight files.
+*.safetensors
 
 # -----------------------------------------------------------------------------
 # Secrets and credentials

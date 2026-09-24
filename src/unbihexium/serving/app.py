@@ -33,12 +33,14 @@
 # Settings come from unbihexium.config (ServingConfig): the request body
 # limit (413 above it), image pixel and value limits, an optional API key
 # (X-API-Key header, required on every route except /health), an optional
-# per-client rate limit (429) and CORS origins. Unknown models give 404,
-# invalid inputs 422. Prediction routes are plain functions, so FastAPI runs
-# them in its thread pool and the event loop stays responsive.
+# per-client rate limit (429) and CORS origins. POST bodies must be JSON
+# (415 for other media types). Unknown models give 404, invalid inputs 422.
+# Prediction routes are plain functions, so FastAPI runs them in its thread
+# pool and the event loop stays responsive.
 #
 # Usage
 # -----
+#   unbihexium serve --host 0.0.0.0 --port 8000
 #   uvicorn unbihexium.serving.app:app --host 0.0.0.0 --port 8000
 #
 #   from unbihexium.serving import create_app
@@ -97,7 +99,12 @@ from unbihexium.serving.schemas import (
 )  # End of the schema imports.
 
 # Security helpers.
-from unbihexium.serving.security import APIKeyAuth, RateLimiter, RequestSizeLimitMiddleware
+from unbihexium.serving.security import (
+    APIKeyAuth,  # API key check.
+    RateLimiter,  # Rate limit.
+    RequestSizeLimitMiddleware,  # Body size limit.
+    require_json,  # Media type check of JSON bodies.
+)  # End of the security imports.
 
 # Description of the service in the OpenAPI document.
 API_DESCRIPTION = (
@@ -190,6 +197,8 @@ def create_app(
     if settings.rate_limit_per_minute > 0:
         # Token bucket per client.
         guards.append(Depends(RateLimiter(settings.rate_limit_per_minute)))
+    # Routes with a JSON body also reject other media types with 415.
+    json_guards = [*guards, Depends(require_json)]
 
     # Health check.
     @app.get(
@@ -341,7 +350,7 @@ def create_app(
             "for segmentation and change detection, value statistics for regression and "
             "spectral indices, and band statistics for enhancement and super-resolution."
         ),  # End of the text.
-        dependencies=guards,  # Authentication and rate limit.
+        dependencies=json_guards,  # Authentication, rate limit and media type.
     )  # End of the route.
     def predict(model_id: str, request: PredictRequest) -> PredictResponse:
         # Run the model; service errors become HTTP errors.
@@ -371,7 +380,7 @@ def create_app(
         tags=["Inference"],  # OpenAPI group.
         summary="Run a model on one band (earlier API)",  # Short title.
         description="Earlier API: single-band image; errors are reported in the body.",  # Text.
-        dependencies=guards,  # Authentication and rate limit.
+        dependencies=json_guards,  # Authentication, rate limit and media type.
     )  # End of the route.
     def infer(model_id: str, request: InferenceRequest) -> InferenceResponse:
         # Errors are reported in the body, as in earlier releases.
@@ -394,7 +403,7 @@ def create_app(
         tags=["Inference"],  # OpenAPI group.
         summary="Detect objects (earlier API)",  # Short title.
         description="Earlier API: boxes of a detection model; prefer POST /predict.",  # Text.
-        dependencies=guards,  # Authentication and rate limit.
+        dependencies=json_guards,  # Authentication, rate limit and media type.
     )  # End of the route.
     def detect(model_id: str, request: DetectionRequest) -> DetectionResponse:
         # Images are required.
@@ -419,7 +428,7 @@ def create_app(
         tags=["Inference"],  # OpenAPI group.
         summary="Segment an image (earlier API)",  # Short title.
         description="Earlier API: class map summary; prefer POST /predict.",  # Text.
-        dependencies=guards,  # Authentication and rate limit.
+        dependencies=json_guards,  # Authentication, rate limit and media type.
     )  # End of the route.
     def segment(model_id: str, request: SegmentationRequest) -> SegmentationResponse:
         # Images are required.

@@ -116,9 +116,11 @@ class ZooTask:
             # Id from the configuration.
             return self._predictor.model_id
         # Model objects carry their configuration.
-        if hasattr(self.source, "config"):
-            # Id of the object.
-            return str(self.source.config.model_id)
+        config = getattr(self.source, "config", None)
+        # Id of the object.
+        if config is not None:
+            # Id from its configuration.
+            return str(config.model_id)
         # Catalogue names can be resolved without loading.
         if isinstance(self.source, str) and not Path(self.source).suffix:
             # Family and variant of the name.
@@ -217,6 +219,8 @@ def register_task_pipeline(
         pipeline = Pipeline(config)
         # Task API configured with the parameters.
         task = factory(**kwargs)
+        # Keep the task API, so that callers can tell which model runs.
+        pipeline.task = task  # type: ignore[attr-defined]
 
         # Single step: read the inputs and run the task.
         def run_task(values: dict[str, Any]) -> dict[str, Any]:

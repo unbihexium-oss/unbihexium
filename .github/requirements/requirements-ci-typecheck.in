@@ -1,0 +1,36 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/requirements/requirements-ci-typecheck.in
+# Title       : Input of the lock file of the CI type check
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : pip requirements, compiled by uv into requirements-ci-typecheck.txt
+# =============================================================================
+#
+# Abstract
+# --------
+# Type checker and type stubs of the CI type check. `make lock` compiles
+# this file together with pyproject.toml (the test, onnx, serving, zarr and
+# parquet extras) and requirements-ci-test.in, so the type check resolves
+# every import against the same versions as the test environment. PyTorch
+# comes from requirements-ci-torch.txt, as in the test job.
+#
+# scipy-stubs replaces the types that pyright would otherwise infer from the
+# untyped SciPy sources. It requires Python 3.12, so the type check job runs
+# on Python 3.13.
+# =============================================================================
+
+pyright  # Static type checker.
+scipy-stubs; python_version >= '3.12'  # Type stubs of SciPy; they need Python 3.12.
+
+# =============================================================================
+# End of file .github/requirements/requirements-ci-typecheck.in
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

@@ -19,7 +19,14 @@
 # library, without large downloads: the starter weights are generated
 # locally and deterministically from the model id (see models.init), then
 # verified against the published digest. Fine-tuned models registered with
-# a download URL or a local path are fetched or read instead.
+# a download URL or a local path are fetched or read instead, and their
+# weights are checked against the registered digest when the entry has one.
+#
+# ensure_model reuses a cached model only when every file listed in its
+# model.sha256 matches and config.json describes the current entry; any
+# other directory is rebuilt. Unchanged files are never rewritten, so a
+# verified store can be read-only. verify_model checks the same checksums
+# and the weights digest and returns False instead of raising.
 #
 # Cache layout
 # ------------
@@ -61,7 +68,13 @@ from typing import TYPE_CHECKING, Any
 from unbihexium.zoo.registry import ModelZooEntry, get_model
 
 # File checksums.
-from unbihexium.zoo.verify import VerificationError, compute_sha256, write_sha256_file
+from unbihexium.zoo.verify import (
+    VerificationError,  # Raised when a checksum does not match.
+    compute_sha256,  # SHA-256 of a file.
+    read_sha256_file,  # Read a sha256sum file.
+    verify_file,  # Verify one file.
+    write_sha256_file,  # Write a sha256sum file.
+)  # End of the checksum imports.
 
 # Only needed by type checkers; importing it at runtime would require PyTorch.
 if TYPE_CHECKING:
@@ -92,8 +105,20 @@ def get_cache_dir() -> Path:
     return Path(root).expanduser() / "models"
 
 
+# Reject names that are not a single directory name inside the store.
+def _check_name(model_id: str) -> str:
+    # Separators, parent references and empty names could leave the store.
+    if not model_id or model_id in {".", ".."} or "/" in model_id or "\\" in model_id:
+        # Report the invalid name.
+        raise ValueError(f"invalid model id {model_id!r}")
+    # Return the name unchanged.
+    return model_id
+
+
 # Directory of one model inside the cache.
 def model_dir(model_id: str, cache_dir: str | Path | None = None) -> Path:
+    # Model ids must name one directory inside the store.
+    _check_name(model_id)
     # Use the given cache root or the default one.
     root = Path(cache_dir) if cache_dir is not None else get_cache_dir()
     # One subdirectory per model id.
@@ -112,10 +137,12 @@ def _entry(model_id: str) -> ModelZooEntry:
     return entry
 
 
-# Check that a model's weights match its published digest.
+# Check that a model's weights match its published or registered digest.
 def _check_digest(model: ZooModel, entry: ModelZooEntry) -> None:
-    # Customised or unpublished models cannot be compared.
-    if not entry.weights_digest or model.config.customised:
+    # Downloaded and local checkpoints are compared even when customised.
+    registered = entry.source in ("url", "local")
+    # Unpublished digests and customised catalogue models cannot be compared.
+    if not entry.weights_digest or (model.config.customised and not registered):
         # Nothing to verify.
         return
     # Compare the digest of the weights with the published value.
@@ -171,14 +198,24 @@ def load_model(name: str | Path, variant: str | None = None, verify: bool = True
     model_id = f"{name}_{variant}" if variant else str(name)
     # Registry entry.
     entry = _entry(model_id)
-    # Local checkpoints of registered models.
-    if entry.source == "local" and entry.local_path:
-        # Load the registered file.
-        return load_checkpoint(entry.local_path, verify=verify)
-    # Downloaded checkpoints are fetched into the cache first.
-    if entry.source == "url":
-        # Download if missing and load from the cache.
-        return load_checkpoint(ensure_model(entry.model_id) / CHECKPOINT_NAME, verify=verify)
+    # Registered checkpoints: a local file or a download in the cache.
+    if entry.source in ("local", "url"):
+        # Local files are read in place.
+        if entry.source == "local" and entry.local_path:
+            # Path of the registered file.
+            path = Path(entry.local_path)
+        # Downloads are fetched and verified into the cache first.
+        else:
+            # Path of the cached checkpoint.
+            path = ensure_model(entry.model_id) / CHECKPOINT_NAME
+        # Load the checkpoint.
+        model = load_checkpoint(path, verify=verify)
+        # Compare with the registered digest.
+        if verify:
+            # Raises VerificationError on a mismatch.
+            _check_digest(model, entry)
+        # Return the model.
+        return model
     # Catalogue models are built in memory with their starter weights.
     model = build_model(entry.model_id)
     # Compare with the published digest.
@@ -202,10 +239,16 @@ def ensure_model(
     directory = model_dir(entry.model_id, cache_dir)
     # Path of the checkpoint.
     checkpoint = directory / CHECKPOINT_NAME
+    # Path of the ONNX export.
+    onnx_path = directory / ONNX_NAME
+    # Files of the cached entry that match model.sha256.
+    verified = set() if force else _verified_files(directory)
+    # The cached entry is reused only when it describes the current entry.
+    current = {CHECKPOINT_NAME, CONFIG_NAME} <= verified and _config_matches(directory, entry)
     # Create the directory.
     directory.mkdir(parents=True, exist_ok=True)
-    # Obtain the checkpoint when missing or forced.
-    if force or not checkpoint.is_file():
+    # Obtain the checkpoint when missing, modified, outdated or forced.
+    if not current:
         # Downloaded models come from their URL.
         if entry.source == "url" and entry.download_url:
             # Fetch the checkpoint.
@@ -214,6 +257,10 @@ def ensure_model(
         elif entry.source == "local" and entry.local_path:
             # Copy the registered file into the cache.
             shutil.copyfile(entry.local_path, checkpoint)
+        # Registered entries without a location cannot be obtained.
+        elif entry.source in ("url", "local"):
+            # Report the incomplete registration.
+            raise ValueError(f"{entry.model_id}: source {entry.source!r} without a location")
         # Catalogue models are built.
         else:
             # PyTorch-dependent module imported lazily.
@@ -223,32 +270,104 @@ def ensure_model(
             model = load_model(entry.model_id)
             # Write the checkpoint.
             save_checkpoint(model, checkpoint)
-    # Export to ONNX when requested and missing.
-    if onnx and (force or not (directory / ONNX_NAME).is_file()):
+        # Registered checkpoints must match the registered digest.
+        if entry.source in ("url", "local"):
+            # Remove a checkpoint that fails, so that it is not reused.
+            try:
+                # PyTorch-dependent module imported lazily.
+                from unbihexium.zoo.checkpoint import load_checkpoint
+
+                # Load with the recorded digest and compare with the entry.
+                _check_digest(load_checkpoint(checkpoint), entry)
+            # Any failure leaves no checkpoint behind.
+            except Exception:
+                # Delete the rejected file.
+                checkpoint.unlink(missing_ok=True)
+                # Report the original error.
+                raise
+    # An ONNX file is used only when model.sha256 vouches for it.
+    onnx_ok = current and ONNX_NAME in verified
+    # Unverified or outdated ONNX files are removed.
+    if not onnx_ok and onnx_path.is_file():
+        # Delete the file; it is exported again when requested.
+        onnx_path.unlink()
+    # Export to ONNX when requested and not verified.
+    if onnx and not onnx_ok:
         # PyTorch-dependent modules imported lazily.
         from unbihexium.zoo.checkpoint import load_checkpoint  # Reads checkpoint files.
         from unbihexium.zoo.export import export_onnx  # Writes ONNX files.
 
         # Export the cached checkpoint.
-        export_onnx(load_checkpoint(checkpoint), directory / ONNX_NAME)
-    # Write the configuration file.
+        export_onnx(load_checkpoint(checkpoint), onnx_path)
+    # Write the configuration file when it changed.
     _write_config(directory, entry)
-    # Write the checksums of the model files.
+    # Write the checksums of the model files when they changed.
     write_sha256_file(directory, [CHECKPOINT_NAME, ONNX_NAME, CONFIG_NAME])
     # Return the directory.
     return directory
 
 
-# Write config.json with the entry metadata and the checkpoint checksum.
-def _write_config(directory: Path, entry: ModelZooEntry) -> None:
+# Names of the files of a model directory that match its model.sha256.
+def _verified_files(directory: Path) -> set[str]:
+    # Path of the checksum file.
+    checksums = directory / CHECKSUM_NAME
+    # Without a checksum file nothing is verified.
+    if not checksums.is_file():
+        # Empty set.
+        return set()
+    # Expected digests; an unreadable file verifies nothing.
+    try:
+        # Parse the checksum file.
+        expected = read_sha256_file(checksums)
+    # Undecodable or unreadable files.
+    except (OSError, UnicodeDecodeError):
+        # Empty set.
+        return set()
+    # Only files of the store layout count, and all of them must match.
+    if not expected or not set(expected) <= {CHECKPOINT_NAME, ONNX_NAME, CONFIG_NAME}:
+        # Unknown names mean a foreign or damaged file.
+        return set()
+    # Every listed file must exist and match.
+    if not all(verify_file(directory / n, d) for n, d in expected.items()):
+        # One mismatch invalidates the directory.
+        return set()
+    # Names of the verified files.
+    return set(expected)
+
+
+# Text of config.json for an entry and the checkpoint in a directory.
+def _config_text(directory: Path, entry: ModelZooEntry) -> str:
     # Entry metadata.
     data: dict[str, Any] = entry.to_dict()
     # Checksum of the checkpoint file for quick checks.
     data["checkpoint_sha256"] = compute_sha256(directory / CHECKPOINT_NAME)
-    # Write pretty-printed JSON with a final newline.
-    text = json.dumps(data, indent=2, sort_keys=True) + "\n"
+    # Pretty-printed JSON with a final newline.
+    return json.dumps(data, indent=2, sort_keys=True) + "\n"
+
+
+# Whether config.json of a directory describes the entry and its checkpoint.
+def _config_matches(directory: Path, entry: ModelZooEntry) -> bool:
+    # Compare the stored text with the expected one.
+    try:
+        # Exact comparison of the file contents.
+        return (directory / CONFIG_NAME).read_text(encoding="utf-8") == _config_text(
+            directory,  # Model directory.
+            entry,  # Registry entry.
+        )  # End of the comparison.
+    # Missing or unreadable files do not match.
+    except (OSError, UnicodeDecodeError):
+        # Not current.
+        return False
+
+
+# Write config.json with the entry metadata and the checkpoint checksum.
+def _write_config(directory: Path, entry: ModelZooEntry) -> None:
+    # Unchanged files are left alone, so a verified store can be read-only.
+    if _config_matches(directory, entry):
+        # Nothing to write.
+        return
     # Write the file.
-    (directory / CONFIG_NAME).write_text(text, encoding="utf-8")
+    (directory / CONFIG_NAME).write_text(_config_text(directory, entry), encoding="utf-8")
 
 
 # Backwards-compatible name: obtain a model and return its checkpoint path.
@@ -285,16 +404,34 @@ def list_cached(cache_dir: str | Path | None = None) -> list[str]:
 
 # Remove one model or the whole cache; returns the number of removed models.
 def clear_cache(model_id: str | None = None, cache_dir: str | Path | None = None) -> int:
+    # Cache root.
+    root = Path(cache_dir) if cache_dir is not None else get_cache_dir()
+    # A single model must be a known model id or an entry of the store.
+    if model_id is not None:
+        # Rejects separators and parent references.
+        _check_name(model_id)
+        # Unknown names that are not store entries are errors.
+        if get_model(model_id) is None and not (root / model_id).is_dir():
+            # Report the unknown name.
+            raise ValueError(f"{model_id!r} is neither a model id nor an entry of the store")
     # Models to remove.
     targets = [model_id] if model_id else list_cached(cache_dir)
     # Number removed.
     removed = 0
+    # Resolved cache root, for the containment check.
+    resolved_root = root.resolve()
     # Remove each model directory.
     for mid in targets:
         # Directory of the model.
         directory = model_dir(mid, cache_dir)
-        # Skip models that are not cached.
-        if directory.is_dir():
+        # A symbolic link is removed without touching its target.
+        if directory.is_symlink():
+            # Delete the link only.
+            directory.unlink()
+            # Count the removal.
+            removed += 1
+        # Only directories directly inside the store are deleted.
+        elif directory.is_dir() and directory.resolve().parent == resolved_root:
             # Delete the directory tree.
             shutil.rmtree(directory)
             # Count the removal.
@@ -305,23 +442,25 @@ def clear_cache(model_id: str | None = None, cache_dir: str | Path | None = None
 
 # Verify a cached model: file checksums and the published weights digest.
 def verify_model(model_id: str, cache_dir: str | Path | None = None) -> bool:
-    # PyTorch-dependent module imported lazily.
-    from unbihexium.zoo.checkpoint import CheckpointError, load_checkpoint
-
-    # Path of the checkpoint.
-    checkpoint = get_cached_model_path(model_id, cache_dir)
-    # Uncached models cannot be verified.
-    if checkpoint is None:
-        # Report failure.
-        return False
-    # Load the checkpoint, which also checks its recorded digest.
+    # Every failure, including unreadable or corrupt files, means "not verified".
     try:
-        # Load with digest verification.
-        model = load_checkpoint(checkpoint, verify=True)
+        # PyTorch-dependent module imported lazily.
+        from unbihexium.zoo.checkpoint import load_checkpoint
+
+        # Directory of the model; invalid ids raise ValueError.
+        directory = model_dir(model_id, cache_dir)
+        # Files that match model.sha256; empty when any listed file does not.
+        verified = _verified_files(directory)
+        # The checkpoint and the configuration must be listed and match.
+        if not {CHECKPOINT_NAME, CONFIG_NAME} <= verified:
+            # Missing, unlisted or modified files.
+            return False
+        # Load the checkpoint, which also checks its recorded digest.
+        model = load_checkpoint(directory / CHECKPOINT_NAME, verify=True)
         # Compare with the published digest.
         _check_digest(model, _entry(model_id))
-    # Any mismatch fails verification.
-    except (CheckpointError, VerificationError, KeyError):
+    # Corrupt files raise many kinds of errors, for example UnpicklingError.
+    except Exception:
         # Report failure.
         return False
     # All checks passed.

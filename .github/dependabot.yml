@@ -45,8 +45,6 @@ updates:  # One entry per package ecosystem.
     ignore:  # Updates that Dependabot must not propose.
       - dependency-name: "torch"  # PyTorch runtime.
         update-types: ["version-update:semver-major"]  # Major versions are upgraded by hand.
-      - dependency-name: "torchvision"  # PyTorch vision models and transforms.
-        update-types: ["version-update:semver-major"]  # Kept in step with torch.
 
   # Actions referenced by the workflows in .github/workflows/.
   - package-ecosystem: "github-actions"
