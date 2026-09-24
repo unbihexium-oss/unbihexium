@@ -30,7 +30,9 @@
 #                                timing side channels
 #   RateLimiter                  token bucket per client: `rate` requests per
 #                                minute with bursts up to `burst`; answers
-#                                429 with a Retry-After header
+#                                429 with a Retry-After header. Buckets that
+#                                have refilled completely are dropped, so the
+#                                memory holds only recently active clients
 #   get_client_ip                client address; X-Forwarded-For is trusted
 #                                only when requested, because clients can
 #                                set it freely
@@ -72,6 +74,9 @@ from fastapi import HTTPException, Request
 
 # Default maximum request body (10 MiB).
 MAX_PAYLOAD_SIZE = 10 * 1024 * 1024
+
+# Number of client buckets above which the rate limiter drops idle ones.
+PRUNE_THRESHOLD = 1024
 
 # Media types accepted by the service.
 ALLOWED_CONTENT_TYPES = {
@@ -293,8 +298,27 @@ class RateLimiter:
         self.trust_forwarded = trust_forwarded
         # Buckets: key -> (tokens, time of the last update).
         self._buckets: dict[str, tuple[float, float]] = {}
+        # Seconds after which an idle bucket is full again and can be dropped.
+        self._idle = self.capacity / self.rate
+        # Number of buckets above which idle ones are dropped.
+        self._prune_at = PRUNE_THRESHOLD
+        # Time of the last pruning.
+        self._pruned = clock()
         # Lock for concurrent requests.
         self._lock = threading.Lock()
+
+    # Drop buckets that have refilled completely; they equal a new bucket.
+    def _prune(self, now: float) -> None:
+        # Keys idle for at least the refill time.
+        stale = [k for k, (_, last) in self._buckets.items() if now - last >= self._idle]
+        # Remove them.
+        for key in stale:
+            # Forget the key.
+            del self._buckets[key]
+        # Prune again only after the table has doubled, so the cost stays amortised.
+        self._prune_at = max(PRUNE_THRESHOLD, 2 * len(self._buckets))
+        # Remember the time.
+        self._pruned = now
 
     # Take one token for a key; returns 0 when allowed, else seconds to wait.
     def acquire(self, key: str) -> float:
@@ -302,6 +326,15 @@ class RateLimiter:
         with self._lock:
             # Current time.
             now = self.clock()
+            # Keep the memory bounded by the clients of the last refill period:
+            # prune when the table doubled, or once per refill period when large.
+            size = len(self._buckets)
+            # A large table not pruned for a refill period.
+            overdue = size > PRUNE_THRESHOLD and now - self._pruned >= self._idle
+            # Either condition triggers a pass over the table.
+            if size >= self._prune_at or overdue:
+                # Drop full buckets.
+                self._prune(now)
             # Stored state, a full bucket for new keys.
             tokens, last = self._buckets.get(key, (self.capacity, now))
             # Refill since the last update, up to the capacity.

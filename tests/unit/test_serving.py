@@ -410,6 +410,26 @@ def test_json_media_type(client: TestClient) -> None:
     assert response.status_code == 200
 
 
+# The rate limiter forgets clients whose bucket has refilled completely.
+def test_rate_limiter_memory_is_bounded() -> None:
+    # Fake clock.
+    now = [0.0]
+    # One request per second, bursts of one.
+    limiter = RateLimiter(60, burst=1, clock=lambda: now[0])
+    # Many clients within one second stay in memory.
+    for i in range(3000):
+        # Each client takes its token.
+        assert limiter.acquire(f"10.0.{i // 256}.{i % 256}") == 0.0
+    # All are recent.
+    assert len(limiter._buckets) == 3000
+    # Ten seconds later every bucket has refilled.
+    now[0] = 10.0
+    # The next request drops the idle buckets.
+    assert limiter.acquire("192.0.2.1") == 0.0
+    # Only the new client remains.
+    assert len(limiter._buckets) == 1
+
+
 # Token bucket: 60 requests per minute with bursts of 2.
 def test_rate_limiter() -> None:
     # Fake clock.
