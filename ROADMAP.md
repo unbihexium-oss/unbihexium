@@ -56,7 +56,7 @@ Items are grouped by area, not by priority. Each item states the gap, the eviden
 
 As of 2026-09-24:
 
-- The latest release is 2.0.0 (2026-09-24), the first release built, signed and attested by the current release workflow. It contains the rewrite of the library, the model zoo and the release pipeline; the changes since 1.0.1 are listed in [CHANGELOG.md](CHANGELOG.md).
+- The latest release is 2.0.1 (2026-09-24). Release 2.0.0 was the first built, signed and attested by the current release workflow; 2.0.1 is the first whose container image is signed as well. It contains the rewrite of the library, the model zoo and the release pipeline; the changes since 1.0.1 are listed in [CHANGELOG.md](CHANGELOG.md).
 - The model zoo defines 520 untrained starter models (130 families in four variants); only the 28 models of the 7 spectral index families compute results without training.
 - The project has one maintainer, listed in [MAINTAINERS.md](MAINTAINERS.md).
 
@@ -64,9 +64,9 @@ As of 2026-09-24:
 
 ### 3.1 Verification of the first signed release (planned)
 
-- Gap: 2.0.0 is the first release whose distributions are signed with Sigstore and carry SLSA provenance and an SBOM, and the first whose container image is signed with cosign. The verification commands in [SECURITY.md](SECURITY.md), Section 7, were written before any such release existed. The GitHub releases v1.0.0 and v1.0.1 have no signatures or provenance.
-- Evidence: `.github/workflows/release.yml` and `.github/workflows/docker.yml`; the assets of the GitHub release v2.0.0.
-- Outcome: the verification commands are run against the assets of v2.0.0 and its container image, and [SECURITY.md](SECURITY.md) and [docs/security/supply_chain_security.md](docs/security/supply_chain_security.md) record the result.
+- Gap: 2.0.0 is the first release whose distributions are signed with Sigstore and carry SLSA provenance and an SBOM, and 2.0.1 is the first whose container image is signed with cosign. The verification commands in [SECURITY.md](SECURITY.md), Section 7, were written before any such release existed. The GitHub releases v1.0.0 and v1.0.1 have no signatures or provenance.
+- Evidence: `.github/workflows/release.yml` and `.github/workflows/docker.yml`; the assets of the GitHub releases v2.0.0 and v2.0.1.
+- Outcome: the verification commands are run against the assets of v2.0.1 and its container image, and [SECURITY.md](SECURITY.md) and [docs/security/supply_chain_security.md](docs/security/supply_chain_security.md) record the result.
 
 ## 4. Model zoo
 

@@ -760,7 +760,7 @@ body:  # Elements of the form, in display order.
       description: |  # Help text shown under the question.
         Select the Unbihexium version you are using. Run `python -c "import unbihexium; print(unbihexium.__version__)"` if you are unsure.
       options:  # Answer choices, in display order.
-        - "2.0.0 (latest release)"  # Choice 1.
+        - "2.0.x (2.0.0 or 2.0.1, latest release series)"  # Choice 1.
         - "1.0.x (1.0.0 or 1.0.1)"  # Choice 2.
         - "main branch (unreleased)"  # Choice 3.
         - "Other (specify in the next field)"  # Choice 4.

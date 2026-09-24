@@ -466,7 +466,7 @@ Select the Unbihexium version you are using. Run `python -c "import unbihexium; 
 
 _Select one._
 
-- [ ] 2.0.0 (latest release)
+- [ ] 2.0.x (2.0.0 or 2.0.1, latest release series)
 - [ ] 1.0.x (1.0.0 or 1.0.1)
 - [ ] main branch (unreleased)
 - [ ] Other:

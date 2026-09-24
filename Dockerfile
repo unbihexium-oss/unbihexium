@@ -42,7 +42,7 @@
 #   docker build -t unbihexium:local .
 #
 #   Optional build arguments add OCI metadata:
-#     --build-arg VERSION=2.0.0
+#     --build-arg VERSION=2.0.1
 #     --build-arg VCS_REF="$(git rev-parse HEAD)"
 #     --build-arg BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 #
@@ -132,7 +132,7 @@ RUN /opt/build/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-di
 FROM python:3.14.7-slim-trixie@sha256:caaf356f40667c496d405780745b9ac25771c189a51dfcc42430d531ea09f8a2 AS runtime
 
 # Package version recorded in the image metadata.
-ARG VERSION=2.0.0
+ARG VERSION=2.0.1
 # Git commit the image was built from.
 ARG VCS_REF=unknown
 # Build time in RFC 3339 format.

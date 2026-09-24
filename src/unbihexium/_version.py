@@ -26,10 +26,10 @@
 from __future__ import annotations
 
 # Version string, identical to the version in pyproject.toml.
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 
 # Major, minor and patch numbers of the version string.
-__version_tuple__ = (2, 0, 0)
+__version_tuple__ = (2, 0, 1)
 
 # =============================================================================
 # End of module src/unbihexium/_version.py

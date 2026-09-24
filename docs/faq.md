@@ -53,7 +53,7 @@ The classical processing functions are deterministic implementations of publishe
 
 ### 1.3 Which version should I use?
 
-Use the latest release, 2.0.0 (tag `v2.0.0`, 24 September 2026), from PyPI ([installation guide](getting_started/installation.md)). It is a major release with breaking changes; to move existing 1.0.x code, read [MIGRATION.md](MIGRATION.md). The documentation under `docs/` describes the main branch, which matches 2.0.0 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). An installation from the main branch reports the version of the last release ([VERSIONING.md](../VERSIONING.md), Section 2.4), so record the commit hash with results obtained from it.
+Use the latest release, 2.0.1 (tag `v2.0.1`, 24 September 2026), from PyPI ([installation guide](getting_started/installation.md)). The 2.0 series is a major release with breaking changes compared with 1.0.x; to move existing 1.0.x code, read [MIGRATION.md](MIGRATION.md). The documentation under `docs/` describes the main branch, which matches 2.0.1 apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). An installation from the main branch reports the version of the last release ([VERSIONING.md](../VERSIONING.md), Section 2.4), so record the commit hash with results obtained from it.
 
 ### 1.4 Can I use it in proprietary software?
 

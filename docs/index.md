@@ -51,7 +51,7 @@ This is the entry point of the documentation of Unbihexium, the open source Pyth
 
 ### 1.1 What the documentation describes
 
-The documentation describes the main branch of the repository <https://github.com/unbihexium-oss/unbihexium>. The latest published release is 2.0.0 on PyPI (<https://pypi.org/project/unbihexium/>), tagged `v2.0.0` on 24 September 2026; the main branch matches it apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). Differences between 1.0.x and 2.0.0 are listed in [MIGRATION.md](MIGRATION.md) and in the changelog.
+The documentation describes the main branch of the repository <https://github.com/unbihexium-oss/unbihexium>. The latest published release is 2.0.1 on PyPI (<https://pypi.org/project/unbihexium/>), tagged `v2.0.1` on 24 September 2026; the main branch matches it apart from changes listed under `[Unreleased]` in [CHANGELOG.md](../CHANGELOG.md). Differences between 1.0.x and 2.0.0 are listed in [MIGRATION.md](MIGRATION.md) and in the changelog.
 
 ### 1.2 What the software is
 

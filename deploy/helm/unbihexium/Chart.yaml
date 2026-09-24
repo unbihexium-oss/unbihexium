@@ -32,8 +32,8 @@ apiVersion: v2  # Chart API version of Helm 3.
 name: unbihexium  # Chart name, also the default release name prefix.
 description: REST API of Unbihexium, the Earth observation, geospatial, remote sensing and SAR library  # Shown by `helm search`.
 type: application  # Deployable chart, not a library chart.
-version: 2.0.0  # Version of the chart (SemVer).
-appVersion: "2.0.0"  # Version of Unbihexium deployed by the chart.
+version: 2.0.1  # Version of the chart (SemVer).
+appVersion: "2.0.1"  # Version of Unbihexium deployed by the chart.
 kubeVersion: ">=1.25.0-0"  # First release with policy/v1 disruption budgets and autoscaling/v2.
 keywords:  # Search terms for chart repositories.
   - geospatial  # Geographic data.

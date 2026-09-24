@@ -52,9 +52,10 @@ This guide explains how to move code, command line scripts, REST clients, model 
 | --- | --- | --- | --- |
 | 1.0.0 | Released | `v1.0.0`, 2025-12-21 | GitHub release only; Apache-2.0 |
 | 1.0.1 | Released | `v1.0.1`, 2025-12-21 | PyPI and GitHub; Apache-2.0 |
-| 2.0.0 | Released, latest | `v2.0.0`, 2026-09-24 | PyPI, GitHub and the container registry; MPL-2.0 |
+| 2.0.0 | Released | `v2.0.0`, 2026-09-24 | PyPI, GitHub and the container registry; MPL-2.0 |
+| 2.0.1 | Released, latest | `v2.0.1`, 2026-09-24 | Patch release of 2.0.0 without changes to the library; PyPI, GitHub and the container registry; MPL-2.0 |
 
-No version older than 1.0.0 was ever released. `unbihexium --version` prints the installed version, so it tells the two sides of this migration apart. Install 2.0.0 from PyPI with `python -m pip install "unbihexium==2.0.0"` or as described in [docs/getting_started/installation.md](getting_started/installation.md).
+No version older than 1.0.0 was ever released. `unbihexium --version` prints the installed version, so it tells the two sides of this migration apart. Install the latest 2.0.x release from PyPI with `python -m pip install "unbihexium>=2.0,<3"` or as described in [docs/getting_started/installation.md](getting_started/installation.md).
 
 ### 1.2 Conventions
 

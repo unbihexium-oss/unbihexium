@@ -67,7 +67,7 @@ Pre-releases, when they are published, MUST use the normalised PEP 440 [2] suffi
 
 ### 2.3 Tags
 
-Each release MUST have an annotated Git tag named `v` followed by the version, for example `v1.0.1`. Tags MUST NOT be moved or reused once they have been pushed. The existing tags are `v1.0.0` and `v1.0.1`, both created on 2025-12-21, and `v2.0.0`, created on 2026-09-24.
+Each release MUST have an annotated Git tag named `v` followed by the version, for example `v1.0.1`. Tags MUST NOT be moved or reused once they have been pushed. The existing tags are `v1.0.0` and `v1.0.1`, both created on 2025-12-21, and `v2.0.0` and `v2.0.1`, both created on 2026-09-24.
 
 ### 2.4 Development versions
 
@@ -181,7 +181,7 @@ The project has no fixed release schedule. Releases are made when the maintainer
 
 ## 10. Supported release series
 
-Only the latest release series receives fixes. Fixes, including security fixes, are made on `main` first and released as a new PATCH version of the latest series; earlier patch versions are not patched separately. The latest release is 2.0.0; the 1.0.x series no longer receives fixes. Vulnerabilities are reported and handled as described in [SECURITY.md](SECURITY.md).
+Only the latest release series receives fixes. Fixes, including security fixes, are made on `main` first and released as a new PATCH version of the latest series; earlier patch versions are not patched separately. The latest release is 2.0.1; the 1.0.x series no longer receives fixes. Vulnerabilities are reported and handled as described in [SECURITY.md](SECURITY.md).
 
 ## 11. Querying versions
 
@@ -191,8 +191,8 @@ The installed library version, the catalogue version and the version of a catalo
 import unbihexium
 from unbihexium.zoo import catalog_version, get_model
 
-print(unbihexium.__version__)        # Library version, for example "2.0.0".
-print(unbihexium.__version_tuple__)  # The same version as a tuple, (2, 0, 0).
+print(unbihexium.__version__)        # Library version, for example "2.0.1".
+print(unbihexium.__version_tuple__)  # The same version as a tuple, (2, 0, 1).
 print(catalog_version())             # Model catalogue version, "2.0.0".
 
 entry = get_model("aircraft_detector_base")  # Catalogue entry of one model.

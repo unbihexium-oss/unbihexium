@@ -365,7 +365,7 @@ curl -s -X POST http://127.0.0.1:8000/predict/ndvi_calculator_tiny \
 ```
 
 ```text
-{"status":"healthy","version":"2.0.0","ready":true,"models_available":520,"models_loaded":0}
+{"status":"healthy","version":"2.0.1","ready":true,"models_available":520,"models_loaded":0}
 {"model_id":"ndvi_calculator_tiny","task":"spectral_index","description":"Normalized Difference Vegetation Index, (NIR - RED) / (NIR + RED) (Rouse et al., 1974).","name":"NDVI Calculator (tiny)","domain":"indices","variant":"tiny","in_channels":2,"channels":["red","nir"],"outputs":["ndvi"],"units":[],"requires_training":false}
 {"model_id":"ndvi_calculator_tiny","task":"spectral_index","success":true,"input_shape":[2,2,2],"elapsed_ms":1731.767,"requires_training":false,"result":{"outputs":["ndvi"],"units":[],"shape":[1,2,2],"statistics":{"ndvi":{"count":4,"missing":0,"mean":0.764297366142273,"std":0.009829425528553128,"min":0.7499999403953552,"max":0.7777777314186096}}}}
 ```

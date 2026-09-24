@@ -130,7 +130,7 @@ def test_version_tuple_matches_string() -> None:
     # Numbers of the string.
     numbers = tuple(int(p) for p in unbihexium.__version__.split("."))
     # Same numbers.
-    assert unbihexium.__version_tuple__ == numbers == (2, 0, 0)
+    assert unbihexium.__version_tuple__ == numbers == (2, 0, 1)
 
 
 # Arrays of three dimensions keep their shape.
