@@ -63,14 +63,14 @@ The key words MUST, MUST NOT, SHOULD, SHOULD NOT and MAY in this document are to
 
 | Credential | Kind | Stored in | Used by | Purpose |
 | --- | --- | --- | --- | --- |
-| `PYPI_API_TOKEN` | Long-lived PyPI API token | Repository secret | [release.yml](../../.github/workflows/release.yml), step "Publish to PyPI" | Upload the sdist and the wheel to <https://pypi.org/project/unbihexium/> |
+| PyPI upload token | Short-lived API token, minted by PyPI for one run through trusted publishing | Not stored | [release.yml](../../.github/workflows/release.yml), step "Publish to PyPI" | Upload the sdist and the wheel to <https://pypi.org/project/unbihexium/> |
 | `CODECOV_TOKEN` | Codecov upload token | Repository secret | [coverage.yml](../../.github/workflows/coverage.yml), step "Upload coverage to Codecov" | Upload the coverage report; it grants no write access to the repository |
 | `GITHUB_TOKEN` | Automatic, per job, expires when the job ends | Provided by GitHub Actions | Every workflow (Section 3) | Read the repository; where granted, write releases, packages, labels, comments or code scanning results |
-| OIDC ID token | Short-lived JSON Web Token, requested at run time | Not stored | [release.yml](../../.github/workflows/release.yml), [scorecard.yml](../../.github/workflows/scorecard.yml) | Sigstore signing, artifact attestations, Scorecard publication (Section 4) |
+| OIDC ID token | Short-lived JSON Web Token, requested at run time | Not stored | [release.yml](../../.github/workflows/release.yml), [docker.yml](../../.github/workflows/docker.yml), [scorecard.yml](../../.github/workflows/scorecard.yml) | PyPI trusted publishing, Sigstore signing of the distributions and the container image, artifact attestations, Scorecard publication (Section 4) |
 
-No other secret is referenced by any workflow. There are no cloud provider credentials, no registry passwords other than `GITHUB_TOKEN` for the GitHub Container Registry, no signing keys and no deployment keys. The lead maintainer controls `PYPI_API_TOKEN`, as recorded in [GOVERNANCE.md](../../GOVERNANCE.md).
+No other secret is referenced by any workflow. There are no cloud provider credentials, no registry passwords other than `GITHUB_TOKEN` for the GitHub Container Registry, no PyPI credentials, no signing keys and no deployment keys.
 
-The release workflow grants `id-token: write`, and its comment mentions PyPI trusted publishing, but the upload step authenticates with `PYPI_API_TOKEN`; trusted publishing is not configured. Replacing the token with trusted publishing, so that no upload credential is stored, is listed in [ROADMAP.md](../../ROADMAP.md) under "Trusted publishing to PyPI".
+The release job runs in the GitHub environment `pypi` and publishes with PyPI trusted publishing [8]: PyPI checks the OIDC token of the job against the trusted publisher registered for the project (repository `unbihexium-oss/unbihexium`, workflow `release.yml`, environment `pypi`) and returns an upload token that expires after the upload. The lead maintainer, who administers the project on PyPI ([GOVERNANCE.md](../../GOVERNANCE.md)), registers the trusted publisher once, then deletes the former `PYPI_API_TOKEN` repository secret and revokes that token on PyPI. Required reviewers MAY be added to the `pypi` environment in the repository settings, so that every upload waits for an approval.
 
 ## 3. GITHUB_TOKEN Permissions per Workflow
 
@@ -82,7 +82,7 @@ Every workflow declares a top-level `permissions` block. The table lists that de
 | [codeql.yml](../../.github/workflows/codeql.yml) | `contents: read` | `analyze`: `contents: read`, `actions: read`, `security-events: write` |
 | [container-scan.yml](../../.github/workflows/container-scan.yml) | `contents: read` | `grype`: `contents: read`, `security-events: write` |
 | [coverage.yml](../../.github/workflows/coverage.yml) | `contents: read` | none (inherit) |
-| [docker.yml](../../.github/workflows/docker.yml) | `contents: read` | `build-and-push`: `contents: read`, `packages: write` |
+| [docker.yml](../../.github/workflows/docker.yml) | `contents: read` | `build-and-push`: `contents: read`, `packages: write`, `id-token: write`, `attestations: write` |
 | [fuzz.yml](../../.github/workflows/fuzz.yml) | `contents: read` | none (inherit) |
 | [integration.yml](../../.github/workflows/integration.yml) | `contents: read` | none (inherit) |
 | [labeler.yml](../../.github/workflows/labeler.yml) | `contents: read` | `label`: `contents: read`, `pull-requests: write` |
@@ -108,9 +108,10 @@ Only two jobs can change what users download: `release` in release.yml (`content
 
 ## 4. OpenID Connect Tokens
 
-A job with `id-token: write` can request an OIDC ID token from GitHub that states which repository, workflow, ref and commit the job runs for [4]. The token lives for minutes and is not stored. Two jobs use it:
+A job with `id-token: write` can request an OIDC ID token from GitHub that states which repository, workflow, ref and commit the job runs for [4]. The token lives for minutes and is not stored. Three jobs use it:
 
-- **release** in release.yml. `actions/attest-build-provenance` exchanges the token for a short-lived signing certificate from the Sigstore certificate authority (Fulcio) and signs SLSA build provenance for every distribution; the attestation is stored by GitHub (`attestations: write`). `sigstore/gh-action-sigstore-python` does the same to sign each distribution and writes a `.sigstore.json` bundle; the signature is recorded in the public Rekor transparency log [5]. The certificate identity is the workflow path at the tag, `https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag>`, which is what verifiers check (see [supply_chain_security.md](supply_chain_security.md)).
+- **release** in release.yml. `actions/attest-build-provenance` exchanges the token for a short-lived signing certificate from the Sigstore certificate authority (Fulcio) and signs SLSA build provenance for every distribution; the attestation is stored by GitHub (`attestations: write`). `sigstore/gh-action-sigstore-python` does the same to sign each distribution and writes a `.sigstore.json` bundle; the signature is recorded in the public Rekor transparency log [5]. The certificate identity is the workflow path at the tag, `https://github.com/unbihexium-oss/unbihexium/.github/workflows/release.yml@refs/tags/<tag>`, which is what verifiers check (see [supply_chain_security.md](supply_chain_security.md)). `actions/attest-sbom` attests the SPDX SBOM of the release in the same way, and `pypa/gh-action-pypi-publish` exchanges the token for the PyPI upload token (Section 2).
+- **build-and-push** in docker.yml. For pushed images only, `actions/attest-build-provenance` and `actions/attest-sbom` attest the image digest and store the attestations in the registry, and `cosign sign` signs the digest in keyless mode; the certificate identity is `https://github.com/unbihexium-oss/unbihexium/.github/workflows/docker.yml@<ref>`.
 - **analysis** in scorecard.yml. The OpenSSF Scorecard action uses the token to prove to the public Scorecard API that the results come from this repository's workflow on the default branch [6].
 
 Because no private key exists, there is nothing to rotate or leak for signing. The trust in a signature rests on the workflow file and on who can push tags.
@@ -180,6 +181,8 @@ If a credential of the project is exposed, the maintainer revokes it at its issu
 [6] OpenSSF. OpenSSF Scorecard. 2026. <https://scorecard.dev/>
 
 [7] Truffle Security. TruffleHog. 2026. <https://github.com/trufflesecurity/trufflehog>
+
+[8] Python Packaging Authority. Publishing to PyPI with a Trusted Publisher. 2026. <https://docs.pypi.org/trusted-publishers/>
 
 <!--
 =============================================================================

@@ -94,7 +94,7 @@ Maintainers have write access to the repository and are listed in [MAINTAINERS.m
 
 ### 3.4 Lead maintainer
 
-One maintainer is the lead maintainer. The lead maintainer holds administrator rights on the repository and the organisation and controls the PyPI publishing token (the `PYPI_API_TOKEN` repository secret used by the release workflow), and decides when the maintainers cannot reach agreement (Section 4.3). The lead maintainer is currently Olaf Yunus Laitinen Imanov.
+One maintainer is the lead maintainer. The lead maintainer holds administrator rights on the repository and the organisation and administers the project on PyPI, including the trusted publisher through which the release workflow uploads, and decides when the maintainers cannot reach agreement (Section 4.3). The lead maintainer is currently Olaf Yunus Laitinen Imanov.
 
 ### 3.5 Emeritus maintainers
 
@@ -219,7 +219,7 @@ Maintainers SHOULD sign their commits and tags.
 
 ## 10. Releases
 
-Releases are prepared by a maintainer. The version in `pyproject.toml` and the changelog are updated in a pull request, and a tag `v<version>` is pushed. `.github/workflows/release.yml` then builds the sdist and the wheel, signs them with Sigstore (`.sigstore.json` bundles), creates GitHub artifact attestations and SLSA provenance (`unbihexium-<tag>.intoto.jsonl`), creates the GitHub release and uploads the distributions to PyPI. The versioning and compatibility policy is described in [VERSIONING.md](VERSIONING.md); notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
+Releases are prepared by a maintainer. The version in `pyproject.toml` and the changelog are updated in a pull request, and a tag `v<version>` is pushed. `.github/workflows/release.yml` then builds the sdist and the wheel, signs them with Sigstore (`.sigstore.json` bundles), creates GitHub artifact attestations, SLSA provenance (`unbihexium-<tag>.intoto.jsonl`) and an SPDX SBOM (`unbihexium-<tag>.spdx.json`), creates the GitHub release and uploads the distributions to PyPI with trusted publishing. The versioning and compatibility policy is described in [VERSIONING.md](VERSIONING.md); notable changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## 11. Conduct and conflicts of interest
 

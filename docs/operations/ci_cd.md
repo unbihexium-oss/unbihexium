@@ -91,7 +91,7 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 
 | Workflow file | Name | Triggers | Jobs |
 | --- | --- | --- | --- |
-| [ci.yml](../../.github/workflows/ci.yml) | CI | PR, push | `lint`, `typecheck`, `test` (Python 3.10 to 3.14) |
+| [ci.yml](../../.github/workflows/ci.yml) | CI | PR, push | `lint`, `typecheck`, `test` (Python 3.10 to 3.14), `platforms` (macOS and Windows, Python 3.10 and 3.14) |
 | [codeql.yml](../../.github/workflows/codeql.yml) | CodeQL | PR, push, Tuesday 03:00, manual | `analyze` (`python`, `actions`) |
 | [container-scan.yml](../../.github/workflows/container-scan.yml) | Container Scan | PR and push touching `Dockerfile`, `.dockerignore`, `pyproject.toml`, `requirements*.txt`; Monday 03:00; manual | `grype` |
 | [coverage.yml](../../.github/workflows/coverage.yml) | Coverage | PR, push | `coverage` |
@@ -102,6 +102,7 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 | [labels.yml](../../.github/workflows/labels.yml) | Labels | PR and push touching `.github/labels.yml` or the workflow; manual | `sync` |
 | [license-compliance.yml](../../.github/workflows/license-compliance.yml) | License Compliance | PR, push, Monday 04:00, manual | `headers`, `reuse`, `dependencies` |
 | [links.yml](../../.github/workflows/links.yml) | Links | Monday 05:00, manual | `lychee` |
+| [doc-examples.yml](../../.github/workflows/doc-examples.yml) | Documentation Examples | PR and push touching Markdown, `src/`, `pyproject.toml`, the test locks or the runner; Thursday 04:00; manual | `examples` |
 | [markdown.yml](../../.github/workflows/markdown.yml) | Markdown | PR and push touching `**/*.md`, `.markdownlint.yaml` or the identifier check; manual | `markdownlint`, `document-ids` |
 | [model-zoo.yml](../../.github/workflows/model-zoo.yml) | Model Zoo | PR and push touching `model_zoo/**`, `src/unbihexium/zoo/**`, `src/unbihexium/ai/models/**`, the check script or the workflow; Monday 05:00; manual (with a `rebuild` input) | `consistency`, `reproducibility` |
 | [package.yml](../../.github/workflows/package.yml) | Package | PR, push, manual | `build`, `smoke-test` (Python 3.10 and 3.14) |
@@ -126,10 +127,11 @@ The table lists every workflow, its triggers and its jobs. "PR" means `pull_requ
 | CI, `lint` | `ruff check src/ --config pyproject.toml` and `ruff format --check src/` | Yes |
 | CI, `typecheck` | `pyright src/` in standard mode on CPython 3.13, against the hashed type check lock (test environment, pyright and the SciPy type stubs) and CPU PyTorch | Yes |
 | CI, `test` | `pytest tests/ --tb=short` on CPython 3.10, 3.11, 3.12, 3.13 and 3.14 with CPU PyTorch and the optional backends | Yes |
+| CI, `platforms` | The same command on `macos-latest` (arm64) and `windows-latest` (x86_64) with CPython 3.10 and 3.14, from the same hashed lock files | Yes |
 | Integration Tests, `integration` | `pytest tests/integration/` on CPython 3.10 to 3.14; GDAL system packages are installed on a best-effort basis | Yes |
 | Integration Tests, `e2e` | `pytest tests/e2e/` on CPython 3.14, after `integration` | Yes |
 | Integration Tests, `api-test` | Starts `create_app()` with uvicorn on 127.0.0.1:8000 for at most 30 seconds and polls `GET /health` until it answers | Yes |
-| Coverage, `coverage` | `pytest tests/ --cov=src/unbihexium` and upload of `coverage.xml` to Codecov (flag `unittests`) with the `CODECOV_TOKEN` secret | Only if the tests fail; upload errors are ignored, and the Codecov statuses in [codecov.yml](../../codecov.yml) are informational |
+| Coverage, `coverage` | `pytest tests/ --cov=src/unbihexium` and upload of `coverage.xml` to Codecov (flag `unittests`) with the `CODECOV_TOKEN` secret | Yes when a test fails or the coverage of lines and branches is below 85 % (`fail_under`); upload errors are ignored. The Codecov project status (drop of more than one percentage point) and patch status (below 80 %) in [codecov.yml](../../codecov.yml) are failing statuses |
 | Package, `build` | `python -m build --no-isolation` with the hash-pinned hatchling of the tools lock, `twine check --strict`, and that `LICENSE.txt` and `NOTICE` are shipped in the wheel and the sdist; uploads `dist/` as the artifact `dist` (7 days) | Yes |
 | Package, `smoke-test` | Installs the wheel into a fresh virtual environment on CPython 3.10 and 3.14, imports the package and runs `unbihexium --help` outside the checkout | Yes |
 
@@ -146,6 +148,7 @@ The Model Zoo workflow runs `.github/scripts/check_model_zoo.py` in two jobs. `c
 | Text Policy, `commit-messages` | Every commit message of the pull request is free of emojis, em dashes, horizontal bars and the listed Turkish letters |
 | Markdown, `markdownlint` | `markdownlint-cli@0.49.1` over every Markdown file with [.markdownlint.yaml](../../.markdownlint.yaml) |
 | Markdown, `document-ids` | `.github/scripts/check_document_ids.py`: every controlled document has a numbered identifier that is unique and matches the [Document Register](../document_register.md) and [docs/toc.md](../toc.md) |
+| Documentation Examples, `examples` | `.github/scripts/run_doc_examples.py`: the Python blocks and the `unbihexium` shell blocks of every controlled document, in order, one process and temporary directory per document, against the hashed test environment; blocks marked `<!-- doc-example: skip (reason) -->` do not run |
 | Repository Config, `schemas` | Issue forms, issue chooser, workflows, Dependabot, `CITATION.cff`, the Compose file and Codecov against their JSON Schemas with check-jsonschema; `codemeta.json` is valid JSON; `yamllint --strict`; the remaining `.github` YAML files parse |
 | Repository Config, `security-insights` | [security-insights.yml](../../security-insights.yml) against the OpenSSF Security Insights 2.2.0 schema with cue |
 | Workflow Lint, `actionlint` | actionlint 1.7.12 (archive pinned by SHA-256) with shellcheck over all workflows |
@@ -153,6 +156,26 @@ The Model Zoo workflow runs `.github/scripts/check_model_zoo.py` in two jobs. `c
 | PR Title, `conventional-title` | The title matches `type(scope): description` with the types feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert and deps; the scope is optional |
 
 Whether a failing check blocks the merge is decided by the branch protection rules of the repository, which are settings outside the source tree; [CONTRIBUTING.md](../../CONTRIBUTING.md) requires all checks to pass before a pull request is merged.
+
+### 4.4 Required Status Checks
+
+The branch protection rule (or ruleset) of `main` SHOULD require the checks below. They run on every pull request, so requiring them never leaves a pull request waiting for a check that does not start:
+
+| Workflow | Checks |
+| --- | --- |
+| CI | `Lint`, `Type Check`, `Test (3.10)` to `Test (3.14)`, `Test (macOS, 3.10)`, `Test (macOS, 3.14)`, `Test (Windows, 3.10)`, `Test (Windows, 3.14)` |
+| Integration Tests | `Integration Tests (3.10)` to `Integration Tests (3.14)`, `End-to-End Tests`, `API Integration` |
+| Coverage | `Code Coverage` |
+| Package | `Build distributions`, `Install wheel (Python 3.10)`, `Install wheel (Python 3.14)` |
+| Security | `Bandit Security Scan`, `Dependency Audit`, `Dependency Review` |
+| Secret Scan | `TruffleHog` |
+| CodeQL | `CodeQL (python)`, `CodeQL (actions)` |
+| Licence Compliance | `MPL-2.0 notices`, `REUSE compliance`, `Dependency licences` |
+| Text Policy | `English only, no emojis, no em dashes`, `Python documentation style`, `Commit messages` |
+| PR Title | `Conventional commit title` |
+| Docker | `Build and Push Docker Image` |
+
+The workflows with a path filter (Markdown with `Document identifiers`, Documentation Examples, Fuzz, Model Zoo, Deploy Files, Repository Config, Workflow Lint and Container Scan) run only when their files change and MUST NOT be required checks, because a required check that never starts blocks the merge; when they run, they MUST pass before the pull request is merged. The rule SHOULD also require a pull request with one approving review, dismiss approvals on new commits, and block force pushes and deletion of `main`.
 
 ## 5. Security Workflows
 
@@ -176,11 +199,11 @@ These controls and their limits are described in detail in [supply_chain_securit
 
 ### 6.1 Docker
 
-[docker.yml](../../.github/workflows/docker.yml) builds the image from the repository [Dockerfile](../../Dockerfile) with Buildx and the GitHub Actions layer cache. On pull requests it only builds, to prove that the Dockerfile works. On pushes to `main` and on version tags it logs in to `ghcr.io` with `GITHUB_TOKEN` (`packages: write`), pushes `ghcr.io/unbihexium-oss/unbihexium` with tags computed by `docker/metadata-action` (the branch name, `MAJOR.MINOR.PATCH` and `MAJOR.MINOR` for version tags, and `sha-<short commit>`), and stores an SPDX SBOM of the pushed image as the artifact `sbom-docker.spdx.json`. Using the image is described in [docker.md](docker.md).
+[docker.yml](../../.github/workflows/docker.yml) builds the image from the repository [Dockerfile](../../Dockerfile) with Buildx and the GitHub Actions layer cache. On pull requests it only builds, to prove that the Dockerfile works. On pushes to `main` and on version tags it logs in to `ghcr.io` with `GITHUB_TOKEN` (`packages: write`), pushes `ghcr.io/unbihexium-oss/unbihexium` with tags computed by `docker/metadata-action` (the branch name, `MAJOR.MINOR.PATCH` and `MAJOR.MINOR` for version tags, and `sha-<short commit>`), stores an SPDX SBOM of the pushed image as the artifact `sbom-docker.spdx.json`, attests the build provenance and the SBOM of the digest in the registry (`id-token: write`, `attestations: write`) and signs the digest with cosign in keyless mode. Using the image is described in [docker.md](docker.md).
 
 ### 6.2 Release
 
-[release.yml](../../.github/workflows/release.yml) runs when a tag `v*` is pushed. Its single job builds the sdist and the wheel, writes `SHA256SUMS.txt`, creates GitHub artifact attestations with SLSA build provenance, signs the distributions with Sigstore (`.sigstore.json` bundles), exports the provenance as `unbihexium-<tag>.intoto.jsonl`, creates the GitHub release with generated notes, and uploads the distributions to PyPI with the `PYPI_API_TOKEN` secret. The procedure around it is in [releasing.md](releasing.md).
+[release.yml](../../.github/workflows/release.yml) runs when a tag `v*` is pushed. Its single job builds the sdist and the wheel, writes `SHA256SUMS.txt`, writes and attests the SPDX SBOM `unbihexium-<tag>.spdx.json` of the wheel installed with the runtime lock, creates GitHub artifact attestations with SLSA build provenance, signs the distributions with Sigstore (`.sigstore.json` bundles), exports the provenance as `unbihexium-<tag>.intoto.jsonl`, creates the GitHub release with generated notes, and uploads the distributions to PyPI with trusted publishing from the environment `pypi`. The procedure around it is in [releasing.md](releasing.md).
 
 ### 6.3 Torch Lock
 
@@ -208,9 +231,10 @@ These controls and their limits are described in detail in [supply_chain_securit
 | Monday 06:00 | Integration Tests, OpenSSF Scorecard |
 | Tuesday 03:00 | CodeQL |
 | Wednesday 02:00 | Fuzzing (twenty minutes per target) |
+| Thursday 04:00 | Documentation Examples |
 | Thursday 05:00 | Torch Lock |
 
-Scheduled runs catch problems that appear without a code change: new advisories, new dependency releases, broken external links and platform drift in the model weights. GitHub disables scheduled workflows in repositories without activity for 60 days [3].
+Scheduled runs catch problems that appear without a code change: new advisories, new dependency releases, examples broken by a dependency, broken external links and platform drift in the model weights. GitHub disables scheduled workflows in repositories without activity for 60 days [3].
 
 ## 9. Running the Checks Locally
 

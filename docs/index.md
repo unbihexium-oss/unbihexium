@@ -202,7 +202,7 @@ Every document under `docs/` follows the same layout: a licence and header comme
 
 ### 13.2 Accuracy
 
-Documents describe the code of the main branch at their review date. Code examples and commands were executed against that code, and shown outputs are real outputs; numbers such as timings state how and where they were measured. Documents do not contain performance, accuracy or compliance claims that the repository cannot support.
+Documents describe the code of the main branch at their review date. Code examples and commands were executed against that code, and shown outputs are real outputs; the Documentation Examples workflow runs the Python examples and the `unbihexium` commands again on every change, so an example that the code no longer supports fails a check; numbers such as timings state how and where they were measured. Documents do not contain performance, accuracy or compliance claims that the repository cannot support.
 
 ### 13.3 Reporting problems
 

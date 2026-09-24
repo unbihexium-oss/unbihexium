@@ -188,8 +188,8 @@ The table lists what the project does and does not do at the date of review.
 | File notices | Checked in CI for every tracked Python and shell file |
 | REUSE Specification 3.3 | Checked in CI with `reuse lint` |
 | Dependency licences | Installed runtime set checked in CI; new dependencies checked in pull requests |
-| Software bill of materials | SPDX SBOM for each pushed container image, stored as a workflow artifact; none for the Python distributions |
-| Release integrity | Sigstore signatures, SLSA provenance and GitHub artifact attestations for releases built by the current release workflow; see [SECURITY.md](SECURITY.md) |
+| Software bill of materials | SPDX SBOM for each release (`unbihexium-<tag>.spdx.json`, the wheel with its locked runtime dependencies) and for each pushed container image, both with signed attestations |
+| Release integrity | Sigstore signatures, SLSA provenance and GitHub artifact attestations for releases built by the current release workflow, PyPI trusted publishing with PEP 740 attestations, and keyless cosign signatures of the container images; see [SECURITY.md](SECURITY.md) |
 | Export control classification | Not performed |
 | AI Act classification | Not applicable to the library as published; the responsibility of those who build systems with it |
 | Certifications and external audits (for example ISO/IEC 27001, SOC 2) | None |

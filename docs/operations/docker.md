@@ -104,7 +104,7 @@ The image therefore contains the command line interface, the REST service, PyTor
 | Push to `main` | `main`, `sha-<short commit>` |
 | Version tag `vMAJOR.MINOR.PATCH` | `MAJOR.MINOR.PATCH`, `MAJOR.MINOR`, `sha-<short commit>` |
 
-There is no `latest` tag. The workflow stores an SPDX software bill of materials of the pushed image as the workflow artifact `sbom-docker.spdx.json`, and [container-scan.yml](../../.github/workflows/container-scan.yml) scans the image with Grype. The image is not signed. The platform is `linux/amd64`.
+There is no `latest` tag. The workflow stores an SPDX software bill of materials of the pushed image as the workflow artifact `sbom-docker.spdx.json`, attests the build provenance and the SBOM of the pushed digest in the registry, and signs the digest with cosign in keyless mode; [container-scan.yml](../../.github/workflows/container-scan.yml) scans the image with Grype. Verify an image with `cosign verify` and `gh attestation verify` as described in [supply_chain_security.md](../security/supply_chain_security.md), Section 9.5. The platform is `linux/amd64`.
 
 Deployments SHOULD use a version tag or pin the image by digest (`ghcr.io/unbihexium-oss/unbihexium@sha256:...`); the `main` tag moves with every push to the main branch.
 

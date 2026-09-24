@@ -166,13 +166,14 @@ After the pull request is merged, the maintainer creates and pushes the annotate
 
 1. builds the source distribution and the wheel with `python -m build --no-isolation`, with the build frontend and the backend hatchling from the hashed tools lock;
 2. writes `SHA256SUMS.txt` for the distributions;
-3. creates GitHub artifact attestations of build provenance for every distribution;
-4. signs every distribution with Sigstore and attaches the `.sigstore.json` bundles;
-5. attaches the SLSA provenance of the attestation as `unbihexium-<tag>.intoto.jsonl`;
-6. creates the GitHub release with notes compiled from the merged pull requests, grouped by the categories in `.github/release.yml`;
-7. uploads the distributions to the Python Package Index.
+3. writes the SPDX SBOM `unbihexium-<tag>.spdx.json` of the wheel installed with the runtime lock, and attests it;
+4. creates GitHub artifact attestations of build provenance for every distribution;
+5. signs every distribution with Sigstore and attaches the `.sigstore.json` bundles;
+6. attaches the SLSA provenance of the attestation as `unbihexium-<tag>.intoto.jsonl`;
+7. creates the GitHub release with notes compiled from the merged pull requests, grouped by the categories in `.github/release.yml`;
+8. uploads the distributions to the Python Package Index with trusted publishing.
 
-The tag also starts `.github/workflows/docker.yml`, which pushes the container image with the tags `MAJOR.MINOR.PATCH` and `MAJOR.MINOR` and a commit tag, and records an SPDX software bill of materials of the pushed image. Releases v1.0.0 and v1.0.1 were published before signing and SLSA provenance assets were introduced and have neither. How to verify a signed release is described in [SECURITY.md](SECURITY.md); the attestations can be checked with `gh attestation verify <file> --repo unbihexium-oss/unbihexium`.
+The tag also starts `.github/workflows/docker.yml`, which pushes the container image with the tags `MAJOR.MINOR.PATCH` and `MAJOR.MINOR` and a commit tag, records an SPDX software bill of materials of the pushed image, attests its provenance and SBOM and signs it with cosign. Releases v1.0.0 and v1.0.1 were published before signing and SLSA provenance assets were introduced and have neither. How to verify a signed release is described in [SECURITY.md](SECURITY.md); the attestations can be checked with `gh attestation verify <file> --repo unbihexium-oss/unbihexium`.
 
 ### 9.3 Release cadence
 

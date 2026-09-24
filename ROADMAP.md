@@ -36,11 +36,10 @@ This document lists the work the Unbihexium project intends to do next, and why.
 - [2. Current state](#2-current-state)
 - [3. Release and supply chain](#3-release-and-supply-chain)
 - [4. Model zoo](#4-model-zoo)
-- [5. Examples and documentation](#5-examples-and-documentation)
-- [6. Project sustainability and governance](#6-project-sustainability-and-governance)
-- [7. Platform support](#7-platform-support)
-- [8. Quality assurance](#8-quality-assurance)
-- [9. Proposing changes to the roadmap](#9-proposing-changes-to-the-roadmap)
+- [5. Project sustainability and governance](#5-project-sustainability-and-governance)
+- [6. Platform support](#6-platform-support)
+- [7. Quality assurance](#7-quality-assurance)
+- [8. Proposing changes to the roadmap](#8-proposing-changes-to-the-roadmap)
 - [References](#references)
 
 ## 1. Scope and conventions
@@ -76,11 +75,11 @@ As of 2026-09-24:
 - Evidence: `.github/workflows/release.yml`; the assets of the existing GitHub releases.
 - Outcome: the next release carries `.sigstore.json` bundles, `SHA256SUMS.txt` and SLSA provenance, and the verification steps in [SECURITY.md](SECURITY.md) are checked against a real release.
 
-### 3.3 Trusted publishing to PyPI (under consideration)
+### 3.3 Trusted publisher registration on PyPI (planned)
 
-- Gap: the release workflow uploads to the Python Package Index with a long-lived API token (`secrets.PYPI_API_TOKEN`).
-- Evidence: the "Publish to PyPI" step of `.github/workflows/release.yml`.
-- Outcome: replace the token with PyPI trusted publishing through OpenID Connect [3], so that no upload credential is stored in the repository settings.
+- Gap: the release workflow uploads with PyPI trusted publishing [3] from the GitHub environment `pypi`, but the trusted publisher still has to be registered on PyPI, and the former `PYPI_API_TOKEN` repository secret still has to be deleted and its token revoked.
+- Evidence: the "Publish to PyPI" step and the `environment` of `.github/workflows/release.yml`; the publishing settings of the project on PyPI.
+- Outcome: the publisher is registered for `release.yml` and the environment `pypi` as described in [docs/operations/releasing.md](docs/operations/releasing.md), Section 2.1, before the next release, so that no upload credential is stored anywhere.
 
 ### 3.4 Security self-assessment (planned)
 
@@ -102,57 +101,43 @@ As of 2026-09-24:
 - Evidence: `docs/benchmarks/BENCHMARKS.md`; the tests in `tests/benchmarks/`.
 - Outcome: a scheduled job that runs the benchmark tests and publishes the results with the hardware and software versions, and accuracy figures for trained models only.
 
-## 5. Examples and documentation
+## 5. Project sustainability and governance
 
-### 5.1 Documentation examples executed in CI (under consideration)
-
-- Gap: the code examples and commands in the documentation were executed against the code when they were written, but no workflow runs them, so a later change of the library can make an example wrong without a failing check.
-- Evidence: the workflows under `.github/workflows/`, none of which extracts code blocks from Markdown files.
-- Outcome: a job that extracts the Python and shell blocks of the documentation and runs them against the current code.
-
-## 6. Project sustainability and governance
-
-### 6.1 A second maintainer (planned)
+### 5.1 A second maintainer (planned)
 
 - Gap: one person holds all maintainer roles, including releases and security response. Reviews, releases and the handling of vulnerability reports stop when that person is unavailable.
 - Evidence: [MAINTAINERS.md](MAINTAINERS.md); `core-team` in [security-insights.yml](security-insights.yml).
 - Outcome: at least one further maintainer with write access and a share of the security response, appointed under the rules in [GOVERNANCE.md](GOVERNANCE.md). Contributors interested in the role are invited to start with reviewed pull requests.
 
-### 6.2 Persistent identifiers for citation (under consideration)
+### 5.2 Persistent identifiers for citation (under consideration)
 
 - Gap: Unbihexium has no DOI, and the citation metadata record no ORCID identifier for the personal author.
 - Evidence: [CITATION.cff](CITATION.cff) and [codemeta.json](codemeta.json).
 - Outcome: archive each release in a repository that assigns DOIs, for example through the GitHub integration of Zenodo, and add the DOI and ORCID to the citation metadata and [CITATION.md](CITATION.md).
 
-## 7. Platform support
+## 6. Platform support
 
-### 7.1 Python 3.10 end of life (planned)
+### 6.1 Python 3.10 end of life (planned)
 
 - Gap: Python 3.10 reaches its upstream end of life in October 2026 [4].
 - Evidence: the Python version support policy in [VERSIONING.md](VERSIONING.md).
 - Outcome: under that policy, support for Python 3.10 is removed in the first minor release after its end of life, together with the Python 3.10 specific dependency bounds and lock entries.
 
-### 7.2 Python 3.15 (planned)
+### 6.2 Python 3.15 (planned)
 
 - Gap: Python 3.15 is scheduled for release in October 2026 [4] and is not yet tested.
 - Evidence: the CI test matrix and the classifiers in `pyproject.toml`.
 - Outcome: support for Python 3.15 once the runtime dependencies publish wheels for it, following the dependency policy in `pyproject.toml`.
 
-## 8. Quality assurance
+## 7. Quality assurance
 
-### 8.1 Coverage threshold (under consideration)
-
-- Gap: coverage is measured and reported, but no threshold fails a build: the Codecov statuses are informational and no `fail_under` setting exists.
-- Evidence: `codecov.yml`; the coverage configuration in `pyproject.toml`.
-- Outcome: an enforced minimum for project and patch coverage once the current coverage is known to be stable.
-
-### 8.2 Wider fuzzing (under consideration)
+### 7.1 Wider fuzzing (under consideration)
 
 - Gap: the atheris fuzz targets cover the GeoJSON and STAC parsers only; other parsers of untrusted input, such as the request handling of the REST service, are not fuzzed.
 - Evidence: `fuzz/fuzz_geojson.py`, `fuzz/fuzz_stac.py`.
 - Outcome: further fuzz targets for input parsed from files or network requests.
 
-## 9. Proposing changes to the roadmap
+## 8. Proposing changes to the roadmap
 
 Proposals are made in an issue opened with the feature request form at <https://github.com/unbihexium-oss/unbihexium/issues>. A proposal SHOULD state the gap, the evidence and the intended outcome in the form used above. The maintainer reviews this roadmap when a release is prepared and removes items once they are recorded in [CHANGELOG.md](CHANGELOG.md).
 
