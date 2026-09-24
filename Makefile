@@ -74,7 +74,7 @@ LOCK_FILES := requirements.txt requirements-dev.txt $(CI_REQ)/requirements-ci-te
 # Targets that do not create a file of the same name.
 .PHONY: help install install-dev lock lock-check test test-fast test-cov \
         lint format format-check type-check security licence text-policy \
-        yaml-lint md-lint doc-ids model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
+        yaml-lint md-lint doc-ids doc-examples model-zoo check pre-commit build check-dist docker-build docker-run docker-api \
         validate verify clean distclean
 
 ##@ Help
@@ -227,6 +227,10 @@ md-lint: ## Lint all Markdown files with markdownlint
 doc-ids: ## Check the document identifiers against docs/document_register.md
 # Compare every control table, the register and docs/toc.md.
 	$(PYTHON) .github/scripts/check_document_ids.py
+
+doc-examples: ## Run the code examples of the documentation (needs the installed package)
+# Run the Python and unbihexium shell blocks of every controlled document.
+	$(PYTHON) .github/scripts/run_doc_examples.py
 
 model-zoo: ## Check model zoo structure, checksums, cards and manifests
 # Check the model zoo against its catalogue and checksums.

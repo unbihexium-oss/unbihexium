@@ -105,9 +105,10 @@ Requests made by Unbihexium itself use the `requests` library with HTTPS certifi
 
 Models built or downloaded with `unbihexium zoo build`, `ensure_model` or `download_model` are stored under `$UNBIHEXIUM_CACHE/models/<model_id>/`, with `UNBIHEXIUM_CACHE` defaulting to `~/.cache/unbihexium`. Each model directory holds `model.pt`, optionally `model.onnx`, `config.json` and `model.sha256`. The cache contains model weights and metadata only, never user imagery. In the container image the cache is `/home/unbihexium/.cache/unbihexium`, declared as a volume.
 
-The cache can be inspected and removed with the CLI:
+The cache can be filled, inspected and removed with the CLI:
 
 ```bash
+unbihexium zoo build ship_detector_tiny
 unbihexium zoo where ship_detector_tiny
 unbihexium zoo clear ship_detector_tiny --yes
 unbihexium zoo clear --yes

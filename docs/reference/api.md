@@ -1163,6 +1163,14 @@ import numpy as np
 from unbihexium.ai import WaterDetector, predict, task_api, write_result
 from unbihexium.ai.inference import Predictor
 
+# A 4-band blue, green, red, NIR test scene of 128 by 128 pixels.
+from rasterio.transform import from_origin
+
+from unbihexium.io import write_geotiff
+
+scene = np.random.default_rng(1).uniform(0, 0.3, size=(4, 128, 128)).astype("float32")
+write_geotiff(scene, "scene.tif", crs="EPSG:32635", transform=from_origin(500000, 6700000, 10, 10))
+
 # One call: open the model, run the matching task API and return a result object.
 result = predict("water_surface_detector_tiny", "scene.tif")
 print(type(result).__name__, result.mask.shape, result.crs)

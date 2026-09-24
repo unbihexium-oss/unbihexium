@@ -125,7 +125,11 @@ A shared trained model SHOULD be accompanied by a model card written for it, bec
 | Unbihexium version or commit used | `unbihexium --version` and the Git commit |
 | Intended use and known limitations | See [RESPONSIBLE_USE.md](../../RESPONSIBLE_USE.md) |
 
-The training metadata stored in a checkpoint can be read without building the model:
+The training metadata stored in a checkpoint can be read without building the model. A checkpoint for the example, trained on synthetic data in place of the toy dataset of [training.md](training.md#51-command), is created with:
+
+```bash
+unbihexium train water_surface_detector_tiny --synthetic 16 --epochs 3 --chip-size 64
+```
 
 ```python
 from unbihexium.zoo.checkpoint import read_checkpoint
@@ -140,7 +144,7 @@ water_surface_detector_tiny False 7ed5fc4a9ed71ce4
 ['config', 'epoch', 'metrics'] 3 3
 ```
 
-The example reads the checkpoint trained in [training.md](training.md#51-command) on toy data; the digest of a trained model depends on the data, the options and the numerical environment, so another run can print a different value.
+The output shown was printed for the checkpoint trained in [training.md](training.md#51-command) on toy data; the digest of a trained model depends on the data, the options and the numerical environment, so another run can print a different value.
 
 ## 6. Provenance records
 

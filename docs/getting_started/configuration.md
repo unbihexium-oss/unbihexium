@@ -174,6 +174,7 @@ log_level WARNING
 
 A configuration file contains any subset of the sections; omitted keys keep their defaults. Save the following as `unbihexium.yaml`:
 
+<!-- doc-example: write unbihexium.yaml -->
 ```yaml
 model:
   variant: tiny

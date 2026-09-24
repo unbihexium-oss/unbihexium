@@ -281,7 +281,12 @@ unbihexium pipeline run ship_detection -i before.tif -o ships.geojson -p variant
 
 unbihexium pipeline run change_detection -i before.tif --input2 after.tif -o change.tif -p variant=tiny
 # Completed: dfd72665-5efc-4e98-b583-6c916853c603 -> change.tif
+```
 
+Invalid runs end with an error message and exit status 1:
+
+<!-- doc-example: skip (shows the error messages of invalid runs) -->
+```bash
 unbihexium pipeline run water_detection -i before.tif -o water.tif -p variant=tiny
 # Error: water_surface_detector_tiny expects 4 bands (blue, green, red, nir), got shape (3, 128, 128)
 

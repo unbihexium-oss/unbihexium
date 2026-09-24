@@ -118,6 +118,28 @@ All lower bounds of the dependencies were raised to releases that provide wheels
 
 ## 5. Python API
 
+The examples of this section stand for code that reads the user's own files. To run them as written, create the two synthetic scenes they use: `scene.tif`, the 6-band test scene of the [tutorials](tutorials/index.md) (blue, green, red, NIR, SWIR 1.6 um and SWIR 2.2 um with 20 m pixels in EPSG:32635), and `harbour.tif`, a 3-band red, green and blue scene.
+
+```python
+import numpy as np
+from rasterio.transform import from_origin
+
+from unbihexium.io import write_geotiff
+
+# Reflectance of water, vegetation and bare soil, in three strips of 30 columns.
+table = np.array([[0.06, 0.05, 0.03, 0.02, 0.01, 0.01],
+                  [0.03, 0.06, 0.04, 0.40, 0.20, 0.10],
+                  [0.12, 0.16, 0.20, 0.26, 0.32, 0.28]], dtype="float32")
+cover = np.repeat([0, 1, 2], 30)[None, :].repeat(60, axis=0)
+rng = np.random.default_rng(42)
+scene = table[cover].transpose(2, 0, 1) + rng.normal(0, 0.005, (6, 60, 90)).astype("float32")
+transform = from_origin(500000, 6700000, 20, 20)
+write_geotiff(np.clip(scene, 0.0, 1.0), "scene.tif", crs="EPSG:32635", transform=transform,
+              descriptions=["blue", "green", "red", "nir", "swir16", "swir22"])
+write_geotiff(rng.uniform(0, 0.3, (3, 256, 256)).astype("float32"), "harbour.tif",
+              crs="EPSG:32635", transform=transform)
+```
+
 ### 5.1 GeoTIFF input and output
 
 `read_geotiff` still returns `(data, metadata)` with the CRS as a string, but `metadata["transform"]` is now a tuple of six affine coefficients `(a, b, c, d, e, f)` instead of a rasterio `Affine`, and the metadata has additional keys (`bounds` as a plain tuple, `band_count`, `descriptions`, `overviews`, `compression`, `tiled`, `block_shape`, `is_cog`, `driver` and others). `write_geotiff` now takes the data first and the path second; the 1.0.x order `write_geotiff(path, data)` is still accepted. The default compression changed from LZW to DEFLATE and the output is tiled by default.
@@ -325,7 +347,7 @@ ship_detector_tiny/model.pt True ['ship_detector_tiny']
 1
 ```
 
-`harbour.tif` is any 3-band red, green, blue GeoTIFF. The detector is an untrained starter model, so finding no ships is the expected result; see Section 8.
+`harbour.tif` stands for any 3-band red, green, blue GeoTIFF. The detector is an untrained starter model, so finding no ships is the expected result; see Section 8.
 
 ### 5.9 Model zoo API
 

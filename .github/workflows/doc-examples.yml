@@ -1,0 +1,93 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# =============================================================================
+# Project     : Unbihexium
+# File        : .github/workflows/doc-examples.yml
+# Title       : Run the code examples of the documentation
+# Author      : Olaf Yunus Laitinen Imanov <yunus.z.imanov@helsinki.fi>
+# Affiliation : University of Helsinki
+# Copyright   : 2025-2026 Unbihexium OSS Foundation and contributors
+# Licence     : Mozilla Public License 2.0, see LICENSE.txt
+# Format      : GitHub Actions workflow (YAML)
+# =============================================================================
+#
+# Abstract
+# --------
+# Runs .github/scripts/run_doc_examples.py against the package installed
+# from the hashed test environment: the Python blocks of every controlled
+# Markdown document and its shell blocks that consist of `unbihexium`
+# commands, in order, one document per process in a temporary directory.
+# Blocks marked with <!-- doc-example: skip (reason) --> do not run. The
+# workflow starts when documentation, the package or the environment
+# changes, weekly on Thursday at 04:00 UTC and on demand, so that a change
+# of the library or of a dependency that breaks an example fails a check.
+# =============================================================================
+
+name: Documentation Examples  # Name shown in the Actions tab and in the status checks.
+
+on:  # Events that start the workflow.
+  push:  # Run on pushes to the listed branches.
+    branches: [main]  # Only the default branch.
+    paths:  # Only when an example or what it runs against changes.
+      - "**/*.md"  # Documents with examples.
+      - "src/**"  # The package.
+      - "pyproject.toml"  # Dependencies and settings.
+      - ".github/requirements/requirements-ci-test.txt"  # Test environment.
+      - ".github/requirements/requirements-ci-torch.txt"  # PyTorch build.
+      - ".github/scripts/run_doc_examples.py"  # The runner.
+      - ".github/workflows/doc-examples.yml"  # This workflow.
+  pull_request:  # Run on pull requests.
+    branches: [main]  # Only pull requests that target the default branch.
+    paths:  # Same path filter as for pushes.
+      - "**/*.md"  # Documents with examples.
+      - "src/**"  # The package.
+      - "pyproject.toml"  # Dependencies and settings.
+      - ".github/requirements/requirements-ci-test.txt"  # Test environment.
+      - ".github/requirements/requirements-ci-torch.txt"  # PyTorch build.
+      - ".github/scripts/run_doc_examples.py"  # The runner.
+      - ".github/workflows/doc-examples.yml"  # This workflow.
+  schedule:  # Weekly run to catch changes of dependencies.
+    - cron: "0 4 * * 4"  # Every Thursday at 04:00 UTC.
+  workflow_dispatch:  # Allow manual runs from the Actions tab.
+
+permissions:  # Least-privilege token for every job.
+  contents: read  # The job only needs to read the repository.
+
+concurrency:  # One run per workflow and ref at a time.
+  group: ${{ github.workflow }}-${{ github.ref }}  # Group by workflow and branch or pull request.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}  # Cancel superseded pull request runs; let main runs finish.
+
+jobs:  # Jobs of the workflow.
+  examples:  # Run the examples.
+    name: Documentation examples  # Name of the status check.
+    runs-on: ubuntu-latest  # GitHub-hosted Linux runner.
+    timeout-minutes: 60  # Cancel a hung job after one hour.
+    steps:  # Steps of the example job.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the commit under test.
+        with:  # Inputs of the checkout action.
+          persist-credentials: false  # Do not leave the token in .git/config.
+
+      - name: Set up Python  # Install the interpreter for the examples.
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
+        with:  # Inputs of the setup action.
+          python-version: "3.14"  # Newest supported CPython.
+
+      - name: Install dependencies  # Same hashed environment as the test jobs.
+        run: |  # Shell script run by bash.
+          # Install the locked, hashed CPU-only PyTorch build from the PyTorch index.
+          python -m pip install --require-hashes --no-deps -r .github/requirements/requirements-ci-torch.txt
+          # Install the locked, hashed test environment (runtime, test and backend extras).
+          python -m pip install --require-hashes -r .github/requirements/requirements-ci-test.txt
+          # Install the package itself in editable mode without resolving dependencies again.
+          python -m pip install --no-deps -e .
+
+      - name: Run the documentation examples  # Every controlled document with examples.
+        run: python .github/scripts/run_doc_examples.py  # Fails on the first failing block of any document.
+
+# =============================================================================
+# End of file .github/workflows/doc-examples.yml
+# Part of Unbihexium (https://github.com/unbihexium-oss/unbihexium).
+# Cite the project as described in CITATION.cff.
+# =============================================================================

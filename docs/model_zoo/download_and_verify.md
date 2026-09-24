@@ -171,6 +171,12 @@ For a model that is not cached the command exits with status 1 and suggests `unb
 
 `zoo export MODEL OUTPUT` exports a catalogue model or a checkpoint file to ONNX and, unless `--no-verify` is given, runs the export in ONNX Runtime and compares the result with PyTorch:
 
+The second command exports a trained checkpoint ([training.md](training.md)); for a quick check, a checkpoint trained briefly on synthetic data serves as well:
+
+```bash
+unbihexium train water_surface_detector_tiny --synthetic 16 --epochs 1 --chip-size 64
+```
+
 ```bash
 unbihexium zoo export ship_detector_tiny ship_detector_tiny.onnx
 unbihexium zoo export runs/water_surface_detector_tiny/best.pt water.onnx

@@ -182,6 +182,7 @@ In the trial, after the generator had run, the results were: `check_model_zoo.py
 
 A quick functional test SHOULD train the new family briefly on synthetic data, which exercises the loss, the metrics and the checkpoint code for its layout:
 
+<!-- doc-example: skip (needs the new family of the previous steps in the catalogue) -->
 ```bash
 unbihexium train snow_cover_mapper_tiny --synthetic 16 --epochs 1 --chip-size 64
 ```
@@ -231,7 +232,11 @@ A change to the architecture or initialisation code of an existing task changes 
 
 ## 6. Registering a model without changing the repository
 
-A user who wants a model of their own, for example a trained checkpoint, to be available under a model identifier can register it at run time with `unbihexium.zoo.register_model`. The registration lasts for the Python process:
+A user who wants a model of their own, for example a trained checkpoint, to be available under a model identifier can register it at run time with `unbihexium.zoo.register_model`. The registration lasts for the Python process. The example registers a checkpoint trained as in [training.md](training.md); a short run on synthetic data gives one:
+
+```bash
+unbihexium train water_surface_detector_tiny --synthetic 16 --epochs 1 --chip-size 64
+```
 
 ```python
 from unbihexium.zoo import (
