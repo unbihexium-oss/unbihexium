@@ -179,8 +179,6 @@ Thumbs.db
 
 # Documentation sources.
 docs/
-# Site built by MkDocs.
-site/
 # Markdown files, except those re-included below.
 *.md
 # README.md and NOTICE.md are package metadata (readme and licence file

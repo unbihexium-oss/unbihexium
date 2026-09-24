@@ -130,7 +130,7 @@ Other changes:
 - GitHub Actions dependencies were updated by Dependabot: `codecov/codecov-action` 4 to 5 (#12), `ossf/scorecard-action` 2.3.1 to 2.4.3 (#11), `slsa-framework/slsa-github-generator` 1.9.0 to 2.1.0 (#10), `actions/upload-pages-artifact` 3 to 4 (#9), `docker/build-push-action` 5 to 6 (#8), `actions/setup-python` 5 to 6 (#18), `softprops/action-gh-release` 1 to 2 (#17), `github/codeql-action` 3 to 4 (#16), `actions/checkout` 4 to 6 (#15) and `actions/attest-build-provenance` 1 to 3 (#14); the container base image moved from `python:3.12-slim` to `python:3.14-slim` (#13).
 - A model path lookup that searches the parent directories for `model_zoo` (#7) and Git LFS set-up instructions (direct commits on 2025-12-22) were added for the example material and the documentation. Both referred to the model files that were removed later in this cycle and were superseded by the removals in [2.3 Removed](#23-removed).
 - The documentation under `docs/` was rewritten to match the current code, in the same document layout as the root documents, with every code example and command executed against the current code.
-- The PyPI `Homepage` link and the `url` fields of `CITATION.cff` and `codemeta.json` point to the GitHub repository, because the project has no separate web site; the Helm chart and the Kubernetes manifest use the reserved placeholder host `unbihexium.example.com`.
+- The package metadata, `CITATION.cff`, `codemeta.json` and `security-insights.yml` no longer name a home page address; the repository and PyPI links remain. The Helm chart and the Kubernetes manifest use the reserved placeholder host `unbihexium.example.com`.
 
 ### 2.3 Removed
 

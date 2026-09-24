@@ -241,7 +241,6 @@ unbihexium = "unbihexium.cli.main:main"  # Entry point of the command line inter
 
 # Links shown in the sidebar of the PyPI page.
 [project.urls]
-Homepage = "https://github.com/unbihexium-oss/unbihexium"  # Project home page (the repository).
 Documentation = "https://github.com/unbihexium-oss/unbihexium/tree/main/docs"  # User and developer documentation.
 Repository = "https://github.com/unbihexium-oss/unbihexium"  # Source code.
 Issues = "https://github.com/unbihexium-oss/unbihexium/issues"  # Bug reports and feature requests.

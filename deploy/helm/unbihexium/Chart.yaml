@@ -35,7 +35,7 @@ keywords:  # Search terms for chart repositories.
   - earth-observation  # Satellite imagery.
   - remote-sensing  # Optical and SAR data.
   - onnx  # Inference backend of the image.
-home: https://github.com/unbihexium-oss/unbihexium  # Project home page.
+home: https://github.com/unbihexium-oss/unbihexium  # Source repository of the project.
 sources:  # Source code locations.
   - https://github.com/unbihexium-oss/unbihexium  # Main repository.
 maintainers:  # Contacts for the chart.

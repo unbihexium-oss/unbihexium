@@ -139,7 +139,7 @@ The project receives personal data only when people contact it:
 - **Contributions** record the author name and e-mail address in the Git history, which is public and permanent; the project also lists contributors in [AUTHORS.md](AUTHORS.md) and [CITATION.cff](CITATION.cff).
 - **Package downloads** from PyPI and the GitHub Container Registry are logged by those services; the project sees at most aggregate download statistics that they publish.
 
-The project does not run a website with analytics, a mailing list or any service that collects data from users of the software.
+The project does not operate analytics, a mailing list or any other service that collects data from users of the software.
 
 ## 8. Responsibilities of Deployers
 

@@ -10,7 +10,6 @@
   "softwareVersion": "1.0.1",
   "license": "https://spdx.org/licenses/MPL-2.0",
   "isAccessibleForFree": true,
-  "url": "https://github.com/unbihexium-oss/unbihexium",
   "codeRepository": "https://github.com/unbihexium-oss/unbihexium",
   "issueTracker": "https://github.com/unbihexium-oss/unbihexium/issues",
   "continuousIntegration": "https://github.com/unbihexium-oss/unbihexium/actions",
@@ -19,12 +18,12 @@
   "buildInstructions": "https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md",
   "softwareHelp": [
     {
-      "@type": "WebSite",
+      "@type": "CreativeWork",
       "name": "Documentation",
       "url": "https://github.com/unbihexium-oss/unbihexium/tree/main/docs"
     },
     {
-      "@type": "WebSite",
+      "@type": "CreativeWork",
       "name": "Support policy",
       "url": "https://github.com/unbihexium-oss/unbihexium/blob/main/SUPPORT.md"
     }

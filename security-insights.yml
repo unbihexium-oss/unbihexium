@@ -53,7 +53,6 @@ header:  # Metadata about this file.
 # -----------------------------------------------------------------------------
 project:  # The project as a whole.
   name: Unbihexium  # Project name.
-  homepage: https://github.com/unbihexium-oss/unbihexium  # Main web page of the project.
   funding: https://github.com/unbihexium-oss/unbihexium/blob/main/.github/FUNDING.yml  # How the project is funded.
   roadmap: https://github.com/unbihexium-oss/unbihexium/blob/main/ROADMAP.md  # Planned work.
   administrators:  # People with administrative rights on the project.
