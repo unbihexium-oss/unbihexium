@@ -159,10 +159,10 @@ metadata:  # Identity of the Ingress.
 spec:  # Routing rules.
   tls:  # TLS termination.
     - hosts:  # Host names covered by the certificate.
-        - api.unbihexium.org  # Public host name of the API.
+        - unbihexium.example.com  # Placeholder; replace with the public host name of your deployment.
       secretName: unbihexium-tls  # Secret that cert-manager fills with the certificate.
   rules:  # Routing rules.
-    - host: api.unbihexium.org  # Public host name of the API.
+    - host: unbihexium.example.com  # Placeholder; replace with the public host name of your deployment.
       http:  # HTTP routing.
         paths:  # URL paths.
           - path: /  # Every path.

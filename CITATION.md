@@ -68,7 +68,7 @@ The table lists every citation field recorded in [CITATION.cff](CITATION.cff) an
 | Licence | MPL-2.0 | <https://spdx.org/licenses/MPL-2.0> |
 | Repository | <https://github.com/unbihexium-oss/unbihexium> | `codeRepository`: same address |
 | Package | <https://pypi.org/project/unbihexium/> | `installUrl`: same address |
-| Project web site | <https://unbihexium.org> | `url`: same address |
+| Project home page | <https://github.com/unbihexium-oss/unbihexium> (the repository; the project has no separate web site) | `url`: same address |
 | Release identifier | <https://github.com/unbihexium-oss/unbihexium/releases/tag/v1.0.1> | Not recorded |
 | DOI | None | None |
 | ORCID of the personal author | None | None |

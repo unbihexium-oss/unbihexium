@@ -10,7 +10,7 @@
   "softwareVersion": "1.0.1",
   "license": "https://spdx.org/licenses/MPL-2.0",
   "isAccessibleForFree": true,
-  "url": "https://unbihexium.org",
+  "url": "https://github.com/unbihexium-oss/unbihexium",
   "codeRepository": "https://github.com/unbihexium-oss/unbihexium",
   "issueTracker": "https://github.com/unbihexium-oss/unbihexium/issues",
   "continuousIntegration": "https://github.com/unbihexium-oss/unbihexium/actions",

@@ -57,14 +57,14 @@ ingress:  # External HTTP access.
   annotations:  # Controller and certificate settings.
     cert-manager.io/cluster-issuer: letsencrypt-prod  # Obtain the TLS certificate from Let's Encrypt.
   hosts:  # Host names routed to the service.
-    - host: api.unbihexium.org  # Public host name of the API.
+    - host: unbihexium.example.com  # Placeholder; replace with the public host name of your deployment.
       paths:  # URL paths routed to the service.
         - path: /  # Every path.
           pathType: Prefix  # Match the path and everything below it.
   tls:  # TLS termination at the ingress.
     - secretName: unbihexium-tls  # Secret that cert-manager fills with the certificate.
       hosts:  # Host names covered by the certificate.
-        - api.unbihexium.org  # Public host name of the API.
+        - unbihexium.example.com  # Placeholder; replace with the public host name of your deployment.
 
 resources:  # Compute resources per pod.
   limits:  # Upper bounds enforced by the kubelet.
