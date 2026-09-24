@@ -364,7 +364,7 @@ The 520 models have 10,655,126,116 parameters in total.
 
 No weights are downloaded. The starter weights of each model are generated locally and deterministically from its model id, and their digest (SHA-256 over the sorted state dictionary) is compared with the published value in [src/unbihexium/zoo/digests.json](https://github.com/unbihexium-oss/unbihexium/blob/main/src/unbihexium/zoo/digests.json). The workflow `.github/workflows/model-zoo.yml` rebuilds the tiny variants on pull requests and all 520 models weekly to detect platform drift. Checkpoints contain plain data only and are loaded with `torch.load(weights_only=True)`, so loading a checkpoint cannot execute code.
 
-As stated in Section 2.2, only the 28 spectral index models produce meaningful output without training. The per-family model cards are indexed in [model_zoo/MODEL_CARDS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md), and one example notebook per family is in [examples/notebooks/](https://github.com/unbihexium-oss/unbihexium/tree/main/examples/notebooks).
+As stated in Section 2.2, only the 28 spectral index models produce meaningful output without training. The per-family model cards are indexed in [model_zoo/MODEL_CARDS.md](https://github.com/unbihexium-oss/unbihexium/blob/main/model_zoo/MODEL_CARDS.md).
 
 ## 8. REST service
 
@@ -405,7 +405,7 @@ Settings are layered, later layers winning: the built-in defaults, a YAML file (
 
 - **Locked dependencies.** `requirements.txt` (runtime with `onnx` and `serving`), `requirements-dev.txt` (all extras) and the CI lock files in `.github/requirements/` pin every package with SHA-256 hashes; CI installs with `--require-hashes`. The container image installs binary wheels only from `requirements.txt`, and its base image is pinned by digest.
 - **Deterministic models.** Starter weights are derived from the model id and verified by digest (Section 7.3). Training takes a `seed`, and the normalisation statistics estimated from the training data are stored with the checkpoint, so inference and ONNX exports apply exactly the same scaling.
-- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, notebook checks, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
+- **Continuous checks.** CI runs ruff, pyright and pytest on CPython 3.10 to 3.14; further workflows run integration and end-to-end tests, a REST smoke test, packaging checks with `twine check --strict`, model zoo consistency and reproducibility, markdownlint, link checks, and the project text policy.
 
 ### 10.2 Release integrity
 
@@ -444,7 +444,7 @@ unbihexium/
   tests/                 unit, integration, end-to-end and benchmark tests
   model_zoo/             model cards, manifests, inventory and checksums
   docs/                  user, architecture, model zoo, security and operations documentation
-  examples/              notebooks (one per model family), scripts and a serving example
+  examples/              example scripts and a serving example
   fuzz/                  atheris fuzz targets and seed corpora
   deploy/                Helm chart and Kubernetes manifests
   scripts/               lock merging, model validation and shell completion
@@ -467,7 +467,7 @@ unbihexium/
 | Model zoo: catalogue, training, inference, distribution | [docs/model_zoo/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/model_zoo) |
 | Security | [docs/security/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/security) |
 | Operations: CI/CD, Docker, releasing | [docs/operations/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/operations) |
-| Tutorials and notebooks | [docs/tutorials/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/tutorials) |
+| Tutorials | [docs/tutorials/](https://github.com/unbihexium-oss/unbihexium/tree/main/docs/tutorials) |
 | Frequently asked questions, glossary | [docs/faq.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/faq.md), [docs/glossary.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/glossary.md) |
 | Migration between versions | [docs/MIGRATION.md](https://github.com/unbihexium-oss/unbihexium/blob/main/docs/MIGRATION.md) |
 
@@ -478,7 +478,7 @@ Project policies are kept in the repository root: [GOVERNANCE.md](https://github
 Contributions are welcome. [CONTRIBUTING.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CONTRIBUTING.md) describes the development setup, the coding and documentation standards, the tests and checks expected before review, and the pull request process; participants follow the [CODE_OF_CONDUCT.md](https://github.com/unbihexium-oss/unbihexium/blob/main/CODE_OF_CONDUCT.md). Pull request titles follow Conventional Commits, and the local checks mirror CI:
 
 ```bash
-make check        # lint, format, types, tests, licences, text policy, YAML, notebooks, model zoo
+make check        # lint, format, types, tests, licences, text policy, YAML, model zoo
 pre-commit run --all-files
 ```
 

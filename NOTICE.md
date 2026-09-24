@@ -62,7 +62,7 @@ License, v. 2.0. If a copy of the MPL was not distributed with this
 file, You can obtain one at https://mozilla.org/MPL/2.0/.
 ```
 
-Files that cannot carry a comment, such as JSON files, notebooks and NumPy arrays, are covered by the annotation in `REUSE.toml`, which applies the same copyright and licence to every file in the repository in the manner defined by the REUSE specification [3].
+Files that cannot carry a comment, such as JSON files and NumPy arrays, are covered by the annotation in `REUSE.toml`, which applies the same copyright and licence to every file in the repository in the manner defined by the REUSE specification [3].
 
 ### 1.3 What the licence means in practice
 

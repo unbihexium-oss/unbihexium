@@ -82,7 +82,7 @@ Vulnerabilities MUST NOT be reported in public issues, pull requests or discussi
 
 ### 2.3 Kinds of contribution
 
-Contributions of every kind are welcome: bug fixes, new processing functions, tests, fuzz targets and corpus entries, documentation, example notebooks and scripts, model zoo metadata, packaging and CI improvements. Issues labelled `good first issue` or `help wanted` are suitable starting points.
+Contributions of every kind are welcome: bug fixes, new processing functions, tests, fuzz targets and corpus entries, documentation, example scripts, model zoo metadata, packaging and CI improvements. Issues labelled `good first issue` or `help wanted` are suitable starting points.
 
 ## 3. Development environment
 
@@ -135,9 +135,8 @@ make install-dev
 | `make licence` | REUSE lint and `.github/scripts/check_license_headers.py` |
 | `make text-policy` | `.github/scripts/check_text_policy.py` |
 | `make md-lint` | markdownlint with `.markdownlint.yaml` |
-| `make notebooks` | Notebook format and absence of outputs |
 | `make model-zoo` | `.github/scripts/check_model_zoo.py` |
-| `make check` | Lint, format check, type check, tests, licence, text policy, YAML lint, notebooks and model zoo |
+| `make check` | Lint, format check, type check, tests, licence, text policy, YAML lint and model zoo |
 | `make pre-commit` | Every pre-commit hook on all files |
 | `make check-dist` | Builds the sdist and wheel and runs `twine check --strict` |
 
@@ -244,7 +243,7 @@ Without arguments the script checks every tracked Python file under `STYLE_ROOTS
 
 Same-line comments are accepted only in formats whose parsers strip them: YAML, TOML, shell, pip requirements and `model_zoo/checksums.txt`. In the other formats (INI, Dockerfile, Makefile and the Git, Docker and editor files) a trailing `#` would become part of the value, so the comment MUST stand on the line above. Continuation lines after a trailing backslash, lines with only closing brackets, the contents of YAML block scalars and TOML multi-line strings (except shell scripts under a `run` key in workflows), and INI value continuations are covered by the comment of the line that opens them.
 
-JSON files, NumPy arrays, the empty `py.typed` marker, Markdown and notebooks (which have their own rules), the fuzz corpus in `fuzz/corpus/` and the verbatim licence and notice texts (`LICENSE.txt`, `LICENSES/`, `NOTICE`) are not checked.
+JSON files, NumPy arrays, the empty `py.typed` marker, Markdown (which has its own rules), the fuzz corpus in `fuzz/corpus/` and the verbatim licence and notice texts (`LICENSE.txt`, `LICENSES/`, `NOTICE`) are not checked.
 
 A minimal conforming YAML file, stored as `examples/settings.yml`:
 
@@ -283,11 +282,10 @@ tiling:  # Settings of the tiler.
 
 YAML files are additionally linted with yamllint (`.yamllint.yml`), and workflows with actionlint and shellcheck (Workflow Lint workflow).
 
-### 5.4 Markdown and notebooks
+### 5.4 Markdown
 
 - Markdown MUST pass markdownlint with `.markdownlint.yaml` (`make md-lint`; Markdown workflow). The root documents follow a common layout: an HTML comment with the licence notice and header block, one H1 heading, a document control table, an abstract, a contents list, numbered sections, references and a closing HTML comment.
 - Relative links MUST point to files that exist. The Links workflow checks links on a schedule with lychee (`.github/lychee.toml`).
-- Example notebooks in `examples/notebooks/` MUST be valid notebooks and MUST NOT contain outputs (`make notebooks`; Notebooks workflow).
 
 ### 5.5 Text policy
 
@@ -469,7 +467,6 @@ The following workflows run on pull requests that target `main`. A pull request 
 | Text Policy | Text policy of the files, Python and configuration file documentation style, and commit messages |
 | PR Title | Conventional Commits format of the title |
 | Markdown | markdownlint (when Markdown files change) |
-| Notebooks | Notebook format and absence of outputs (when notebooks change) |
 | Model Zoo | Consistency of the model zoo (when it changes) |
 | Fuzzing | atheris fuzz targets (when the parsers or targets change) |
 | License Compliance | MPL-2.0 notices, REUSE and the licences of the dependencies |
