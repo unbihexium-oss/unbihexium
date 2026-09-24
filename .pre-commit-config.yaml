@@ -179,6 +179,12 @@ repos:  # Hook repositories, each pinned to a released version.
         language: system  # Use the Python already on the PATH.
         pass_filenames: false  # The script lists the tracked files itself.
         exclude_types: [python, markdown, json]  # Formats with their own rules or without comments.
+      - id: document-ids  # Numbered identifiers of the controlled documents.
+        name: document identifiers (register and table of contents)  # Name shown in the hook output.
+        entry: python .github/scripts/check_document_ids.py  # Command that runs the check.
+        language: system  # Use the Python already on the PATH.
+        pass_filenames: false  # The script lists the tracked files itself.
+        types: [markdown]  # Run when a Markdown file is staged.
 
 # Settings for the pre-commit.ci service, if it is enabled for the repository.
 ci:
