@@ -18,8 +18,7 @@
 # Read by the lychee link checker in .github/workflows/links.yml, which scans
 # the documentation for broken links. The settings keep the run polite to
 # remote servers, treat rate limiting and bot protection as reachable, and
-# skip local addresses, example domains and the placeholder Zenodo DOI,
-# which are not meant to resolve.
+# skip local addresses and example domains, which are not meant to resolve.
 # =============================================================================
 
 max_concurrency = 16  # Limit parallel requests to stay under rate limits.
@@ -36,7 +35,6 @@ exclude = [
     "^https?://127\\.0\\.0\\.1",  # Loopback address.
     "^https?://0\\.0\\.0\\.0",  # Bind-all address in service examples.
     "^https?://example\\.(com|org)",  # Reserved example domains.
-    "^https?://(www\\.)?doi\\.org/10\\.5281/zenodo\\.0000000",  # Placeholder DOI until the archive exists.
 ]
 
 # =============================================================================
