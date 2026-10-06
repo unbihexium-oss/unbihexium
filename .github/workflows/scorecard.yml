@@ -52,7 +52,7 @@ jobs:  # Jobs of the workflow.
           persist-credentials: false  # Do not leave the token in .git/config.
 
       - name: Run Scorecard  # Evaluate the repository.
-        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a  # v2.4.3; Official Scorecard action.
+        uses: ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc  # v2.4.3; Official Scorecard action.
         with:  # Inputs of the Scorecard action.
           results_file: results.sarif  # Where the report is written.
           results_format: sarif  # Format understood by code scanning.
