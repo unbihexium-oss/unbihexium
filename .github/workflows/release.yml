@@ -71,7 +71,7 @@ jobs:  # Jobs of the workflow.
       id-token: write  # OIDC token for trusted publishing, Sigstore signing and the attestations.
       attestations: write  # Store the build provenance and SBOM attestations.
     steps:  # Steps of the release job.
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803  # v6.1.0; Check out the tagged commit.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v6.1.0; Check out the tagged commit.
 
       - name: Set up Python  # Install the interpreter for the build.
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0; Official Python setup action.
